@@ -16,7 +16,7 @@
 [![forks](https://img.shields.io/github/forks/gameticharles/advance_math)](https://github.com/gameticharles/advance_math/network/members)
 [![CI](https://img.shields.io/github/workflow/status/gameticharles/advance_math/Dart%20CI/master?logo=github-actions&logoColor=white)](https://github.com/gameticharles/matrix/actions)
 
-MathLab is a comprehensive Dart library that enriches mathematical programming in Dart with a wide range of features beyond vectors and matrices. Offering functionality for complex numbers, advanced linear algebra, statistics, geometry, and more, MathLab opens up new possibilities for mathematical computation and data analysis. Whether you're developing a cutting-edge machine learning application, or simply need to perform calculations with complex numbers, MathLab provides the tools you need in a well-organized and easy-to-use package.
+Advance math is a comprehensive Dart library that enriches mathematical programming in Dart with a wide range of features beyond vectors and matrices. Offering functionality for complex numbers, advanced linear algebra, statistics, geometry, and more. The library opens up new possibilities for mathematical computation and data analysis. Whether you're developing a cutting-edge machine learning application, or simply need to perform calculations with complex numbers. It also provides the tools you need in a well-organized and easy-to-use package.
 
 ## Features
 
