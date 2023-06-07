@@ -1,4 +1,4 @@
-# Matrix Library for Dart
+# Advance Math Library for Dart
 
 [![pub package](https://img.shields.io/pub/v/advance_math.svg?logo=dart&logoColor=00b9fc)](https://pub.dartlang.org/packages/advance_math)
 [![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
@@ -47,6 +47,9 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
 ```dart
 import 'package:advance_math/advance_math.dart';
 ```
+
+<details>
+<summary>MATRIX</summary>
 
 ## Create a Matrix
 
@@ -1044,44 +1047,150 @@ print(doubled);
 // ┌ 2 4 ┐
 // └ 6 8 ┘
 ```
+</details>
 
-## Vectors, Complex Numbers, and ComplexVectors
+<details>
+<summary>VECTOR</summary>
 
-This library provides efficient and easy-to-use classes for representing and manipulating vectors, complex numbers, and complex vectors in Dart. This document serves as an introduction to these classes, featuring a variety of examples to demonstrate their usage.
+The Vector library provides a powerful and flexible Vector class for numerical computations in Dart. This Vector class is very useful for performing operations in a wide variety of fields including data analysis, linear algebra, numerical computations, and machine learning.
 
-### Vectors
+This library supports operations like addition, subtraction, scalar multiplication, and division. It also supports vector-specific operations like dot and cross product.
 
-Vectors are a fundamental concept in mathematics and physics. They represent quantities that have both magnitude and direction.
+Here's a quick summary of the class and its main methods.
 
-This library allows you to create vectors, access and modify their elements, and perform vector operations such as addition, subtraction, and dot product.
+## Constructors
+
+* `Vector(int length, {bool isDouble = true})`: Creates a [Vector] of given length with all elements initialized to 0.
+* `Vector.fromList(List<num> data)`: Constructs a [Vector] from a list of numerical values.
+* `Vector.random(int length,{double min = 0, double max = 1, bool isDouble = true, math.Random? random, int? seed})`: Constructs a [Vector] from a list of random numerical values.
+* `Vector.linspace(int start, int end, [int number = 50])`: Creates a row Vector with equally spaced values between the start and end values (inclusive).
+* `Vector.range(int end, {int start = 1, int step = 1}) & Vector.arrange(int end, {int start = 1, int step = 1})`: Creates a Vector with values in the specified range, incremented by the specified step size.
 
 ```dart
-// Creating a new vector
-Vector v = Vector(3);
-print(v);  // Output: [0, 0, 0]
+// Create a vector of length 3 with all elements initialized to 0
+var v1 = Vector(3);
 
-// Setting and getting elements
-v[0] = 1;
-v[1] = 2;
-v[2] = 3;
-print(v[0]);  // Output: 1
+// Create a vector from a list of values
+var v2 = Vector([1, 2, 3]);
+v2 = Vector.fromList([1, 2, 3]);
+
+// Create a vector with random values between 0 and 1
+var v3 = Vector.random(3);
+
+// Create a vector with 50 values equally spaced between 0 and 1
+var v4 = Vector.linspace(0, 1);
+
+// Create a vector with values 1, 3, 5, 7, 9
+var v5 = Vector.range(10, start: 1, step: 2);
+```
+
+## Operators
+
+* `operator [](int index)`: Fetches the value at the given index of the vector.
+* `operator []=(int index, num value)`: Sets the value at the given index of the vector.
+* `operator +(Vector other)`: Adds two vectors.
+* `operator -(Vector other)`: Subtracts two vectors.
+* `operator *(double scalar)`: Multiplies a vector by a scalar.
+* `operator /(double scalar)`: Divides a vector by a scalar.
+
+```dart
+// Get the value at index 2 of v2
+var val = v2[2];
+
+// Set the value at index 1 of v1 to 7
+v1[1] = 7;
+
+// Add v1 and v2
+var v6 = v1 + v2;
+
+// Subtract v2 from v1
+var v7 = v1 - v2;
+
+// Multiply v1 by a scalar
+var v8 = v1 * 3.5;
+
+// Divide v2 by a scalar
+var v9 = v2 / 2;
+```
+
+## Vector Operations
+
+* `double dot(Vector other)`: Calculates the dot product of the vector with another vector.
+* `Vector cross(Vector other)`: Calculates the cross product of the vector with another vector.
+
+```dart
+// Calculate the dot product of v1 and v2
+var dotProduct = v1.dot(v2);
+
+// Calculate the cross product of two 3D vectors
+var crossProduct = Vector.fromList([1, 2, 3]).cross(Vector.fromList([4, 5, 6]));
+```
+
+## Vector Metrics
+* `double get magnitude`: Returns the magnitude (or norm) of the vector.
+* `double get direction`: Returns the direction (or angle) of the vector, in radians.
+* `double norm()`: Returns the norm (or length) of this vector.
+* `Vector normalize()`: Returns this vector normalized.
+* `bool isZero()`: Returns true if this is a zero vector, i.e., all its elements are zero.
+* `bool isUnit()`: Returns true if this is a unit vector, i.e., its norm is 1.
+
+```dart
+// Get the magnitude of v1
+var magnitude = v1.magnitude;
+
+// Get the direction of v1
+var direction = v1.direction;
+
+// Get the norm of v1
+var norm = v1.norm();
+
+// Normalize v1
+var normalizedV1 = v1.normalize();
+```
+
+Others metrics include:
+* `List<num> toList()`: Converts the vector to a list of numerical values.
+* `int get length`: Returns the length (number of elements) of the vector.
+* `void setAll(num value)`: Sets all elements of this vector to [value].
+* `double distance(Vector other)`: Returns the Euclidean distance between this vector and [other].
+* `Vector projection(Vector other)`: Returns the projection of this vector onto [other].
+* `double angle(Vector other)`: Returns the angle (in radians) between this vector and [other].
+* `List<double> toSpherical()`: Converts the Vector from Cartesian to Spherical coordinates.
+* `void fromSpherical(List<num> sphericalCoordinates)`: Converts the Vector from Spherical to Cartesian coordinates.
+
+```dart
+Vector v = Vector([1, 2, 3]);
 print(v);  // Output: [1, 2, 3]
 
-// Performing vector operations
-Vector u = Vector.fromList([4, 5, 6]);
-Vector sum = v + u;
-Vector diff = v - u;
-double dotProduct = v.dot(u);
-print(sum);  // Output: [5, 7, 9]
-print(diff);  // Output: [-3, -3, -3]
-print(dotProduct);  // Output: 32
+// Convert v1 to a list
+var list = v1.toList();
 
-// Norm and normalization
-double norm = v.norm();
-Vector normalized = v.normalize();
-print(norm);  // Output: 3.7416573867739413
-print(normalized);  // Output: [0.2672612419124244, 0.5345224838248488, 0.8017837257372732]
+// Get the length of v1
+var length = v1.length;
 
+// Set all elements of v1 to 5
+v1.setAll(5);
+
+// Calculate the Euclidean distance between v1 and v2
+var distance = v1.distance(v2);
+
+// Calculate the projection of v1 onto v2
+var projection = v1.projection(v2);
+
+// Calculate the angle between v1 and v2
+var angle = v1.angle(v2);
+
+// Convert v1 to spherical coordinates
+var spherical = v1.toSpherical();
+
+// Create a vector from spherical coordinates
+var v10 = Vector(3);
+v10.fromSpherical(spherical);
+```
+
+## Vector Subset
+
+```dart
 // Extraction
 var u1 = Vector.fromList([5, 0, 2, 4]);
 var v1 = u1.getVector(['x', 'x', 'y']);
@@ -1098,6 +1207,16 @@ var subVector = v.subVector(indices: [0, 2, 4, 1, 1]);
 print(subVector);  // Output: [1.0, 3.0, 5.0, 2.0, 2.0]
 print(subVector.runtimeType); // Vector
 ```
+</details>
+
+</details>
+
+<details>
+<summary>COMPLEX NUMBERS & COMPLEX VECTORS</summary>
+
+## Complex Numbers and ComplexVectors
+
+This library provides efficient and easy-to-use classes for representing and manipulating vectors, complex numbers, and complex vectors in Dart. This document serves as an introduction to these classes, featuring a variety of examples to demonstrate their usage.
 
 ### Complex Numbers
 
@@ -1151,6 +1270,8 @@ print(normalized);  // Output: [(0.18257418583505536 + 0.3651483716701107i), (0.
 ```
 
 The above sections provide a basic introduction to vectors, complex numbers, and complex vectors. The full API of these classes offers even more possibilities, including conversions to other forms of vectors, multiplication by scalars, and more. These classes aim to make mathematical programming in Dart efficient, flexible, and enjoyable.
+
+</details>
 
 ## Testing
 

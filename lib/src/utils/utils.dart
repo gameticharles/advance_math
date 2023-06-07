@@ -5,7 +5,7 @@ Performance Optimizations:
 
 */
 
-import '../math/matrix/matrix.dart';
+import '../math/algebra/matrix/matrix.dart';
 import '/src/math/basic/math.dart' as math;
 
 class Utils {

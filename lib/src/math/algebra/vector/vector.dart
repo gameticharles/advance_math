@@ -2,8 +2,8 @@ library vector;
 
 import 'dart:collection';
 
-import '../../utils/utils.dart';
-import '../complex.dart';
+import '../../../utils/utils.dart';
+import '../../complex.dart';
 import '../matrix/matrix.dart';
 import '/src/math/basic/math.dart' as math;
 
