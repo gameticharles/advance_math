@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 /// A custom iterator for traversing the elements of a [Matrix] in row-major or column-major order.
 ///

@@ -1,4 +1,4 @@
-part of vector;
+part of algebra;
 
 //extends ListBase<num>
 class Vector extends IterableMixin<num> {
@@ -579,7 +579,7 @@ class Vector extends IterableMixin<num> {
         (start != null && end != null
             ? List.generate(end - start + 1, (i) => start + i)
             : (range.isNotEmpty
-                ? Utils.parseRange(range, length)
+                ? _Utils.parseRange(range, length)
                 : (start != null
                     ? List.generate(length - start, (i) => start + i)
                     : (end != null

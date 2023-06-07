@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 extension NumOperationExtension on num {
   dynamic operator +(dynamic other) {
@@ -367,7 +367,7 @@ extension MatrixOperationExtension on Matrix {
     switch (rescaleBy) {
       case Rescale.row:
         for (int i = 0; i < rowCount; i++) {
-          var row = Utils.toSDList(_data[i]);
+          var row = _Utils.toSDList(_data[i]);
           var maxElement = row.reduce(math.max);
           var minElement = row.reduce(math.min);
 
@@ -380,7 +380,7 @@ extension MatrixOperationExtension on Matrix {
         return rescaledMatrix;
       case Rescale.column:
         for (int j = 0; j < columnCount; j++) {
-          var col = Utils.toSDList(column(j).asList);
+          var col = _Utils.toSDList(column(j).asList);
           var maxElement = col.reduce(math.max);
           var minElement = col.reduce(math.min);
 
@@ -792,7 +792,7 @@ extension MatrixOperationExtension on Matrix {
   num _spectralNorm() {
     var singularValues = decomposition.singularValueDecomposition();
 
-    return Utils.toSDList(singularValues.S.diagonal()).reduce(math.max);
+    return _Utils.toSDList(singularValues.S.diagonal()).reduce(math.max);
   }
 
   /// Computes the trace norm (also known as nuclear norm) of the matrix,
@@ -1034,7 +1034,7 @@ extension MatrixOperationExtension on Matrix {
     if (n != columnCount) {
       throw Exception('Matrix must be square to calculate determinant');
     }
-    _data = Utils.toDoubleList(_data);
+    _data = _Utils.toDoubleList(_data);
 
     if (n == 1) {
       return this[0][0];
@@ -1545,7 +1545,7 @@ extension MatrixOperationExtension on Matrix {
     }
 
     int n = rowCount;
-    Matrix A = Utils.toDoubleMatrix(this);
+    Matrix A = _Utils.toDoubleMatrix(this);
     Matrix V = Matrix.eye(n, isDouble: true);
     Matrix aPrev;
 
@@ -1577,7 +1577,7 @@ extension MatrixOperationExtension on Matrix {
   // Performs a plane rotation (Givens rotation) on the matrix.
   Matrix rotate(int p, int q, double c, double s) {
     int n = rowCount;
-    Matrix result = Utils.toDoubleMatrix(this);
+    Matrix result = _Utils.toDoubleMatrix(this);
 
     for (int i = 0; i < n; i++) {
       double api = c * this[i][p] - s * this[i][q];
@@ -1668,7 +1668,7 @@ extension MatrixOperationExtension on Matrix {
       // Compute Householder reflection for the k-th column of B
       var columnVector = B.slice(k, m, k, k + 1);
 
-      Matrix pk = Utils.householderReflection(columnVector);
+      Matrix pk = _Utils.householderReflection(columnVector);
       Matrix P = Matrix.eye(m);
       P.setSubMatrix(k, k, pk);
 
@@ -1680,7 +1680,7 @@ extension MatrixOperationExtension on Matrix {
         // Compute Householder reflection for the k-th row of B
         var rowVector = Column(B.slice(k, k + 1, k, n).flatten());
 
-        Matrix qk = Utils.householderReflection(rowVector);
+        Matrix qk = _Utils.householderReflection(rowVector);
         Matrix Q = Matrix.eye(n);
 
         Q.setSubMatrix(k, k, qk);

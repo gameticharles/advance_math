@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 class Matrix2 extends Matrix {
   final num a1;

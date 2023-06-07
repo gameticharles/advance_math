@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 /// Enumeration for available decomposition methods in the `solve` function.
 enum DecompositionMethod {

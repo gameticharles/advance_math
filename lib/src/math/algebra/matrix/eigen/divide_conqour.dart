@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 class DivideAndConquer {
   // Helper function: Tridiagonalization
@@ -27,7 +27,7 @@ class DivideAndConquer {
 
   // Helper function: Solve eigenvalue problems for smaller matrices
   Eigen solveSmallEigenProblem(Matrix T) {
-    T = Utils.toDoubleMatrix(T);
+    T = _Utils.toDoubleMatrix(T);
     int n = T.rowCount;
     if (n == 1) {
       // For 1x1 matrices, the eigenvalue is the only element
@@ -91,7 +91,7 @@ class DivideAndConquer {
 
   // The main function for the Divide-and-Conquer algorithm.
   Eigen divideAndConquer(Matrix A) {
-    A = Utils.toDoubleMatrix(A);
+    A = _Utils.toDoubleMatrix(A);
     // Step 1: Tridiagonalization
     Matrix T = tridiagonalize(A);
     Matrix P =

@@ -1,6 +1,6 @@
 part of maths;
 
-/// Returns the sine of a number.
+/// Returns the sine of a number in radians.
 ///
 /// Example:
 /// ```dart
@@ -8,7 +8,7 @@ part of maths;
 /// ```
 double sin(num x) => math.sin(x);
 
-/// Returns the cosine of a number.
+/// Returns the cosine of a number in radians.
 ///
 /// Example:
 /// ```dart
@@ -16,7 +16,7 @@ double sin(num x) => math.sin(x);
 /// ```
 double cos(num x) => math.cos(x);
 
-/// Returns the tangent of a number.
+/// Returns the tangent of a number in radians.
 ///
 /// Example:
 /// ```dart
@@ -24,7 +24,7 @@ double cos(num x) => math.cos(x);
 /// ```
 double tan(num x) => math.tan(x);
 
-/// Returns the secant of a number.
+/// Returns the secant of a number in radians.
 ///
 /// Example:
 /// ```dart
@@ -34,7 +34,7 @@ double sec(num x) {
   return 1 / cos(x);
 }
 
-/// Returns the cosecant of a number.
+/// Returns the cosecant of a number in radians.
 ///
 /// Example:
 /// ```dart
@@ -44,7 +44,7 @@ double csc(num x) {
   return 1 / sin(x);
 }
 
-/// Returns the cotangent of a number.
+/// Returns the cotangent of a number in radians.
 ///
 /// Example:
 /// ```dart
@@ -54,7 +54,7 @@ double cot(num x) {
   return 1 / tan(x);
 }
 
-/// Returns the arcsine of a number.
+/// Returns the arcsine of a number in radians.
 ///
 /// Example:
 /// ```dart
@@ -62,7 +62,7 @@ double cot(num x) {
 /// ```
 double asin(num x) => math.asin(x);
 
-/// Returns the arccosine of a number.
+/// Returns the arccosine of a number in radians.
 ///
 /// Example:
 /// ```dart
@@ -104,7 +104,7 @@ double atan2(num a, num b) => math.atan2(a, b);
 /// ```dart
 /// print(asec(2)); // prints: 1.0471975511965979
 /// ```
-double asec(double x) {
+double asec(num x) {
   if (x.abs() < 1) {
     throw ArgumentError(
         'Invalid input for asec: absolute value of input must be >= 1');
@@ -118,7 +118,7 @@ double asec(double x) {
 /// ```dart
 /// print(acsc(2)); // prints: 0.5235987755982989
 /// ```
-double acsc(double x) {
+double acsc(num x) {
   if (x.abs() < 1) {
     throw ArgumentError(
         'Invalid input for acsc: absolute value of input must be >= 1');
@@ -132,7 +132,7 @@ double acsc(double x) {
 /// ```dart
 /// print(acot(1)); // prints: 0.7853981633974483
 /// ```
-double acot(double x) {
+double acot(num x) {
   return pi / 2 - math.atan(x);
 }
 
@@ -234,7 +234,7 @@ double atanh(num x) {
 /// ```dart
 /// print(asech(0.5)); // prints: 1.3169578969248166
 /// ```
-double asech(double x) {
+double asech(num x) {
   if (x <= 0 || x > 1) {
     throw ArgumentError('Invalid input for asech: input must be in (0, 1]');
   }
@@ -247,7 +247,7 @@ double asech(double x) {
 /// ```dart
 /// print(acsch(1)); // prints: 0.881373587019543
 /// ```
-double acsch(double x) {
+double acsch(num x) {
   return math.log(1 / x + math.sqrt(1 / (x * x) + 1));
 }
 
@@ -257,7 +257,7 @@ double acsch(double x) {
 /// ```dart
 /// print(acoth(2)); // prints: 0.5493061443340549
 /// ```
-double acoth(double x) {
+double acoth(num x) {
   if (x.abs() <= 1) {
     throw ArgumentError(
         'Invalid input for acoth: absolute value of input must be > 1');
@@ -267,7 +267,7 @@ double acoth(double x) {
 
 /// Versine function
 ///
-/// The versine or versin or versed sine of an angle is 1 − cos(θ).
+/// The versine or versine or versed sine of an angle is 1 − cos(θ).
 /// It's rarely used in modern mathematics but can be found in various historical contexts.
 ///
 /// Example:
@@ -278,7 +278,7 @@ double acoth(double x) {
 /// ```
 ///
 /// The output is `1.0` because the versine of π/2 (or 90 degrees) is 1.
-double vers(double x) {
+double vers(num x) {
   return 1 - math.cos(x);
 }
 
@@ -295,7 +295,7 @@ double vers(double x) {
 /// ```
 ///
 /// The output is `0.0` because the coversine of π/2 (or 90 degrees) is 0.
-double covers(double x) {
+double covers(num x) {
   return 1 - math.sin(x);
 }
 
@@ -312,7 +312,7 @@ double covers(double x) {
 /// ```
 ///
 /// The output is `0.0` because the haversine of π/2 (or 90 degrees) is 0.
-double havers(double x) {
+double havers(num x) {
   return 0.5 * (1 - cos(x));
 }
 
@@ -327,7 +327,7 @@ double havers(double x) {
 /// ```
 ///
 /// The output is `Infinity` because the exsecant of π/2 (or 90 degrees) is infinity (as sec(π/2) is infinity).
-double exsec(double x) {
+double exsec(num x) {
   return 1 / cos(x) - 1;
 }
 
@@ -342,13 +342,10 @@ double exsec(double x) {
 /// ```
 ///
 /// The output is `0.0` because the excosecant of π/2 (or 90 degrees) is 0 (as csc(π/2) is 1).
-double excsc(double x) {
+double excsc(num x) {
   return 1 / sin(x) - 1;
 }
 
-/// Sawtooth wave function
-///
-/// The sawtooth wave function generates a waveform which ramps upward and then sharply drops```dart
 /// Sawtooth wave function
 ///
 /// The sawtooth wave function generates a waveform which ramps upward and then sharply drops.
@@ -360,8 +357,8 @@ double excsc(double x) {
 /// ```
 ///
 /// The output is `0.7` because the fractional part of `2.7` is `0.7`.
-double sawtooth(double x) {
-  return x - x.floor();
+double sawtooth(num x) {
+  return (x - x.floor()).toDouble();
 }
 
 /// Square wave function

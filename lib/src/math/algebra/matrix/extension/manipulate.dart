@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 extension MatrixManipulationExtension on Matrix {
   /// Concatenates the given list of matrices with the current matrix along the specified axis.
@@ -744,7 +744,7 @@ extension MatrixManipulationExtension on Matrix {
         (rowStart != null && rowEnd != null
             ? List.generate(rowEnd - rowStart + 1, (i) => rowStart + i)
             : (rowRange.isNotEmpty
-                ? Utils.parseRange(rowRange, rowCount)
+                ? _Utils.parseRange(rowRange, rowCount)
                 : (rowStart != null
                     ? List.generate(rowCount - rowStart, (i) => rowStart + i)
                     : (rowEnd != null
@@ -757,7 +757,7 @@ extension MatrixManipulationExtension on Matrix {
         (colStart != null && colEnd != null
             ? List.generate(colEnd - colStart + 1, (i) => colStart + i)
             : (colRange.isNotEmpty
-                ? Utils.parseRange(colRange, columnCount)
+                ? _Utils.parseRange(colRange, columnCount)
                 : (colStart != null
                     ? List.generate(columnCount - colStart, (i) => colStart + i)
                     : (colEnd != null

@@ -101,19 +101,11 @@ class SphericalTriangle {
   }
 
   /// Checks if the values form a valid spherical triangle.
-  void _validateTriangle() {
+  bool isValidTriangle() {
     var sumOfAngles = _angleA + _angleB + _sideC;
     var sumOfSides = _sideA + _sideB + _sideC;
 
-    if ((sumOfAngles - pi).abs() > 1e-6) {
-      throw ArgumentError(
-          'Sum of angles should be approximately equal to pi but was: $sumOfAngles');
-    }
-
-    if (sumOfSides >= 2 * pi) {
-      throw ArgumentError(
-          'Sum of sides should be less than 2*pi but was: $sumOfSides');
-    }
+    return !((sumOfAngles - pi).abs() > 1e-6 && sumOfSides >= 2 * pi);
   }
 
   /// Computes the area of the spherical triangle

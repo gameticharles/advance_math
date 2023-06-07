@@ -1,4 +1,4 @@
-part of vector;
+part of algebra;
 
 extension MatrixVectorOperations on Matrix {
   /// Add a matrix and a vector

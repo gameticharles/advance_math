@@ -1,3 +1,5 @@
+part of algebra;
+
 /* TODO:
 Performance Optimizations:
    - Implement parallel processing techniques to improve the performance of computationally intensive operations (e.g., matrix multiplication, decompositions)
@@ -5,10 +7,7 @@ Performance Optimizations:
 
 */
 
-import '../math/algebra/matrix/matrix.dart';
-import '/src/math/basic/math.dart' as math;
-
-class Utils {
+class _Utils {
   static List<List<dynamic>> parseMatrixString(String input) {
     return input
         .split(';')

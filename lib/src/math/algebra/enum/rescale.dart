@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 /// Enum for specifying the direction of rescaling operation in a matrix.
 ///

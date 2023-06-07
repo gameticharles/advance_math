@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 extension MatrixListExtension on List<List<dynamic>> {
   /// The shape of an array is the number of elements in each dimension.

@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 class MatrixFactory {
   MatrixFactory();

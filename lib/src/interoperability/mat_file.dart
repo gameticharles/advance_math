@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:buffer/buffer.dart';
+// import 'package:buffer/buffer.dart';
 import 'package:intl/intl.dart';
 
 // array element data types
@@ -174,7 +174,7 @@ dynamic readElements(RandomAccessFile fd, String endian, List<String> mtps,
   var numBytes = elementTag['numBytes'];
   var data = elementTag['data'];
 
-  if (mtps != null &&
+  if (mtps.isEmpty &&
       !mtps.contains(
           eTypes.keys.firstWhere((key) => eTypes[key]!['n'] == mtpn))) {
     throw Exception(
@@ -195,8 +195,8 @@ dynamic readElements(RandomAccessFile fd, String endian, List<String> mtps,
   dynamic val;
   if (isName) {
     // names are stored as miINT8 bytes
-    var fmt = 's';
-    val = utf8.decode(data).split('\0').where((s) => s.isNotEmpty).toList();
+    // var fmt = 's';
+    val = utf8.decode(data).split('0').where((s) => s.isNotEmpty).toList();
     if (val.isEmpty) {
       val = '';
     } else if (val.length == 1) {
@@ -584,8 +584,8 @@ Future<void> writeElements(
       // add pad bytes
       bytes.add(Uint8List(4 - numBytes));
     }
-    await fd.writeFrom(Uint8List.fromList(
-        [eType['n'] as int, numBytes]..addAll(bytes.toBytes())));
+    await fd.writeFrom(
+        Uint8List.fromList([eType['n'] as int, numBytes, ...bytes.toBytes()]));
     return;
   }
 
@@ -924,7 +924,7 @@ Map<String, dynamic> guessHeader(dynamic array, [String name = '']) {
 /// A ``ValueError`` exception is raised if data has invalid format, or if the
 /// data structure cannot be mapped to a known MAT array type.
 void saveMat(String filename, Map<String, dynamic> data) async {
-  if (data == null) {
+  if (data.isEmpty) {
     throw ArgumentError('Data should be a Map of variable arrays');
   }
 

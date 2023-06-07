@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 /// Column class extends Matrix and represents a single column in a matrix.
 ///

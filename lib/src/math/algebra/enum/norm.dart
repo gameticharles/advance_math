@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 /// Enumeration of supported norms for vectors and matrices.
 ///

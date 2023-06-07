@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 /*
  * In this implementation, the code for Singular Value Decomposition (SVD)
@@ -39,7 +39,7 @@ class LU {
   /// - [A] Rectangular matrix
   LU(Matrix A) {
     // Use a "left-looking", dot-product, Crout/Doolittle algorithm.
-    luMatrix = Utils.toDoubleMatrix(A.copy());
+    luMatrix = _Utils.toDoubleMatrix(A.copy());
     _m = A.rowCount;
     _n = A.columnCount;
     _piv = Matrix.fill(1, _m, 0.0);
@@ -62,7 +62,7 @@ class LU {
       // Apply previous transformations.
 
       for (var i = 0; i < _m; i++) {
-        luRowI = Utils.toDoubleMatrix(luMatrix.row(i));
+        luRowI = _Utils.toDoubleMatrix(luMatrix.row(i));
 
         // Most of the time is spent in the following dot product.
 

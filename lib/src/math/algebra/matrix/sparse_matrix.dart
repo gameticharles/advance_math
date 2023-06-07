@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 // Abstract SparseMatrix class that extends Matrix
 abstract class SparseMatrix extends Matrix {

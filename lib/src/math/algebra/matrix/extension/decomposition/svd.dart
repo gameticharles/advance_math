@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 /*
  * In this implementation, the code for Singular Value Decomposition (SVD)
@@ -67,7 +67,7 @@ class SVD {
       A = mat.copy();
     }
 
-    A = Utils.toDoubleMatrix(A);
+    A = _Utils.toDoubleMatrix(A);
 
     var nu = math.min(_m, _n).toInt();
     _s = Matrix.fill(1, math.min(_m + 1, _n), 0.0);

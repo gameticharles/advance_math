@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 class QRDecomposition extends Decomposition {
   final Matrix Q;
@@ -29,7 +29,7 @@ class QRDecomposition extends Decomposition {
     Matrix y = Q.transpose() * b;
 
     // Solve Rx = Q^T * b using backward substitution
-    Matrix x = Utils.backwardSubstitution(R, y);
+    Matrix x = _Utils.backwardSubstitution(R, y);
 
     return x;
   }
@@ -61,7 +61,7 @@ class LQDecomposition extends Decomposition {
     }
 
     // Solve Ly = b using forward substitution
-    Matrix y = Utils.forwardSubstitution(L, b);
+    Matrix y = _Utils.forwardSubstitution(L, b);
 
     // Compute x = Q^T * y
     Matrix x = Q.transpose() * y;
@@ -179,11 +179,11 @@ class CholeskyDecomposition extends Decomposition {
 
     // Solve Ly = b using forward substitution
     // L is the lower triangular matrix from Cholesky decomposition
-    Matrix y = Utils.forwardSubstitution(L, b);
+    Matrix y = _Utils.forwardSubstitution(L, b);
 
     // Solve L^T * x = y using backward substitution
     // L^T is the transpose of the lower triangular matrix L
-    Matrix x = Utils.backwardSubstitution(L.transpose(), y);
+    Matrix x = _Utils.backwardSubstitution(L.transpose(), y);
 
     return x;
   }
@@ -295,10 +295,10 @@ class LUDecomposition extends Decomposition {
     Matrix pb = P != null ? P! * b : b;
 
     // Solve LY = Pb using forward substitution
-    Matrix y = Utils.forwardSubstitution(L, pb);
+    Matrix y = _Utils.forwardSubstitution(L, pb);
 
     // Solve UX = Y using backward substitution
-    Matrix x = Utils.backwardSubstitution(U, y);
+    Matrix x = _Utils.backwardSubstitution(U, y);
 
     return x;
   }

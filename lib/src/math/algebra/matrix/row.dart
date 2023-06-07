@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 /// Row class extends Matrix and represents a single row in a matrix.
 ///

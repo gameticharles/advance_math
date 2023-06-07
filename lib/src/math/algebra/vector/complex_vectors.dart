@@ -1,4 +1,4 @@
-part of vector;
+part of algebra;
 
 /// A class representing a vector with complex numbers.
 ///

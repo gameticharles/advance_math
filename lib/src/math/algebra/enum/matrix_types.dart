@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 /// Enum representing different types of matrices and their properties.
 ///

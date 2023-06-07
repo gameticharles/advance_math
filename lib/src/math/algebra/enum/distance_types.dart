@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 /// The DistanceType enum contains different types of distance metrics used
 /// for both Vector and Matrix distance calculations.

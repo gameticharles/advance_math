@@ -31,7 +31,7 @@ class Triangle {
     return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
   }
 
-  double _angleFromSides(num a, num b, num c) {
+  num _angleFromSides(num a, num b, num c) {
     return degrees(acos((pow(a, 2) + pow(b, 2) - pow(c, 2)) / (2 * a * b)));
   }
 
@@ -41,7 +41,7 @@ class Triangle {
   }
 
   static double trigonometricFormula(double a, double b, double angleC) {
-    double angleCRad = radians(angleC);
+    num angleCRad = radians(angleC);
     return 0.5 * a * b * sin(angleCRad);
   }
 
@@ -70,7 +70,7 @@ class Triangle {
       throw Exception(
           "Sides a, b and the angle between them (angleC) are required for the trigonometric formula.");
     }
-    double angleCRad = radians(angleC!);
+    num angleCRad = radians(angleC!);
     return 0.5 * a! * b! * sin(angleCRad);
   }
 
@@ -150,7 +150,7 @@ class Triangle {
       throw Exception(
           "Point A, B, side a, b and angleC are required to calculate other coordinates.");
     }
-    double angleCRad = radians(angleC!);
+    num angleCRad = radians(angleC!);
     C = Point(B!.x + a! * cos(angleCRad), B!.y + a! * sin(angleCRad));
     return [A!, B!, C!];
   }

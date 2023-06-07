@@ -4,7 +4,6 @@ import 'dart:math' as math;
 
 part 'basic.dart';
 part 'statistics.dart';
-part '../angle/angle.dart';
 part 'constants.dart';
 part 'trigonometry.dart';
 part 'logarithm.dart';

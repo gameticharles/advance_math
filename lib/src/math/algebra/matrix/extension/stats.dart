@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 extension MatrixStatsExtension on Matrix {
   /// Returns the smallest value in the matrix.
@@ -408,7 +408,7 @@ extension MatrixStatsExtension on Matrix {
   /// 0  0  0
   /// ```
   Matrix rowEchelonForm() {
-    Matrix result = Utils.toDoubleMatrix(copy());
+    Matrix result = _Utils.toDoubleMatrix(copy());
     int lead = 0;
     int rowCount = result.rowCount;
     int columnCount = result.columnCount;
@@ -465,7 +465,7 @@ extension MatrixStatsExtension on Matrix {
     int rowCount = result.rowCount;
 
     for (int r = rowCount - 1; r >= 0; r--) {
-      int nonZeroIndex = Utils.getFirstNonZeroIndex(result[r]);
+      int nonZeroIndex = _Utils.getFirstNonZeroIndex(result[r]);
 
       if (nonZeroIndex != -1) {
         for (int i = r - 1; i >= 0; i--) {

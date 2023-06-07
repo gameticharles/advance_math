@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 /*TODO:
 Advanced Matrix Operations:

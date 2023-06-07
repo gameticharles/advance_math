@@ -1,10 +1,4 @@
-library linear_system;
-
-import '../../vector/vector.dart';
-import '/src/math/basic/math.dart' as math;
-
-import '../../../utils/utils.dart';
-import '../../matrix/matrix.dart';
+part of algebra;
 
 /*
 Linear Algebra Utilities:
@@ -96,7 +90,7 @@ class LinearSystemSolvers {
   /// x.prettyPrint();
   /// ```
   static Matrix ridgeRegression(Matrix a, Matrix b, double alpha) {
-    Matrix A = Utils.toDoubleMatrix(a);
+    Matrix A = _Utils.toDoubleMatrix(a);
     int n = A.columnCount;
     Matrix I = Matrix.eye(n, isDouble: true);
     Matrix aTrans = A.transpose();
@@ -221,8 +215,8 @@ class LinearSystemSolvers {
   /// // └ 6 ┘
   /// ```
   static Matrix gaussElimination(Matrix a, Matrix b) {
-    Matrix fe = Utils.forwardElimination(a, b);
-    return Utils.backwardSubstitution(fe, b);
+    Matrix fe = _Utils.forwardElimination(a, b);
+    return _Utils.backwardSubstitution(fe, b);
   }
 
   /// Solves a linear system Ax = b using Gauss-Jordan Elimination.
@@ -365,7 +359,7 @@ class LinearSystemSolvers {
     Matrix c = q.transpose() * b;
 
     // Solve the system Rx = c using backward substitution
-    return Utils.backwardSubstitution(r, c);
+    return _Utils.backwardSubstitution(r, c);
   }
 
   /// Solves a linear system Ax = b using the Jacobi method.
@@ -613,10 +607,10 @@ class LinearSystemSolvers {
     Matrix Q = Matrix.zeros(m, n);
 
     for (int j = 0; j < n; j++) {
-      Vector v = Vector.fromList(Utils.toSDList(A.column(j).asList));
+      Vector v = Vector.fromList(_Utils.toSDList(A.column(j).asList));
 
       for (int i = 0; i < j; i++) {
-        Vector qi = Vector.fromList(Utils.toSDList(Q.column(i).asList));
+        Vector qi = Vector.fromList(_Utils.toSDList(Q.column(i).asList));
         double projCoeff = v.dot(qi) / qi.dot(qi);
         v = v - qi.scale(projCoeff);
       }
@@ -657,16 +651,16 @@ class LinearSystemSolvers {
   /// // └ 6 ┘
   /// ```
   static Matrix luDecompositionSolve(Matrix a, Matrix b) {
-    a = Utils.toDoubleMatrix(a);
+    a = _Utils.toDoubleMatrix(a);
     var lu = a.decomposition.luDecompositionDoolittle();
     Matrix l = lu.L;
     Matrix u = lu.U;
 
     // Solve Ly = b
-    Matrix y = Utils.forwardSubstitution(l, b);
+    Matrix y = _Utils.forwardSubstitution(l, b);
 
     // Solve Ux = y
-    Matrix x = Utils.backwardSubstitution(u, y);
+    Matrix x = _Utils.backwardSubstitution(u, y);
 
     return x;
   }
@@ -693,8 +687,8 @@ class LinearSystemSolvers {
   /// ```
   Matrix solve(Matrix b,
       {LinearSystemMethod method = LinearSystemMethod.gaussElimination}) {
-    var a = Utils.toDoubleMatrix(_matrix);
-    b = Utils.toDoubleMatrix(b);
+    var a = _Utils.toDoubleMatrix(_matrix);
+    b = _Utils.toDoubleMatrix(b);
 
     switch (method) {
       case LinearSystemMethod.cramersRule:

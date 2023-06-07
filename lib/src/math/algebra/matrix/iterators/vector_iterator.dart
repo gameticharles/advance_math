@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 class VectorIterator implements Iterator<num> {
   final Vector _vector;

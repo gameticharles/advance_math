@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 /// Class to store eigenvalues and eigenvectors of a matrix.
 class Eigen {

@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 /// The `Matrix` class provides a structure for two-dimensional arrays of data,
 /// along with various utility methods for manipulating these arrays.
@@ -81,10 +81,10 @@ class Matrix extends IterableMixin<List<dynamic>> {
     if (input == null) {
       _data = const [];
     } else if (input is String) {
-      _data = Utils.parseMatrixString(input);
+      _data = _Utils.parseMatrixString(input);
     } else if (input is List<List<dynamic>>) {
       // if (input is List<List<num>>) {
-      // _data = Utils.toDoubleMatrix(input);
+      // _data = _Utils.toDoubleMatrix(input);
       // } else {
       // _data = input;
       // }
@@ -652,13 +652,13 @@ class Matrix extends IterableMixin<List<dynamic>> {
         return (m1 - m2).norm(Norm.trace);
       case Distance.cosine:
       // // Flatten the matrices and compute cosine distance
-      // return Vector.fromList(Utils.toSDList(m1.flatten())).distance(
-      //     Vector.fromList(Utils.toSDList(m2.flatten())),
+      // return Vector.fromList(_Utils.toSDList(m1.flatten())).distance(
+      //     Vector.fromList(_Utils.toSDList(m2.flatten())),
       //     distanceType: DistanceType.cosine);
       case Distance.hamming:
       // // Flatten the matrices and compute hamming distance
-      // return Vector.fromList(Utils.toSDList(m1.flatten())).distance(
-      //     Vector.fromList(Utils.toSDList(m2.flatten())),
+      // return Vector.fromList(_Utils.toSDList(m1.flatten())).distance(
+      //     Vector.fromList(_Utils.toSDList(m2.flatten())),
       //     distanceType: DistanceType.hamming);
       default:
         throw Exception('Invalid distance type');
@@ -685,13 +685,13 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// ```
   static Matrix compare(Matrix matrix, String operator, dynamic value,
       {double tolerance = 1e-6}) {
-    Utils.defaultTolerance = tolerance;
+    _Utils.defaultTolerance = tolerance;
 
-    if (!Utils.comparisonFunctions.containsKey(operator)) {
+    if (!_Utils.comparisonFunctions.containsKey(operator)) {
       throw Exception('Invalid operator');
     }
 
-    var compareFunc = Utils.comparisonFunctions[operator];
+    var compareFunc = _Utils.comparisonFunctions[operator];
 
     var result = matrix
         .map((row) => row.map((item) => compareFunc!(item, value)).toList())
@@ -886,7 +886,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
       {String separator = ' ',
       bool isPrettyMatrix = true,
       MatrixAlign alignment = MatrixAlign.right}) {
-    return Utils.matString(this,
+    return _Utils.matString(this,
         separator: separator,
         isPrettyMatrix: isPrettyMatrix,
         alignment: alignment);
@@ -911,7 +911,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
       {String separator = ' ',
       bool isPrettyMatrix = true,
       MatrixAlign alignment = MatrixAlign.right}) {
-    print(Utils.matString(this,
+    print(_Utils.matString(this,
         separator: separator,
         isPrettyMatrix: isPrettyMatrix,
         alignment: alignment));

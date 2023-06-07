@@ -1,4 +1,4 @@
-part of vector;
+part of algebra;
 
 // extension DynamicVector on dynamic {
 //   Matrix operator +(dynamic other) {

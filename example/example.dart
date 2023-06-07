@@ -16,6 +16,7 @@ void main() {
 
   var eMat = Matrix('1 2 3 4; 2 5 6 7; 3 6 8 9; 4 7 9 10');
 
+  printLine('Spherical Triangle');
   // Define a spherical triangle with one angle-side pair
   //var triangle = SphericalTriangle(a: pi / 2, b: pi / 2, c: pi / 2);
   var triangle = SphericalTriangle.fromAllSides(pi / 2, pi / 3, pi / 4);
@@ -34,8 +35,7 @@ void main() {
       'Area: ${triangle.area} ≈ ${triangle.areaPercentage} % of unit sphere surface area');
   print(
       'Perimeter: ${triangle.perimeter} ≈ ${triangle.perimeterPercentage} % of unit sphere circumference');
-
-  return;
+  print('isValidTriangle: ${triangle.isValidTriangle()}');
 
   printLine('Test Vectors');
 

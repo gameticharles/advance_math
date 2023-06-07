@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 extension MatrixStructure on Matrix {
   /// Returns a list of all the properties of the matrix.

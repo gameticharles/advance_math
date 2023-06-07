@@ -1,6 +1,6 @@
-part of advance_math;
+part of algebra;
 
-class NonLinearSystemSolvers {
-  final Matrix _matrix;
-  NonLinearSystemSolvers(this._matrix);
-}
+// class NonLinearSystemSolvers {
+//   final Matrix _matrix;
+//   NonLinearSystemSolvers(this._matrix);
+// }

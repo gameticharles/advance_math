@@ -20,6 +20,11 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
 
 ## Features
 
+- Basic statistics: Statistics operations like mean, median, mode, min, max, variance, standardDeviation, quartiles,permutations, combinations, greatest common divisor(gcd), least common multiple(lcm).
+- Logarithmic operations are implemented. These includes: natural logarithm of a number, base-10 logarithm and logarithm of a number to a given base. 
+- Support angle convertion (degrees, minutes, seconds, radians, gradians, DMS). Aside these functionalities on an angle.
+- It provides computing all the trigonometry functions on the angle. These includes inverse and hyperbolic function (sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, sec, csc, cot, asec, acsc, acot, sech, csch, coth, asech, acsch, acoth, vers, covers, havers, exsec, excsc).
+- Angle operation: Supports addition, subtraction, multiplication, and division. Also sopports comparisons, normalize, interpolation, and small-differencing on angles. 
 - Matrix creation, filling and generation: Methods for filling the matrix with specific values or generating matrices with certain properties, such as zero, ones, identity, diagonal, list, or random matrices.
 - Import and export matrices to and from other formats (e.g., CSV, JSON, binary)
 - Matrix operations: Implement common matrix operations such as addition, subtraction, multiplication (element-wise and matrix-matrix), and division (element-wise) etc.
@@ -47,6 +52,70 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
 ```dart
 import 'package:advance_math/advance_math.dart';
 ```
+
+<details>
+<summary>ANGLE</summary>
+
+# Angle Class
+
+The `Angle` class is part of the `advanced_math` library. It's designed to make working with angles straightforward in a variety of units, including degrees, radians, gradians, and DMS (Degrees, Minutes, Seconds).
+
+## Features
+
+1. Create an Angle object with any of the four units. The class will automatically convert it to all other units and store them as properties:
+
+```dart
+var angleDeg = Angle.degrees(45);
+var angleRad = Angle.radians(math.pi / 4);
+var angleGrad = Angle.gradians(50);
+var angleDMS = Angle.dms([45, 0, 0]);
+```
+
+2. Get the smallest difference between two angles:
+
+```dart
+num diff = angleDeg.smallestDifference(angleRad);
+```
+
+3. Interpolate between two angles:
+
+```dart
+Angle interpolated = angleDeg.interpolate(angleRad, 0.5);
+```
+
+4. Convert an angle from one unit to another:
+
+```dart
+double rad = Angle.convert(180, AngleType.degrees, AngleType.radians);  // Converts 180 degrees to radians
+print(rad);  // Outputs: 3.141592653589793
+
+double grad = Angle.convert(1, AngleType.radians, AngleType.gradians);  // Converts 1 radian to gradians
+print(grad);  // Outputs: 63.661977236758134
+```
+
+5. Convert degrees to gradians, radians, minutes or seconds, and vice versa:
+
+```dart
+double minutes = degrees2Minutes(1);  // Output: 60.0
+double degreesFromMinutes = minutes2Degrees(60);  // Output: 1.0
+double seconds = degrees2Seconds(1);  // Output: 3600.0
+double degreesFromSeconds = seconds2Degrees(3600);  // Output: 1.0
+```
+
+6. Perform all the possible trignometry functions on the angle:
+
+```dart
+var angle = Angle.degrees(45);
+var t1 = angle.sin();
+var t2 = angle.cos();
+var t3 = angle.tan();
+var t4 = angle.tanh();
+var t5 = angle.atanh();
+```
+
+These features provide an easy-to-use interface for handling various angle calculations, especially for applications that require geometric computations or work with geospatial data. The `Angle` class is an essential part of the `advanced_math` library and can be useful for anyone who needs advanced mathematical operations in Dart.
+
+</details>
 
 <details>
 <summary>MATRIX</summary>
@@ -1052,13 +1121,7 @@ print(doubled);
 <details>
 <summary>VECTOR</summary>
 
-The Vector library provides a powerful and flexible Vector class for numerical computations in Dart. This Vector class is very useful for performing operations in a wide variety of fields including data analysis, linear algebra, numerical computations, and machine learning.
-
-This library supports operations like addition, subtraction, scalar multiplication, and division. It also supports vector-specific operations like dot and cross product.
-
-Here's a quick summary of the class and its main methods.
-
-## Constructors
+## Create a new vector
 
 * `Vector(int length, {bool isDouble = true})`: Creates a [Vector] of given length with all elements initialized to 0.
 * `Vector.fromList(List<num> data)`: Constructs a [Vector] from a list of numerical values.
@@ -1082,16 +1145,12 @@ var v4 = Vector.linspace(0, 1);
 
 // Create a vector with values 1, 3, 5, 7, 9
 var v5 = Vector.range(10, start: 1, step: 2);
+v5 = Vector.arrange(10, start: 1, step: 2);
 ```
 
 ## Operators
 
-* `operator [](int index)`: Fetches the value at the given index of the vector.
-* `operator []=(int index, num value)`: Sets the value at the given index of the vector.
-* `operator +(Vector other)`: Adds two vectors.
-* `operator -(Vector other)`: Subtracts two vectors.
-* `operator *(double scalar)`: Multiplies a vector by a scalar.
-* `operator /(double scalar)`: Divides a vector by a scalar.
+Supports operations for elementwise operations by scalar value or vector
 
 ```dart
 // Get the value at index 2 of v2
@@ -1117,16 +1176,6 @@ var v9 = v2 / 2;
 
 * `double dot(Vector other)`: Calculates the dot product of the vector with another vector.
 * `Vector cross(Vector other)`: Calculates the cross product of the vector with another vector.
-
-```dart
-// Calculate the dot product of v1 and v2
-var dotProduct = v1.dot(v2);
-
-// Calculate the cross product of two 3D vectors
-var crossProduct = Vector.fromList([1, 2, 3]).cross(Vector.fromList([4, 5, 6]));
-```
-
-## Vector Metrics
 * `double get magnitude`: Returns the magnitude (or norm) of the vector.
 * `double get direction`: Returns the direction (or angle) of the vector, in radians.
 * `double norm()`: Returns the norm (or length) of this vector.
@@ -1135,6 +1184,12 @@ var crossProduct = Vector.fromList([1, 2, 3]).cross(Vector.fromList([4, 5, 6]));
 * `bool isUnit()`: Returns true if this is a unit vector, i.e., its norm is 1.
 
 ```dart
+// Calculate the dot product of v1 and v2
+var dotProduct = v1.dot(v2);
+
+// Calculate the cross product of two 3D vectors
+var crossProduct = Vector.fromList([1, 2, 3]).cross(Vector.fromList([4, 5, 6]));
+
 // Get the magnitude of v1
 var magnitude = v1.magnitude;
 

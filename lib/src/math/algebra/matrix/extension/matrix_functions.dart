@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 extension MatrixFunctions on Matrix {
   /// Element-wise sine

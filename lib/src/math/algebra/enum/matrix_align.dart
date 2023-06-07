@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 /// An enum representing the alignment options for matrix elements in a string representation.
 ///

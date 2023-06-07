@@ -1,6 +1,6 @@
 // ignore_for_file: non_constant_identifier_names
 
-part of advance_math;
+part of algebra;
 
 /// An enumeration of different methods that can be used to solve the least squares problem.
 enum EquationMethod {

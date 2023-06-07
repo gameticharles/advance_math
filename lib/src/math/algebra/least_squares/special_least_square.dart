@@ -1,4 +1,4 @@
-part of advance_math;
+part of algebra;
 
 /// The `LeastSquares` class is used to perform a least squares fit to the
 /// given model, specified by matrix `A` and column vector `b`.

@@ -1,4 +1,4 @@
-part of vector;
+part of algebra;
 
 extension MatrixVectorConversion on Matrix {
   // Convert a column vector matrix to a Vector object

@@ -1,4 +1,4 @@
-part of vector;
+part of algebra;
 
 class Vector2 extends Vector {
   Vector2(num x, num y) : super.fromList([x, y]);

@@ -1,4 +1,4 @@
-part of matrix;
+part of algebra;
 
 /// Enum representing the available methods for solving linear systems.
 ///
