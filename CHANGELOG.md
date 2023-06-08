@@ -1,3 +1,7 @@
+## 1.0.3
+* Fixed bugs
+* Fixed README
+
 ## 1.0.2
 * Conversion of angles(radians, degrees, gradients, DMS, and DM) 
 * Organized code

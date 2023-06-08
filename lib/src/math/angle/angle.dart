@@ -35,8 +35,8 @@ class Angle {
   final AngleType unit;
   num get rad => radians(deg!);
   num get grad => degreesToGrads(deg!);
-  num get arcMinutes => degrees2Minutes(deg!);
-  num get arcSeconds => degrees2Seconds(deg!);
+  num get minutes => degrees2Minutes(deg!);
+  num get seconds => degrees2Seconds(deg!);
 
   static Angle right = Angle(90);
   static Angle straight = Angle(180);

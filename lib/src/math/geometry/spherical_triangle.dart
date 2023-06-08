@@ -1,5 +1,7 @@
 part of geometry;
 
+// Todo: use the angle instance for the angle calculations
+
 /// Represents a spherical triangle, defined by its three angles (A, B, C)
 /// and the lengths of the three sides opposite those angles (a, b, c).
 ///

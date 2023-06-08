@@ -1,5 +1,7 @@
 part of geometry;
 
+// Todo: use the angle instance for the angle calculations
+
 class Triangle {
   num? a, b, c;
   num? angleA, angleB, angleC;

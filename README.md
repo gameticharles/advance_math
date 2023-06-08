@@ -21,27 +21,27 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
 ## Features
 
 - Basic statistics: Statistics operations like mean, median, mode, min, max, variance, standardDeviation, quartiles,permutations, combinations, greatest common divisor(gcd), least common multiple(lcm).
-- Logarithmic operations are implemented. These includes: natural logarithm of a number, base-10 logarithm and logarithm of a number to a given base. 
-- Support angle convertion (degrees, minutes, seconds, radians, gradians, DMS). Aside these functionalities on an angle.
-- It provides computing all the trigonometry functions on the angle. These includes inverse and hyperbolic function (sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, sec, csc, cot, asec, acsc, acot, sech, csch, coth, asech, acsch, acoth, vers, covers, havers, exsec, excsc).
+- Logarithmic operations: natural logarithm of a number, base-10 logarithm and logarithm of a number to a given base.
+- Support angle conversion (degrees, minutes, seconds, radians, gradians, DMS).
+- Trigonometry: It provides computation on all the trigonometric functions on the angle. These includes inverse and hyperbolic function (sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, sec, csc, cot, asec, acsc, acot, sech, csch, coth, asech, acsch, acoth, vers, covers, havers, exsec, excsc).
 - Angle operation: Supports addition, subtraction, multiplication, and division. Also sopports comparisons, normalize, interpolation, and small-differencing on angles. 
 - Matrix creation, filling and generation: Methods for filling the matrix with specific values or generating matrices with certain properties, such as zero, ones, identity, diagonal, list, or random matrices.
 - Import and export matrices to and from other formats (e.g., CSV, JSON, binary)
 - Matrix operations: Implement common matrix operations such as addition, subtraction, multiplication (element-wise and matrix-matrix), and division (element-wise) etc.
 - Matrix transformation methods: Add methods for matrix transformations, such as transpose, inverse, pseudoInverse, and rank etc.
-- Matrix manipulation (concatenate, sort, removeRow, removeRows, removeCol, removeCols, reshape, swapping rows and columns etc. )
+- Matrix manipulation (concatenate, sort, removeRow, removeRows, removeCol, removeCols, reshape, swapping rows and columns etc.)
 - Statistical methods: Methods for calculating statistical properties of the matrix, such as min, max, sum, mean, median, mode, skewness, standard deviation, and variance.
 - Element-wise operations: Methods for performing element-wise operations on the matrix, such as applying a function to each element or filtering elements based on a condition.
 - Solving linear systems of equations
 - Solve matrix decompositions like LU decomposition, QR decomposition, LQ decomposition, Cholesky, Singular Value Decomposition (SVD)  with different algorithms Crout's, Doolittle, Gauss Elimination Method, Gram Schmidt, Householder, Partial and Complete Pivoting, etc.
 - Matrix slicing and partitioning: Methods for extracting sub-Matrices or slices from the matrix.
 - Matrix concatenation and stacking: Methods for concatenating or stacking matrices horizontally or vertically.
-- Matrix norms: Methods for calculating matrix norms, such as L1, L2 (Euclidean), and infinity norms.
+- Matrix norms: Methods for calculating matrix norms, such as L1 (Marathan), L2 (Euclidean), and infinity norms.
 - Determine the properties of a matrix.
 - From the matrix, row and columns of the matrix are iterables and also iterate on every element.
 - Supports vectors, complex numbers and complex vectors with most of the basic functionalities and operations.
 
-## TODO
+## Todo
 
 - Improve speed and performance
 
@@ -52,6 +52,38 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
 ```dart
 import 'package:advance_math/advance_math.dart';
 ```
+
+<details>
+<summary>LOGARITHM</summary>
+
+# Logarithm
+
+Base-10 logarithm of a number is also implemented.
+
+```dart
+print(log10(100));  // Output: 2.0
+```
+
+Compute the natural logarithm of of a number using the function below. It also supports computes logarithm to any base.
+
+```dart
+// Natural log of `e`
+print(log(math.e));  // Output: 1.0
+
+//log to any base. Example log to base 10 on 100
+print(log(100, 10)); // prints: 2.0
+```
+
+Compute the logarithm of a number to a given base.
+
+```dart
+print(logBase(10, 100));  // Output: 2.0
+print(logBase(2, 8));  // Output: 3.0
+print(logBase(2, 32));  // Output: 5.0
+```
+
+</details>
+
 
 <details>
 <summary>ANGLE</summary>

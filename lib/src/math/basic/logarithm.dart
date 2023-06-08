@@ -22,6 +22,7 @@ double log10(num x) => math.log(x) / math.ln10;
 /// Example 2:
 /// ```dart
 /// print(log(math.e));  // Output: 1.0
+/// ```
 double log(num x, [double? b]) {
   if (x <= 0 || (b != null && b <= 0)) {
     throw ArgumentError('Invalid input for log: n and b must be > 0');
