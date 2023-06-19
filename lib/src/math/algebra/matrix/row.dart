@@ -28,7 +28,7 @@ class Row extends Matrix {
   /// print(row.getValueAt(1)); // Output: 2
   /// ```
   dynamic getValueAt(int colIndex) {
-    if (colIndex < 0 || colIndex >= _data[0].length) {
+    if (colIndex < 0 || colIndex >= columnCount) {
       throw Exception('Index is out of range');
     }
     return _data[0][colIndex];
@@ -48,7 +48,7 @@ class Row extends Matrix {
   /// print(row); // Output: [1, 5, 3]
   /// ```
   void setValueAt(int colIndex, dynamic value) {
-    if (colIndex < 0 || colIndex >= _data[0].length) {
+    if (colIndex < 0 || colIndex >= columnCount) {
       throw Exception('Index is out of range');
     }
     _data[0][colIndex] = value;
@@ -151,7 +151,7 @@ class Row extends Matrix {
   /// var row = Row([1, 2, 3]);
   /// print(row.last); // Output: 3
   /// ```
-  dynamic get lastItem => _data[0][_data[0].length - 1];
+  dynamic get lastItem => _data[0][columnCount - 1];
 
   /// Returns the sum of all elements in the row.
   ///
@@ -169,7 +169,7 @@ class Row extends Matrix {
   /// var row = Row([1, 2, 3]);
   /// print(row.average); // Output: 2.0
   /// ```
-  double get average => sum / _data[0].length;
+  double get average => sum / columnCount;
 
   /// Returns the leading diagonals from a row.
   ///
@@ -183,7 +183,7 @@ class Row extends Matrix {
   /// ```
   Matrix toDiagonal() {
     List<dynamic> diagonal = [];
-    for (int i = 0; i < _data[0].length; i++) {
+    for (int i = 0; i < columnCount; i++) {
       diagonal.add(_data[0][i]);
     }
     return Diagonal(diagonal);

@@ -6,7 +6,7 @@ part of maths;
 /// ```dart
 /// print(pi);  // Output: 3.141592653589793
 /// ```
-num get pi => math.pi;
+const num pi = math.pi;
 
 /// Returns the mathematical constant e. Base of the natural logarithms
 ///
@@ -14,7 +14,7 @@ num get pi => math.pi;
 /// ```dart
 /// print(e);  // Output: 2.718281828459045
 /// ```
-num get e => math.e;
+const double e = math.e;
 
 /*
 Angle constants

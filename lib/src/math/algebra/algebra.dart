@@ -1,11 +1,17 @@
 library algebra;
 
 import 'dart:collection';
-import '../complex.dart';
+import 'dart:convert';
+import 'dart:typed_data';
+
+//import '../complex.dart';
+import '../../quantity/number.dart';
+import '../geometry/geometry.dart';
 import '/src/math/basic/math.dart' as math;
+import 'interoperability/file_helper/file_io.dart';
 
 part 'utils/utils.dart';
-part 'matrix/matrix_base.dart';
+part 'matrix/matrix.dart';
 
 part 'enum/matrix_align.dart';
 part 'enum/norm.dart';
@@ -17,7 +23,7 @@ part 'enum/sparse_format.dart';
 part 'enum/decomposition_methods.dart';
 
 part 'matrix/eigen/eigen.dart';
-part 'matrix/eigen/divide_conqour.dart';
+part 'matrix/eigen/divide_conquer.dart';
 
 part 'matrix/iterators/matrix_iterator.dart';
 part 'matrix/iterators/vector_iterator.dart';
@@ -43,7 +49,7 @@ part 'matrix/extension/decomposition/svd.dart';
 part 'matrix/extension/decomposition/lu.dart';
 part 'matrix/extension/decomposition/models.dart';
 
-part 'vector/vector_base.dart';
+part 'vector/vector.dart';
 part 'vector/vector_special.dart';
 part 'vector/complex_vectors.dart';
 part 'vector/matrix_vector.dart';
@@ -54,3 +60,6 @@ part 'nonlinear/nonlinear.dart';
 part 'linear/linear.dart';
 part 'least_squares/base_least_square.dart';
 part 'least_squares/special_least_square.dart';
+
+// This function should return an instance of FileIODesktop or FileIOWeb depending on the platform.
+FileIO fileIO = FileIO();

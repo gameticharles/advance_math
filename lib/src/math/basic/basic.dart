@@ -24,7 +24,13 @@ num abs(num x) => x.abs();
 /// ```dart
 /// print(sqrt(9));  // Output: 3.0
 /// ```
-double sqrt(num x) => math.sqrt(x);
+dynamic sqrt(num x) {
+  if (x >= 0) {
+    return math.sqrt(x);
+  } else {
+    return Complex(0, math.sqrt(-x));
+  }
+}
 
 /// Returns the cube root of a number.
 ///
@@ -32,8 +38,23 @@ double sqrt(num x) => math.sqrt(x);
 /// ```dart
 /// print(cbrt(8));  // Output: 2.0
 /// ```
-num cbrt(num x) {
-  return math.pow(x, 1 / 3);
+dynamic cbrt(num x) {
+  return nthRoot(x, 3);
+}
+
+/// Returns the nth root of a number.
+///
+/// Example:
+/// ```dart
+/// // The cube root of 8 will be:
+/// print(nthRoot(8, 3));  // Output: 2.0
+/// ```
+dynamic nthRoot(num x, double nth) {
+  if (x >= 0) {
+    return math.pow(x, 1 / nth);
+  } else {
+    return Complex(0, math.pow(-x, 1 / nth));
+  }
 }
 
 /// Returns the natural exponentiation of a number.

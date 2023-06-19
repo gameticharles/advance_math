@@ -24,7 +24,7 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
 - Logarithmic operations: natural logarithm of a number, base-10 logarithm and logarithm of a number to a given base.
 - Support angle conversion (degrees, minutes, seconds, radians, gradians, DMS).
 - Trigonometry: It provides computation on all the trigonometric functions on the angle. These includes inverse and hyperbolic function (sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, sec, csc, cot, asec, acsc, acot, sech, csch, coth, asech, acsch, acoth, vers, covers, havers, exsec, excsc).
-- Angle operation: Supports addition, subtraction, multiplication, and division. Also sopports comparisons, normalize, interpolation, and small-differencing on angles. 
+- Angle operation: Supports addition, subtraction, multiplication, and division. Also supports comparisons, normalize, interpolation, and small-differencing on angles. 
 - Matrix creation, filling and generation: Methods for filling the matrix with specific values or generating matrices with certain properties, such as zero, ones, identity, diagonal, list, or random matrices.
 - Import and export matrices to and from other formats (e.g., CSV, JSON, binary)
 - Matrix operations: Implement common matrix operations such as addition, subtraction, multiplication (element-wise and matrix-matrix), and division (element-wise) etc.

@@ -2,7 +2,7 @@ part of algebra;
 
 /// The DistanceType enum contains different types of distance metrics used
 /// for both Vector and Matrix distance calculations.
-enum Distance {
+enum DistanceType {
   /// The Frobenius norm, often used as a matrix norm, is a
   /// measure of the magnitude of the matrix elements. It's the square
   /// root of the sum of the absolute squares of its elements and is

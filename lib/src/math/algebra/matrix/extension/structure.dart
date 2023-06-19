@@ -324,7 +324,7 @@ extension MatrixStructure on Matrix {
       for (int j = i; j < n; j++) {
         Complex conjugateValue;
         if (this[j][i] is Complex) {
-          conjugateValue = (this[j][i] as Complex).conjugate();
+          conjugateValue = (this[j][i] as Complex).conjugate;
         } else {
           conjugateValue = this[j][i];
         }

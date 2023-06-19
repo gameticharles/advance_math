@@ -4,16 +4,11 @@ library advance_math;
 /// The library was developed, documented, and published by
 /// [Charles Gameti]
 
-import 'dart:io';
-import 'dart:convert';
-import 'dart:typed_data';
-
-import 'src/math/algebra/algebra.dart';
+import 'src/math/basic/math.dart' as math;
 
 export 'src/math/basic/math.dart';
-export 'src/math/angle/angle.dart';
 export 'src/math/geometry/geometry.dart';
-export 'src/math/complex.dart';
 export 'src/math/algebra/algebra.dart';
+export 'src/quantity/quantity.dart';
 
-part 'src/interoperability/interoperability.dart';
+part 'src/utils/num_ext.dart';

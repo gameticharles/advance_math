@@ -4,7 +4,7 @@ part of geometry;
 
 class Triangle {
   num? a, b, c;
-  num? angleA, angleB, angleC;
+  Angle? angleA, angleB, angleC;
   Point? A, B, C;
 
   Triangle(
@@ -33,8 +33,8 @@ class Triangle {
     return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
   }
 
-  num _angleFromSides(num a, num b, num c) {
-    return degrees(acos((pow(a, 2) + pow(b, 2) - pow(c, 2)) / (2 * a * b)));
+  Angle _angleFromSides(num a, num b, num c) {
+    return Angle(rad: acos((pow(a, 2) + pow(b, 2) - pow(c, 2)) / (2 * a * b)));
   }
 
   static double heronFormula(double a, double b, double c) {
@@ -43,7 +43,7 @@ class Triangle {
   }
 
   static double trigonometricFormula(double a, double b, double angleC) {
-    num angleCRad = radians(angleC);
+    num angleCRad = toRadians(angleC);
     return 0.5 * a * b * sin(angleCRad);
   }
 
@@ -72,17 +72,17 @@ class Triangle {
       throw Exception(
           "Sides a, b and the angle between them (angleC) are required for the trigonometric formula.");
     }
-    num angleCRad = radians(angleC!);
-    return 0.5 * a! * b! * sin(angleCRad);
+
+    return 0.5 * a! * b! * angleC!.sin();
   }
 
   void cosineRule() {
     if (a != null && b != null && angleC != null) {
-      c = sqrt(pow(a!, 2) + pow(b!, 2) - 2 * a! * b! * cos(radians(angleC!)));
+      c = sqrt(pow(a!, 2) + pow(b!, 2) - 2 * a! * b! * angleC!.cos());
     } else if (a != null && c != null && angleB != null) {
-      b = sqrt(pow(a!, 2) + pow(c!, 2) - 2 * a! * c! * cos(radians(angleB!)));
+      b = sqrt(pow(a!, 2) + pow(c!, 2) - 2 * a! * c! * angleB!.cos());
     } else if (b != null && c != null && angleA != null) {
-      a = sqrt(pow(b!, 2) + pow(c!, 2) - 2 * b! * c! * cos(radians(angleA!)));
+      a = sqrt(pow(b!, 2) + pow(c!, 2) - 2 * b! * c! * angleA!.cos());
     } else {
       throw Exception("Not enough information provided for the cosine rule.");
     }
@@ -99,34 +99,34 @@ class Triangle {
     }
 
     if (a != null && angleA != null) {
-      double ratio = a! / sin(radians(angleA!));
+      double ratio = a! / angleA!.sin();
       if (b == null && angleB != null) {
-        b = ratio * sin(radians(angleB!));
+        b = ratio * angleB!.sin();
       } else if (c == null && angleC != null) {
-        c = ratio * sin(radians(angleC!));
+        c = ratio * angleC!.sin();
       } else if (angleB == null && b != null) {
-        angleB = degrees(asin(b! / ratio));
-        angleC = 180 - angleA! - angleB!;
+        angleB = Angle(rad: asin(b! / ratio));
+        angleC = Angle(deg: 180 - angleA!.deg - angleB!.deg);
       }
     } else if (b != null && angleB != null) {
-      double ratio = b! / sin(radians(angleB!));
+      double ratio = b! / angleB!.sin();
       if (a == null && angleA != null) {
-        a = ratio * sin(radians(angleA!));
+        a = ratio * angleA!.sin();
       } else if (c == null && angleC != null) {
-        c = ratio * sin(radians(angleC!));
+        c = ratio * angleC!.sin();
       } else if (angleA == null && a != null) {
-        angleA = degrees(asin(a! / ratio));
-        angleC = 180 - angleA! - angleB!;
+        angleA = Angle(rad: asin(a! / ratio));
+        angleC = Angle(deg: 180 - angleA!.deg - angleB!.deg);
       }
     } else if (c != null && angleC != null) {
-      double ratio = c! / sin(radians(angleC!));
+      double ratio = c! / angleC!.sin();
       if (a == null && angleA != null) {
-        a = ratio * sin(radians(angleA!));
+        a = ratio * angleA!.sin();
       } else if (b == null && angleB != null) {
-        b = ratio * sin(radians(angleB!));
+        b = ratio * angleB!.sin();
       } else if (angleA == null && a != null) {
-        angleA = degrees(asin(a! / ratio));
-        angleB = 180 - angleA! - angleC!;
+        angleA = Angle(rad: asin(a! / ratio));
+        angleB = Angle(deg: 180 - angleA!.deg - angleC!.deg);
       }
     } else {
       throw Exception("Not enough information provided for the sine rule.");
@@ -141,7 +141,7 @@ class Triangle {
       double s = (a! + b! + c!) / 2;
       return sqrt(s * (s - a!) * (s - b!) * (s - c!));
     } else if (method == 'sine' && angleC != null) {
-      return 0.5 * a! * b! * sin(radians(angleC!));
+      return 0.5 * a! * b! * angleC!.sin();
     } else {
       throw Exception("Invalid method. Must be either 'heron' or 'sine'.");
     }
@@ -152,8 +152,8 @@ class Triangle {
       throw Exception(
           "Point A, B, side a, b and angleC are required to calculate other coordinates.");
     }
-    num angleCRad = radians(angleC!);
-    C = Point(B!.x + a! * cos(angleCRad), B!.y + a! * sin(angleCRad));
+
+    C = Point(B!.x + a! * angleC!.cos(), B!.y + a! * angleC!.sin());
     return [A!, B!, C!];
   }
 
@@ -164,11 +164,4 @@ class Triangle {
       throw Exception("All points (A, B, C) are already known.");
     }
   }
-}
-
-class Point {
-  final num x;
-  final num y;
-
-  Point(this.x, this.y);
 }

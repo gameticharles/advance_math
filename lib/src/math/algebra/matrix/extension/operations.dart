@@ -850,7 +850,7 @@ extension MatrixOperationExtension on Matrix {
   /// Note: The output may vary due to numerical precision.
   ///
   /// Throws [Exception] if the matrices have different dimensions.
-  num distance(Matrix other, {Distance distance = Distance.frobenius}) {
+  num distance(Matrix other, {DistanceType distance = DistanceType.frobenius}) {
     return Matrix.distance(this, other, distance: distance);
   }
 
@@ -966,7 +966,7 @@ extension MatrixOperationExtension on Matrix {
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
         if (this[i][j] is Complex) {
-          result[i][j] = (this[i][j] as Complex).conjugate();
+          result[i][j] = (this[i][j] as Complex).conjugate;
         } else {
           result[i][j] = this[i][j];
         }

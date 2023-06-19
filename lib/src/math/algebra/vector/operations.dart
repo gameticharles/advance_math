@@ -146,6 +146,54 @@ extension VectorOperations on Vector {
     ]);
   }
 
+  /// Checks if this [Vector] is parallel to [other].
+  ///
+  /// Two vectors are parallel if their cross product has a magnitude of 0.
+  ///
+  /// Example:
+  /// ```dart
+  /// var vector1 = Vector(1, 0, 0);
+  /// var vector2 = Vector(2, 0, 0);
+  /// print(vector1.isParallelTo(vector2)); // Output: true
+  /// ```
+  ///
+  /// Returns `true` if the vectors are parallel, and `false` otherwise.
+  bool isParallelTo(Vector other) {
+    if (length != 3 || other.length != 3) {
+      throw ArgumentError("Both vectors must be three-dimensional.");
+    }
+    if (magnitude == 0 || other.magnitude == 0) {
+      throw ArgumentError(
+          'Neither the Vector nor the other Vector can be zero');
+    }
+
+    return cross(other).magnitude < 1e-10;
+  }
+
+  /// Checks if this [Vector] is perpendicular to [other].
+  ///
+  /// Two vectors are perpendicular if their dot product is 0.
+  ///
+  /// Example:
+  /// ```dart
+  /// var vector1 = Vector(1, 0, 0);
+  /// var vector2 = Vector(0, 1, 0);
+  /// print(vector1.isPerpendicularTo(vector2)); // Output: true
+  /// ```
+  ///
+  /// Returns `true` if the vectors are perpendicular, and `false` otherwise.
+  bool isPerpendicularTo(Vector other) {
+    if (length != 3 || other.length != 3) {
+      throw ArgumentError("Both vectors must be three-dimensional.");
+    }
+    if (magnitude == 0 || other.magnitude == 0) {
+      throw ArgumentError(
+          'Neither the Vector nor the other Vector can be zero');
+    }
+
+    return dot(other).abs() < 1e-10;
+  }
+
   /// Rounds each element in the vector to the specified number of decimal places.
   ///
   /// [decimalPlaces]: The number of decimal places to round to.

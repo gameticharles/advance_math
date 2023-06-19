@@ -16,20 +16,27 @@ void main() {
 
   var eMat = Matrix('1 2 3 4; 2 5 6 7; 3 6 8 9; 4 7 9 10');
 
+  var ang = Length.inUnits(360.14554, LengthUnits.miles);
+  print(ang.valueInUnits(LengthUnits.kilometers));
+
   printLine('Spherical Triangle');
   // Define a spherical triangle with one angle-side pair
   //var triangle = SphericalTriangle(a: pi / 2, b: pi / 2, c: pi / 2);
-  var triangle = SphericalTriangle.fromAllSides(pi / 2, pi / 3, pi / 4);
+  var triangle = SphericalTriangle.fromAllSides(
+    Angle(rad: pi / 2),
+    Angle(rad: pi / 3),
+    Angle(rad: pi / 4),
+  );
 
   // Angles
-  print('AngleA: ${triangle.angleA} ≈ ${degrees(triangle.angleA)}');
-  print('AngleB: ${triangle.angleB} ≈ ${degrees(triangle.angleB)}');
-  print('AngleC: ${triangle.angleC} ≈ ${degrees(triangle.angleC)}');
+  print('AngleA: ${triangle.angleA} ');
+  print('AngleB: ${triangle.angleB} ');
+  print('AngleC: ${triangle.angleC}');
 
   // Sides
-  print('SideA: ${triangle.sideA} ≈ ${degrees(triangle.sideA)}');
-  print('SideB: ${triangle.sideB} ≈ ${degrees(triangle.sideB)}');
-  print('SideC: ${triangle.sideC} ≈ ${degrees(triangle.sideC)}');
+  print('SideA: ${triangle.sideA}');
+  print('SideB: ${triangle.sideB}');
+  print('SideC: ${triangle.sideC} ');
 
   print(
       'Area: ${triangle.area} ≈ ${triangle.areaPercentage} % of unit sphere surface area');
@@ -62,7 +69,7 @@ void main() {
   //Vector operations
   final vector1 = Vector([1.0, 2.0, 3.0, 4.0, 5.0]);
   final vector2 = Vector.fromList([2.0, 3.0, 4.0, 5.0, 6.0]);
-  final result1 = vector1.distance(vector2, distance: Distance.cosine);
+  final result1 = vector1.distance(vector2, distance: DistanceType.cosine);
   print(result1); // 0.00506
 
   var result = vector1.normalize();
@@ -78,21 +85,6 @@ void main() {
   var vector3 = Vector.fromList([4.0, 5.0, 6.0, 7.0, 8.0]);
   result = vector3 - [2.0, 3.0, 2.0, 3.0, 2.0];
   print(result); // [2.0, 2.0, 4.0, 4.0, 6.0]
-
-  printLine('Test Complex Numbers');
-  var z1 = Complex(3, 2);
-  var z2 = Complex(1, -1);
-  var sum = z1 + z2;
-  var difference = z1 - z2;
-  var product = z1 * z2;
-  var quotient = z1 / z2;
-
-  print(sum);
-  print(difference);
-  print(product);
-  print(quotient);
-
-  printLine('Matrix Statistics');
 
   var A = Matrix("1 2 3 4; 2 5 6 7; 3 6 8 9; 4 7 9 10");
   print(A);

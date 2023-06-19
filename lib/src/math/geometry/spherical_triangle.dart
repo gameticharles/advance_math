@@ -30,12 +30,12 @@ part of geometry;
 /// print(triangle.sideC);
 /// ```
 class SphericalTriangle {
-  final double _angleA;
-  final double _angleB;
-  final double _angleC;
-  final double _sideA;
-  final double _sideB;
-  final double _sideC;
+  final Angle _angleA;
+  final Angle _angleB;
+  final Angle _angleC;
+  final Angle _sideA;
+  final Angle _sideB;
+  final Angle _sideC;
 
   /// Creates a new SphericalTriangle. Any provided parameters are used
   /// to calculate any missing values.
@@ -43,57 +43,65 @@ class SphericalTriangle {
       this._sideB, this._sideC);
 
   factory SphericalTriangle.fromTwoSidesAndAngle(
-      double angleA, double sideA, double sideB) {
-    var angleB = asin(sin(angleA) * sideB / sideA);
-    var angleC = pi - angleA - angleB;
-    var sideC = acos(
-        (cos(sideA) - cos(sideB) * cos(angleC)) / (sin(sideB) * sin(angleC)));
+      Angle angleA, Angle sideA, Angle sideB) {
+    var angleB = Angle(rad: asin(angleA.sin() * sideB.rad / sideA.rad));
+    var angleC = Angle(rad: pi - angleA.rad - angleB.rad);
+    var sideC = Angle(
+        rad: acos((sideA.cos() - sideB.cos() * angleC.cos()) /
+            (sideB.sin() * angleC.sin())));
     //_validateTriangle();
     return SphericalTriangle._(angleA, angleB, angleC, sideA, sideB, sideC);
   }
 
   factory SphericalTriangle.fromTwoAnglesAndSide(
-      double angleA, double angleB, double sideA) {
-    var angleC = pi - angleA - angleB;
-    var sideB = asin(sin(sideA) * sin(angleB) / sin(angleA));
-    var sideC = acos(
-        cos(sideA) - cos(sideB) * cos(angleC) / (sin(sideB) * sin(angleC)));
+      Angle angleA, Angle angleB, Angle sideA) {
+    var angleC = Angle(rad: pi - angleA.rad - angleB.rad);
+    var sideB = Angle(rad: asin(sideA.sin() * angleB.sin() / angleA.sin()));
+    var sideC = Angle(
+        rad: acos(sideA.cos() -
+            sideB.cos() * angleC.cos() / (sideB.sin() * angleC.sin())));
     //_validateTriangle();
     return SphericalTriangle._(angleA, angleB, angleC, sideA, sideB, sideC);
   }
 
   factory SphericalTriangle.fromAllSides(
-      double sideA, double sideB, double sideC) {
-    var angleA = acos(
-        (cos(sideC) - cos(sideA) * cos(sideB)) / (sin(sideA) * sin(sideB)));
-    var angleB = acos(
-        (cos(sideA) - cos(sideB) * cos(sideC)) / (sin(sideB) * sin(sideC)));
-    var angleC = acos(
-        (cos(sideB) - cos(sideC) * cos(sideA)) / (sin(sideC) * sin(sideA)));
+      Angle sideA, Angle sideB, Angle sideC) {
+    var angleA = Angle(
+        rad: acos((sideC.cos() - sideA.cos() * sideB.cos()) /
+            (sideA.sin() * sideB.sin())));
+    var angleB = Angle(
+        rad: acos((sideA.cos() - sideB.cos() * sideC.cos()) /
+            (sideB.sin() * sideC.sin())));
+    var angleC = Angle(
+        rad: acos((sideB.cos() - sideC.cos() * sideA.cos()) /
+            (sideC.sin() * sideA.sin())));
     //_validateTriangle();
     return SphericalTriangle._(angleA, angleB, angleC, sideA, sideB, sideC);
   }
 
   factory SphericalTriangle.fromAllAngles(
-      double angleA, double angleB, double angleC) {
-    var sideA = acos((cos(angleC) - cos(angleA) * cos(angleB)) /
-        (sin(angleA) * sin(angleB)));
-    var sideB = acos((cos(angleA) - cos(angleB) * cos(angleC)) /
-        (sin(angleB) * sin(angleC)));
-    var sideC = acos((cos(angleB) - cos(angleC) * cos(angleA)) /
-        (sin(angleC) * sin(angleA)));
+      Angle angleA, Angle angleB, Angle angleC) {
+    var sideA = Angle(
+        rad: acos((angleC.cos() - angleA.cos() * angleB.cos()) /
+            (angleA.sin() * angleB.sin())));
+    var sideB = Angle(
+        rad: acos((angleA.cos() - angleB.cos() * angleC.cos()) /
+            (angleB.sin() * angleC.sin())));
+    var sideC = Angle(
+        rad: acos((angleB.cos() - angleC.cos() * angleA.cos()) /
+            (angleC.sin() * angleA.sin())));
     //_validateTriangle();
     return SphericalTriangle._(angleA, angleB, angleC, sideA, sideB, sideC);
   }
 
-  static double calculateOtherSide(double angle1, double angle2, double side) {
-    return side * sin(angle2) / sin(angle1);
+  static Angle calculateOtherSide(Angle side, Angle angle1, Angle angle2) {
+    return Angle(rad: side.rad * angle2.sin() / angle1.sin());
   }
 
-  factory SphericalTriangle.fromSideAndAngle(double angleA, double sideA) {
+  factory SphericalTriangle.fromSideAndAngle(Angle angleA, Angle sideA) {
     // First, calculate the other two angles
-    var angleB = asin(sin(sideA) * sin(angleA));
-    var angleC = pi - angleA - angleB;
+    var angleB = Angle(rad: asin(sideA.sin() * angleA.sin()));
+    var angleC = Angle(rad: pi - angleA.rad - angleB.rad);
 
     // Then, calculate the other two sides
     var sideB = calculateOtherSide(sideA, angleA, angleB);
@@ -104,8 +112,8 @@ class SphericalTriangle {
 
   /// Checks if the values form a valid spherical triangle.
   bool isValidTriangle() {
-    var sumOfAngles = _angleA + _angleB + _sideC;
-    var sumOfSides = _sideA + _sideB + _sideC;
+    var sumOfAngles = _angleA.rad + _angleB.rad + _angleB.rad;
+    var sumOfSides = _sideA.rad + _sideB.rad + _sideC.rad;
 
     return !((sumOfAngles - pi).abs() > 1e-6 && sumOfSides >= 2 * pi);
   }
@@ -113,14 +121,14 @@ class SphericalTriangle {
   /// Computes the area of the spherical triangle
   /// using the formula A = E - pi, where E is the
   /// sum of the interior angles of the triangle.
-  double get area {
-    return _angleA + _angleB + _angleC - pi;
+  num get area {
+    return _angleA.rad + _angleB.rad + _angleC.rad - pi;
   }
 
   /// Computes the perimeter of the spherical triangle,
   /// which is the sum of the lengths of its sides.
-  double get perimeter {
-    return _sideA + _sideB + _sideC;
+  num get perimeter {
+    return _sideA.rad + _sideB.rad + _sideC.rad;
   }
 
   /// as a percentage of the surface area of a unit sphere.
@@ -135,20 +143,20 @@ class SphericalTriangle {
   }
 
   /// Returns the angle A.
-  num get angleA => _angleA;
+  Angle get angleA => _angleA;
 
   /// Returns the angle B.
-  num get angleB => _angleB;
+  Angle get angleB => _angleB;
 
   /// Returns the angle C.
-  num get angleC => _angleC;
+  Angle get angleC => _angleC;
 
   /// Returns the side a.
-  num get sideA => _sideA;
+  Angle get sideA => _sideA;
 
   /// Returns the side b.
-  num get sideB => _sideB;
+  Angle get sideB => _sideB;
 
   /// Returns the side c.
-  num get sideC => _sideC;
+  Angle get sideC => _sideC;
 }

@@ -87,8 +87,8 @@ extension MatrixManipulationExtension on Matrix {
       List<dynamic> row = [];
       for (int j = 0; j < newCols; j++) {
         int index = i * newCols + j;
-        int rowIndex = index ~/ _data[0].length;
-        int colIndex = index % _data[0].length;
+        int rowIndex = index ~/ columnCount;
+        int colIndex = index % columnCount;
         row.add(_data[rowIndex][colIndex]);
       }
       newData.add(row);

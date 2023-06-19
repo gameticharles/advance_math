@@ -22,4 +22,19 @@ void main() {
 
   print('Properties of the Matrix:\n$mat\n');
   mat.matrixProperties().forEach((element) => print(' - $element'));
+
+  // var A = Matrix([
+  //   [-7, -2, 9, 4],
+  //   [-4, -9, 3, 0],
+  //   [-3, 4, 6, -2],
+  //   [6, 7, -4, -8]
+  // ]);
+
+  var A = Matrix('4 4 ; -3 3');
+  var eig = A.decomposition.singularValueDecomposition();
+
+  print(eig.S);
+  print(eig.U);
+  print(eig.V);
+  print(eig.checkMatrix);
 }

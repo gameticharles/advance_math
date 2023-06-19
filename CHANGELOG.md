@@ -1,3 +1,10 @@
+## 2.0.0
+* Fixed the usage of quantities in the respective computations
+* Implemented support for quantity
+* Fixed Web not supported
+* Fixed range
+* Fixed README
+
 ## 1.0.3
 * Fixed bugs
 * Fixed README
