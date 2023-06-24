@@ -14,6 +14,7 @@ part of algebra;
 /// - [scalar]: A diagonal matrix with equal non-zero elements on the main diagonal.
 /// - [row]: A matrix with only one row.
 /// - [column]: A matrix with only one column.
+/// - [magic]: A magic square is an arrangement of the integers 1:n^2 such that the row sums, column sums, and diagonal sums are all equal to the same value.
 /// - [fullRank]: A matrix with rank equal to the minimum of its row and column count.
 /// - [horizontal]: A matrix with more columns than rows.
 /// - [vertical]: A matrix with more rows than columns.
@@ -67,6 +68,7 @@ enum MatrixType {
   scalar,
   row,
   column,
+  magic,
   fullRank,
   horizontal,
   vertical,

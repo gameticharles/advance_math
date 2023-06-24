@@ -1,3 +1,11 @@
+## 2.0.2
+* Changed the reverse function to flip in matrices
+* Added magic() to the Maatrix constructors
+* Fixed bug in FileIO
+
+## 2.0.1
+* Fixed bug
+
 ## 2.0.0
 * Fixed the usage of quantities in the respective computations
 * Implemented support for quantity

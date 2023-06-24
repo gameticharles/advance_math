@@ -604,6 +604,12 @@ class Vector extends IterableMixin<num> {
     }
   }
 
+  /// Flips elements of the vector.
+  Vector flip() {
+    var newData = _data.reversed.toList();
+    return Vector.fromList(newData);
+  }
+
   /// Adds a new value at the end of the row.
   void push(num value) {
     _data.add(value);

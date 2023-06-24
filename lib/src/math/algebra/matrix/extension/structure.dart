@@ -64,6 +64,7 @@ extension MatrixStructure on Matrix {
     safelyAdd('Scalar Matrix', isScalarMatrix);
     safelyAdd('Row Matrix', isRowMatrix);
     safelyAdd('Column Matrix', isColumnMatrix);
+    safelyAdd('Magic Matrix', isMagicMatrix);
     safelyAdd('Full Rank Matrix', isFullRank);
     safelyAdd('Horizontal Matrix', isHorizontalMatrix);
     safelyAdd('Vertical Matrix', isVerticalMatrix);
@@ -97,6 +98,66 @@ extension MatrixStructure on Matrix {
     if (properties.isEmpty) properties.add('General Matrix');
 
     return properties;
+  }
+
+  /// Checks if the matrix is a magic square.
+  ///
+  /// Returns true if the matrix is a magic square and false otherwise.
+  ///
+  /// Example:
+  /// ```dart
+  /// var matrix = Matrix.magic(3);
+  /// print(matrix.isMagic());
+  /// // Output: true
+  /// ```
+  bool isMagicMatrix() {
+    if (!isSquareMatrix()) {
+      return false;
+    }
+
+    int n = rows.length;
+
+    // Compute sum of first row
+    num sum = 0;
+    for (int i = 0; i < n; i++) {
+      sum += _data[0][i];
+    }
+
+    // Check rows and columns
+    for (int i = 0; i < n; i++) {
+      num rowSum = 0, colSum = 0;
+      for (int j = 0; j < n; j++) {
+        rowSum += _data[i][j];
+        colSum += _data[j][i];
+      }
+
+      if (rowSum != sum || colSum != sum) {
+        return false;
+      }
+    }
+
+    // Check main diagonal
+    num diagSum1 = 0;
+    for (int i = 0; i < n; i++) {
+      diagSum1 += _data[i][i];
+    }
+
+    if (diagSum1 != sum) {
+      return false;
+    }
+
+    // Check other diagonal
+    num diagSum2 = 0;
+    for (int i = 0; i < n; i++) {
+      diagSum2 += _data[i][n - 1 - i];
+    }
+
+    if (diagSum2 != sum) {
+      return false;
+    }
+
+    // All checks passed
+    return true;
   }
 
   /// Checks if two matrices are approximately equal within the given tolerance.

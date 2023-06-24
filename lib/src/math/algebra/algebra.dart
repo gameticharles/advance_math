@@ -15,6 +15,7 @@ part 'matrix/matrix.dart';
 
 part 'enum/matrix_align.dart';
 part 'enum/norm.dart';
+part 'enum/axis.dart';
 part 'enum/rescale.dart';
 part 'enum/matrix_types.dart';
 part 'enum/distance_types.dart';

@@ -500,6 +500,225 @@ class Matrix extends IterableMixin<List<dynamic>> {
         value: value, isDouble: value is double);
   }
 
+  /// Constructs a new `Matrix` from smaller square matrices (blocks).
+  ///
+  /// [blocks]: A 2D list of square `Matrix` objects that will be used to create
+  /// the new `Matrix`. All matrices must be of the same size.
+  ///
+  /// Returns a new `Matrix` constructed from the provided blocks.
+  ///
+  /// Example:
+  /// ```dart
+  /// var block1 = Matrix([
+  ///   [1, 2],
+  ///   [3, 4]
+  /// ]);
+  /// var block2 = Matrix([
+  ///   [5, 6],
+  ///   [7, 8]
+  /// ]);
+  /// var block3 = Matrix([
+  ///   [9, 10],
+  ///   [11, 12]
+  /// ]);
+  /// var block4 = Matrix([
+  ///   [13, 14],
+  ///   [15, 16]
+  /// ]);
+  /// var matrix = Matrix.fromBlocks([
+  ///   [block1, block2],
+  ///   [block3, block4]
+  /// ]);
+  /// print(matrix);
+  /// ```
+  ///
+  /// Output:
+  /// ```plaintext
+  /// Matrix: 4x4
+  /// ┌  1   2   5   6 ┐
+  /// |  3   4   7   8 |
+  /// |  9  10  13  14 |
+  /// └ 11  12  15  16 ┘
+  /// ```
+  factory Matrix.fromBlocks(List<List<Matrix>> blocks) {
+    int rows = blocks.length;
+    int cols = blocks[0].length;
+
+    // Check that blocks is a valid 2D list of Matrices.
+    for (var blockRow in blocks) {
+      if (blockRow.length != cols) {
+        throw ArgumentError('All rows of blocks must have the same length.');
+      }
+
+      for (var block in blockRow) {
+        if (block._data.length != block._data[0].length) {
+          throw ArgumentError('All blocks must be square matrices.');
+        }
+      }
+    }
+
+    // Check that all blocks have the same dimensions.
+    int blockSize = blocks[0][0]._data.length;
+    for (var blockRow in blocks) {
+      for (var block in blockRow) {
+        if (block._data.length != blockSize) {
+          throw ArgumentError('All blocks must have the same dimensions.');
+        }
+      }
+    }
+
+    // Create the new matrix.
+    List<List<dynamic>> matrix = List.generate(
+        rows * blockSize, (_) => List<num>.filled(cols * blockSize, 0));
+    for (int blockRow = 0; blockRow < rows; ++blockRow) {
+      for (int blockCol = 0; blockCol < cols; ++blockCol) {
+        for (int row = 0; row < blockSize; ++row) {
+          for (int col = 0; col < blockSize; ++col) {
+            matrix[blockSize * blockRow + row][blockSize * blockCol + col] =
+                blocks[blockRow][blockCol]._data[row][col];
+          }
+        }
+      }
+    }
+
+    return Matrix(matrix);
+  }
+
+  /// Generates a magic square of the given size.
+  ///
+  /// A magic square is an `n x n` matrix filled with distinct positive integers
+  /// from `1` to `n^2` that add up to the same number in each row, column, and diagonal.
+  ///
+  /// This function throws an [ArgumentError] if the input size `n` is non-positive or equals to 2,
+  /// since a magic square is not possible for these values.
+  ///
+  /// Example:
+  /// ```dart
+  /// final magicSquare = Matrix.magic(3);
+  /// print(magicSquare);
+  /// ```
+  ///
+  /// Output:
+  /// ```dart
+  /// // Matrix: 3x3
+  /// // ┌ 8 1 6 ┐
+  /// // | 3 5 7 |
+  /// // └ 4 9 2 ┘
+  /// ```
+  factory Matrix.magic(int n) {
+    if (n <= 2) {
+      throw ArgumentError("Magic square is not possible for n=$n");
+    }
+
+    List<List<dynamic>> matrix =
+        List.generate(n, (_) => List<num>.filled(n, 0));
+
+    if (n % 2 != 0) {
+      // Odd order case remains the same (Siamese method).
+      int count = 1;
+      int i = 0;
+      int j = n ~/ 2;
+
+      while (count <= math.pow(n, 2)) {
+        matrix[i][j] = count++;
+        i--;
+        j++;
+
+        if (i < 0 && j == n) {
+          i += 2;
+          j--;
+        } else if (i < 0) {
+          i = n - 1;
+        } else if (j == n) {
+          j = 0;
+        } else if (matrix[i][j] != 0) {
+          i += 2;
+          j--;
+        }
+      }
+    } else if (n % 4 == 0) {
+      // Doubly even order case (Bachmann's Method)
+      int count = 1;
+
+      for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+          if ((i % 4 == j % 4) || ((i % 4 + j % 4) == 3)) {
+            matrix[i][j] = count;
+          } else {
+            matrix[i][j] = n * n + 1 - count;
+          }
+          count++;
+        }
+      }
+    } else {
+      // Singly even order case (Strachey's method)
+      int m = n ~/ 2;
+      int d = (n - 2) ~/ 4;
+      Matrix A = Matrix.magic(m);
+
+      for (int i = 0; i < m; i++) {
+        for (int j = 0; j < m; j++) {
+          int aij = A[i][j];
+          matrix[i][j] = aij;
+          matrix[i + m][j] = aij + 3 * m * m;
+          matrix[i][j + m] = aij + 2 * m * m;
+          matrix[i + m][j + m] = aij + m * m;
+        }
+      }
+
+      // Swap left side
+      for (int j = 0; j < d; j++) {
+        for (int i = 0; i < m; i++) {
+          int tmp = matrix[i][j];
+          matrix[i][j] = matrix[i + m][j];
+          matrix[i + m][j] = tmp;
+        }
+      }
+
+      // Swap right side
+      for (int j = n - d + 1; j < n; j++) {
+        for (int i = 0; i < m; i++) {
+          int tmp = matrix[i][j];
+          matrix[i][j] = matrix[i + m][j];
+          matrix[i + m][j] = tmp;
+        }
+      }
+
+      // Swap corner elements back to original position
+      for (int j = 1; j <= d; j++) {
+        int tmp = matrix[m - 1][j];
+        matrix[m - 1][j] = matrix[m][j];
+        matrix[m][j] = tmp;
+      }
+
+      // Swap the middle columns
+      int tmp = matrix[m - 1][d];
+      matrix[m - 1][d] = matrix[m][d];
+      matrix[m][d] = tmp;
+      tmp = matrix[m - 1][d - 1];
+      matrix[m - 1][d - 1] = matrix[m][d - 1];
+      matrix[m][d - 1] = tmp;
+    }
+
+    Matrix result = Matrix(matrix);
+
+    // Add these lines to flip the result for doubly even order
+    if (n % 4 == 0) {
+      result = result.flip(MatrixAxis.vertical).flip(MatrixAxis.horizontal);
+    }
+
+    return result;
+  }
+
+  static List<List<dynamic>> swaps(
+      List<List<dynamic>> matrix, int i1, int j1, int i2, int j2) {
+    int temp = matrix[i1][j1];
+    matrix[i1][j1] = matrix[i2][j2];
+    matrix[i2][j2] = temp;
+
+    return matrix;
+  }
+
   /// Creates a Matrix of the specified dimensions with all elements set to the specified value.
   ///
   /// [rows]: Number of rows.

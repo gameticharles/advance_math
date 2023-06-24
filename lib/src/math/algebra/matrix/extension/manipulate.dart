@@ -576,46 +576,37 @@ extension MatrixManipulationExtension on Matrix {
     return newData;
   }
 
-  /// Reverses the matrix along the specified axis.
+  /// Flips the matrix along the specified axis.
   ///
-  /// [axis]: The axis along which to reverse the matrix (0 for rows, 1 for columns).
+  /// [axis]: The axis along which to flip the matrix (Axis.rows for rows, Axis.columns for columns).
   ///
-  /// Returns a new matrix reversed along the specified axis.
+  /// Returns a new matrix flipped along the specified axis.
   ///
   /// Example:
   /// ```dart
   /// var matrix = Matrix([[1, 2], [3, 4], [5, 6]]);
-  /// var matrixReversed = matrix.reverse(1);
+  /// var matrixReversed = matrix.flip(MatrixAxis.horizontal);
   /// print(matrixReversed);
   /// // Output:
-  /// // 2  1
-  /// // 4  3
-  /// // 6  5
+  /// // Matrix: 3x2
+  /// // ┌ 2  1 ┐
+  /// // │ 4  3 │
+  /// // └ 6  5 ┘
   /// ```
-  Matrix reverse(int axis) {
-    if (axis == 0) {
-      List<List<dynamic>> newData = [];
+  Matrix flip(MatrixAxis axis) {
+    List<List<dynamic>> newData = [];
 
-      for (int i = rowCount - 1; i >= 0; i--) {
-        newData.add(this[i]);
-      }
+    switch (axis) {
+      case MatrixAxis.vertical:
+        newData = _data.reversed.toList();
+        break;
 
-      return Matrix(newData);
-    } else if (axis == 1) {
-      List<List<dynamic>> newData = [];
-
-      for (int i = 0; i < rowCount; i++) {
-        List<dynamic> row = [];
-        for (int j = columnCount - 1; j >= 0; j--) {
-          row.add(this[i][j]);
-        }
-        newData.add(row);
-      }
-
-      return Matrix(newData);
-    } else {
-      throw Exception('Invalid axis');
+      case MatrixAxis.horizontal:
+        newData = _data.map((row) => row.reversed.toList()).toList();
+        break;
     }
+
+    return Matrix(newData);
   }
 
   /// Returns a copy of the matrix.

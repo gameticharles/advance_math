@@ -29,7 +29,8 @@ extension MatrixListExtension on List<List<dynamic>> {
   List max({int? axis}) => Matrix(this).max();
 
   /// flip (`reverse`) the matrix along the given axis and returns the modified array.
-  List flip({int axis = 0}) => Matrix(this).reverse(axis).toList();
+  List flip({MatrixAxis axis = MatrixAxis.vertical}) =>
+      Matrix(this).flip(axis).toList();
 }
 
 extension ListVector on List<num> {
