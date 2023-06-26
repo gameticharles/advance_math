@@ -4,7 +4,7 @@ extension MatrixManipulationExtension on Matrix {
   /// Concatenates the given list of matrices with the current matrix along the specified axis.
   ///
   /// [matrices]: List of matrices to be concatenated.
-  /// [axis]: 0 for concatenating along rows, and 1 for concatenating along columns (default is 0).
+  /// [axis]: 0 for concatenating along rows (vertically), and 1 for concatenating along columns (horizontally) (default is 0).
   /// [resize]: If true, resizes the matrices so that they have the same dimensions before concatenation (default is false).
   ///
   /// Returns a new concatenated matrix.
@@ -578,14 +578,15 @@ extension MatrixManipulationExtension on Matrix {
 
   /// Flips the matrix along the specified axis.
   ///
-  /// [axis]: The axis along which to flip the matrix (Axis.rows for rows, Axis.columns for columns).
+  /// [axis]: 0 for flipping along rows (vertically),
+  /// and 1 for flipping along columns (horizontally) (default is 0).
   ///
   /// Returns a new matrix flipped along the specified axis.
   ///
   /// Example:
   /// ```dart
   /// var matrix = Matrix([[1, 2], [3, 4], [5, 6]]);
-  /// var matrixReversed = matrix.flip(MatrixAxis.horizontal);
+  /// var matrixReversed = matrix.flip(axis:0);
   /// print(matrixReversed);
   /// // Output:
   /// // Matrix: 3x2
@@ -593,15 +594,19 @@ extension MatrixManipulationExtension on Matrix {
   /// // │ 4  3 │
   /// // └ 6  5 ┘
   /// ```
-  Matrix flip(MatrixAxis axis) {
+  Matrix flip({int axis = 0}) {
+    if (axis < 0 || axis > 1) {
+      throw ArgumentError(
+          "Axis out of range. Must be 0 - vertical or 1- horizontal.");
+    }
     List<List<dynamic>> newData = [];
 
     switch (axis) {
-      case MatrixAxis.vertical:
+      case 0:
         newData = _data.reversed.toList();
         break;
 
-      case MatrixAxis.horizontal:
+      case 1:
         newData = _data.map((row) => row.reversed.toList()).toList();
         break;
     }
@@ -763,15 +768,6 @@ extension MatrixManipulationExtension on Matrix {
       throw Exception('Column indices are out of range');
     }
 
-    // List<List<dynamic>> newData = [];
-
-    // for (int i = 0; i < rowIndices_.length; i++) {
-    //   List<dynamic> row = [];
-    //   for (int j = 0; j < colIndices_.length; j++) {
-    //     row.add(_data[rowIndices_[i]][colIndices_[j]]);
-    //   }
-    //   newData.add(row);
-    // }
     List<List<dynamic>> newData = rowIndices_.map((rowIndex) {
       return colIndices_.map((colIndex) => _data[rowIndex][colIndex]).toList();
     }).toList();
@@ -1109,5 +1105,42 @@ extension MatrixManipulationExtension on Matrix {
         rowCount, (i) => List.generate(columnCount, (j) => func(_data[i][j])));
 
     return Matrix(newData);
+  }
+
+  /// Applies the given function [func] to each row in the matrix and returns a new matrix with the results.
+  ///
+  /// [func] should be a function that takes a list argument (representing a row) and returns a list.
+  /// The returned list can be of different length from the input list, which allows this method to be used for operations like filtering or extending rows.
+  ///
+  /// Example:
+  /// ```dart
+  /// var matrix = Matrix.fromList([
+  ///   [1, 2, 3],
+  ///   [4, 5, 6],
+  ///   [7, 8, 9]
+  /// ]);
+  ///
+  /// // Doubles the value of each element in each row
+  /// var doubledMatrix = matrix.applyToRows((row) => row.map((x) => x * 2).toList());
+  /// print(doubledMatrix);
+  ///
+  /// // Output:
+  /// // [[2, 4, 6],
+  /// //  [8, 10, 12],
+  /// //  [14, 16, 18]]
+  ///
+  /// // Filters each row to only keep even numbers
+  /// var evenMatrix = matrix.applyToRows((row) => row.where((x) => x % 2 == 0).toList());
+  /// print(evenMatrix);
+  ///
+  /// // Output:
+  /// // [[2],
+  /// //  [4, 6],
+  /// //  [8]]
+  /// ```
+  ///
+  /// Note: The number of columns in the resulting matrix can vary from row to row if [func] changes the length of the rows.
+  Matrix applyToRows(List<dynamic> Function(List<dynamic>) func) {
+    return Matrix(_data.map((row) => func(row)).toList());
   }
 }

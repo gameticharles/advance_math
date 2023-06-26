@@ -169,7 +169,6 @@ class MatrixFactory {
           }
         }
         break;
-
       case MatrixType.periodic:
         if (rowCount != columnCount) {
           throw ArgumentError(

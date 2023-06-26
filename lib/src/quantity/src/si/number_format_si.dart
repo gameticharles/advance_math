@@ -258,7 +258,8 @@ class NumberFormatSI implements NumberFormat {
   }
 
   @override
-  int? get significantDigits => _scientific.significantDigits;
+  int? get significantDigits =>
+      maximumSignificantDigits! ~/ minimumSignificantDigits!;
 
   // @override
   // int? get maximumSignificantDigits => _scientific.maximumSignificantDigits;

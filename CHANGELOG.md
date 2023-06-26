@@ -1,3 +1,9 @@
+## 2.1.0
+* Added arguments for diagonal 
+* Improved min, max and sum functions with axes
+* Fixed bug with magic matrix not working for singly even numbers (6, 10, 14, 18, 22 etc).
+* Fixed bugs
+
 ## 2.0.2
 * Changed the reverse function to flip in matrices
 * Added magic() to the Maatrix constructors

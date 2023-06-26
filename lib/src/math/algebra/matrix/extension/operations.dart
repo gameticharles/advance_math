@@ -591,27 +591,125 @@ extension MatrixOperationExtension on Matrix {
     return Matrix(newData);
   }
 
-  /// Calculates the sum of the elements in the matrix.
+  /// Calculates the sum of the elements in the matrix along the specified axis.
   ///
-  /// [absolute]: If set to `true`, the absolute values of the elements are summed.
+  /// - If [axis] is null, the sum of all elements is returned.
+  /// - If [axis] is 0, a list of sums of each column is returned.
+  /// - If [axis] is 1, a list of sums of each row is returned.
+  /// - If [axis] is 2, the sum of the diagonal elements is returned.
+  /// If the matrix is non-square, the sum is of the elements from
+  /// the top left to the bottom right, up to the point where the matrix ends.
+  /// - If [axis] is 3, a list of sums of each main diagonal (top-left to bottom-right) is returned.
+  /// - If [axis] is 4, a list of sums of each anti-diagonal (top-right to bottom-left) is returned.
   ///
-  /// Returns the sum of the elements in the matrix.
+  /// [absolute] (optional): If set to `true`, the absolute values of the elements are summed.
   ///
   /// Example:
   /// ```dart
-  /// var matrix = Matrix([[1, 2], [3, 4]]);
-  /// var result = matrix.sum();
-  /// print(result); // Output: 10
+  /// var matrix = Matrix.fromList([[1, 2, 3], [4, -5, 6], [-7, 8, 9]]);
+  /// var nonSquareMatrix = Matrix.fromList([[1, 2, 3], [4, -5, 6]]);
+  ///
+  /// var totalSum = matrix.sum();
+  /// print(totalSum); // Output: 21
+  ///
+  /// var rowSums = matrix.sum(axis: 1);
+  /// print(rowSums); // Output: [6, 5, 10]
+  ///
+  /// var colSums = matrix.sum(axis: 0);
+  /// print(colSums); // Output: [-2, 5, 18]
+  ///
+  /// var diagSum = matrix.sum(axis: 2);
+  /// print(diagSum); // Output: 5
+  ///
+  /// var diagonalSumTLBR = matrix.sum(axis: 3);
+  /// print(diagonalSumTLBR); // Output: [-7, 12, 5, 8, 3]
+  ///
+  /// var diagonalSumTRBL = matrix.sum(axis: 4);
+  /// print(diagonalSumTRBL); // Output: [1, 6, -5, 14, 9]
+  ///
+  /// var diagSumNonSquare = nonSquareMatrix.sum(axis: 2);
+  /// print(diagSumNonSquare); // Output: -4
+  ///
+  /// var diagonalNonSumTLBR = nonSquareMatrix.sum(axis: 3);
+  /// print(diagonalNonSumTLBR); // Output: [4, -4, 8, 3]
+  ///
+  /// var diagonalNonSumTRBL = nonSquareMatrix.sum(axis: 4);
+  /// print(diagonalNonSumTRBL); // Output: [1, 6, -2, 6]
+  ///
+  /// var totalSumAbs = matrix.sum(absolute: true);
+  /// print(totalSumAbs); // Output: 45
+  ///
+  /// var rowSumsAbs = matrix.sum(axis: 1, absolute: true);
+  /// print(rowSumsAbs); // Output: [6, 15, 24]
+  ///
+  /// var colSumsAbs = matrix.sum(axis: 0, absolute: true);
+  /// print(colSumsAbs); // Output: [12, 15, 18]
+  ///
+  /// var diagSumAbs = matrix.sum(axis: 2, absolute: true);
+  /// print(diagSumAbs); // Output: 15
   /// ```
-  num sum({bool absolute = false}) {
-    if (toList().isEmpty) {
-      throw Exception("Matrix is empty");
+  ///
+  /// Returns zero(0) if the matrix is empty.
+  /// Throws [ArgumentError] if [axis] is not null, 0, 1, 2, 3 or 4.
+  dynamic sum({bool absolute = false, int? axis}) {
+    if (_data.isEmpty) {
+      return 0;
     }
-    num sum = 0;
-    for (dynamic element in elements) {
-      sum += absolute ? (element as num).abs() : (element as num);
+
+    if (axis != null &&
+        axis != 0 &&
+        axis != 1 &&
+        axis != 2 &&
+        axis != 3 &&
+        axis != 4) {
+      throw ArgumentError(
+          "Axis must be 0 (for columns), 1 (for rows), 2 (for diagonal), 3 (for main diagonal), 4 (for anti-diagonal),  or null (for total sum)");
     }
-    return sum;
+
+    switch (axis) {
+      case 0:
+        return List.generate(
+            columnCount,
+            (col) => _data
+                .map((row) => absolute ? row[col].abs() : row[col])
+                .reduce((value, element) => value + element));
+      case 1:
+        return _data
+            .map((row) => row
+                .map((e) => absolute ? e.abs() : e)
+                .reduce((value, element) => value + element))
+            .toList();
+      case 2:
+        int diagonalLength = math.min(rowCount, columnCount);
+        num diagonalSum = 0;
+        for (int i = 0; i < diagonalLength; i++) {
+          diagonalSum += absolute ? _data[i][i].abs() : _data[i][i];
+        }
+        return diagonalSum;
+
+      case 3:
+      case 4:
+        List<num> sums = [];
+        var data = axis == 4 ? _data.reversed.toList() : _data;
+        for (int offset = 1 - rowCount; offset < columnCount; offset++) {
+          num diagonalSum = 0;
+          for (int row = 0; row < rowCount; row++) {
+            int col = row + offset;
+            if (col >= 0 && col < columnCount) {
+              diagonalSum += absolute ? data[row][col].abs() : data[row][col];
+            }
+          }
+          sums.add(diagonalSum);
+        }
+        return sums;
+
+      default:
+        num sum = 0;
+        for (dynamic element in elements) {
+          sum += absolute ? (element as num).abs() : (element as num);
+        }
+        return sum;
+    }
   }
 
   /// Returns the product of all elements in the matrix.
@@ -1029,12 +1127,11 @@ extension MatrixOperationExtension on Matrix {
   /// var result = matrix.determinant();
   /// print(result); // Output: -2
   /// ```
-  double determinant() {
+  num determinant() {
     int n = rowCount;
     if (n != columnCount) {
       throw Exception('Matrix must be square to calculate determinant');
     }
-    _data = _Utils.toDoubleList(_data);
 
     if (n == 1) {
       return this[0][0];
@@ -1309,7 +1406,7 @@ extension MatrixOperationExtension on Matrix {
       throw Exception('Matrix must be square to calculate inverse');
     }
 
-    double det = determinant();
+    num det = determinant();
     if (det == 0) {
       throw Exception('Matrix is singular and cannot be inverted');
     }

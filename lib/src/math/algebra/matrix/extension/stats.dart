@@ -1,33 +1,121 @@
 part of algebra;
 
 extension MatrixStatsExtension on Matrix {
-  /// Returns the smallest value in the matrix.
+  /// Returns the smallest value in the matrix along the specified axis.
   ///
-  /// Throws an exception if the matrix is empty.
+  /// If [axis] is null, the smallest value in the matrix is returned.
+  /// If [axis] is 0, a list of the smallest values in each column is returned.
+  /// If [axis] is 1, a list of the smallest values in each row is returned.
   ///
   /// Example:
   /// ```dart
-  /// var matrix = Matrix([[2, 3], [1, 4]]);
-  /// print(matrix.min()); // Output: 1
+  /// var matrix = Matrix.fromList([[2, 3], [1, 4]]);
+  ///
+  /// var minValue = matrix.min();
+  /// print(minValue); // Output: 1
+  ///
+  /// var rowMinValues = matrix.min(axis: 1);
+  /// print(rowMinValues); // Output: [2, 1]
+  ///
+  /// var colMinValues = matrix.min(axis: 0);
+  /// print(colMinValues); // Output: [1, 3]
   /// ```
-  dynamic min() {
+  ///
+  /// Throws [Exception] if the matrix is empty.
+  /// Throws [ArgumentError] if [axis] is not null, 0, or 1.
+  dynamic min({int? axis}) {
     int rows = rowCount;
     int cols = columnCount;
     if (rows == 0 || cols == 0) {
       throw Exception("Matrix is empty");
     }
 
-    dynamic minValue = this[0][0];
-
-    for (int i = 0; i < rows; i++) {
-      for (int j = 0; j < cols; j++) {
-        if (this[i][j] < minValue) {
-          minValue = this[i][j];
-        }
-      }
+    if (axis != null && axis != 0 && axis != 1) {
+      throw ArgumentError(
+          "Axis must be 0 (for columns), 1 (for rows), or null (for total min)");
     }
 
-    return minValue;
+    switch (axis) {
+      case 0:
+        return List<dynamic>.generate(
+            _data[0].length,
+            (i) =>
+                _Utils.toNumList(_data).map((row) => row[i]).reduce(math.min));
+      case 1:
+        return _Utils.toNumList(_data)
+            .map((row) => row.reduce(math.min))
+            .toList();
+      default:
+        dynamic minValue = _data[0][0];
+
+        for (var row in _Utils.toNumList(_data)) {
+          dynamic rowMin = row.reduce(math.min);
+          if (rowMin < minValue) {
+            minValue = rowMin;
+          }
+        }
+
+        return minValue;
+    }
+  }
+
+  /// Returns the largest numeric value in the matrix along the specified axis.
+  ///
+  /// If [axis] is null, the largest value in the matrix is returned.
+  /// If [axis] is 0, a list of the largest values in each column is returned.
+  /// If [axis] is 1, a list of the largest values in each row is returned.
+  ///
+  /// Example:
+  /// ```dart
+  /// var matrix = Matrix.fromList([[2, 3], [1, 4]]);
+  ///
+  /// var maxValue = matrix.max();
+  /// print(maxValue); // Output: 4
+  ///
+  /// var rowMaxValues = matrix.max(axis: 1);
+  /// print(rowMaxValues); // Output: [3, 4]
+  ///
+  /// var colMaxValues = matrix.max(axis: 0);
+  /// print(colMaxValues); // Output: [2, 4]
+  /// ```
+  ///
+  /// Throws [Exception] if the matrix is empty.
+  /// Throws [ArgumentError] if [axis] is not null, 0, or 1.
+  /// Throws [ArgumentError] if the matrix contains non-numeric values.
+  dynamic max({int? axis}) {
+    int rows = rowCount;
+    int cols = columnCount;
+    if (rows == 0 || cols == 0) {
+      throw Exception("Matrix is empty");
+    }
+
+    if (axis != null && axis != 0 && axis != 1) {
+      throw ArgumentError(
+          "Axis must be 0 (for columns), 1 (for rows), or null (for total min)");
+    }
+
+    switch (axis) {
+      case 0:
+        return List<dynamic>.generate(
+            _data[0].length,
+            (i) =>
+                _Utils.toNumList(_data).map((row) => row[i]).reduce(math.max));
+      case 1:
+        return _Utils.toNumList(_data)
+            .map((row) => row.reduce(math.max))
+            .toList();
+      default:
+        dynamic maxValue = _data[0][0];
+
+        for (var row in _Utils.toNumList(_data)) {
+          num rowMax = row.reduce(math.max);
+          if (rowMax > maxValue) {
+            maxValue = rowMax;
+          }
+        }
+
+        return maxValue;
+    }
   }
 
   /// Finds the maximum absolute value in the matrix starting from the given row and column indices (inclusive).
@@ -94,35 +182,6 @@ extension MatrixStatsExtension on Matrix {
     }
 
     return [minRow, minCol];
-  }
-
-  /// Returns the largest value in the matrix.
-  ///
-  /// Throws an exception if the matrix is empty.
-  ///
-  /// Example:
-  /// ```dart
-  /// var matrix = Matrix([[2, 3], [1, 4]]);
-  /// print(matrix.max()); // Output: 4
-  /// ```
-  dynamic max() {
-    int rows = rowCount;
-    int cols = columnCount;
-    if (rows == 0 || cols == 0) {
-      throw Exception("Matrix is empty");
-    }
-
-    dynamic maxValue = this[0][0];
-
-    for (int i = 0; i < rows; i++) {
-      for (int j = 0; j < cols; j++) {
-        if (this[i][j] > maxValue) {
-          maxValue = this[i][j];
-        }
-      }
-    }
-
-    return maxValue;
   }
 
   /// Returns the rank of the matrix.

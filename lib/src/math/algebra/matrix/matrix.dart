@@ -266,12 +266,6 @@ class Matrix extends IterableMixin<List<dynamic>> {
       }
     }
     return Matrix(data);
-
-    // List<List<dynamic>> data =
-    //     columns.map((col) => col.columns.first.flatten).toList();
-    // return Matrix(data).transpose();
-
-    //return Matrix.concatenate(columns, axis: 1, resize: resize);
   }
 
   /// Constructs a Matrix from a list of Row vectors.
@@ -302,7 +296,6 @@ class Matrix extends IterableMixin<List<dynamic>> {
     }
 
     return Matrix(rows.map((row) => row.rows.first).toList());
-    //return Matrix.concatenate(rows, axis: 0, resize: resize);
   }
 
   /// Concatenates a list of matrices along the specified axis.
@@ -334,11 +327,11 @@ class Matrix extends IterableMixin<List<dynamic>> {
   factory Matrix.concatenate(List<Matrix> matrices,
       {int axis = 0, bool resize = false}) {
     if (matrices.isEmpty) {
-      throw Exception("Matrices list cannot be null or empty");
+      throw ArgumentError("Matrices list cannot be null or empty");
     }
 
     if (axis != 0 && axis != 1) {
-      throw Exception("Invalid axis: Axis must be either 0 or 1");
+      throw ArgumentError("Invalid axis: Axis must be either 0 or 1");
     }
 
     Matrix first = matrices[0];
@@ -502,10 +495,13 @@ class Matrix extends IterableMixin<List<dynamic>> {
 
   /// Constructs a new `Matrix` from smaller square matrices (blocks).
   ///
-  /// [blocks]: A 2D list of square `Matrix` objects that will be used to create
-  /// the new `Matrix`. All matrices must be of the same size.
+  /// The blocks of the matrix are specified in a two-dimensional list, with each inner list
+  /// representing a row of blocks. This allows you to construct a large matrix from
+  /// smaller matrices, each representing a block of the larger one.
   ///
-  /// Returns a new `Matrix` constructed from the provided blocks.
+  /// It's essential that all block matrices are square and of the same size. This constructor
+  /// will throw an `ArgumentError` if the blocks are not all the same size, or if they're not
+  /// all square matrices.
   ///
   /// Example:
   /// ```dart
@@ -540,40 +536,38 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// |  9  10  13  14 |
   /// └ 11  12  15  16 ┘
   /// ```
+  ///
+  /// [blocks]: A 2D list of square `Matrix` objects that will be used to create
+  /// the new `Matrix`. All matrices must be of the same size.
   factory Matrix.fromBlocks(List<List<Matrix>> blocks) {
     int rows = blocks.length;
     int cols = blocks[0].length;
+    int blockSize = blocks[0][0]._data.length;
 
-    // Check that blocks is a valid 2D list of Matrices.
+    // Check for block validity and uniformity.
     for (var blockRow in blocks) {
       if (blockRow.length != cols) {
         throw ArgumentError('All rows of blocks must have the same length.');
       }
 
       for (var block in blockRow) {
-        if (block._data.length != block._data[0].length) {
-          throw ArgumentError('All blocks must be square matrices.');
+        if (block._data.length != blockSize ||
+            block._data[0].length != blockSize) {
+          throw ArgumentError(
+              'All blocks must be square matrices and have the same dimensions.');
         }
       }
     }
 
-    // Check that all blocks have the same dimensions.
-    int blockSize = blocks[0][0]._data.length;
-    for (var blockRow in blocks) {
-      for (var block in blockRow) {
-        if (block._data.length != blockSize) {
-          throw ArgumentError('All blocks must have the same dimensions.');
-        }
-      }
-    }
-
-    // Create the new matrix.
+    // Pre-compute the final size of the matrix and allocate memory at once.
     List<List<dynamic>> matrix = List.generate(
         rows * blockSize, (_) => List<num>.filled(cols * blockSize, 0));
-    for (int blockRow = 0; blockRow < rows; ++blockRow) {
-      for (int blockCol = 0; blockCol < cols; ++blockCol) {
-        for (int row = 0; row < blockSize; ++row) {
-          for (int col = 0; col < blockSize; ++col) {
+
+    // Re-order loops for more linear data access.
+    for (int row = 0; row < blockSize; ++row) {
+      for (int col = 0; col < blockSize; ++col) {
+        for (int blockRow = 0; blockRow < rows; ++blockRow) {
+          for (int blockCol = 0; blockCol < cols; ++blockCol) {
             matrix[blockSize * blockRow + row][blockSize * blockCol + col] =
                 blocks[blockRow][blockCol]._data[row][col];
           }
@@ -606,117 +600,86 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// // └ 4 9 2 ┘
   /// ```
   factory Matrix.magic(int n) {
-    if (n <= 2) {
-      throw ArgumentError("Magic square is not possible for n=$n");
+    if (n < 3) {
+      throw ArgumentError("Size must be at least 3");
     }
 
-    List<List<dynamic>> matrix =
-        List.generate(n, (_) => List<num>.filled(n, 0));
+    var result = Matrix.zeros(n, n);
 
-    if (n % 2 != 0) {
+    if (math.isOdd(n)) {
       // Odd order case remains the same (Siamese method).
-      int count = 1;
-      int i = 0;
-      int j = n ~/ 2;
+      var p = List<int>.generate(n, (i) => i + 1);
+      var nPlus3Over2 = (n + 3) ~/ 2;
 
-      while (count <= math.pow(n, 2)) {
-        matrix[i][j] = count++;
-        i--;
-        j++;
-
-        if (i < 0 && j == n) {
-          i += 2;
-          j--;
-        } else if (i < 0) {
-          i = n - 1;
-        } else if (j == n) {
-          j = 0;
-        } else if (matrix[i][j] != 0) {
-          i += 2;
-          j--;
+      for (var i = 0; i < n; i++) {
+        for (var j = 0; j < n; j++) {
+          result[i][j] = n * ((p[i] + p[j] - nPlus3Over2) % n) +
+              (p[i] + 2 * p[j] - 2) % n +
+              1;
         }
       }
-    } else if (n % 4 == 0) {
-      // Doubly even order case (Bachmann's Method)
-      int count = 1;
-
-      for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-          if ((i % 4 == j % 4) || ((i % 4 + j % 4) == 3)) {
-            matrix[i][j] = count;
-          } else {
-            matrix[i][j] = n * n + 1 - count;
+    } else if (math.isDivisible(n, 4)) {
+      // Doubly even order case for n divisible by 4(Bachmann's Method)
+      var J = List<int>.generate(n, (i) => (i + 1) % 4 ~/ 2);
+      for (var i = 0; i < n; i++) {
+        for (var j = 0; j < n; j++) {
+          result[i][j] = i * n + j + 1;
+          if (J[i] == J[j]) {
+            result[i][j] = n * n + 1 - result[i][j];
           }
-          count++;
         }
       }
     } else {
-      // Singly even order case (Strachey's method)
-      int m = n ~/ 2;
-      int d = (n - 2) ~/ 4;
-      Matrix A = Matrix.magic(m);
+      // LUX method for singly even numbers
+      var p = n ~/ 2;
+      // Recursive call to generate smaller magic square
+      var M = Matrix.magic(p);
 
-      for (int i = 0; i < m; i++) {
-        for (int j = 0; j < m; j++) {
-          int aij = A[i][j];
-          matrix[i][j] = aij;
-          matrix[i + m][j] = aij + 3 * m * m;
-          matrix[i][j + m] = aij + 2 * m * m;
-          matrix[i + m][j + m] = aij + m * m;
+      var p2 = p * p;
+      var m3p2 = 3 * p2;
+      var m2p2 = 2 * p2;
+
+      // Populate quadrants with values
+      for (var i = 0; i < p; i++) {
+        for (var j = 0; j < p; j++) {
+          var val = M[i][j];
+          result[i][j] = val;
+          result[i + p][j] = val + m3p2;
+          result[i][j + p] = val + m2p2;
+          result[i + p][j + p] = val + p2;
+        }
+      }
+      var k = (n - 2) ~/ 4;
+      var j = List<int>.generate(k, (idx) => idx)
+        ..addAll(List<int>.generate(k, (idx) => n - k + idx));
+
+      for (var x = 0; x < p; x++) {
+        for (var y in j) {
+          if (y < n) {
+            var tmp = result[x][y];
+            result[x][y] = result[x + p][y];
+            result[x + p][y] = tmp;
+          }
         }
       }
 
-      // Swap left side
-      for (int j = 0; j < d; j++) {
-        for (int i = 0; i < m; i++) {
-          int tmp = matrix[i][j];
-          matrix[i][j] = matrix[i + m][j];
-          matrix[i + m][j] = tmp;
-        }
-      }
+      // Swap corners
+      var tmp = result[k][0];
+      result[k][0] = result[k + p][0];
+      result[k + p][0] = tmp;
 
-      // Swap right side
-      for (int j = n - d + 1; j < n; j++) {
-        for (int i = 0; i < m; i++) {
-          int tmp = matrix[i][j];
-          matrix[i][j] = matrix[i + m][j];
-          matrix[i + m][j] = tmp;
-        }
-      }
+      tmp = result[k][k];
+      result[k][k] = result[k + p][k];
+      result[k + p][k] = tmp;
 
-      // Swap corner elements back to original position
-      for (int j = 1; j <= d; j++) {
-        int tmp = matrix[m - 1][j];
-        matrix[m - 1][j] = matrix[m][j];
-        matrix[m][j] = tmp;
-      }
+      int swapColumnIndex = (n - 6) ~/ 4 + 1;
+      var swapColumn =
+          result.column(result.columnCount - swapColumnIndex).asList;
 
-      // Swap the middle columns
-      int tmp = matrix[m - 1][d];
-      matrix[m - 1][d] = matrix[m][d];
-      matrix[m][d] = tmp;
-      tmp = matrix[m - 1][d - 1];
-      matrix[m - 1][d - 1] = matrix[m][d - 1];
-      matrix[m][d - 1] = tmp;
+      result.setColumn(result.columnCount - swapColumnIndex,
+          [...swapColumn.sublist(n ~/ 2), ...swapColumn.sublist(0, n ~/ 2)]);
     }
-
-    Matrix result = Matrix(matrix);
-
-    // Add these lines to flip the result for doubly even order
-    if (n % 4 == 0) {
-      result = result.flip(MatrixAxis.vertical).flip(MatrixAxis.horizontal);
-    }
-
     return result;
-  }
-
-  static List<List<dynamic>> swaps(
-      List<List<dynamic>> matrix, int i1, int j1, int i2, int j2) {
-    int temp = matrix[i1][j1];
-    matrix[i1][j1] = matrix[i2][j2];
-    matrix[i2][j2] = temp;
-
-    return matrix;
   }
 
   /// Creates a Matrix of the specified dimensions with all elements set to the specified value.
@@ -1166,6 +1129,9 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// super-diagonal elements, while a negative value extracts the sub-diagonal
   /// elements.
   ///
+  /// The optional `reverse` parameter will reverse the order of the rows before
+  /// extracting the diagonal, thus returning the diagonal from bottom-left to top-right.
+  ///
   /// Example:
   /// ```dart
   /// var A = Matrix.fromList([
@@ -1177,22 +1143,27 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// var mainDiagonal = A.diagonal(); // [1, 5, 9]
   /// var subDiagonal = A.diagonal(k: -1); // [4, 8]
   /// var superDiagonal = A.diagonal(k: 1); // [2, 6]
+  /// var reverseDiagonal = A.diagonal(reverse: true); // [7, 5, 3]
+  /// var reverseSuperDiagonal =A.diagonal(k: -1, reverse: true); // [4, 2]
+  /// var reverseSubDiagonal =A.diagonal(k: 1, reverse: true); // [8, 6]
   /// ```
-  List<dynamic> diagonal({int k = 0}) {
+  List<dynamic> diagonal({int k = 0, reverse = false}) {
     List<dynamic> diagonal = [];
     int n = _data.length;
 
+    var data = reverse ? _data.reversed.toList() : _data;
+
     if (k > 0) {
       for (int i = 0; i < n - k; i++) {
-        diagonal.add(_data[i][i + k]);
+        diagonal.add(data[i][i + k]);
       }
     } else if (k < 0) {
       for (int i = 0; i < n + k; i++) {
-        diagonal.add(_data[i - k][i]);
+        diagonal.add(data[i - k][i]);
       }
     } else {
       for (int i = 0; i < n; i++) {
-        diagonal.add(_data[i][i]);
+        diagonal.add(data[i][i]);
       }
     }
 

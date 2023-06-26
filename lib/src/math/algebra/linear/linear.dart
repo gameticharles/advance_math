@@ -44,7 +44,7 @@ class LinearSystemSolvers {
       throw Exception("Matrix A must be a square matrix for Cramer's Rule.");
     }
     int n = a.rowCount;
-    double determinantA = a.determinant();
+    num determinantA = a.determinant();
     if (determinantA == 0) {
       throw Exception(
           "The determinant of A is zero. Cramer's rule is not applicable.");
@@ -55,7 +55,7 @@ class LinearSystemSolvers {
     for (int i = 0; i < n; i++) {
       ai.copyFrom(a);
       ai.setColumn(i, b.flatten());
-      double determinantAi = ai.determinant();
+      num determinantAi = ai.determinant();
       x[i][0] = determinantAi / determinantA;
     }
 
@@ -278,7 +278,7 @@ class LinearSystemSolvers {
       }
 
       // Normalize the pivot row
-      double pivot = augmentedMatrix[i][i];
+      num pivot = augmentedMatrix[i][i];
       for (int k = i; k < augmentedMatrix.columnCount; k++) {
         augmentedMatrix[i][k] /= pivot;
       }

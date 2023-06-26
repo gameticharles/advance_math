@@ -154,6 +154,16 @@ num lerp(num a, num b, num t) {
   return a + (b - a) * t;
 }
 
+/// Checks if a number [n] is divisible by a another number [divisor].
+///
+/// Example:
+/// ```dart
+/// print(isDivisible(8, 4)); // prints: true
+/// ```
+bool isDivisible(num n, num divisor) {
+  return n % divisor == 0;
+}
+
 /// Checks if a number is even.
 ///
 /// Example:

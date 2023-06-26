@@ -514,7 +514,7 @@ class SVD {
   /// Check if a is an Odd number.
   bool isOdd(int a) => a % 2 != 0;
 
-  double hypotenuse(double x, double y) {
+  double hypotenuse(num x, num y) {
     return math.sqrt(math.pow(x, 2) + math.pow(y, 2));
   }
 

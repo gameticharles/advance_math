@@ -14,7 +14,8 @@ extension MatrixListExtension on List<List<dynamic>> {
   Matrix toMatrix() => Matrix(this);
 
   /// Function returns the sum of array elements
-  num get sum => Matrix(this).sum();
+  num sum({bool absolute = false, int? axis}) =>
+      Matrix(this).sum(absolute: absolute, axis: axis);
 
   /// To find a diagonal element from a given matrix and gives output as one dimensional matrix
   List<dynamic> get diagonal => Matrix(this).diagonal();
@@ -23,14 +24,13 @@ extension MatrixListExtension on List<List<dynamic>> {
   List reshape(int row, int column) => Matrix().reshape(row, column).toList();
 
   /// find min value of given matrix
-  List min({int? axis}) => Matrix(this).min();
+  List min({int? axis}) => Matrix(this).min(axis: axis);
 
   /// find max value of given matrix
-  List max({int? axis}) => Matrix(this).max();
+  List max({int? axis}) => Matrix(this).max(axis: axis);
 
   /// flip (`reverse`) the matrix along the given axis and returns the modified array.
-  List flip({MatrixAxis axis = MatrixAxis.vertical}) =>
-      Matrix(this).flip(axis).toList();
+  List flip({int axis = 0}) => Matrix(this).flip(axis: axis).toList();
 }
 
 extension ListVector on List<num> {
@@ -104,4 +104,7 @@ extension ListVector on List<num> {
     }
     return result;
   }
+
+  /// Function returns the sum of array elements
+  num get sum => reduce((a, b) => a + b);
 }

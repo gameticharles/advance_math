@@ -12,6 +12,7 @@ extension MatrixStructure on Matrix {
   ///   - Scalar Matrix
   ///   - Row Matrix
   ///   - Column Matrix
+  ///   - Magic Matrix
   ///   - Full Rank Matrix
   ///   - Horizontal Matrix
   ///   - Vertical Matrix

@@ -31,16 +31,16 @@ class _Utils {
     return [start, end];
   }
 
-  ///Convert the integer matrix to double type
-  static List<List<double>> toDoubleList(List<List<dynamic>> input) {
+  ///Convert the dynamic matrix to num type
+  static List<List<num>> toNumList(List<List<dynamic>> input) {
     return input
-        .map((row) => row.map((value) => (value as num).toDouble()).toList())
+        .map((row) => row.map((value) => (value as num)).toList())
         .toList();
   }
 
   /// Convert a dynamic matrix to double matrix
   static Matrix toDoubleMatrix(Matrix input) {
-    return Matrix(toDoubleList(input.toList()));
+    return Matrix(toNumList(input._data));
   }
 
   ///Convert a dynamic list to double list

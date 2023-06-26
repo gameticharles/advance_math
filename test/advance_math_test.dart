@@ -197,7 +197,7 @@ void main() {
 
   test('test #5 flip matrix axis - 0', () {
     expect(
-        m.flip(MatrixAxis.vertical),
+        m.flip(axis: 0),
         Matrix([
           [5, 7, 8, 9, 10],
           [6, 7, 8, 9, 10],
@@ -207,7 +207,7 @@ void main() {
 
   test('test #6 flip matrix axis - 1', () {
     expect(
-        m.flip(MatrixAxis.horizontal),
+        m.flip(axis: 1),
         Matrix([
           [5, 4, 3, 2, 1],
           [10, 9, 8, 7, 6],
