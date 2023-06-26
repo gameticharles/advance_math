@@ -157,7 +157,7 @@ class MatrixDecomposition {
     if (_matrix.rowCount != _matrix.columnCount) {
       throw ArgumentError('Schur decomposition requires a square matrix');
     }
-    var A = _Utils.toDoubleMatrix(_matrix);
+    var A = _Utils.toNumMatrix(_matrix);
     Matrix Q = Matrix.eye(A.rowCount);
 
     for (int i = 0; i < maxIterations; i++) {
@@ -203,7 +203,7 @@ class MatrixDecomposition {
     if (_matrix.rowCount != _matrix.columnCount) {
       throw ArgumentError('Matrix must be square for Cholesky decomposition.');
     }
-    var A = _Utils.toDoubleMatrix(_matrix);
+    var A = _Utils.toNumMatrix(_matrix);
 
     Matrix L = Matrix.zeros(A.rowCount, A.columnCount, isDouble: true);
 
@@ -251,7 +251,7 @@ class MatrixDecomposition {
           'Matrix must have more rows than columns for QR decomposition.');
     }
 
-    var A = _Utils.toDoubleMatrix(_matrix);
+    var A = _Utils.toNumMatrix(_matrix);
 
     Matrix Q = Matrix.zeros(A.rowCount, A.columnCount, isDouble: true);
     Matrix R = Matrix.zeros(A.columnCount, A.columnCount, isDouble: true);
@@ -297,7 +297,7 @@ class MatrixDecomposition {
   /// qr.R.prettyPrint();
   /// ```
   QRDecomposition qrDecompositionHouseholder() {
-    var A = _Utils.toDoubleMatrix(_matrix);
+    var A = _Utils.toNumMatrix(_matrix);
     Matrix Q = Matrix.eye(A.rowCount);
     Matrix R = A.copy();
 
@@ -336,7 +336,7 @@ class MatrixDecomposition {
   /// ```
   LQDecomposition lqDecomposition() {
     // Compute the QR decomposition of the transpose of the matrix
-    var A = _Utils.toDoubleMatrix(_matrix);
+    var A = _Utils.toNumMatrix(_matrix);
     QRDecomposition qr =
         A.transpose().decomposition.qrDecompositionHouseholder();
 
@@ -374,7 +374,7 @@ class MatrixDecomposition {
     if (_matrix.rowCount != _matrix.columnCount) {
       throw ArgumentError('LU decomposition requires a square matrix');
     }
-    var A = _Utils.toDoubleMatrix(_matrix);
+    var A = _Utils.toNumMatrix(_matrix);
     int n = A.rowCount;
     Matrix L = Matrix.eye(n);
     Matrix U = Matrix.zeros(n, n);
@@ -415,7 +415,7 @@ class MatrixDecomposition {
   /// lu.P.prettyPrint();
   /// ```
   LUDecomposition luDecompositionDoolittlePartialPivoting() {
-    var A = _Utils.toDoubleMatrix(_matrix);
+    var A = _Utils.toNumMatrix(_matrix);
     int n = A.rowCount;
 
     // Initialize L, U, and P
@@ -480,7 +480,7 @@ class MatrixDecomposition {
     if (_matrix.rowCount != _matrix.columnCount) {
       throw ArgumentError('Matrix must be square for LU decomposition.');
     }
-    var A = _Utils.toDoubleMatrix(_matrix);
+    var A = _Utils.toNumMatrix(_matrix);
 
     int n = A.rowCount;
     Matrix L = Matrix.eye(n);
@@ -526,7 +526,7 @@ class MatrixDecomposition {
   /// lu.P.prettyPrint();
   /// ```
   LUDecomposition luDecompositionGauss() {
-    var A = _Utils.toDoubleMatrix(_matrix);
+    var A = _Utils.toNumMatrix(_matrix);
     int n = A.rowCount;
 
     // Initialize L, U, and P
@@ -593,7 +593,7 @@ class MatrixDecomposition {
   /// lu.Q.prettyPrint();
   /// ```
   LUDecomposition luDecompositionDoolittleCompletePivoting() {
-    var A = _Utils.toDoubleMatrix(_matrix);
+    var A = _Utils.toNumMatrix(_matrix);
     int n = A.rowCount;
 
     // Initialize L, U, P, and Q
@@ -725,7 +725,7 @@ class MatrixDecomposition {
       throw ArgumentError(
           'Matrix must be symmetric for this eigenvalue decomposition implementation.');
     }
-    var a = _Utils.toDoubleMatrix(_matrix);
+    var a = _Utils.toNumMatrix(_matrix);
     int n = a.rowCount;
     Matrix ak = a.copy();
     Matrix q = Matrix.eye(n);

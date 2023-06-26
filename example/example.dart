@@ -7,22 +7,6 @@ void printLine(String s) {
   print('\n$l$s $l\n');
 }
 
-bool testMagic(Matrix ms) {
-  int n = ms.rowCount;
-  int s = n * ((n * n) + 1) ~/ 2;
-
-  bool diag1 = ms.diagonal().reduce((a, b) => a + b) == s;
-  bool diag2 = ms
-          .applyToRows((row) => row.reversed.toList())
-          .diagonal()
-          .reduce((a, b) => a + b) ==
-      s;
-  bool columns = ms.sum(axis: 0).every((sum) => sum == s);
-  bool rows = ms.sum(axis: 1).every((sum) => sum == s);
-
-  return columns && rows && diag1 && diag2;
-}
-
 void main() {
   var mat = Matrix.fromList([
     [2, 3, 3, 3],

@@ -467,7 +467,7 @@ extension MatrixStatsExtension on Matrix {
   /// 0  0  0
   /// ```
   Matrix rowEchelonForm() {
-    Matrix result = _Utils.toDoubleMatrix(copy());
+    Matrix result = _Utils.toNumMatrix(copy());
     int lead = 0;
     int rowCount = result.rowCount;
     int columnCount = result.columnCount;

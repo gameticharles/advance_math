@@ -1,3 +1,6 @@
+## 2.1.1
+* Fixed bugs
+
 ## 2.1.0
 * Added arguments for diagonal 
 * Improved min, max and sum functions with axes

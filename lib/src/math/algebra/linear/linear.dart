@@ -90,7 +90,7 @@ class LinearSystemSolvers {
   /// x.prettyPrint();
   /// ```
   static Matrix ridgeRegression(Matrix a, Matrix b, double alpha) {
-    Matrix A = _Utils.toDoubleMatrix(a);
+    Matrix A = _Utils.toNumMatrix(a);
     int n = A.columnCount;
     Matrix I = Matrix.eye(n, isDouble: true);
     Matrix aTrans = A.transpose();
@@ -651,7 +651,7 @@ class LinearSystemSolvers {
   /// // └ 6 ┘
   /// ```
   static Matrix luDecompositionSolve(Matrix a, Matrix b) {
-    a = _Utils.toDoubleMatrix(a);
+    a = _Utils.toNumMatrix(a);
     var lu = a.decomposition.luDecompositionDoolittle();
     Matrix l = lu.L;
     Matrix u = lu.U;
@@ -687,8 +687,8 @@ class LinearSystemSolvers {
   /// ```
   Matrix solve(Matrix b,
       {LinearSystemMethod method = LinearSystemMethod.gaussElimination}) {
-    var a = _Utils.toDoubleMatrix(_matrix);
-    b = _Utils.toDoubleMatrix(b);
+    var a = _Utils.toNumMatrix(_matrix);
+    b = _Utils.toNumMatrix(b);
 
     switch (method) {
       case LinearSystemMethod.cramersRule:

@@ -39,7 +39,7 @@ class _Utils {
   }
 
   /// Convert a dynamic matrix to double matrix
-  static Matrix toDoubleMatrix(Matrix input) {
+  static Matrix toNumMatrix(Matrix input) {
     return Matrix(toNumList(input._data));
   }
 

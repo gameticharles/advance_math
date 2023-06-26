@@ -67,7 +67,7 @@ class SVD {
       A = mat.copy();
     }
 
-    A = _Utils.toDoubleMatrix(A);
+    A = _Utils.toNumMatrix(A);
 
     var nu = math.min(_m, _n).toInt();
     _s = Matrix.fill(1, math.min(_m + 1, _n), 0.0);

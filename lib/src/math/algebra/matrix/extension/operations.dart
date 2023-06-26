@@ -1347,7 +1347,7 @@ extension MatrixOperationExtension on Matrix {
   ///
   /// Validation:
   /// Throws [RangeError] if [sourceIndex] or [targetIndex] is not a valid row index in the matrix.
-  void addRow(int sourceIndex, int targetIndex, double scaleFactor) {
+  void addRow(int sourceIndex, int targetIndex, num scaleFactor) {
     RangeError.checkValidIndex(sourceIndex, this, "sourceIndex", rowCount);
     RangeError.checkValidIndex(targetIndex, this, "targetIndex", rowCount);
 
@@ -1642,7 +1642,7 @@ extension MatrixOperationExtension on Matrix {
     }
 
     int n = rowCount;
-    Matrix A = _Utils.toDoubleMatrix(this);
+    Matrix A = _Utils.toNumMatrix(this);
     Matrix V = Matrix.eye(n, isDouble: true);
     Matrix aPrev;
 
@@ -1674,7 +1674,7 @@ extension MatrixOperationExtension on Matrix {
   // Performs a plane rotation (Givens rotation) on the matrix.
   Matrix rotate(int p, int q, double c, double s) {
     int n = rowCount;
-    Matrix result = _Utils.toDoubleMatrix(this);
+    Matrix result = _Utils.toNumMatrix(this);
 
     for (int i = 0; i < n; i++) {
       double api = c * this[i][p] - s * this[i][q];
