@@ -1,15 +1,32 @@
 part of geometry;
 
+/// Todo: constructors for gradients , intercepts , x or y, etc
+
 /// A class representing a line in a 2-dimensional space.
 ///
-/// The line is defined by two distinct points.
+/// The line is defined by two distinct points, or by gradient and intercept,
+/// or by a point and a gradient, or by an x-coordinate, a gradient and an intercept.
 ///
-/// Example:
+/// Examples:
 /// ```dart
-/// var p1 = Point(1, 1);
-/// var p2 = Point(2, 2);
-/// var line = Line(p1, p2);
-/// print(line); // Output: Line(Point(1.0, 1.0), Point(2.0, 2.0))
+/// var line1 = Line(p1: Point(1, 1), p2: Point(2, 2));
+/// print(line1); // Output: Line(Point(1.0, 1.0), Point(2.0, 2.0))
+///
+/// var line2 = Line(gradient: 1, intercept: 0);
+/// print(line2); // Output: Line(Point(0.0, 0.0), Point(1.0, 1.0))
+///
+/// var line3 = Line(gradient: 2.0, intercept: 2.0, x: 3.0);
+/// print(line3); // Output: Line(Point(3.0, 8.0), Point(4.0, 10.0))
+///
+/// var line4 = Line(y: 1.0, gradient: 2.0, intercept: 3.0);
+/// print(line4); // Output: Line(Point(-1.0, 1.0), Point(0.0, 3.0))
+///
+/// var line5 = Line(y: 1.0, gradient: -0.5, intercept: 7.0);
+/// print(line5); // Output: Line(Point(-12.0, 1.0), Point(-11.0, 5.5))
+///
+/// var line6 = Line(y: 1.0, gradient: 2.0, x: 1.0);
+/// print(line6); // Output: Line(Point(1.0, 1.0), Point(2.0, 3.0))
+///
 /// ```
 class Line {
   /// The first point defining the line.
@@ -18,21 +35,55 @@ class Line {
   /// The second point defining the line.
   final Point point2;
 
-  /// Creates a line between [point1] and [point2].
+  /// Gradient of the line (if defined).
+  final num? _gradient;
+
+  /// Y-intercept of the line (if defined).
+  final num? _intercept;
+
+  /// Private constructor used by the factory constructor.
+  Line._(this.point1, this.point2, [this._gradient, this._intercept]);
+
+  /// Factory constructor to create a Line instance.
   ///
-  /// Throws an [ArgumentError] if [point1] and [point2] are the same.
+  /// Supports several forms of input to define a line: two points, a gradient and intercept, a gradient and an x-coordinate, or a gradient, a y-coordinate, and an intercept.
   ///
-  /// Example:
-  /// ```dart
-  /// var p1 = Point(1, 1);
-  /// var p2 = Point(2, 2);
-  /// var line = Line(p1, p2);
-  /// print(line); // Output: Line(Point(1.0, 1.0), Point(2.0, 2.0))
-  /// ```
-  Line(this.point1, this.point2) {
-    if (point1 == point2) {
-      throw ArgumentError("The two points must be distinct.");
+  /// Throws an [ArgumentError] if provided parameters are insufficient to define a distinct line.
+  factory Line(
+      {Point? p1,
+      Point? p2,
+      num? y,
+      num? gradient = 0,
+      num? intercept = 0,
+      num? x}) {
+    if (p1 != null && p2 != null) {
+      if (p1 == p2) {
+        throw ArgumentError("The two points must be distinct.");
+      }
+      return Line._(p1, p2);
     }
+    if (gradient != null && intercept != null && x != null) {
+      num y1 = gradient * x + intercept;
+      num y2 = gradient * (x + 1) + intercept;
+      return Line._(Point(x, y1), Point(x + 1, y2), gradient, intercept);
+    }
+    if (y != null && gradient != null && intercept != null) {
+      num x1 = (y - intercept) / gradient;
+      num x2 = ((y + 1) - intercept) / gradient;
+      return Line._(Point(x1, y), Point(x2, y + 1), gradient, intercept);
+    }
+    if (y != null && gradient != null && x != null) {
+      num intercept = y - gradient * x;
+      num y2 = gradient * (x + 1) + intercept;
+      return Line._(Point(x, y), Point(x + 1, y2), gradient, intercept);
+    }
+    if (gradient != null && intercept != null) {
+      num y1 = intercept;
+      num y2 = gradient + intercept;
+      return Line._(Point(0, y1), Point(1, y2), gradient, intercept);
+    }
+    throw ArgumentError(
+        'Provided parameters are not sufficient to define a distinct line.');
   }
 
   @override
@@ -56,7 +107,7 @@ class Line {
   /// var line = Line(p1, p2);
   /// print(line.length()); // Output: 1.4142135623730951
   /// ```
-  double length() {
+  num length() {
     return point1.distanceTo(point2);
   }
 
@@ -71,8 +122,8 @@ class Line {
   /// var line = Line(p1, p2);
   /// print(line.slope()); // Output: 1.0
   /// ```
-  double slope() {
-    return (point2.y - point1.y) / (point2.x - point1.x);
+  num slope() {
+    return _gradient ?? (point2.y - point1.y) / (point2.x - point1.x);
   }
 
   /// Returns the y-intercept of the line.
@@ -86,8 +137,8 @@ class Line {
   /// var line = Line(p1, p2);
   /// print(line.intercept()); // Output: 0.0
   /// ```
-  double intercept() {
-    return point1.y - slope() * point1.x;
+  num intercept() {
+    return _intercept ?? point1.y - slope() * point1.x;
   }
 
   /// Returns the midpoint of the line.
@@ -137,12 +188,13 @@ class Line {
   Line perpendicularBisector() {
     var midpoint = this.midpoint();
     if (point2.x == point1.x) {
-      return Line(midpoint, Point(midpoint.x + 1, midpoint.y));
+      return Line(p1: midpoint, p2: Point(midpoint.x + 1, midpoint.y));
     }
     var newSlope = -1 / slope();
     var newIntercept = midpoint.y - newSlope * midpoint.x;
-    return Line(midpoint,
-        Point(midpoint.x + 1, newSlope * (midpoint.x + 1) + newIntercept));
+    return Line(
+        p1: midpoint,
+        p2: Point(midpoint.x + 1, newSlope * (midpoint.x + 1) + newIntercept));
   }
 
   /// Returns the angle between this line and another line.

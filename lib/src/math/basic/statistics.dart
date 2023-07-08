@@ -106,13 +106,13 @@ int combinations(int n, int r) {
 /// ```dart
 /// print(gcd(48, 18));  // Output: 6
 /// ```
-int gcd(int a, int b) {
+int gcd(num a, num b) {
   while (b != 0) {
-    int t = b;
+    num t = b;
     b = a % b;
     a = t;
   }
-  return a;
+  return a.toInt();
 }
 
 /// Returns the least common multiple of two numbers.
@@ -121,7 +121,7 @@ int gcd(int a, int b) {
 /// ```dart
 /// print(lcm(15, 20));  // Output: 60
 /// ```
-int lcm(int a, int b) {
+int lcm(num a, num b) {
   if (a == 0 || b == 0) {
     return 0;
   } else {

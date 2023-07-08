@@ -7,7 +7,7 @@ part of geometry;
 /// transformation operations (like rotation and scaling), distance and angle calculations,
 /// conversion to/from polar coordinates, and geometric operations related to lines, triangles,
 /// circles, and polygons.
-class Point {
+class Point extends Vector {
   /// The x-coordinate of the point.
   num x;
 
@@ -29,7 +29,7 @@ class Point {
   /// var p1 = Point(1, 2);  // 2D point
   /// var p2 = Point(1, 2, 3);  // 3D point
   /// ```
-  Point(this.x, this.y, [this.z]);
+  Point(this.x, this.y, [this.z]) : super.fromList([x, y]);
 
   /// Creates a point at the origin of the coordinate system.
   /// If [is3DPoint] is true, the point will have a z-coordinate of zero.
@@ -38,7 +38,7 @@ class Point {
   /// Example:
   ///``` dart
   /// var p1 = Point.origin(); // creates a 2D point (0, 0)
-  ///  var p2 = Point.origin(true); // creates a 3D point (0, 0, 0)
+  /// var p2 = Point.origin(true); // creates a 3D point (0, 0, 0)
   factory Point.origin([bool is3DPoint = true]) {
     return is3DPoint ? Point(0, 0, 0) : Point(0, 0);
   }
@@ -133,21 +133,22 @@ class Point {
   /// Returns a list of 2 or 3 numbers.
   Vector toVector() => z != null ? Vector3(x, y, z!) : Vector2(x, y);
 
-  /// Converts the point's coordinates to a list of numbers.
-  ///
-  /// If `z` is not `null`, the returned list contains `x`, `y`, and `z`.
-  /// If `z` is `null`, the returned list contains `x`, `y`, and `0`.
-  ///
-  /// Example:
-  /// ```
-  /// var point = Point(3, 4, 5);
-  /// print(point.toList()); // Output: [3, 4, 5]
-  /// ```
-  ///
-  /// Returns a list containing `x`, `y`, and `z` or `0`.
-  List<num> toList() {
-    return [x, y, z ?? 0];
-  }
+  // /// Converts the point's coordinates to a list of numbers.
+  // ///
+  // /// If `z` is not `null`, the returned list contains `x`, `y`, and `z`.
+  // /// If `z` is `null`, the returned list contains `x`, `y`, and `0`.
+  // ///
+  // /// Example:
+  // /// ```
+  // /// var point = Point(3, 4, 5);
+  // /// print(point.toList()); // Output: [3, 4, 5]
+  // /// ```
+  // ///
+  // /// Returns a list containing `x`, `y`, and `z` or `0`.
+  // @override
+  // List<num> toList() {
+  //   return [x, y, z ?? 0];
+  // }
 
   /// A custom `toString` method for better readability.
   ///

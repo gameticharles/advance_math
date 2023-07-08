@@ -1,12 +1,5 @@
 import '../../../math/basic/math.dart' as math;
-import 'double.dart';
-import 'imaginary.dart';
-import 'integer.dart';
-import 'number.dart';
-import 'number_exception.dart';
-import 'precise.dart';
-import 'real.dart';
-import 'util/jenkins_hash.dart';
+import '../../number.dart';
 
 /// Complex numbers have both a real and an imaginary part.
 class Complex extends Number {
@@ -50,6 +43,30 @@ class Complex extends Number {
       : real = Double(r * math.cos(theta)),
         imaginary = Imaginary(Double(r * math.sin(theta)));
 
+  /// Factory constructor to create a Complex number from a real number only.
+  /// The imaginary part will be 0.
+  Complex.fromReal(num realValue)
+      : real = Double(realValue.toDouble()),
+        imaginary = Imaginary(0);
+
+  /// Creates a complex number from [Fraction] objects.
+  factory Complex.fromFraction(Fraction real, Fraction imaginary) =>
+      Complex(real.toDouble(), imaginary.toDouble());
+
+  /// Creates a complex number having only the real part expressed as a
+  /// [Fraction] object.
+  ///
+  /// The imaginary part is set to 0i.
+  factory Complex.fromRealFraction(Fraction real) =>
+      Complex(real.toDouble(), 0);
+
+  /// Creates a complex number having only the imaginary part expressed as a
+  /// [Fraction] object.
+  ///
+  /// The real part is set to 0.
+  factory Complex.fromImaginaryFraction(Fraction imaginary) =>
+      Complex(0, imaginary.toDouble());
+
   /// Parses a complex number from the given string.
   ///
   /// The string must be in the format "a + bi" or "a - bi", where
@@ -68,6 +85,16 @@ class Complex extends Number {
     final imaginary =
         Imaginary(Double.parse(parts[1].trim().replaceFirst('i', '')));
     return Complex.num(real, hasPlus ? imaginary : -imaginary);
+  }
+
+  /// Computes the complex n-th root of this object. The returned root is the
+  /// one with the smallest positive argument.
+  factory Complex.nthRootFromValue(double x, int n) {
+    if (x >= 0) {
+      return Complex(math.pow(x, 1.0 / n), 0);
+    } else {
+      return Complex(math.pow(-x, 1.0 / n), 0);
+    }
   }
 
   /// Constructs a complex number that represents zero.
@@ -97,7 +124,7 @@ class Complex extends Number {
 
   /// Constructs a complex number representing "e + 0.0i"
   Complex.e()
-      : real = Double(math.e.toDouble()),
+      : real = Double(math.e),
         imaginary = Imaginary(0);
 
   /// The real number component of the complex number.
@@ -168,6 +195,13 @@ class Complex extends Number {
   @override
   bool get isInteger => (imaginary.toDouble() == 0) && real.isInteger;
 
+  /// Checks whether the complex number is zero.
+  bool get isZero => real == Integer(0) && imaginary == Imaginary(0);
+
+  /// The sign of the current object is changed and the result is returned in a
+  /// new [Complex] instance.
+  Complex get negate => Complex.num(-real, -imaginary);
+
   /// Returns the real part of this complex number as a double.
   @override
   double toDouble() => real.toDouble();
@@ -188,6 +222,15 @@ class Complex extends Number {
       return hashObjects(<Object>[real, imaginary.value]);
     }
   }
+
+  Complex copyWith({
+    num? real,
+    num? imaginary,
+  }) =>
+      Complex(
+        real ?? this.real.value,
+        imaginary ?? this.imaginary.value.value,
+      );
 
   @override
   bool operator ==(dynamic obj) {
@@ -349,8 +392,16 @@ class Complex extends Number {
   /// The modulo operator (not supported).
   @override
   Number operator %(dynamic divisor) {
-    throw const NumberException(
-        'The number library does not support the modulo operator for complex numbers');
+    var modulus = magnitude;
+    if (divisor is num) {
+      var remainder = modulus % divisor;
+      return Complex.fromPolar(numberToNum(remainder), numberToNum(phase));
+    } else if (divisor is Complex) {
+      var otherModulus = divisor.magnitude;
+      var remainder = modulus % otherModulus;
+      return Complex.fromPolar(numberToNum(remainder), numberToNum(phase));
+    }
+    return this % divisor;
   }
 
   /// The power operator (note: NOT bitwise XOR).
@@ -413,7 +464,8 @@ class Complex extends Number {
   ///
   /// print(z_power); // Output: -5 + 12i
   /// ```
-  Complex pow(num exponent) {
+  @override
+  Number pow(num exponent) {
     final r = math.pow(magnitude.toDouble(), exponent);
     final theta = angle * exponent;
     return Complex.fromPolar(r, theta.toDouble());
@@ -427,7 +479,8 @@ class Complex extends Number {
   ///
   /// print(z_sqrt); // Output: 2.0 + 0.0i
   /// ```
-  Complex sqrt() => pow(0.5);
+  @override
+  Number sqrt() => pow(0.5);
 
   /// Returns a new complex number representing the exponential of this number.
   ///
@@ -440,7 +493,7 @@ class Complex extends Number {
   Complex exp() {
     final r = math.exp(real.value);
     return Complex(
-        r * math.cos(imaginary.getValue()), r * math.sin(imaginary.getValue()));
+        r * math.cos(imaginary.getValue), r * math.sin(imaginary.getValue));
   }
 
   /// Returns a new complex number representing the natural logarithm (base e) of this number.
@@ -464,8 +517,8 @@ class Complex extends Number {
   /// print(z_sin); // Output: 1.0 + 0.0i
   /// ```
   Complex sin() {
-    return Complex(math.sin(real.value) * math.cosh(imaginary.getValue()),
-        math.cos(real.value) * math.sinh(imaginary.getValue()));
+    return Complex(math.sin(real.value) * math.cosh(imaginary.getValue),
+        math.cos(real.value) * math.sinh(imaginary.getValue));
   }
 
   /// Returns a new complex number representing the cosine of this number.
@@ -477,8 +530,8 @@ class Complex extends Number {
   /// print(z_cos); // Output: 1.0 + 0.0i
   /// ```
   Complex cos() {
-    return Complex(math.cos(real.value) * math.cosh(imaginary.getValue()),
-        -math.sin(real.value) * math.sinh(imaginary.getValue()));
+    return Complex(math.cos(real.value) * math.cosh(imaginary.getValue),
+        -math.sin(real.value) * math.sinh(imaginary.getValue));
   }
 
   /// Returns a new complex number representing the tangent of this number.
@@ -502,8 +555,8 @@ class Complex extends Number {
   /// print(z_sinh); // Output: 0.0 + 0.0i
   /// ```
   Complex sinh() => Complex(
-      math.sinh(real.value) * math.cos(imaginary.getValue()),
-      math.cosh(real.value) * math.sin(imaginary.getValue()));
+      math.sinh(real.value) * math.cos(imaginary.getValue),
+      math.cosh(real.value) * math.sin(imaginary.getValue));
 
   /// Returns a new Complex number representing the hyperbolic cosine of this number.
   ///
@@ -514,8 +567,8 @@ class Complex extends Number {
   /// print(z_cosh); // Output: 1.0 + 0.0i
   /// ```
   Complex cosh() => Complex(
-      math.cosh(real.value) * math.cos(imaginary.getValue()),
-      math.sinh(real.value) * math.sin(imaginary.getValue()));
+      math.cosh(real.value) * math.cos(imaginary.getValue),
+      math.sinh(real.value) * math.sin(imaginary.getValue));
 
   /// Returns a new Complex number representing the hyperbolic tangent of this number.
   ///
@@ -574,14 +627,6 @@ class Complex extends Number {
     return Complex.num(real / a2b2 as Real, Imaginary(imaginary.value / -a2b2));
   }
 
-  Complex nthRoot(double x, int n) {
-    if (x >= 0) {
-      return Complex(math.pow(x, 1.0 / n), 0);
-    } else {
-      return Complex(math.pow(-x, 1.0 / n), 0);
-    }
-  }
-
   /// Support [dart:json] stringify.
   ///
   /// Map Contents:
@@ -596,13 +641,103 @@ class Complex extends Number {
       <String, dynamic>{'real': real.toJson(), 'imag': imaginary.toJson()};
 
   @override
-  String toString() {
-    var absVal = Precise.num(imag.getValue().abs());
-    var result = absVal.value;
-    if (imaginary >= 0) {
-      return '$real + ${result == 1 ? '' : result}i';
-    } else {
-      return '$real - ${result == 1 ? '' : result}i';
+  String toString({bool asFraction = false, int? fractionDigits}) =>
+      _convertToString(asFraction: asFraction, fractionDigits: fractionDigits);
+
+  /// Prints the real and the imaginary parts of this [Complex] object with
+  /// [fractionDigits] decimal digits. The output produced by this method is the
+  /// same that would result in calling `toStringAsFixed` on a [double]:
+  ///
+  /// ```dart
+  /// final example = Complex(5.123, 8.123);
+  ///
+  /// // Calling 'toStringAsFixed' on the `Complex` instance
+  /// print(example.toStringAsFixed(1)); // 5.1 + 8.1i
+  ///
+  /// // The same result but with 'toStringAsFixed' calls on the single [double]
+  /// // values of the complex value
+  /// final real = example.real.toStringAsFixed(1);
+  /// final imag = example.imaginary.toStringAsFixed(1);
+  ///
+  /// print("$real + $imag"); // 5.1 + 8.1i
+  /// ```
+  String toStringAsFixed(int fractionDigits) =>
+      _convertToString(fractionDigits: fractionDigits);
+
+  /// Prints the real and the imaginary parts of the complex number as fractions
+  /// with the best possible approximation.
+  String toStringAsFraction() => _convertToString(asFraction: true);
+
+  /// Prints the complex number with opening and closing parenthesis in case the
+  /// complex number had both real and imaginary part.
+  String toStringWithParenthesis() {
+    if (real == Integer(0)) {
+      return '${_fixZero(imaginary.getValue)}i';
     }
+
+    if (imaginary == Imaginary(0)) {
+      return _fixZero(real.value);
+    }
+
+    return '($this)';
+  }
+
+  /// When a value is a whole number, it's printed without the fractional part.
+  /// For example, `_fixZero(5.0)` returns `"5"`.
+  String _fixZero(num value) {
+    if (value % 1 < 0) {
+      return '${value.truncate()}';
+    }
+
+    return '$value';
+  }
+
+  /// Converts this complex number into a string. If [asFraction] is `true` then
+  /// the real and the imaginary part are converted into fractions.
+  ///
+  /// If you define `asFraction = true` and assign `fractionDigits` together,
+  /// then `fractionDigit` takes precedence and ignores the `asFraction` value.
+  String _convertToString({
+    bool asFraction = false,
+    int? fractionDigits,
+  }) {
+    String realPart;
+    String imaginaryPart;
+    var newImag = imaginary;
+
+    // Clean up the the output
+    if (imaginary.getValue.abs() < 1e-8) {
+      newImag = Imaginary(0);
+    }
+
+    if (fractionDigits != null) {
+      realPart = real.value.toStringAsFixed(fractionDigits);
+      imaginaryPart = '${newImag.getValue.toStringAsFixed(fractionDigits)}i';
+    } else if (asFraction) {
+      realPart = real.toFractionString();
+      imaginaryPart = '${newImag.value.toFractionString()}i';
+    } else {
+      realPart = _fixZero(real.value);
+      imaginaryPart = '${_fixZero(newImag.getValue)}i';
+    }
+
+    String imaginaryPartAbs = imaginaryPart;
+    if (imaginary.value < 0) {
+      imaginaryPartAbs = '${_fixZero(newImag.getValue.abs())}i';
+    }
+
+    if (real == Double(0) && newImag == Imaginary(0)) {
+      return '0';
+    }
+    if (real == Double(0)) {
+      return imaginaryPart;
+    }
+    if (newImag == Imaginary(0)) {
+      return realPart;
+    }
+
+    return imaginary < Imaginary(0)
+        ? '$realPart - ${newImag.getValue.abs() == 1 ? 'i' : imaginaryPartAbs}'
+        : '$realPart + ${newImag.getValue.abs() == 1 ? 'i' : imaginaryPart}';
   }
 }

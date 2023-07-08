@@ -740,7 +740,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// Creates a Matrix with values in the specified range, incremented or decremented by the specified step size.
   ///
   /// [end]: End value (exclusive).
-  /// [start]: Start value. Default is 1.
+  /// [start]: Start value. Default is 0.
   /// [step]: Step size. Default is 1. Can be negative for decrementing ranges.
   /// [isColumn]: If true, creates a column matrix. Default is false (creates a row matrix).
   ///
@@ -755,7 +755,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// // └ 5 ┘
   /// ```
   factory Matrix.range(int end,
-      {int start = 1, int step = 1, bool isColumn = false}) {
+      {int start = 0, int step = 1, bool isColumn = false}) {
     if (step == 0) {
       throw ArgumentError('Step must not be zero');
     }
@@ -784,7 +784,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
 
   /// Alias for Matrix.range.
   factory Matrix.arrange(int end,
-      {int start = 1, int step = 1, bool isColumn = false}) {
+      {int start = 0, int step = 1, bool isColumn = false}) {
     return Matrix.range(end, start: start, step: step, isColumn: isColumn);
   }
 

@@ -136,7 +136,7 @@ class Vector extends IterableMixin<num> {
   /// Creates a Vector with values in the specified range, incremented by the specified step size.
   ///
   /// [end]: End value (exclusive).
-  /// [start]: Start value. Default is 1.
+  /// [start]: Start value. Default is 0.
   /// [steps]: Step size. Default is 1.
   ///
   /// Example:
@@ -146,7 +146,7 @@ class Vector extends IterableMixin<num> {
   /// // Output:
   /// // [1, 3, 5]
   /// ```
-  factory Vector.range(int end, {int start = 1, int step = 1}) {
+  factory Vector.range(int end, {int start = 0, int step = 1}) {
     if (start >= end) {
       throw Exception('Start must be less than end');
     }
@@ -164,7 +164,7 @@ class Vector extends IterableMixin<num> {
   }
 
   /// Alias for Matrix.range.
-  factory Vector.arrange(int end, {int start = 1, int step = 1}) {
+  factory Vector.arrange(int end, {int start = 0, int step = 1}) {
     return Vector.range(end, start: start, step: step);
   }
 
@@ -272,7 +272,6 @@ class Vector extends IterableMixin<num> {
   /// ```
   /// 5.196152422706632
   /// ```
-
   num distance(Vector other, {DistanceType distance = DistanceType.frobenius}) {
     if (length != other.length) {
       throw ArgumentError(
@@ -628,6 +627,36 @@ class Vector extends IterableMixin<num> {
   /// Removes the first value in the row.
   dynamic shift() {
     return _data.removeAt(0);
+  }
+
+  /// Rolls the elements in a 1D list by a certain amount.
+  ///
+  /// This function creates a new list where the elements are shifted by
+  /// [shift] positions. Elements that are shifted off the end of the list
+  /// wrap around to the beginning.
+  ///
+  /// Positive [shift] values shift elements to the right, and negative values
+  /// shift elements to the left.
+  ///
+  /// [list] is the original list, and [shift] is the number of positions
+  /// to shift the elements.
+  Vector roll(dynamic shift) {
+    if (_data.isEmpty) return this;
+    if (shift is int) {
+      return Vector(_rollFlat);
+    } else if (shift is (int, int)) {
+      List<dynamic> rolledArray = _rollFlat(_data, shift.$1);
+      rolledArray = _rollFlat(rolledArray, shift.$2);
+      return Vector(rolledArray);
+    }
+    throw ArgumentError("shift and axis must be type (int, int), or type int");
+  }
+
+  /// Private helper function to flatten the array
+  List<num> _rollFlat(List<dynamic> array, int shift) {
+    int n = array.length;
+    shift = ((shift % n) + n) % n; // Handle negative shifts
+    return [...array.sublist(n - shift), ...array.sublist(0, n - shift)];
   }
 
   /// Adds/removes elements at an arbitrary position in the row.

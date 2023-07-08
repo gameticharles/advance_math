@@ -24,7 +24,7 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
 - Logarithmic operations: natural logarithm of a number, base-10 logarithm and logarithm of a number to a given base.
 - Support angle conversion (degrees, minutes, seconds, radians, gradians, DMS).
 - Trigonometry: It provides computation on all the trigonometric functions on the angle. These includes inverse and hyperbolic function (sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, sec, csc, cot, asec, acsc, acot, sech, csch, coth, asech, acsch, acoth, vers, covers, havers, exsec, excsc).
-- Angle operation: Supports addition, subtraction, multiplication, and division. Also supports comparisons, normalize, interpolation, and small-differencing on angles. 
+- Angle operation: Supports addition, subtraction, multiplication, and division. Also supports comparisons, normalize, interpolation, and small-differencing on angles.
 - Matrix creation, filling and generation: Methods for filling the matrix with specific values or generating matrices with certain properties, such as zero, ones, identity, diagonal, list, or random matrices.
 - Import and export matrices to and from other formats (e.g., CSV, JSON, binary)
 - Matrix operations: Implement common matrix operations such as addition, subtraction, multiplication (element-wise and matrix-matrix), and division (element-wise) etc.
@@ -83,7 +83,6 @@ print(logBase(2, 32));  // Output: 5.0
 ```
 
 </details>
-
 
 <details>
 <summary>ANGLE</summary>
@@ -150,7 +149,281 @@ These features provide an easy-to-use interface for handling various angle calcu
 </details>
 
 <details>
+<summary>GEOMETRY</summary>
+
+# Geometry Library
+
+This library provides a suite of classes and functions to work with geometric objects and perform geometric calculations.
+
+## Usage
+
+### Point
+
+A `Point` represents a point in a 2D space.
+
+```dart
+Point p1 = Point(3, 4); // 2D point
+print(p1.x); // prints: 3
+print(p1.y); // prints: 4
+
+var p2 = Point(1, 2, 3);  // 3D point
+print(p2.is3DPoint) // true
+
+var p = Point.fromPolarCoordinates(5, radians(53.13));
+print(p); // Output: Point(3.0000000000000004, 3.9999999999999996)
+
+var p = Point.fromSphericalCoordinates(5, radians(53.13), radians(30));
+print(p); // Output: Point(1.50, 1.999997320371271, 4.330127018922194)
+
+```
+
+A `Point3D` represents a point in a 3D space.
+
+```dart
+Point3D p1 = Point3D(3, 4, 2); // 3D point
+print(p1.x); // prints: 3
+print(p1.y); // prints: 4
+
+```
+
+Compute Distances
+Example 1:
+
+```dart
+var p1 = Point(3, 4);
+var p2 = Point(6, 8);
+print(p1.distanceTo(p2)); // Output: 5.0
+
+var point1 = Point(2, 3);
+var point2 = Point(5, 11);
+print(point1.slopeTo(point2)); // Output: 2.6666666666666665
+```
+
+Example 2:
+
+```dart
+var point1 = Point(1, 2, 3);
+var point2 = Point(4, 5, 6);
+print(point1.distanceTo(point2)); // Output: 5.196152422706632
+print(point1.midpointTo(point2)); // Output: Point(2.5, 3.5, 4.5)
+```
+
+Arithmetics of points
+
+```dart
+var point1 = Point(2, 2);
+var point2 = Point(1, 1);
+print(point1 - point2); // Output: Point(1.0, 1.0)
+print(point1 + point2); // Output: Point(3.0, 3.0)
+print(point1 * 2); // Output: Point(4.0, 4.0)
+print(point1 / 2); // Output: Point(1.0, 1.0)
+```
+
+Others include: bearingTo, distanceToLine, isCollinear etc
+
+```dart
+var point = Point(2, 0);
+var origin = Point(1, 0);
+Angle angle = Angle.radians(math.pi / 2)
+var rotated = point.rotateBy(angle, origin)
+print(rotated); // Output: Point(1, 1)
+
+var point = Point(1, 2, 3);
+print(point.move(1, -1, 2)); // Output: Point(2, 1, 5)
+print(point.scale(2)); // Output: Point(2, 4, 6)
+print(point.reflect(Point(0, 0, 0))); // Output: Point(-1, -2, -3)
+```
+
+
+### Line
+
+A `Line` represents a line in a 2D space, defined by two points.
+
+```dart
+var line1 = Line(p1: Point(1, 1), p2: Point(2, 2));
+print(line1); // Output: Line(Point(1.0, 1.0), Point(2.0, 2.0))
+
+var line2 = Line(gradient: 1, intercept: 0);
+print(line2); // Output: Line(Point(0.0, 0.0), Point(1.0, 1.0))
+
+var line3 = Line(gradient: 2.0, intercept: 2.0, x: 3.0);
+print(line3); // Output: Line(Point(3.0, 8.0), Point(4.0, 10.0))
+
+var line4 = Line(y: 1.0, gradient: 2.0, intercept: 3.0);
+print(line4); // Output: Line(Point(-1.0, 1.0), Point(0.0, 3.0))
+
+var line5 = Line(y: 1.0, gradient: -0.5, intercept: 7.0);
+print(line5); // Output: Line(Point(-12.0, 1.0), Point(-11.0, 5.5))
+
+var line6 = Line(y: 1.0, gradient: 2.0, x: 1.0);
+print(line6); // Output: Line(Point(1.0, 1.0), Point(2.0, 3.0))
+```
+
+### Plane
+A class that represents a plane in a three-dimensional space.
+Each instance of this class is defined by a [Point] and a normal [Vector].
+
+```dart
+var point = Point(1, 2, 3);
+var normal = Vector(1, 0, 0);
+var plane = Plane(point, normal);
+print(plane);  // Output: Plane(point: Point(1, 2, 3), normal: Vector(1, 0, 0))
+var pivot = Point(2, 3, 4);
+var perpendicularLine = plane.perpendicularLine(pivot);
+print(perpendicularLine);  // Output: Plane(Point(2, 3, 4), Vector(1, 0, 0))
+var otherPoint = Point(1, 3, 4);
+var newPlane = plane.parallelThroughPoint(otherPoint);
+print(newPlane);  // Output: Plane(point: Point(1, 3, 4), normal: Vector(1, 0, 0))
+```
+
+### Circle
+
+A `Circle` is represented by a center point and a radius.
+
+```dart
+var center = Point(0, 0);
+var circle = Circle(center, 5);
+print(circle.area()); // Output: 78.53981633974483
+print(circle.circumference()); // Output: 31.41592653589793
+print(circle.isPointInside(Point(3, 4))); // Output: true
+```
+
+### Polygon
+
+A `Polygon` is represented by a list of points. The points should be ordered either clockwise or counter-clockwise.
+
+```dart
+Point p1 = Point(0, 0);
+Point p2 = Point(1, 0);
+Point p3 = Point(0, 1);
+Polygon triangle = Polygon([p1, p2, p3]);
+print(triangle.area); // prints: 0.5
+```
+
+### Triangle
+
+A `Triangle` is a special kind of polygon. It can be created by providing the lengths of its sides, or its coordinates.
+
+```dart
+Triangle triangle1 = Triangle(a: 3, b: 4, c: 5);
+print(triangle1.area(AreaMethod.heron)); // prints: 6.0
+
+Triangle triangle2 = Triangle(A: Point(0, 0), B: Point(3, 0), C: Point(0, 4));
+print(triangle2.area(AreaMethod.coordinates)); // prints: 6.0
+```
+
+### SphericalTriangle
+
+A `SphericalTriangle` is a triangle on the surface of a sphere. It can be created by providing the lengths of its sides and the radius of the sphere.
+
+```dart
+  var triangle = SphericalTriangle.fromAllSides( Angle(rad: pi / 2), Angle(rad: pi / 3), Angle(rad: pi / 4));
+
+  // Angles
+  print('AngleA: ${triangle.angleA} '); // AngleA: Angle: 35.26438968275524° or 0.6154797086703871 rad or [35, 15, 51.802857918852396]
+  print('AngleB: ${triangle.angleB} '); // AngleB: Angle: 125.26438968275677° or 2.186276035465284 rad or [125, 15, 51.80285792437758]
+  print('AngleC: ${triangle.angleC}'); // AngleC: Angle: 45.00000000000074° or 0.785398163397448 rad or [45, 0, 2.660272002685815e-9]
+
+  // Sides
+  print('SideA: ${triangle.sideA}'); // SideA: Angle: 90.00000000000152° or 1.5707963267948966 rad or [90, 0, 5.474021236295812e-9]
+  print('SideB: ${triangle.sideB}'); // SideB: Angle: 60.00000000000101° or 1.0471975511965976 rad or [60, 0, 3.632294465205632e-9]
+  print('SideC: ${triangle.sideC} '); // SideC: Angle: 45.00000000000076° or 0.7853981633974483 rad or [45, 0, 2.737010618147906e-9]
+
+  print('Area: ${triangle.area} ≈ ${triangle.areaPercentage} % of unit sphere surface area'); // Area: 0.445561253943326 ≈ 3.545663800765179 % of unit sphere surface area
+  print('Perimeter: ${triangle.perimeter} ≈ ${triangle.perimeterPercentage} % of unit sphere circumference'); // Perimeter: 3.4033920413889422 ≈ 54.166666666666664 % of unit sphere circumference
+  print('isValidTriangle: ${triangle.isValidTriangle()}'); // isValidTriangle: true
+```
+
+</details>
+
+<details>
+<summary>POLYNOMIALS</summary>
+
+# Polynomials
+
+The Geometry Library provides comprehensive support for Polynomials. This includes polynomials of different degrees, from linear to quartic, as well as a general polynomial implementation using the Durand-Kerner method for degrees of 5 or higher.
+
+## Usage
+
+### Linear
+
+Linear polynomials are of the form ax + b = 0.
+
+```dart
+Linear linear = Linear.num(a: 2, b: -3);
+print(linear.roots()); // Output: [1.5]
+```
+
+### Quadratic
+
+Quadratic polynomials are of the form ax² + bx + c = 0.
+
+```dart
+Quadratic quad = Quadratic.num(a: 2, b: -3, c: -2);
+print(quad.roots()); // Output: [2.0, -0.5]
+print(quad.vertex()); // Output: [0.75, -3.125]
+```
+
+### Cubic
+
+Cubic polynomials are of the form ax³ + bx² + cx + d = 0.
+
+```dart
+Cubic cubic = Cubic.num(a: -1, b: 1, c: 1, d: 2);
+print(cubic.roots()); // Output: [-1.0, -1.0, 2.0]
+```
+
+### Quartic
+
+Quartic polynomials are of the form ax⁴ + bx³ + cx² + dx + e = 0.
+
+```dart
+Quartic quartic = Quartic.num(a: -1, b: -8, c: 0, d: 0, e: -1);
+print(quartic.roots()); // Output: [1.0, -1.0, -1.0, -1.0]
+```
+
+### Durand-Kerner
+
+This is a general polynomial implementation that uses the Durand-Kerner method to find the roots of a polynomial with a degree of 5 or higher.
+
+```dart
+DurandKerner dk = DurandKerner.num([1, 5, 1, 4, 0, 3, 2]);
+print(dk.degree); // 6
+print(dk); // x⁶ + 5x⁵ + x⁴ + 4x³ + 3x + 2
+print(dk.roots()); 
+// [-0.34289017575006814 + 0.9530107213799093i, -0.34289017581899034 - 0.9530107213040406i, 0.5696766117867249 + 0.6923844884012686i, -4.9651242864231895, 0.5696766117855657 - 0.6923844884824355i, -0.4884485856011231]
+```
+
+### Additional Features
+
+Each of these polynomials can be differentiated, integrated, simplified, and evaluated.
+
+```dart
+Polynomial poly = Polynomial.fromList([3, -6, 12]);
+print(poly); // 3x² - 6x + 12
+print(poly.simplify()); // x² - 2x + 4
+print(poly.roots()); // [1 + 1.7320508075688774i, 1 - 1.7320508075688774i]
+print(poly.differentiate()); // 6x - 6
+print(poly.integrate()); // x³ - 3x² + 12x
+print(poly.evaluate(2)); // 12.0
+```
+
+```dart
+Polynomial p = Polynomial.fromString("x^5 - x^4 - x + 1");
+print(p.coefficients); // [1.0, -1.0, 0, 0, -1.0, 1.0]
+print(p); // x⁵ - x⁴ - x + 1.0
+print(p.evaluate(Complex(-19 / 8, 7.119033245839726e-16))); // -104.00619506835938
+print(p.roots());
+// [2.481185557213347e-11 - 0.9999999999737949i, -1.0000000000550548 + 3.5929979905099436e-11i, 1.0000004031257346 + 2.7703711854406305e-7i, 5.095265802549413e-11 + 1.0000000000706935i, 1.0000004031257346 + 2.7703711854406305e-7i]
+print('');
+```
+
+</details>
+
+<details>
 <summary>MATRIX</summary>
+
+# Matrix
 
 ## Create a Matrix
 
@@ -320,7 +593,7 @@ print(randomMatrix);
 // └ 4  9  1  3 ┘
 ```
 
-Create a specific random matrix from the  matrix factory 
+Create a specific random matrix from the  matrix factory
 
 ```dart
 var randomMatrix = Matrix.factory
@@ -372,39 +645,137 @@ randomMatrix.matrixProperties().forEach((element) => print(' - $element'));
 Easy much easier to query the properties of a matrix.
 
 ```dart
-Matrix A = Matrix([
+var A = Matrix([
     [4, 1, -1],
     [1, 4, -1],
     [-1, -1, 4]
   ]);
+print(A);
 
-  print('\n\n$A\n');
-  print('l1Norm: ${A.l1Norm()}');
-  print('l2Norm: ${A.l2Norm()}');
-  print('Rank: ${A.rank()}');
-  print('Condition number: ${A.conditionNumber()}');
-  print('Decomposition Condition number: ${A.decomposition.conditionNumber()}');
-  A.matrixProperties().forEach((element) => print(' - $element'));
+print('Shape: ${A.shape}');
+print('Max: ${A.max()}');
+print('Column Max: ${A.max(axis: 0)}');
+print('Row Max: ${A.max(axis: 1)}');
+print('Min: ${A.min()}');
+print('Column Min: ${A.min(axis: 0)}');
+print('Row Min: ${A.min(axis: 1)}');
+print('Sum: ${A.sum()}');
+print('Absolute Sum: ${A.sum(absolute: true)}');
+print('Column Sum: ${A.sum(axis: 0)}');
+print('Row Sum: ${A.sum(axis: 1)}');
+print('Diagonal Sum: ${A.sum(axis: 2)}');
+print('Diagonal Sum TLBR: ${A.sum(axis: 3)}');
+print('Diagonal Sum TRBL: ${A.sum(axis: 4)}');
+print('Mean: ${A.mean()}');
+print('Median: ${A.median()}');
+print('Product: ${A.product()}');
+print('Variance: ${A.variance()}');
+print('Standard Deviation: ${A.standardDeviation()}');
+print('Absolute Sum: ${A.sum(absolute: true)}');
+print('Determinant: ${A.determinant()}');
+print('Rank: ${A.rank()}');
+print('Trace: ${A.trace()}');
+print('Skewness: ${A.skewness()}');
+print('Kurtosis: ${A.kurtosis()}');
+print('Condition number: ${A.conditionNumber()}');
+print('Decomposition Condition number: ${A.decomposition.conditionNumber()}');
 
-  // Output:
-  // Matrix: 3x3
-  // ┌  4  1 -1 ┐
-  // │  1  4 -1 │
-  // └ -1 -1  4 ┘
-  //
-  // l1Norm: 6.0
-  // l2Norm: 7.3484692283495345
-  // Rank: 3
-  // Condition number: 3.6742346141747673
-  // Decomposition Condition number: 1.9999999999999998
-  //  - Square Matrix
-  //  - Full Rank Matrix
-  //  - Symmetric Matrix
-  //  - Non-Singular Matrix
-  //  - Hermitian Matrix
-  //  - Positive Definite Matrix
-  //  - Diagonally Dominant Matrix
-  //  - Strictly Diagonally Dominant Matrix
+print('Manhattan Norm(l1Norm): ${A.norm(Norm.manhattan)}');
+print('Frobenius/Euclidean Norm(l2Norm): ${A.norm(Norm.frobenius)}');
+print('Chebyshev/Infinity Norm: ${A.norm(Norm.chebyshev)}');
+print('Spectral Norm: ${A.norm(Norm.spectral)}');
+print('Trace/Nuclear Norm: ${A.norm(Norm.trace)}');
+print('Nullity: ${A.nullity()}');
+
+print('Normalize: ${A.normalize()}\n');
+print('Frobenius/Euclidean Normalize: ${A.normalize(Norm.frobenius)}\n');
+print('Row Echelon Form: ${A.rowEchelonForm()}\n');
+print('Reduced Row Echelon Form: ${A.reducedRowEchelonForm()}\n');
+print('Null Space: ${A.nullSpace()}\n');
+print('Row Space: ${A.rowSpace()}\n');
+print('Column Space: ${A.columnSpace()}\n');
+print('Matrix Properties:');
+A.matrixProperties().forEach((element) => print(' - $element'));
+
+// Output:
+// Matrix: 3x3
+// ┌  4  1 -1 ┐
+// │  1  4 -1 │
+// └ -1 -1  4 ┘
+//
+// Shape: [3, 3]
+// Max: 4
+// Column Max: [4, 4, 4]
+// Row Max: [4, 4, 4]
+// Min: -1
+// Column Min: [-1, -1, -1]
+// Row Min: [-1, -1, -1]
+// Sum: 10
+// Absolute Sum: 18
+// Column Sum: [4, 4, 2]
+// Row Sum: [4, 4, 2]
+// Diagonal Sum: 12
+// Diagonal Sum TLBR: [-1, 0, 12, 0, -1]
+// Diagonal Sum TRBL: [4, 2, 2, -2, 4]
+// Mean: 1.1111111111111112
+// Median: 1
+// Product: 64
+// Variance: 4.765432098765432
+// Standard Deviation: 2.1829869671542776
+// Absolute Sum: 18
+// Determinant: 54.0
+// Rank: 3
+// Trace: 12
+// Skewness: 0.3705316948061136
+// Kurtosis: -1.58891513866144
+// Condition number: 3.6742346141747673
+// Decomposition Condition number: 1.9999999999999998
+// Manhattan Norm(l1Norm): 6.0
+// Frobenius/Euclidean Norm(l2Norm): 7.3484692283495345
+// Chebyshev/Infinity Norm: 6.0
+// Spectral Norm: 5.999999999999999
+// Trace/Nuclear Norm: 12.0
+// Nullity: 0
+// Normalize: Matrix: 3x3
+// ┌   1.0  0.25 -0.25 ┐
+// │  0.25   1.0 -0.25 │
+// └ -0.25 -0.25   1.0 ┘
+
+// Frobenius/Euclidean Normalize: Matrix: 3x3
+// ┌   0.5443310539518174  0.13608276348795434 -0.13608276348795434 ┐
+// │  0.13608276348795434   0.5443310539518174 -0.13608276348795434 │
+// └ -0.13608276348795434 -0.13608276348795434   0.5443310539518174 ┘
+
+// Row Echelon Form: Matrix: 3x3
+// ┌ 1.0 0.25 -0.25 ┐
+// │ 0.0  1.0  -0.2 │
+// └ 0.0  0.0   1.0 ┘
+
+// Reduced Row Echelon Form: Matrix: 3x3
+// ┌ 1.0 0.0 0.0 ┐
+// │ 0.0 1.0 0.0 │
+// └ 0.0 0.0 1.0 ┘
+
+// Null Space: Matrix: 0x0
+// [ ]
+
+// Row Space: Matrix: 3x3
+// ┌  4  1 -1 ┐
+// │  1  4 -1 │
+// └ -1 -1  4 ┘
+// Column Space: Matrix: 3x3
+// ┌  4  1 -1 ┐
+// │  1  4 -1 │
+// └ -1 -1  4 ┘
+
+// Matrix Properties:
+//  - Square Matrix
+//  - Full Rank Matrix
+//  - Symmetric Matrix
+//  - Non-Singular Matrix
+//  - Positive Definite Matrix
+//  - Diagonally Dominant Matrix
+//  - Strictly Diagonally Dominant Matrix
 ```
 
 ## Matrix Copy
@@ -492,7 +863,7 @@ print(matrixFromFile);
 // └ 7.0 8.0 9.0 ┘
 ```
 
-Write to a csv file 
+Write to a csv file
 
 ``` dart
 String csv = matrix.toCSV(outputFilePath: 'output.csv');
@@ -1111,6 +1482,79 @@ print(xSortedColumn2Descending);
 // └ 0 1 1 1 ┘
 ```
 
+## Roll Matrix
+
+Roll elements along a given axis. Elements that roll beyond the last position are re-introduced at the first.
+
+This function work exactly like the NumPy's roll.
+- shift : int or tuple of ints
+    The number of places by which elements are shifted. If a tuple, then axis must be a tuple of the same size, and each of the given axes is shifted by the corresponding number. If an int while axis is a tuple of ints, then the same value is used for all given axes.
+- axis : int or tuple of ints or null
+    Axis or axes along which elements are shifted. By default, the array is flattened before shifting, after which the original shape is restored.
+
+```dart
+Matrix x2 = Matrix([
+  [0, 1, 2, 3, 4],
+  [5, 6, 7, 8, 9]
+]);
+
+print(x2.roll(1));
+// Matrix: 2x5
+// ┌ 9 0 1 2 3 ┐
+// └ 4 5 6 7 8 ┘
+
+print(x2.roll(-1));
+// Matrix: 2x5
+// ┌ 1 2 3 4 5 ┐
+// └ 6 7 8 9 0 ┘
+
+print(x2.roll(1, axis: 0));
+// Matrix: 2x5
+// ┌ 5 6 7 8 9 ┐
+// └ 0 1 2 3 4 ┘
+
+print(x2.roll(-1, axis: 0));
+// Matrix: 2x5
+// ┌ 5 6 7 8 9 ┐
+// └ 0 1 2 3 4 ┘
+
+print(x2.roll(1, axis: 1));
+// Matrix: 2x5
+// ┌ 4 0 1 2 3 ┐
+// └ 9 5 6 7 8 ┘
+
+print(x2.roll(-1, axis: 1));
+// Matrix: 2x5
+// ┌ 1 2 3 4 0 ┐
+// └ 6 7 8 9 5 ┘
+
+print(x2.roll((1, 1), axis: (1, 0)));
+// Matrix: 2x5
+// ┌ 9 5 6 7 8 ┐
+// └ 4 0 1 2 3 ┘
+
+print(x2.roll((2, 1), axis: (1, 0)));
+// Matrix: 2x5
+// ┌ 8 9 5 6 7 ┐
+// └ 3 4 0 1 2 ┘
+
+print(x2.roll((1, 2), axis: (1, 0)));
+// Matrix: 2x5
+// ┌ 8 9 5 6 7 ┐
+// └ 3 4 0 1 2 ┘
+
+print(x2.roll((1, 2)));
+// Matrix: 2x5
+// ┌ 7 8 9 0 1 ┐
+// └ 2 3 4 5 6 ┘
+
+// Shift Value Larger than Matrix Size
+print(x2.roll(7));
+// Matrix: 2x5
+// ┌ 3 4 5 6 7 ┐
+// └ 8 9 0 1 2 ┘
+```
+
 ## Other Functions of matrices
 
 The Matrix class provides various other functions for matrix manipulation and analysis.
@@ -1148,6 +1592,7 @@ print(doubled);
 // ┌ 2 4 ┐
 // └ 6 8 ┘
 ```
+
 </details>
 
 <details>
@@ -1155,11 +1600,11 @@ print(doubled);
 
 ## Create a new vector
 
-* `Vector(int length, {bool isDouble = true})`: Creates a [Vector] of given length with all elements initialized to 0.
-* `Vector.fromList(List<num> data)`: Constructs a [Vector] from a list of numerical values.
-* `Vector.random(int length,{double min = 0, double max = 1, bool isDouble = true, math.Random? random, int? seed})`: Constructs a [Vector] from a list of random numerical values.
-* `Vector.linspace(int start, int end, [int number = 50])`: Creates a row Vector with equally spaced values between the start and end values (inclusive).
-* `Vector.range(int end, {int start = 1, int step = 1}) & Vector.arrange(int end, {int start = 1, int step = 1})`: Creates a Vector with values in the specified range, incremented by the specified step size.
+- `Vector(int length, {bool isDouble = true})`: Creates a [Vector] of given length with all elements initialized to 0.
+- `Vector.fromList(List<num> data)`: Constructs a [Vector] from a list of numerical values.
+- `Vector.random(int length,{double min = 0, double max = 1, bool isDouble = true, math.Random? random, int? seed})`: Constructs a [Vector] from a list of random numerical values.
+- `Vector.linspace(int start, int end, [int number = 50])`: Creates a row Vector with equally spaced values between the start and end values (inclusive).
+- `Vector.range(int end, {int start = 1, int step = 1}) & Vector.arrange(int end, {int start = 1, int step = 1})`: Creates a Vector with values in the specified range, incremented by the specified step size.
 
 ```dart
 // Create a vector of length 3 with all elements initialized to 0
@@ -1206,14 +1651,14 @@ var v9 = v2 / 2;
 
 ## Vector Operations
 
-* `double dot(Vector other)`: Calculates the dot product of the vector with another vector.
-* `Vector cross(Vector other)`: Calculates the cross product of the vector with another vector.
-* `double get magnitude`: Returns the magnitude (or norm) of the vector.
-* `double get direction`: Returns the direction (or angle) of the vector, in radians.
-* `double norm()`: Returns the norm (or length) of this vector.
-* `Vector normalize()`: Returns this vector normalized.
-* `bool isZero()`: Returns true if this is a zero vector, i.e., all its elements are zero.
-* `bool isUnit()`: Returns true if this is a unit vector, i.e., its norm is 1.
+- `double dot(Vector other)`: Calculates the dot product of the vector with another vector.
+- `Vector cross(Vector other)`: Calculates the cross product of the vector with another vector.
+- `double get magnitude`: Returns the magnitude (or norm) of the vector.
+- `double get direction`: Returns the direction (or angle) of the vector, in radians.
+- `double norm()`: Returns the norm (or length) of this vector.
+- `Vector normalize()`: Returns this vector normalized.
+- `bool isZero()`: Returns true if this is a zero vector, i.e., all its elements are zero.
+- `bool isUnit()`: Returns true if this is a unit vector, i.e., its norm is 1.
 
 ```dart
 // Calculate the dot product of v1 and v2
@@ -1236,14 +1681,14 @@ var normalizedV1 = v1.normalize();
 ```
 
 Others metrics include:
-* `List<num> toList()`: Converts the vector to a list of numerical values.
-* `int get length`: Returns the length (number of elements) of the vector.
-* `void setAll(num value)`: Sets all elements of this vector to [value].
-* `double distance(Vector other)`: Returns the Euclidean distance between this vector and [other].
-* `Vector projection(Vector other)`: Returns the projection of this vector onto [other].
-* `double angle(Vector other)`: Returns the angle (in radians) between this vector and [other].
-* `List<double> toSpherical()`: Converts the Vector from Cartesian to Spherical coordinates.
-* `void fromSpherical(List<num> sphericalCoordinates)`: Converts the Vector from Spherical to Cartesian coordinates.
+- `List<num> toList()`: Converts the vector to a list of numerical values.
+- `int get length`: Returns the length (number of elements) of the vector.
+- `void setAll(num value)`: Sets all elements of this vector to [value].
+- `double distance(Vector other)`: Returns the Euclidean distance between this vector and [other].
+- `Vector projection(Vector other)`: Returns the projection of this vector onto [other].
+- `double angle(Vector other)`: Returns the angle (in radians) between this vector and [other].
+- `List<double> toSpherical()`: Converts the Vector from Cartesian to Spherical coordinates.
+- `void fromSpherical(List<num> sphericalCoordinates)`: Converts the Vector from Spherical to Cartesian coordinates.
 
 ```dart
 Vector v = Vector([1, 2, 3]);
@@ -1294,7 +1739,67 @@ var subVector = v.subVector(indices: [0, 2, 4, 1, 1]);
 print(subVector);  // Output: [1.0, 3.0, 5.0, 2.0, 2.0]
 print(subVector.runtimeType); // Vector
 ```
-</details>
+
+It's possible to use vector instances as keys for HashMap and similar data structures and to look up a value by the vector-key, since the hash code for equal vectors is the same.
+
+```dart
+final map = HashMap<Vector, bool>();
+
+map[Vector.fromList([1, 2, 3, 4, 5])] = true;
+
+print(map[Vector.fromList([1, 2, 3, 4, 5])]); // true
+print(Vector.fromList([1, 2, 3, 4, 5]).hashCode ==
+      Vector.fromList([1, 2, 3, 4, 5]).hashCode); // true
+
+```
+
+Additional features
+
+```dart
+var xx = Vector([1, 2, 3, 4]);
+var yy = Vector([4, 5]);
+print('');
+print(xx.outerProduct(yy));
+// Matrix: 4x2
+// ┌  4  5 ┐
+// │  8 10 │
+// │ 12 15 │
+// └ 16 20 ┘
+
+var mat = Matrix.fromList([
+  [2, 3, 3, 3],
+  [9, 9, 8, 6],
+  [1, 1, 2, 9]
+]);
+
+print(-Vector([1, 2, 3]) + mat);
+// Matrix: 3x4
+// ┌  1  2  2 2 ┐
+// │  7  7  6 4 │
+// └ -2 -2 -1 6 ┘
+
+print(xx * mat + xx.subVector(end: xx.length - 2)); // [30.0, 77.0, 48.0]
+
+//Vector operations
+final vector1 = Vector([1.0, 2.0, 3.0, 4.0, 5.0]);
+final vector2 = Vector.fromList([2.0, 3.0, 4.0, 5.0, 6.0]);
+final result1 = vector1.distance(vector2, distance: DistanceType.cosine);
+print(result1); // 0.005063323673817899
+
+var result = vector1.normalize();
+print(result.round(3)); // [0.135, 0.270, 0.405, 0.539, 0.674]
+
+final vector = Vector.fromList([1.0, -2.0, 3.0, -4.0, 5.0]);
+result = vector.normalize(Norm.manhattan);
+print(result.round(3)); // [0.067, -0.133, 0.200, -0.267, 0.333]
+
+var result2 = vector1.rescale();
+print(result2); // [0.0, 0.25, 0.5, 0.75, 1.0]
+
+var vector3 = Vector.fromList([4.0, 5.0, 6.0, 7.0, 8.0]);
+result = vector3 - [2.0, 3.0, 2.0, 3.0, 2.0];
+print(result); // [2.0, 2.0, 4.0, 4.0, 6.0]
+```
 
 </details>
 

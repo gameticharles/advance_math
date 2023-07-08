@@ -32,6 +32,7 @@ part 'matrix/iterators/element_iterator.dart';
 part 'matrix/row.dart';
 part 'matrix/column.dart';
 part 'matrix/diagonal.dart';
+part 'matrix/sylvester_matrix.dart';
 part 'matrix/sparse_matrix.dart';
 part 'matrix/special_matrix.dart';
 
@@ -53,6 +54,7 @@ part 'vector/vector.dart';
 part 'vector/vector_special.dart';
 part 'vector/complex_vectors.dart';
 part 'vector/matrix_vector.dart';
+part 'vector/list_vector.dart';
 part 'vector/vector_matrix.dart';
 part 'vector/operations.dart';
 
@@ -60,6 +62,14 @@ part 'nonlinear/nonlinear.dart';
 part 'linear/linear.dart';
 part 'least_squares/base_least_square.dart';
 part 'least_squares/special_least_square.dart';
+
+part 'polynomial/constant.dart';
+part 'polynomial/linear.dart';
+part 'polynomial/quadratic.dart';
+part 'polynomial/cubic.dart';
+part 'polynomial/quartic.dart';
+part 'polynomial/durand_kerner.dart';
+part 'polynomial/polynomial.dart';
 
 // This function should return an instance of FileIODesktop or FileIOWeb depending on the platform.
 FileIO fileIO = FileIO();

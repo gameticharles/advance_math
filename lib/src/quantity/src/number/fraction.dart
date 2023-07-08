@@ -15,4 +15,17 @@ class Fraction extends Double {
 
   /// The number below the line in a common fraction.
   final int denominator;
+
+  /// The whole number fraction.
+  int get whole {
+    var result = numerator ~/ denominator;
+    return result == 0 ? 1 : result;
+  }
+
+  // @override
+  // String toString([bool asFraction = false]) {
+  //   return numerator > denominator
+  //       ? "$whole ${numerator % denominator}/$denominator"
+  //       : "$numerator/$denominator";
+  // }
 }

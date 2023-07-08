@@ -31,7 +31,7 @@ class Imaginary extends Number {
   /// The value of the imaginary component as a Real number.
   final Real value;
 
-  num getValue() => value.value;
+  num get getValue => value.value;
 
   /// Always returns zero.
   @override

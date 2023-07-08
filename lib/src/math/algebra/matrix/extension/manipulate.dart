@@ -1014,6 +1014,134 @@ extension MatrixManipulationExtension on Matrix {
     return result;
   }
 
+  /// Rolls the elements in the matrix along the specified axis or axes.
+  ///
+  /// When [shift] is an integer and [axis] is null, the function treats the matrix
+  /// as a flattened one-dimensional array and shifts all elements by the
+  /// specified amount.
+  ///
+  /// When [shift] is an integer and [axis] is an integer, the elements are shifted
+  /// along the specified axis.
+  ///
+  /// When [shift] is a tuple of integers and [axis] is a tuple of integers,
+  /// the elements are shifted along multiple axes.
+  ///
+  /// The function can handle negative shifts.
+  ///
+  /// The function mimics the behavior of the NumPy's roll function in Python.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// var x2 = Matrix([
+  ///     [0, 1, 2, 3, 4],
+  ///     [5, 6, 7, 8, 9]
+  /// ]);
+  ///
+  /// print(x2.roll(1));
+  /// // Output: Matrix: 2x5
+  /// // ┌ 9 0 1 2 3 ┐
+  /// // └ 4 5 6 7 8 ┘
+  ///
+  /// print(x2.roll(-1));
+  /// // Output: Matrix: 2x5
+  /// // ┌ 1 2 3 4 5 ┐
+  /// // └ 6 7 8 9 0 ┘
+  ///
+  /// print(x2.roll((1, 2), axis: (1, 0)));
+  /// // Output: Matrix: 2x5
+  /// // ┌ 8 9 5 6 7 ┐
+  /// // └ 3 4 0 1 2 ┘
+  /// ```
+  ///
+  /// [shift] The number of places by which elements are shifted. If shift
+  /// is a tuple, elements are shifted by different amounts along different axes.
+  ///
+  /// [axis] The axis along which elements are shifted. If axis is a tuple,
+  /// elements are shifted along multiple axes. If axis is null, the matrix
+  /// is treated as a flattened one-dimensional array.
+  ///
+  /// Returns: A new matrix where the elements have been shifted by the specified
+  /// amount along the specified axis or axes.
+  ///
+  /// Throws: ArgumentError If shift or axis are not of type int, (int, int), or null.
+  ///
+  Matrix roll(dynamic shift, {dynamic axis}) {
+    // Check for the empty matrix
+    if (_data.isEmpty) return this;
+    if (shift is int) {
+      // Roll all elements along the specified axis
+      if (axis is int) {
+        return _rollSingle(shift, axis);
+      } else if (axis is (int, int)) {
+        Matrix result = this;
+        result = result._rollSingle(shift, axis.$1);
+        result = result._rollSingle(shift, axis.$2);
+        return result;
+      } else if (axis == null) {
+        // Flatten the array, roll, and then reshape
+        List<dynamic> flatArray = flatten();
+        List<dynamic> rolledArray = _rollFlat(flatArray, shift);
+        return Matrix.fromFlattenedList(rolledArray, rowCount, columnCount);
+      }
+      throw ArgumentError("axis must be type (int, int), or type int or null");
+    } else if (shift is (int, int)) {
+      // Roll elements along the multiple specified axes
+      if (axis is int) {
+        Matrix result = this;
+        result = result._rollSingle(shift.$1, axis);
+        result = result._rollSingle(shift.$2, axis);
+        return result;
+      } else if (axis is (int, int)) {
+        Matrix result = this;
+        result = result._rollSingle(shift.$1, axis.$1);
+        result = result._rollSingle(shift.$2, axis.$2);
+        return result;
+      } else if (axis == null) {
+        // Flatten the array, roll, and then reshape
+        List<dynamic> flatArray = flatten();
+        List<dynamic> rolledArray = _rollFlat(flatArray, shift.$1);
+        rolledArray = _rollFlat(rolledArray, shift.$2);
+        return Matrix.fromFlattenedList(rolledArray, rowCount, columnCount);
+      }
+    }
+    throw ArgumentError("shift and axis must be type (int, int), or type int");
+  }
+
+  /// Private helper function to flatten the array
+  List<dynamic> _rollFlat(List<dynamic> array, int shift) {
+    int n = array.length;
+    shift = ((shift % n) + n) % n; // Handle negative shifts
+    return [...array.sublist(n - shift), ...array.sublist(0, n - shift)];
+  }
+
+  /// Private helper function to roll single shift and axis
+  Matrix _rollSingle(int shift, int axis) {
+    int n = length;
+    int m = _data[0].length;
+
+    if (axis == 0) {
+      // Roll rows
+      shift = ((shift % n) + n) % n; // Handle negative shifts
+      List<List<dynamic>> result = List.generate(
+          n,
+          (i) => List.generate(m, (j) => _data[(i - shift + n) % n][j],
+              growable: false),
+          growable: false);
+      return Matrix(result);
+    } else if (axis == 1) {
+      // Roll columns
+      shift = ((shift % m) + m) % m; // Handle negative shifts
+      List<List<dynamic>> result = List.generate(
+          n,
+          (i) => List.generate(m, (j) => _data[i][(j - shift + m) % m],
+              growable: false),
+          growable: false);
+      return Matrix(result);
+    }
+
+    throw ArgumentError("Unsupported axis");
+  }
+
   /// Determines whether the current matrix and matrix [b] are compatible for broadcasting.
   ///
   /// Two matrices are compatible for broadcasting if, for each dimension, the dimension

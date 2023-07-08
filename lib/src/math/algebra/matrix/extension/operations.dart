@@ -965,34 +965,21 @@ extension MatrixOperationExtension on Matrix {
   /// // 0.25 0.5
   /// // 0.75 1.0
   /// ```
-  Matrix normalize() {
+  Matrix normalize([Norm? normType]) {
     if (_data.isEmpty) {
       throw Exception("Matrix is empty");
     }
 
-    dynamic maxValue = _data[0][0];
-    for (int i = 0; i < rowCount; i++) {
-      for (int j = 0; j < columnCount; j++) {
-        if (_data[i][j] > maxValue) {
-          maxValue = _data[i][j];
-        }
-      }
+    if (normType != null) {
+      return this / norm(normType);
     }
 
+    dynamic maxValue = max();
     if (maxValue == 0) {
       throw Exception("Matrix is filled with zeros, cannot normalize");
     }
 
-    List<List<dynamic>> newData = [];
-    for (int i = 0; i < rowCount; i++) {
-      List<dynamic> row = [];
-      for (int j = 0; j < columnCount; j++) {
-        row.add(_data[i][j] / maxValue);
-      }
-      newData.add(row);
-    }
-
-    return Matrix(newData);
+    return this / maxValue;
   }
 
   /// Transposes the matrix by swapping rows and columns.

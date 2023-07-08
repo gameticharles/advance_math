@@ -557,10 +557,10 @@ String degree2DMSString(num degDEC,
     }
     nswe = '';
   }
+  pn = pn == '+ ' ? '' : "-";
 
   if (noSignOrDirection) {
     nswe = '';
-    pn = '';
   }
 
   return '$pn ${deg.abs().toString().padLeft(3, '0')}° ${min.toString().padLeft(2, '0')}\' ${sec.toStringAsFixed(decPlace).padLeft(2, '0')}"$nswe';

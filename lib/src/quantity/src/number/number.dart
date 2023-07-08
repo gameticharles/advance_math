@@ -1,11 +1,5 @@
-import 'dart:math' as math;
-
-import 'complex.dart';
-import 'double.dart';
-import 'imaginary.dart';
-import 'integer.dart';
-import 'precise.dart';
-import 'real.dart';
+import '../../../math/basic/math.dart' as math;
+import '../../number.dart';
 
 /// The abstract base class for all Number types.
 abstract class Number implements Comparable<dynamic> {
@@ -239,5 +233,188 @@ abstract class Number implements Comparable<dynamic> {
 
     // If n2 is not a num or Number, treat it as a zero
     return Comparable.compare(toDouble(), 0);
+  }
+
+  /// Find the square root of the number
+  Number pow(num exponent) {
+    if (this is Integer || this is Precise || this is Double || this is Real) {
+      return numToNumber(math.pow(numberToNum(this), exponent));
+    } else if (this is Imaginary) {
+      return Complex.num(Integer.zero, this as Imaginary).pow(exponent);
+    } else {
+      return (this as Complex).pow(exponent);
+    }
+  }
+
+  /// Find the square root of the number
+  Number sqrt() {
+    if (this is Integer || this is Precise || this is Double || this is Real) {
+      var re = math.sqrt(numberToNum(this));
+      return re is num ? numToNumber(re) : re;
+    } else if (this is Imaginary) {
+      return Complex.num(Integer.zero, this as Imaginary).sqrt();
+    } else {
+      return (this as Complex).sqrt();
+    }
+  }
+
+  /// Get the nth root of the number
+  dynamic nthRoot(int nth, {bool allRoots = false}) {
+    Complex complex = Complex.zero();
+    if (this is Integer || this is Precise || this is Double || this is Real) {
+      complex = Complex.fromReal(numberToNum(this));
+    }
+    if (this is Imaginary) {
+      complex = Complex.num(Integer.zero, this as Imaginary);
+    }
+    if (this is Complex) {
+      complex = this as Complex;
+    }
+    //Return all the complex numbers of the nth root
+    if (allRoots) {
+      var roots = <Complex>[];
+      for (var k = 0; k < nth; k++) {
+        var r = math.pow(abs().toDouble(), 1 / nth);
+        var theta = (complex.phase.value + 2 * math.pi * k) / nth;
+        roots.add(Complex(r * math.cos(theta), r * math.sin(theta)));
+      }
+      return roots;
+    }
+
+    // return the ony smallest positive complex number
+    var isNegativeNth = nth < 0;
+    var n = isNegativeNth ? -nth : nth;
+
+    var a = 0.0;
+    var b = 0.0;
+
+    if (n == 0) {
+      a = 1;
+    } else {
+      var length = math.pow(abs().toDouble(), 1.0 / n) as double;
+      var angle =
+          complex.phase < 0 ? complex.phase + (2 * math.pi) : complex.phase;
+      angle /= n;
+      a = length * math.cos(angle.toDouble());
+      b = length * math.sin(angle.toDouble());
+    }
+
+    if (isNegativeNth) {
+      final den = a * a + b * b;
+      a /= den;
+      b = -b / den;
+    }
+
+    return Complex(a, b);
+  }
+
+  /// Returns the fractional type of the value
+  Fraction asFraction() {
+    var v = toFraction();
+    return Fraction(v[0], v[1]);
+  }
+
+  /// Converts the double to a mixed fraction represented as a list of integers where the first element is the whole number,
+  /// the second is the numerator of the fractional part, and the third is the denominator of the fractional part.
+  /// Example:
+  /// ```
+  /// double number = 1.666666666;
+  /// List<int> mixedFraction = number.toMixedFraction();
+  /// print(mixedFraction);  // Outputs: [1, 2, 3]
+  /// ```
+  List<int> toMixedFraction() {
+    var fraction = toFraction();
+    int whole = fraction[0] ~/ fraction[1];
+    int numerator = fraction[0] % fraction[1];
+    int denominator = fraction[1];
+
+    // Return mixed fraction if whole part exists, else simple fraction
+    return whole != 0
+        ? [whole, numerator, denominator]
+        : [numerator, denominator];
+  }
+
+  /// Approximates the double as a simple fraction with the numerator and denominator as elements of a list.
+  /// Example:
+  /// ```
+  /// double number = 0.666666666;
+  /// List<int> fraction = number.toFraction();
+  /// print(fraction);  // Outputs: [2, 3]
+  /// ```
+  List<int> toFraction([int precision = 64]) {
+    double error = 1.0 / (precision * precision);
+    double x = toDouble();
+    int sign = (x < 0) ? -1 : 1;
+    x = x.abs();
+
+    // The integer part of the decimal.
+    int integerPart = x.floor();
+    x -= integerPart;
+
+    // If x is now zero, the fraction is [this, 1].
+    if (x < error) return [sign * integerPart, 1];
+
+    // The lower fraction is 0/1.
+    int lowerN = 0;
+    int lowerD = 1;
+
+    // The upper fraction is 1/1.
+    int upperN = 1;
+    int upperD = 1;
+
+    while (true) {
+      // The middle fraction is (lower_n + upper_n) / (lower_d + upper_d).
+      int middleN = lowerN + upperN;
+      int middleD = lowerD + upperD;
+
+      // If x + error < middle, middle is our new upper.
+      if (middleD * (x + error) < middleN) {
+        upperN = middleN;
+        upperD = middleD;
+      }
+      // Else If middle < x - error, middle is our new lower.
+      else if (middleN < (x - error) * middleD) {
+        lowerN = middleN;
+        lowerD = middleD;
+      }
+      // Else middle is our best fraction.
+      else {
+        return [(sign * integerPart * middleD) + (sign * middleN), middleD];
+      }
+    }
+  }
+
+  /// Returns a string representation of the double as a simple fraction.
+  /// Example:
+  /// ```
+  /// double number = 0.666666666;
+  /// String fraction = number.toFractionString();
+  /// print(fraction);  // Outputs: "2/3"
+  /// ```
+  String toFractionString() {
+    var fraction = toFraction();
+    if (fraction[1] == 1 || fraction[0] == fraction[1]) {
+      return "${fraction[0]}";
+    } else {
+      return "${fraction[0]}/${fraction[1]}";
+    }
+  }
+
+  /// Returns a string representation of the double as a mixed fraction.
+  /// Example:
+  /// ```
+  /// double number = 1.666666666;
+  /// String mixedFraction = number.toMixedFractionString();
+  /// print(mixedFraction);  // Outputs: "1(2/3)"
+  /// ```
+  String toMixedFractionString() {
+    var mixedFraction = toMixedFraction();
+    if (mixedFraction[1] == 0) {
+      return "${mixedFraction[0]}";
+    } else if (mixedFraction[0] == 0) {
+      return "${mixedFraction[1]}/${mixedFraction[2]}";
+    } else {
+      return "${mixedFraction[0]}(${mixedFraction[1]}/${mixedFraction[2]})";
+    }
   }
 }

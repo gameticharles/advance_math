@@ -1,3 +1,13 @@
+## 3.0.0
+* Added Geometry (Point, line, Circle, Triangle, Polygon, etc.)
+* Added Polynomial (Linear, Quadratic, Cubic, Quartic, Durand-Kerner)
+* Added List and vecctors having same properties
+* Added NumPy's roll
+* Fixed README file
+
+## 2.1.2
+* Fixed complex number outputing wrong string
+
 ## 2.1.1
 * Fixed bugs
 

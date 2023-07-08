@@ -6,7 +6,7 @@ part of maths;
 /// ```dart
 /// print(pi);  // Output: 3.141592653589793
 /// ```
-const num pi = math.pi;
+const double pi = math.pi;
 
 /// Returns the mathematical constant e. Base of the natural logarithms
 ///

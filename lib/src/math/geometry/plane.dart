@@ -51,7 +51,7 @@ class Plane {
   /// print(perpendicularLine);  // Output: Line(Point(2, 3, 4), Vector(1, 0, 0))
   /// ```
   Line perpendicularLine(Point pivot) {
-    return Line(pivot, normal.toPoint() + pivot);
+    return Line(p1: pivot, p2: normal.toPoint() + pivot);
   }
 
   /// Creates a line parallel to this plane.
@@ -76,11 +76,11 @@ class Plane {
 
     switch (planeType) {
       case PlaneType.xy:
-        return Line(throughPoint, throughPoint + Point(0, 0, 1));
+        return Line(p1: throughPoint, p2: throughPoint + Point(0, 0, 1));
       case PlaneType.xz:
-        return Line(throughPoint, throughPoint + Point(0, 1, 0));
+        return Line(p1: throughPoint, p2: throughPoint + Point(0, 1, 0));
       case PlaneType.yz:
-        return Line(throughPoint, throughPoint + Point(1, 0, 0));
+        return Line(p1: throughPoint, p2: throughPoint + Point(1, 0, 0));
       default:
         throw ArgumentError('Invalid PlaneType provided.');
     }
@@ -158,11 +158,13 @@ class Plane {
       denominator = normal.z * other.normal.y - normal.y * other.normal.z;
       double x = (E * normal.z - D * other.normal.z) / denominator;
       return Line(
-          Point(x, 0, 0), Point(x, 0, 0) + Point.fromList(direction.toList()));
+          p1: Point(x, 0, 0),
+          p2: Point(x, 0, 0) + Point.fromList(direction.toList()));
     } else {
       double y = (D * other.normal.x - E * normal.x) / denominator;
       return Line(
-          Point(0, y, 0), Point(0, y, 0) + Point.fromList(direction.toList()));
+          p1: Point(0, y, 0),
+          p2: Point(0, y, 0) + Point.fromList(direction.toList()));
     }
   }
 
@@ -207,7 +209,8 @@ class Plane {
     Vector directionVector = normal.cross(Vector3(0, 1, 0));
 
     // Create a line object from the direction vector.
-    return Line(point, point + Point.fromList(directionVector.toList()));
+    return Line(
+        p1: point, p2: point + Point.fromList(directionVector.toList()));
   }
 
   /// Calculates the shortest (perpendicular) distance from a point in space to the plane.

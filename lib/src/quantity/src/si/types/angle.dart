@@ -516,7 +516,7 @@ class Angle extends Quantity {
 
   @override
   String toString() {
-    return 'Angle: $deg° or $rad rad or $dms';
+    return 'Angle: $deg° or $rad rad or ${degree2DMSString(deg)}';
   }
 }
 

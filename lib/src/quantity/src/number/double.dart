@@ -79,7 +79,7 @@ class Double extends Real {
   double get value => _value;
 
   @override
-  double toDouble() => _value.toDouble();
+  double toDouble() => _value;
 
   @override
   int toInt() => _value.toInt();
@@ -136,4 +136,17 @@ class Double extends Real {
   ///     'd' : double value
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{'d': value};
+
+  @override
+  String toString([bool asFraction = false]) {
+    if (asFraction) {
+      var fraction = toFraction();
+      if (fraction[1] == 1 || fraction[0] == fraction[1]) {
+        return "${fraction[0]}";
+      } else {
+        return "${fraction[0]}/${fraction[1]}";
+      }
+    }
+    return "$value";
+  }
 }
