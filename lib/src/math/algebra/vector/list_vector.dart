@@ -1,14 +1,6 @@
 part of algebra;
 
 extension ListVector on List<num> {
-  List<num> plus(List<num> other) {
-    if (length != other.length) {
-      throw ArgumentError('Both vectors should have the same length');
-    }
-
-    return List<num>.generate(length, (i) => this[i] + other[i]);
-  }
-
   Vector operator +(dynamic other) {
     if (length != other.length) {
       throw ArgumentError("Vectors must have the same length for addition.");
@@ -78,6 +70,10 @@ extension ListVector on List<num> {
   /// This function creates a new list where the elements are shifted by [shift] positions.
   /// Elements that are shifted off the end of the list wrap around to the beginning.
   List<num> roll(dynamic shift) => Vector(this).roll(shift).toList();
+
+  /// Calculates the dot product of the list with another list or vector.
+  double dot(dynamic other) =>
+      Vector(this).dot(other is num ? Vector(other) : other);
 }
 
 extension ListToVector on List<num> {
