@@ -802,7 +802,7 @@ void main() {
     });
 
     test('operator % (exception)', () {
-      expect(() => Imaginary(5) % 2, throwsA(isA<NumberException>()));
+      expect(Imaginary(5) % 2, Complex(6.123233995736766e-17, 1));
     });
 
     group('operator ~/', () {

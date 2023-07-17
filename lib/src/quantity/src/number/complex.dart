@@ -49,6 +49,12 @@ class Complex extends Number {
       : real = Double(realValue.toDouble()),
         imaginary = Imaginary(0);
 
+  /// Factory constructor to create a Complex number from a real number only.
+  /// The real part will be 0.
+  Complex.fromImaginary(num imaginaryValue)
+      : real = Double(0),
+        imaginary = Imaginary(imaginaryValue);
+
   /// Creates a complex number from [Fraction] objects.
   factory Complex.fromFraction(Fraction real, Fraction imaginary) =>
       Complex(real.toDouble(), imaginary.toDouble());
@@ -77,7 +83,7 @@ class Complex extends Number {
   ///
   /// print(z); // Output: 2 + 2i
   /// ```
-  static Complex parse(String s) {
+  factory Complex.parse(String s) {
     // Simple parsing implementation, assuming input format a +/- bi
     final hasPlus = s.contains('+');
     final parts = s.split(hasPlus ? '+' : '-');
@@ -165,7 +171,7 @@ class Complex extends Number {
   /// Returns the magnitude (or absolute value) of the complex number.
   ///
   /// ```dart
-  /// var z = Complex.num(3, 4);
+  /// var z = Complex(3, 4);
   ///
   /// print(z.magnitude); // Output: 5.0
   /// ```
@@ -174,7 +180,7 @@ class Complex extends Number {
   /// Returns the angle (or argument or phase) in radians of the complex number.
   ///
   /// ```dart
-  /// var z = Complex.num(1, 1);
+  /// var z = Complex(1, 1);
   ///
   /// print(z.angle); // Output: 0.7853981633974483
   /// ```
@@ -402,6 +408,9 @@ class Complex extends Number {
       return Complex.fromPolar(numberToNum(remainder), numberToNum(phase));
     }
     return this % divisor;
+
+    // throw const NumberException(
+    //       'The number library does not support raising a complex number to an imaginary power');
   }
 
   /// The power operator (note: NOT bitwise XOR).
@@ -411,23 +420,13 @@ class Complex extends Number {
   @override
   Number operator ^(dynamic exponent) {
     if (exponent is num) {
-      final scaledPhase = exponent.toDouble() * phase.value;
-      final expModulus = complexModulus ^ exponent;
-      return Number.simplifyType(Complex.num(
-          expModulus * math.cos(scaledPhase) as Real,
-          Imaginary(expModulus * math.sin(scaledPhase))));
+      return pow(exponent);
     } else if (exponent is Real) {
-      final scaledPhase = (exponent * phase.value).toDouble();
-      final expModulus = complexModulus ^ exponent.value;
-      return Number.simplifyType(Complex.num(
-          expModulus * math.cos(scaledPhase) as Real,
-          Imaginary(expModulus * math.sin(scaledPhase))));
+      return pow(Complex.num(exponent, Imaginary(0)));
     } else if (exponent is Complex) {
-      throw const NumberException(
-          'The number library does not support raising a complex number to a complex power');
+      return pow(exponent);
     } else if (exponent is Imaginary) {
-      throw const NumberException(
-          'The number library does not support raising a complex number to an imaginary power');
+      return pow(Complex.num(Double.zero, exponent));
     }
 
     return Double.one;
@@ -458,23 +457,49 @@ class Complex extends Number {
 
   /// Returns a new complex number representing this number raised to the power of [exponent].
   ///
+  /// Example:1
   /// ```dart
-  /// var z = Complex.num(2, 3);
+  /// var z = Complex(2, 3);
   /// var z_power = z.pow(2);
   ///
   /// print(z_power); // Output: -5 + 12i
   /// ```
+  ///
+  /// Example:2
+  /// ```dart
+  /// var z = Complex(1, 2);
+  /// var z_power = z.pow(Complex(2, 1));
+  ///
+  /// print(z_power); // Output: -1.6401010184280038 + 0.202050398556709i
+  /// ```
   @override
-  Number pow(num exponent) {
-    final r = math.pow(magnitude.toDouble(), exponent);
-    final theta = angle * exponent;
-    return Complex.fromPolar(r, theta.toDouble());
+  Number pow(dynamic exponent) {
+    if (exponent is num) {
+      final r = math.pow(magnitude.toDouble(), exponent);
+      final theta = angle * exponent;
+      return Number.simplifyType(Complex.fromPolar(r, theta.toDouble()));
+    }
+    exponent as Complex;
+    var r = magnitude;
+    var theta = phase;
+    var realExp = exponent.real;
+    var imagExp = exponent.imaginary;
+
+    num newR = math.pow(numberToNum(r), realExp.value) *
+        math.exp(-(imagExp.getValue) * theta.value);
+    num newTheta = realExp.value * theta.value +
+        imagExp.getValue * math.log(numberToNum(r));
+
+    num newReal = newR * math.cos(newTheta);
+    num newImaginary = newR * math.sin(newTheta);
+
+    return Number.simplifyType(Complex(newReal, newImaginary));
   }
 
   /// Returns a new complex number representing the square root of this number.
   ///
   /// ```dart
-  /// var z = Complex.num(4, 0);
+  /// var z = Complex(4, 0);
   /// var z_sqrt = z.sqrt();
   ///
   /// print(z_sqrt); // Output: 2.0 + 0.0i
@@ -485,7 +510,7 @@ class Complex extends Number {
   /// Returns a new complex number representing the exponential of this number.
   ///
   /// ```dart
-  /// var z = Complex.num(1, pi);
+  /// var z = Complex(1, pi);
   /// var z_exp = z.exp();
   ///
   /// print(z_exp); // Output: -1.0 + 1.2246467991473532e-16i

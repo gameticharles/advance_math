@@ -539,11 +539,24 @@ class Point extends Vector {
   }
 
   /// Computes the bearing from this point to another point.
-  /// The bearing is the `angle` between the line from this point to
-  /// the other point and the line from this point to the eastward direction, measured
-  /// clockwise from north.
   ///
-  /// Example:
+  /// The bearing is the angle between the line from this point to
+  /// the other point and the line from this point to either the eastward (x-axis)
+  /// or northward (y-axis) direction, measured clockwise.
+  ///
+  /// By default, the bearing is calculated with respect to the x-axis (eastward direction).
+  /// To calculate the bearing with respect to the y-axis (northward direction), set the
+  /// `isXAxis` argument to `false`.
+  ///
+  /// The `point` argument is the other point to which the bearing should be calculated.
+  ///
+  /// The function returns an `Angle` object representing the bearing.
+  ///
+  /// Example
+  ///
+  /// Here is an example of using this function to calculate the bearing from one point
+  /// to another:
+  ///
   /// ```dart
   /// var point1 = Point(0, 0);
   /// var point2 = Point(1, 1);
@@ -551,11 +564,24 @@ class Point extends Vector {
   /// print(bearing.deg); // Output: 45.0
   /// ```
   ///
-  /// Returns the bearing as a `double`.
-  Angle bearingTo(Point point) {
-    var angle = atan2(point.y - y, point.x - x);
-    var bearing = (toDegrees(angle) % 360 + 360) % 360;
-    return Angle(deg: bearing);
+  /// Here is an example of using this function to calculate the bearing from one point
+  /// to another with respect to the y-axis:
+  ///
+  /// ```dart
+  /// var point1 = Point(0, 0);
+  /// var point2 = Point(1, 1);
+  /// Angle bearing = point1.bearingTo(point2, isXAxis: false);
+  /// print(bearing.deg); // Output: 45.0
+  /// ```
+  ///
+  /// Returns the bearing as an `Angle` object.
+  ///
+  Angle bearingTo(Point point, {bool isXAxis = true}) {
+    return Angle(
+            rad: isXAxis
+                ? atan2(point.y - y, point.x - x)
+                : atan2(point.x - x, point.y - y))
+        .normalize();
   }
 
   /// Calculates the shortest distance from this point to a circle.

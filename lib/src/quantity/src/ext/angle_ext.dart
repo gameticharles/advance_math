@@ -551,19 +551,21 @@ String degree2DMSString(num degDEC,
     }
     pn = '';
   } else {
-    pn = "+ ";
+    pn = '+ ';
     if (degDEC < 0) {
-      pn = "- ";
+      pn = '- ';
     }
     nswe = '';
+
+    pn = pn == '+ ' ? '' : '- ';
   }
-  pn = pn == '+ ' ? '' : "-";
 
   if (noSignOrDirection) {
     nswe = '';
+    pn = '';
   }
 
-  return '$pn ${deg.abs().toString().padLeft(3, '0')}° ${min.toString().padLeft(2, '0')}\' ${sec.toStringAsFixed(decPlace).padLeft(2, '0')}"$nswe';
+  return '$pn${deg.abs().toString().padLeft(3, '0')}° ${min.toString().padLeft(2, '0')}\' ${sec.toStringAsFixed(decPlace).padLeft(2, '0')}"$nswe';
 }
 
 /// Units acceptable for use in describing Angle quantities.

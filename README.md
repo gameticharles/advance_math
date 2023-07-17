@@ -25,6 +25,8 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
 - Support angle conversion (degrees, minutes, seconds, radians, gradians, DMS).
 - Trigonometry: It provides computation on all the trigonometric functions on the angle. These includes inverse and hyperbolic function (sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, sec, csc, cot, asec, acsc, acot, sech, csch, coth, asech, acsch, acoth, vers, covers, havers, exsec, excsc).
 - Angle operation: Supports addition, subtraction, multiplication, and division. Also supports comparisons, normalize, interpolation, and small-differencing on angles.
+- Geometry: Geometries like Point, Line, Polygon, Circle, Triangle, SphericalTriangle, etc with specific functionalities and methods are implemented.
+- Polynomial functions: Solve and find roots of a function to any degree (including Linear, Quadratic, Cubic, Quartic etc).
 - Matrix creation, filling and generation: Methods for filling the matrix with specific values or generating matrices with certain properties, such as zero, ones, identity, diagonal, list, or random matrices.
 - Import and export matrices to and from other formats (e.g., CSV, JSON, binary)
 - Matrix operations: Implement common matrix operations such as addition, subtraction, multiplication (element-wise and matrix-matrix), and division (element-wise) etc.
@@ -1818,6 +1820,21 @@ Complex numbers are crucial in many areas of mathematics and engineering.
 
 The Complex class in this library lets you create complex numbers, access their real and imaginary parts, and obtain their conjugate.
 
+
+#### Constructors
+
+The class provides several constructors to create complex numbers in different ways:
+
+```dart
+var z1 = Complex(1, 2); // Creates a complex number 1 + 2i
+var z2 = Complex.fromPolar(2, pi / 2); // Creates a complex number from polar coordinates
+var z3 = Complex.fromReal(1); // Creates a complex number with only a real part
+var z4 = Complex.fromImaginary(2); // Creates a complex number with only an imaginary part
+var z5 = Complex.parse('2 + 2i'); // Parses a complex number from a string
+```
+
+Access its properties
+
 ```dart
 // Creating a new complex number
 Complex z = Complex(3, 2);
@@ -1831,6 +1848,66 @@ print(z.imaginary);  // Output: 2
 Complex conjugate = z.conjugate();
 print(conjugate);  // Output: 3 - 2i
 
+```
+
+#### Operations
+
+The class supports all basic arithmetic operations, including addition, subtraction, multiplication, division, and exponentiation:
+
+```dart
+var z1 = Complex(1, 2);
+var z2 = Complex(2, 3);
+
+var sum = z1 + z2; // Adds two complex numbers
+var difference = z1 - z2; // Subtracts two complex numbers
+var product = z1 * z2; // Multiplies two complex numbers
+var quotient = z1 / z2; // Divides two complex numbers
+var mod = z1 % 2; // Modulo operation of complex numbers
+var power = z1 ^ 2; // Raises a complex number to a power
+
+```
+
+#### Power Operator
+
+The power operator (^) raises the complex number to the power of the given number. The result is another complex number.
+
+```dart
+var z = Complex(2, 3); // 2 + 3i
+var z_power = z ^ 2;
+
+print(z_power); // Output: -5 + 12i
+```
+
+In this example, the complex number z is raised to the power of 2. The result is another complex number -5 + 12i.
+
+```dart
+var z = Complex(1, 2); // 1 + 2i
+var z_power = z ^ Complex(2, 1); // (2 + i)
+
+print(z_power); // Output: -1.6401010184280038 + 0.202050398556709i
+
+```
+
+In this example, the complex number z is raised to the power of another complex number 2 + i. The result is another complex number -1.6401010184280038 + 0.202050398556709i.
+
+#### Other methods
+
+The class also provides several other methods to work with complex numbers
+
+```dart
+var z = Complex(1, 2);
+
+var magnitude = z.magnitude; // Gets the magnitude (or absolute value) of the complex number
+var angle = z.angle; // Gets the angle (or argument or phase) in radians of the complex number
+var conjugate = z.conjugate; // Gets the conjugate of the complex number
+var real = z.real; // Gets the real part of the complex number
+var imaginary = z.imaginary; // Gets the imaginary part of the complex number
+var sqrt = z.sqrt(); // Gets the square root of the complex number
+var exp = z.exp(); // Gets the exponential of the complex number
+var ln = z.ln(); // Gets the natural logarithm (base e) of the complex number
+var sin = z.sin(); // Gets the sine of the complex number
+var cos = z.cos(); // Gets the cosine of the complex number
+var tan = z.tan(); // Gets the tangent of the complex number
 ```
 
 ### Complex vectors

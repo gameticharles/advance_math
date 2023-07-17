@@ -32,3 +32,16 @@ extension MatrixListExtension on List<List<dynamic>> {
   /// flip (`reverse`) the matrix along the given axis and returns the modified array.
   List flip({int axis = 0}) => Matrix(this).flip(axis: axis).toList();
 }
+
+extension ScanList<T> on List<T> {
+  List scan(T Function(T previousValue, T element) combine,
+      {bool continuous = false}) {
+    dynamic value = 0;
+    return map((element) {
+      value = continuous
+          ? (value == null ? element : combine(value, element))
+          : element;
+      return value;
+    }).toList();
+  }
+}

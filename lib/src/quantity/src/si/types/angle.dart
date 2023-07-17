@@ -76,7 +76,7 @@ class Angle extends Quantity {
 
   ///  This constructor creates an angle value from the three values
   ///  passed in for degrees, minutes, and seconds of arc.
-  Angle.fromDegMinSec(int d, int m, double s, [double uncert = 0.0])
+  Angle.fromDegMinSec(int d, int m, num s, [double uncert = 0.0])
       : super(degrees.toMks(d) + minutesArc.toMks(m) + secondsArc.toMks(s),
             AngleUnits.radians, uncert);
 
@@ -413,9 +413,9 @@ class Angle extends Quantity {
     return math.excsc(rad);
   }
 
-  /// Normalize the angle
-  num normalize() {
-    return ((deg % 360) + 360) % 360;
+  /// Normalize the angle between 0 - 360
+  Angle normalize() {
+    return Angle(deg: ((deg % 360) + 360) % 360);
   }
 
   /// Returns an array of three values representing the value of this Angle

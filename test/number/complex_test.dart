@@ -508,18 +508,20 @@ void main() {
       });
 
       test('operator ^ Imaginary (exception)', () {
-        expect(() => Complex(1, 2) ^ Imaginary(3),
-            throwsA(isA<NumberException>()));
+        final c0 = Complex(1, 2) ^ Imaginary(3) as Complex;
+        expect(c0.real.toDouble(), -0.02696287673540687);
+        expect(c0.imag.value.toDouble(), 0.024005325657235826);
       });
 
       test('operator ^ Complex (exception)', () {
-        expect(() => Complex(1, 2) ^ Complex(2, 5),
-            throwsA(isA<NumberException>()));
+        expect((Complex(1, 2) ^ Complex(2, 5)) as Complex,
+            Complex(0.01969615658538202, -0.0008927103407394184));
       });
     });
 
     test('operator % (exception)', () {
-      expect(() => Complex(1, 2) % 2, throwsA(isA<NumberException>()));
+      expect(
+          Complex(1, 2) % 2, Complex(0.1055728090000842, 0.21114561800016834));
     });
 
     test('negation operator -', () {

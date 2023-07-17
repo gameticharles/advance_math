@@ -5,19 +5,6 @@ void printLine(String s) {
   print('\n$l$s $l\n');
 }
 
-List<String> findFactors(List<num> coefficients) {
-  var dk = DurandKerner(coefficients.map((e) => Complex.fromReal(e)).toList());
-  List<String> factors = [];
-  List<dynamic> roots = dk.roots();
-  print(dk.discriminant());
-
-  for (Complex root in roots) {
-    factors.add('(x ${root.real > 0 ? '-' : '+'} ${root.real} ${root.imag})');
-  }
-
-  return factors;
-}
-
 void main() {
   var vertices = [
     Point(1613.26, 2418.11),

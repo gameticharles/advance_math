@@ -1,3 +1,10 @@
+## 3.1.0
+* Simplified Example file
+* Improved exponents of Complex numbers
+* Fixed bearingTo() in Point to include axis
+* Fixed return type of normalize from Angle
+* Fixed README file
+
 ## 3.0.0
 * Added Geometry (Point, line, Circle, Triangle, Polygon, etc.)
 * Added Polynomial (Linear, Quadratic, Cubic, Quartic, Durand-Kerner)

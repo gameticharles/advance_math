@@ -627,7 +627,7 @@ extension MatrixManipulationExtension on Matrix {
   /// // 5  6
   /// ```
   Matrix copy() {
-    return this;
+    return Matrix.fromList(_data);
   }
 
   /// Copies the elements from another matrix into this matrix.
