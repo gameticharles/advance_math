@@ -1,12 +1,12 @@
 part of algebra;
 
 /// A class representing a Polynomial of arbitrary degree.
-class Polynomial implements Comparable<dynamic> {
+class Polynomial implements Expression {
   final List<Number> coefficients;
 
   Polynomial(this.coefficients);
 
-  late dynamic polynomial;
+  late Polynomial polynomial;
 
   /// Constructs a Polynomial from a list of coefficients.
   ///
@@ -20,44 +20,38 @@ class Polynomial implements Comparable<dynamic> {
       // side effects if 'coefficients' is altered
       switch (coefficients.length) {
         case 1:
-          polynomial = Constant(
+          return Constant(
             a: coefficients.first,
           );
-          break;
         case 2:
-          polynomial = Linear(
+          return Linear(
             a: coefficients.first,
             b: coefficients[1],
           );
-          break;
         case 3:
-          polynomial = Quadratic(
+          return Quadratic(
             a: coefficients.first,
             b: coefficients[1],
             c: coefficients[2],
           );
-          break;
         case 4:
-          polynomial = Cubic(
+          return Cubic(
             a: coefficients.first,
             b: coefficients[1],
             c: coefficients[2],
             d: coefficients[3],
           );
-          break;
         case 5:
-          polynomial = Quartic(
+          return Quartic(
             a: coefficients.first,
             b: coefficients[1],
             c: coefficients[2],
             d: coefficients[3],
             e: coefficients[4],
           );
-          break;
         default:
-          polynomial = DurandKerner(coefficients);
+          return DurandKerner(coefficients);
       }
-      return polynomial;
     }
   }
 
@@ -83,6 +77,12 @@ class Polynomial implements Comparable<dynamic> {
   /// ```dart
   /// var Polynomial = Polynomial.fromString("- 20x⁴ + 163x³ - 676x² + 1424x - 1209");
   /// print(Polynomial); // Expected output: - 20x⁴ + 163x³ - 676x² + 1424x - 1209
+  /// ```
+  ///
+  /// Example 3:
+  /// ```dart
+  /// var Polynomial = Polynomial.fromString("-1 + 2x + x^4");
+  /// print(Polynomial); // Expected output: x⁴ + 2x - 1
   /// ```
   factory Polynomial.fromString(String source) {
     try {
@@ -315,6 +315,7 @@ class Polynomial implements Comparable<dynamic> {
   /// var quad = Polynomial([2, -3, -2]);
   /// print(quad.differentiate()); // Output: 4x - 3
   /// ```
+  @override
   dynamic differentiate([Number? x]) {
     if (coefficients.length <= 1) {
       return Polynomial([Integer.zero]);
@@ -339,6 +340,7 @@ class Polynomial implements Comparable<dynamic> {
   /// print(quad.integrate()); // Output: 2/3x³ - 3/2x² - 2x
   /// ```
   /// Assuming indefinite integral, the constant of integration (C) is 0
+  @override
   dynamic integrate([Number? start, Number? end]) {
     var newCoefficients = <Number>[Integer.zero];
     for (var i = 0; i < coefficients.length; i++) {
@@ -359,6 +361,18 @@ class Polynomial implements Comparable<dynamic> {
       // Else, calculate the definite integral between start and end.
       return integral.evaluate(end!) - integral.evaluate(start!);
     }
+  }
+
+  @override
+  bool isIndeterminate(num x) {
+    // For a single polynomial, it's never indeterminate.
+    return false;
+  }
+
+  @override
+  bool isInfinity(num x) {
+    // Simplified. Check if the evaluation at x is infinite.
+    return evaluate(x).isInfinite;
   }
 
   @override
@@ -413,6 +427,7 @@ class Polynomial implements Comparable<dynamic> {
   }
 
   /// Evaluates the Polynomial for a given x value.
+  @override
   Number evaluate(dynamic x) {
     Number result = Double.zero;
     for (var i = 0; i < coefficients.length; i++) {
@@ -469,7 +484,7 @@ class Polynomial implements Comparable<dynamic> {
   ///
   /// Example:
   ///   If the roots are `2`, `-3`, and `1 + 4i`, the returned factors would be
-  ///   `'(x - 2)', '(x + 3)', '(x - 1 - 4i)'`.
+  ///   `[(x - 2), (x + 3), (x - 1 - 4i)]`.
   ///
   /// Returns:
   ///   A list of strings where each string is a polynomial factor.
@@ -477,28 +492,25 @@ class Polynomial implements Comparable<dynamic> {
     List<String> factors = [];
 
     for (Complex root in roots()) {
-      // String realPart =
-      //     '(x ${root.real > Integer(0) ? '-' : '+'} ${root.real.abs()}';
-      // String imaginaryPart = '';
+      String realPart =
+          '(x ${root.real > Integer(0) ? '-' : '+'} ${root.real.abs()}';
+      String imaginaryPart = '';
 
-      // if (root.imag != Imaginary(0)) {
-      //   imaginaryPart =
-      //       ' ${root.imag > Imaginary(0) ? '-' : '+'} ${root.imag.abs()}i';
-      // }
+      if (root.imag != Imaginary(0)) {
+        imaginaryPart =
+            ' ${root.imag > Imaginary(0) ? '-' : '+'} ${root.imag.abs()}i';
+      }
 
-      // factors.add('$realPart$imaginaryPart)');
-
-      factors.add(
-          '(x ${root.real > Integer(0) ? '-' : '+'} ${root.real.abs()}${root.imag == Imaginary(0) ? '' : ' ${root.imag > Imaginary(0) ? '-' : '+'} ${root.imag.abs()}i'})');
+      factors.add('$realPart$imaginaryPart)');
     }
 
     return factors;
   }
 
-  @override
-  int compareTo(dynamic other) {
-    return Comparable.compare(this, other);
-  }
+  // @override
+  // int compareTo(dynamic other) {
+  //   return Comparable.compare(this, other);
+  // }
 
   Number discriminant() => Complex.zero();
 }

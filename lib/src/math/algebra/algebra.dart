@@ -71,5 +71,10 @@ part 'polynomial/quartic.dart';
 part 'polynomial/durand_kerner.dart';
 part 'polynomial/polynomial.dart';
 
+part 'expression/expression.dart';
+part 'expression/rational_function.dart';
+
+part 'limit/limit.dart';
+
 // This function should return an instance of FileIODesktop or FileIOWeb depending on the platform.
 FileIO fileIO = FileIO();

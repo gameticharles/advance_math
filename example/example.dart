@@ -12,10 +12,17 @@ void main() {
     [3, 1, 9]
   ]);
 
+  var xxx = Complex(1, 2);
+  print(numberToNum(xxx));
+  print(xxx.sin());
+
   var poly = Polynomial.fromString('-1 + 2x + x^4');
 
   print(poly);
   print(poly.simplify());
+
+  print(poly.differentiate());
+  print(poly.integrate());
 
   print(poly.runtimeType);
 
