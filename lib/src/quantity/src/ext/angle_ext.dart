@@ -353,29 +353,29 @@ List<num> degree2DMS(num degDEC) {
     return [];
   }
 
-  /// give up here if we can't make a number from deg
-
   var absDegDec = degDEC.abs();
 
-  ///DEG
+  // Calculate degrees
   int deg = absDegDec.truncate();
 
-  ///MIN
-  int min = ((absDegDec - deg) * 60).truncate();
+  // Calculate minutes
+  num remainder = absDegDec - deg;
+  int min = (remainder * 60).truncate();
 
-  ///SEC
-  double sec = (((absDegDec - deg) * 60) - min) * 60;
+  // Calculate seconds
+  double sec = ((remainder * 60) - min) * 60;
 
-  for (var i = 1; i <= 3; i++) {
-    if (sec >= 59.99) {
-      sec = 0;
-      min = min + 1;
-    }
-    if (min >= 59.99) {
-      min = 0;
-      deg = deg + 1;
-    }
+  // Adjust values if seconds or minutes are 60 or more
+  if (sec >= 60) {
+    sec = 0;
+    min += 1;
   }
+  if (min >= 60) {
+    min = 0;
+    deg += 1;
+  }
+
+  // Return result with correct sign for degrees
   return [degDEC >= 0 ? deg : deg * -1, min, sec];
 }
 
@@ -511,7 +511,7 @@ String getDirectionString(num bearing, {num precision = 3}) {
 /// The `isLat` parameter indicates whether the coordinate is latitude (default: false).
 /// The `isLatLon` parameter specifies whether the coordinate is part of a latitude-longitude pair (default: false).
 /// The `decPlace` parameter defines the decimal place for the second value (default: 5).
-/// The `noSignOrDirection` parameter removes the sign or direction from the returned string (default: false).
+/// The `showSignAndDirection` parameter removes the sign or direction from the returned string (default: true).
 ///
 /// Example:
 /// ```dart
@@ -522,50 +522,20 @@ String degree2DMSString(num degDEC,
     {bool isLat = false,
     bool isLatLon = false,
     int decPlace = 5,
-    bool noSignOrDirection = false}) {
+    bool showSignAndDirection = true}) {
   var dms = degree2DMS(degDEC);
-  var deg = dms[0];
-  var min = dms[1];
-  var sec = dms[2];
+  var nswe = isLatLon
+      ? (degDEC < 0 ? (isLat ? ' S' : ' W') : (isLat ? ' N' : ' E'))
+      : '';
+  var pn = !isLatLon
+      ? degDEC >= 0
+          ? '+ '
+          : '- '
+      : '';
 
-  var nswe = "";
+  if (!showSignAndDirection) nswe = pn = '';
 
-  ///NSWE
-  var pn = "";
-
-  ///+-
-
-  if (isLatLon) {
-    if (degDEC < 0) {
-      if (isLat) {
-        nswe = " S";
-      } else {
-        nswe = " W";
-      }
-    } else {
-      if (isLat) {
-        nswe = " N";
-      } else {
-        nswe = " E  ";
-      }
-    }
-    pn = '';
-  } else {
-    pn = '+ ';
-    if (degDEC < 0) {
-      pn = '- ';
-    }
-    nswe = '';
-
-    pn = pn == '+ ' ? '' : '- ';
-  }
-
-  if (noSignOrDirection) {
-    nswe = '';
-    pn = '';
-  }
-
-  return '$pn${deg.abs().toString().padLeft(3, '0')}° ${min.toString().padLeft(2, '0')}\' ${sec.toStringAsFixed(decPlace).padLeft(2, '0')}"$nswe';
+  return '$pn${dms[0].abs().toString().padLeft(3, '0')}° ${dms[1].toString().padLeft(2, '0')}\' ${dms[2].toStringAsFixed(decPlace).padLeft(2, '0')}"$nswe';
 }
 
 /// Units acceptable for use in describing Angle quantities.

@@ -6,11 +6,13 @@ class Polynomial implements Comparable<dynamic> {
 
   Polynomial(this.coefficients);
 
+  late dynamic polynomial;
+
   /// Constructs a Polynomial from a list of coefficients.
   ///
   /// The coefficients should be provided in decreasing order of degree,
   /// i.e., from the coefficient of the highest-degree term to the constant term.
-  factory Polynomial.fromList(List<dynamic> coefficientList) {
+  Polynomial fromList(List<dynamic> coefficientList) {
     {
       List<Number> coefficients = coefficientList
           .map((e) => e is num ? numToNumber(e) : e as Number)
@@ -18,38 +20,44 @@ class Polynomial implements Comparable<dynamic> {
       // side effects if 'coefficients' is altered
       switch (coefficients.length) {
         case 1:
-          return Constant(
+          polynomial = Constant(
             a: coefficients.first,
           );
+          break;
         case 2:
-          return Linear(
+          polynomial = Linear(
             a: coefficients.first,
             b: coefficients[1],
           );
+          break;
         case 3:
-          return Quadratic(
+          polynomial = Quadratic(
             a: coefficients.first,
             b: coefficients[1],
             c: coefficients[2],
           );
+          break;
         case 4:
-          return Cubic(
+          polynomial = Cubic(
             a: coefficients.first,
             b: coefficients[1],
             c: coefficients[2],
             d: coefficients[3],
           );
+          break;
         case 5:
-          return Quartic(
+          polynomial = Quartic(
             a: coefficients.first,
             b: coefficients[1],
             c: coefficients[2],
             d: coefficients[3],
             e: coefficients[4],
           );
+          break;
         default:
-          return DurandKerner(coefficients);
+          polynomial = DurandKerner(coefficients);
       }
+      return polynomial;
     }
   }
 
@@ -313,8 +321,7 @@ class Polynomial implements Comparable<dynamic> {
     }
     var newCoefficients = <Number>[];
     for (var i = 0; i < coefficients.length - 1; i++) {
-      newCoefficients
-          .add(numToNumber(coefficients.length - i - 1) * coefficients[i]);
+      newCoefficients.add(coefficients[i] * (coefficients.length - i - 1));
     }
 
     return x != null
@@ -370,7 +377,7 @@ class Polynomial implements Comparable<dynamic> {
     };
 
     // Polynomial to convert an integer to its superscript representation
-    String toSuperscript(int number) {
+    String toSuperscript(Number number) {
       return number
           .toString()
           .split('')
@@ -393,11 +400,11 @@ class Polynomial implements Comparable<dynamic> {
         }
         final absCoeff = coeff.abs();
         if (absCoeff != Integer.one || termDegree == Integer.zero) {
-          buffer.write(absCoeff);
+          buffer.write(Number.simplifyType(absCoeff));
         }
         if (termDegree > 0) buffer.write('x');
         if (termDegree > 1) {
-          buffer.write(toSuperscript(numberToNum(termDegree).toInt()));
+          buffer.write(toSuperscript(termDegree));
         }
       }
     }
@@ -416,11 +423,10 @@ class Polynomial implements Comparable<dynamic> {
     return result;
   }
 
+  /// Simplify the Polynomial using factoring by grouping and difference of squares.
+  /// This is a placeholder and should be replaced with actual implementation.
+  /// Return a new simplified Polynomial
   Polynomial simplify() {
-    // Simplify the Polynomial using factoring by grouping and difference of squares.
-    // This is a placeholder and should be replaced with actual implementation.
-    // Return a new simplified Polynomial
-
     Number gcd = coefficients.reduce((value, element) =>
         numToNumber(math.gcd(value.toDouble(), element.toDouble())));
 
@@ -453,6 +459,40 @@ class Polynomial implements Comparable<dynamic> {
         simplified.coefficients,
       ).roots();
     }
+  }
+
+  /// Returns a list of polynomial factors derived from the complex roots of a polynomial.
+  ///
+  /// This function determines the factors of a polynomial based on its complex roots.
+  /// Each root corresponds to a factor of the form `(x - root)` or `(x + root)`. If the root
+  /// is complex, the factor will also represent the imaginary part.
+  ///
+  /// Example:
+  ///   If the roots are `2`, `-3`, and `1 + 4i`, the returned factors would be
+  ///   `'(x - 2)', '(x + 3)', '(x - 1 - 4i)'`.
+  ///
+  /// Returns:
+  ///   A list of strings where each string is a polynomial factor.
+  List<String> findFactors() {
+    List<String> factors = [];
+
+    for (Complex root in roots()) {
+      // String realPart =
+      //     '(x ${root.real > Integer(0) ? '-' : '+'} ${root.real.abs()}';
+      // String imaginaryPart = '';
+
+      // if (root.imag != Imaginary(0)) {
+      //   imaginaryPart =
+      //       ' ${root.imag > Imaginary(0) ? '-' : '+'} ${root.imag.abs()}i';
+      // }
+
+      // factors.add('$realPart$imaginaryPart)');
+
+      factors.add(
+          '(x ${root.real > Integer(0) ? '-' : '+'} ${root.real.abs()}${root.imag == Imaginary(0) ? '' : ' ${root.imag > Imaginary(0) ? '-' : '+'} ${root.imag.abs()}i'})');
+    }
+
+    return factors;
   }
 
   @override

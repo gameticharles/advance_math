@@ -712,6 +712,75 @@ extension MatrixOperationExtension on Matrix {
     }
   }
 
+  /// Returns the cumulative sum of the elements in the matrix along the specified axis.
+  ///
+  /// - If [axis] is null, the cumulative sum of all elements is returned.
+  /// - If [axis] is 0, a Matrix of cumulative sums of each column is returned.
+  /// - If [axis] is 1, a Matrix of cumulative sums of each row is returned.
+  /// - If [axis] is 2, the cumulative sum of the diagonal elements is returned.
+  /// - If [axis] is 3, a Matrix of cumulative sums of each main diagonal is returned.
+  /// - If [axis] is 4, a Matrix of cumulative sums of each anti-diagonal is returned.
+  ///
+  /// [absolute] (optional): If set to `true`, the absolute values of the elements are considered.
+  ///
+  /// Returns zero(0) if the matrix is empty.
+  /// Throws [ArgumentError] if [axis] is not null, 0, 1, 2, 3 or 4.
+  Matrix cumsum({bool absolute = false, int? axis, bool continuous = false}) {
+    if (isEmpty) {
+      return Matrix();
+    }
+
+    if (axis != null && (axis < 0 || axis > 4)) {
+      throw ArgumentError.value(
+          axis, 'axis', 'Axis must be null or between 0 and 4.');
+    }
+
+    int rows = rowCount;
+    int cols = columnCount;
+
+    Matrix result = Matrix.fill(rows, cols, 0.0);
+
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        num value = absolute ? this[i][j].abs() : this[i][j];
+
+        if (continuous) {
+          if (axis == null || axis == 1) {
+            // Cumulative sum in row-major order
+            result[i][j] = value +
+                (j > 0
+                    ? result[i][j - 1]
+                    : (i > 0 ? result[i - 1][cols - 1] : 0.0));
+          } else if (axis == 0) {
+            // Cumulative sum in column-major order
+            result[i][j] = value +
+                (i > 0
+                    ? result[i - 1][j]
+                    : (j > 0 ? result[rows - 1][j - 1] : 0.0));
+          } else {
+            // Cumulative sum along the diagonal
+            result[i][j] =
+                value + (i > 0 && j > 0 ? result[i - 1][j - 1] : 0.0);
+          }
+        } else {
+          if (axis == null || axis == 1) {
+            // Cumulative sum in each row
+            result[i][j] = value + (j > 0 ? result[i][j - 1] : 0.0);
+          } else if (axis == 0) {
+            // Cumulative sum in each column
+            result[i][j] = value + (i > 0 ? result[i - 1][j] : 0.0);
+          } else {
+            // Cumulative sum along the diagonal
+            result[i][j] =
+                value + (i > 0 && j > 0 ? result[i - 1][j - 1] : 0.0);
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
   /// Returns the product of all elements in the matrix.
   ///
   /// Example:

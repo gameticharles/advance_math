@@ -9,10 +9,9 @@ environment:
 dependencies:
   buffer: ^1.2.0
   intl: ^0.18.0
-  
+  logging: ^1.2.0
 
 dev_dependencies:
-  logging: ^1.2.0
   benchmark_harness: ^2.2.2
   lints: ^2.0.0
   test: ^1.21.0
