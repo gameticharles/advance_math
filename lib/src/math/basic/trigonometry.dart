@@ -2,36 +2,93 @@ part of maths;
 
 /// Returns the sine of a number in radians.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(sin(math.pi / 2));  // Output: 1.0
 /// ```
-double sin(num x) => math.sin(x);
+///
+/// Example 2:
+/// ```dart
+/// var z = Complex.num(pi / 2, 0);
+/// var z_sin = z.sin();
+///
+/// print(z_sin); // Output: 1.0 + 0.0i
+/// ```
+dynamic sin(dynamic x) {
+  if (x is num) {
+    return math.sin(x);
+  } else if (x is Complex) {
+    // Using the identity: sin(a + bi) = sin(a)cosh(b) + i*cos(a)sinh(b)
+    return Complex(math.sin(x.real.value) * cosh(x.imaginary.getValue),
+        math.cos(x.real.value) * sinh(x.imaginary.getValue));
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
+}
 
 /// Returns the cosine of a number in radians.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(cos(math.pi));  // Output: -1.0
 /// ```
-double cos(num x) => math.cos(x);
+///
+///  Example 2:
+/// ```dart
+/// var z = Complex.num(0, 0);
+/// var z_cos = z.cos();
+///
+/// print(z_cos); // Output: 1.0 + 0.0i
+/// ```
+dynamic cos(dynamic x) {
+  if (x is num) {
+    return math.cos(x);
+  } else if (x is Complex) {
+    // Using the identity: cos(a + bi) = cos(a)cosh(b) - i*sin(a)sinh(b)
+    return Complex(math.cos(x.real.value) * cosh(x.imaginary.getValue),
+        -math.sin(x.real.value) * sinh(x.imaginary.getValue));
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
+}
 
 /// Returns the tangent of a number in radians.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(tan(math.pi / 4));  // Output: 1.0
 /// ```
-double tan(num x) => math.tan(x);
+///
+/// Example 2:
+/// ```dart
+/// var z = Complex.num(0, 0);
+/// var z_cos = z.tan();
+///
+/// print(z_cos); // Output: 1.0 + 0.0i
+/// ```
+dynamic tan(dynamic x) {
+  if (x is num) {
+    return math.tan(x);
+  } else if (x is Complex) {
+    return sin(x) / cos(x);
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
+}
 
 /// Returns the secant of a number in radians.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(sec(1)); // Output: 1.8508157176809255
 /// ```
-double sec(num x) {
-  return 1 / cos(x);
+///
+/// Example 2:
+/// ```dart
+/// print(sec(Complex(1, 2))); // Output: 0.15117629826557724 + 0.22697367539372162i
+/// ```
+dynamic sec(dynamic x) {
+  return (x is num ? 1 / cos(x) : Complex(1, 0) / cos(x));
 }
 
 /// Returns the cosecant of a number in radians.
@@ -40,8 +97,13 @@ double sec(num x) {
 /// ```dart
 /// print(csc(1)); // Output: 1.1883951057781212
 /// ```
-double csc(num x) {
-  return 1 / sin(x);
+///
+/// Example 2:
+/// ```dart
+/// print(csc(Complex(1, 2))); // Output: 0.22837506559968657 - 0.1413630216124078i
+/// ```
+dynamic csc(dynamic x) {
+  return (x is num ? 1 / sin(x) : Complex(1, 0) / sin(x));
 }
 
 /// Returns the cotangent of a number in radians.
@@ -50,8 +112,13 @@ double csc(num x) {
 /// ```dart
 /// print(cot(1)); // Output: 0.6420926159343308
 /// ```
-double cot(num x) {
-  return 1 / tan(x);
+///
+/// Example 2:
+/// ```dart
+/// print(cot(Complex(1, 2))); // Output: 0.032797755533752505 - 0.984329226458191i
+/// ```
+dynamic cot(dynamic x) {
+  return (x is num ? 1 / tan(x) : Complex(1, 0) / tan(x));
 }
 
 /// Returns the arcsine of a number in radians.
@@ -60,7 +127,30 @@ double cot(num x) {
 /// ```dart
 /// print(asin(1));  // Output: 1.5707963267948966
 /// ```
-double asin(num x) => math.asin(x);
+///
+/// Example 2:
+/// ```dart
+/// print(asin(Complex(1, 2))); // Output: 0.4270785863924768 + 1.5285709194809995i
+/// ```
+dynamic asin(dynamic x) {
+  if (x is num) {
+    if (x >= -1 && x <= 1) {
+      return math.asin(x);
+    } else {
+      // Since math.asin does not support inputs outside [-1, 1], we need to use the complex formula
+      Complex z = Complex(x, 0);
+      Number result =
+          -Complex(0, 1) * log(Complex(0, 1) * z + sqrt(Complex(1, 0) - z * z));
+      return result;
+    }
+  } else if (x is Complex) {
+    // Using the formula: asin(z) = -i * log(iz + sqrt(1 - z^2))
+    return -Complex(0, 1) *
+        log(Complex(0, 1) * x + sqrt(Complex(1, 0) - x * x));
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
+}
 
 /// Returns the arccosine of a number in radians.
 ///
@@ -68,7 +158,30 @@ double asin(num x) => math.asin(x);
 /// ```dart
 /// print(acos(1));  // Output: 0.0
 /// ```
-double acos(num x) => math.acos(x);
+///
+/// Example 2:
+/// ```dart
+/// print(acos(Complex(1, 2))); // Output: 1.1437177404024204 - 1.528570919480998i
+/// ```
+dynamic acos(dynamic x) {
+  if (x is num) {
+    if (x >= -1 && x <= 1) {
+      return math.acos(x);
+    } else {
+      // Since math.acos does not support inputs outside [-1, 1], we need to use the complex formula
+      Complex z = Complex(x, 0);
+      Number result =
+          -Complex(0, 1) * log(z + Complex(0, 1) * sqrt(Complex(1, 0) - z * z));
+      return result;
+    }
+  } else if (x is Complex) {
+    // Using the formula: acos(z) = -i * log(z + i * sqrt(1 - z^2))
+    return -Complex(0, 1) *
+        log(x + Complex(0, 1) * sqrt(Complex(1, 0) - x * x));
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
+}
 
 /// Returns the arctangent of a number.
 ///
@@ -76,7 +189,24 @@ double acos(num x) => math.acos(x);
 /// ```dart
 /// print(atan(1));  // Output: 0.7853981633974483
 /// ```
-double atan(num x) => math.atan(x);
+///
+/// Example 2:
+/// ```dart
+/// print(atan(Complex(1, 2))); // Output: 1.3389725222944935 + 0.4023594781085251i
+/// ```
+dynamic atan(dynamic x) {
+  if (x is num) {
+    return math.atan(x);
+  } else if (x is Complex) {
+    // Using the formula: atan(z) = (i/2) * (log(1 - iz) - log(1 + iz))
+    Complex i = Complex(0, 1);
+    Number result =
+        (i / 2) * (log(Complex(1, 0) - i * x) - log(Complex(1, 0) + i * x));
+    return result;
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
+}
 
 /// Returns the angle in radians between the positive x-axis and the vector.
 ///
@@ -96,7 +226,21 @@ double atan(num x) => math.atan(x);
 /// print(atan2(3, 4));  // Output: 0.6435011087932843868028
 /// // atan(3 / 4) = 0.6435011087932843868028
 /// ```
-double atan2(num a, num b) => math.atan2(a, b);
+dynamic atan2(dynamic a, dynamic b) {
+  if (a is num && b is num) {
+    return math.atan2(a, b);
+  } else {
+    // Ensure both are of type Complex for consistency in calculations
+    Complex aComplex = (a is num) ? Complex(a, 0) : a;
+    Complex bComplex = (b is num) ? Complex(b, 0) : b;
+
+    // Using the formula: atan2(a, b) = (1/2i) * log((b + ai) / (b - ai))
+    Complex i = Complex(0, 1);
+    Number result = (Integer.one / (i * 2)) *
+        log((bComplex + i * aComplex) / (bComplex - i * aComplex));
+    return result;
+  }
+}
 
 /// Returns the arcsecant (inverse of the secant) of `x`.
 ///

@@ -486,7 +486,8 @@ extension VectorOperations on Vector {
   /// print(vector.pow(2));  // Output: [4.0, 9.0]
   /// ```
   Vector pow(num exponent) {
-    return Vector.fromList(_data.map((n) => math.pow(n, exponent)).toList());
+    return Vector.fromList(
+        _data.map((n) => math.pow(n, exponent) as num).toList());
   }
 
   /// Returns a new vector with the absolute values of the original vector's elements.

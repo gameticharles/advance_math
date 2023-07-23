@@ -24,11 +24,18 @@ num abs(num x) => x.abs();
 /// ```dart
 /// print(sqrt(9));  // Output: 3.0
 /// ```
-dynamic sqrt(num x) {
-  if (x >= 0) {
-    return math.sqrt(x);
+dynamic sqrt(dynamic x) {
+  if (x is num || x is Double || x is Integer || x is Real || x is Precise) {
+    num nx = x is! num ? numberToNum(x) : x;
+    if (nx >= 0) {
+      return math.sqrt(nx);
+    } else {
+      return Complex(0, math.sqrt(-nx));
+    }
+  } else if (x is Complex || x is Imaginary) {
+    return x is Complex ? x.sqrt() : Complex.num(Integer.zero, x);
   } else {
-    return Complex(0, math.sqrt(-x));
+    throw ArgumentError('Input should be either num or Complex');
   }
 }
 
@@ -67,11 +74,29 @@ double exp(num x) => math.exp(x);
 
 /// Raises a number to the power of another number.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(pow(2, 3));  // Output: 8.0
 /// ```
-num pow(num x, num y) => math.pow(x, y);
+///
+/// Example 2:
+/// ```
+/// var xxx = Complex(1, 2);
+/// print(pow(2, xxx));  // Output: 0.36691394948660344 + 1.9660554808224875i
+/// ```
+dynamic pow(dynamic x, dynamic exponent) {
+  if (x is num) {
+    if (exponent is num) {
+      return math.pow(x, exponent);
+    } else {
+      return Complex(x, 0).pow(exponent);
+    }
+  } else if (x is Complex) {
+    return x.pow(exponent);
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
+}
 
 /// Rounds a number down to the nearest integer.
 ///

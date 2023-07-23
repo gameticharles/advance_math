@@ -11,6 +11,7 @@ export 'src/number/double.dart';
 export 'src/number/fraction.dart';
 export 'src/number/imaginary.dart';
 export 'src/number/integer.dart';
+export 'src/number/roman_numerals.dart';
 export 'src/number/number.dart';
 export 'src/number/number_exception.dart';
 export 'src/number/precise.dart';

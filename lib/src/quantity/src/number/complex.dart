@@ -40,8 +40,8 @@ class Complex extends Number {
   /// print(z); // Output: 1.2246467991473532e-16 + 2.0i
   /// ```
   Complex.fromPolar(num r, num theta)
-      : real = Double(r * math.cos(theta)),
-        imaginary = Imaginary(Double(r * math.sin(theta)));
+      : real = Double(r * math.cos(theta) as double),
+        imaginary = Imaginary(Double(r * math.sin(theta) as double));
 
   /// Factory constructor to create a Complex number from a real number only.
   /// The imaginary part will be 0.
@@ -185,6 +185,15 @@ class Complex extends Number {
   /// print(z.angle); // Output: 0.7853981633974483
   /// ```
   Double get angle => complexArgument;
+
+  /// Returns the angle (or argument or phase) in radians of the complex number.
+  ///
+  /// ```dart
+  /// var z = Complex(1, 1);
+  ///
+  /// print(z.angle); // Output: 0.7853981633974483
+  /// ```
+  Double get argument => angle;
 
   @override
   bool get isInfinite =>
@@ -533,44 +542,6 @@ class Complex extends Number {
     return Complex(math.log(magnitude.toDouble()), angle.value);
   }
 
-  /// Returns a new complex number representing the sine of this number.
-  ///
-  /// ```dart
-  /// var z = Complex.num(pi / 2, 0);
-  /// var z_sin = z.sin();
-  ///
-  /// print(z_sin); // Output: 1.0 + 0.0i
-  /// ```
-  Complex sin() {
-    return Complex(math.sin(real.value) * math.cosh(imaginary.getValue),
-        math.cos(real.value) * math.sinh(imaginary.getValue));
-  }
-
-  /// Returns a new complex number representing the cosine of this number.
-  ///
-  /// ```dart
-  /// var z = Complex.num(0, 0);
-  /// var z_cos = z.cos();
-  ///
-  /// print(z_cos); // Output: 1.0 + 0.0i
-  /// ```
-  Complex cos() {
-    return Complex(math.cos(real.value) * math.cosh(imaginary.getValue),
-        -math.sin(real.value) * math.sinh(imaginary.getValue));
-  }
-
-  /// Returns a new complex number representing the tangent of this number.
-  ///
-  /// ```dart
-  /// var z = Complex.num(0, 0);
-  /// var z_cos = z.tan();
-  ///
-  /// print(z_cos); // Output: 1.0 + 0.0i
-  /// ```
-  Number tan() {
-    return sin() / cos();
-  }
-
   /// Returns a new Complex number representing the hyperbolic sine of this number.
   ///
   /// ```dart
@@ -605,8 +576,8 @@ class Complex extends Number {
   /// ```
   Number tanh() => sinh() / cosh();
 
-  /// Returns a new Complex number representing the hyperbolic tangent
-  Number cot() => Integer(1) / tan();
+  // /// Returns a new Complex number representing the hyperbolic tangent
+  // Number cot() => Integer(1) / tan();
 
   /// The absolute value of a Complex number is its distance from zero in the
   /// Complex number space (e.g., the absolute value of 3 + 4i = 5).  The absolute

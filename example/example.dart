@@ -5,6 +5,18 @@ void printLine(String s) {
   print('\n$l$s $l\n');
 }
 
+// Complex asec(Complex z) {
+//   return acos(Complex(1, 0) / z);
+// }
+
+// Complex acsc(Complex z) {
+//   return asin(Complex(1, 0) / z);
+// }
+
+// Complex acot(Complex z) {
+//   return atan(Complex(1, 0) / z);
+// }
+
 void main() {
   var arr = Matrix([
     [1, 5, 6],
@@ -13,8 +25,10 @@ void main() {
   ]);
 
   var xxx = Complex(1, 2);
-  print(numberToNum(xxx));
-  print(xxx.sin());
+  // print(logBase(Complex(2, 2), 2));
+
+  var i = Complex(0, 1);
+  print((-i * (i * xxx + (Complex(1, 0) - xxx * xxx).sqrt()) as Complex).ln());
 
   var poly = Polynomial.fromString('-1 + 2x + x^4');
 
@@ -22,9 +36,8 @@ void main() {
   print(poly.simplify());
 
   print(poly.differentiate());
-  print(poly.integrate());
-
-  print(poly.runtimeType);
+  var integral = poly.integrate();
+  print(integral);
 
   print(poly.roots());
   print(poly.findFactors());

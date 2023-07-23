@@ -956,9 +956,9 @@ class Polygon {
     } else if (area != null) {
       sideLength = sqrt((4 * area) / (numSides! * (1 / tan(pi / numSides!))));
     } else if (circumradius != null) {
-      sideLength = 2 * circumradius * sin(pi / numSides!);
+      sideLength = 2 * circumradius * sin(pi / numSides!) as double;
     } else if (inradius != null) {
-      sideLength = 2 * inradius * tan(pi / numSides!);
+      sideLength = 2 * inradius * tan(pi / numSides!) as double;
     } else {
       throw ArgumentError(
           "At least one of the parameters (perimeter, area, circumradius, inradius) must be provided.");

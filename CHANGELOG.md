@@ -1,3 +1,9 @@
+## 3.2.0
+* Added limit
+* Added support for complex numbers in basic math operations.
+* Added factors
+* Fixed README file
+
 ## 3.1.0
 * Simplified Example file
 * Improved exponents of Complex numbers
