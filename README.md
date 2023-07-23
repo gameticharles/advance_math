@@ -27,6 +27,7 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
 - Angle operation: Supports addition, subtraction, multiplication, and division. Also supports comparisons, normalize, interpolation, and small-differencing on angles.
 - Geometry: Geometries like Point, Line, Polygon, Circle, Triangle, SphericalTriangle, etc with specific functionalities and methods are implemented.
 - Polynomial functions: Solve and find roots of a function to any degree (including Linear, Quadratic, Cubic, Quartic etc).
+- Roman numerals: Convert roman numerals to integers and vice versa. It also supports basic arithmetic operations and comparisons.
 - Matrix creation, filling and generation: Methods for filling the matrix with specific values or generating matrices with certain properties, such as zero, ones, identity, diagonal, list, or random matrices.
 - Import and export matrices to and from other formats (e.g., CSV, JSON, binary)
 - Matrix operations: Implement common matrix operations such as addition, subtraction, multiplication (element-wise and matrix-matrix), and division (element-wise) etc.
@@ -418,6 +419,83 @@ print(p.evaluate(Complex(-19 / 8, 7.119033245839726e-16))); // -104.006195068359
 print(p.roots());
 // [2.481185557213347e-11 - 0.9999999999737949i, -1.0000000000550548 + 3.5929979905099436e-11i, 1.0000004031257346 + 2.7703711854406305e-7i, 5.095265802549413e-11 + 1.0000000000706935i, 1.0000004031257346 + 2.7703711854406305e-7i]
 print('');
+```
+
+</details>
+
+<details>
+<summary>ROMAN NUMERALS</summary>
+
+# Roman Numerals
+
+A Dart class designed to provide efficient conversions between Roman numerals and integers. This class also supports arithmetic operations directly on Roman numeral representations.
+
+## Features
+
+- Convert integers to Roman numerals and vice versa.
+- Supports numbers up to 3,999 using standard Roman numerals.
+- Supports numbers above 3,999 using parentheses notation.
+- Provides arithmetic operations on Roman numerals.
+- Caches recent conversions for performance.
+
+## Usage
+
+### Instantiation
+
+```dart
+RomanNumerals romanFive = RomanNumerals(5); 
+print(romanFive) // V
+print(RomanNumerals(69)); // LXIX
+print(RomanNumerals(8785)); // (VIII)DCCLXXXV
+```
+
+### Conversion from Roman to Integer
+
+```dart
+RomanNumerals romanYear = RomanNumerals.fromRoman("MMXXIII");
+print(romanYear.value);  // Outputs: 2023
+print(RomanNumerals.fromRoman('(VIII)DCCLXXXV').value); // 8785
+```
+
+### Arithmetic Operations
+
+```dart
+RomanNumerals a = RomanNumerals.fromRoman('MMXXIII'); // 2023
+RomanNumerals b = RomanNumerals.fromRoman('X'); // 10
+
+print(a + b); // MMXXXIII
+print(a - b); // MMXIII
+print(a * b); // (XX)CCXXX
+print(a / b); // CCII
+print(a % b); // III
+
+print(RomanNumerals.fromRoman('MXXII') - RomanNumerals.fromRoman('LXX') - RomanNumerals.fromRoman('LII')); // CM
+print(RomanNumerals.fromRoman('(M)') - RomanNumerals.fromRoman('(CC)DXXV')); // (DCCXCIX)CDLXXV
+print(RomanNumerals.fromRoman('(DCCXCIX)CDLXXV').value); // 799475
+```
+
+Also support shifting the bits of this integer to the left by [shiftAmount].
+
+```dart
+print(a << 1); // (IV)XLVI
+print(RomanNumerals.fromRoman('(IV)XLVI').value);
+print((a >> 1).value); // 1011
+```
+
+### Logical, Comparison Operations
+
+```dart
+RomanNumerals a = RomanNumerals.fromRoman('MMXXIII'); // 2023
+RomanNumerals b = RomanNumerals.fromRoman('X'); // 10
+
+print(a & b); // II (bitwise AND)
+print(a | b); // MMXXXI (bitwise OR)
+print(a ^ b); // MMXXIX (bitwise XOR)
+print(a == b); // false
+print(a > b); // true
+print(a < b); // false
+print(a >= b); // true
+print(a <= b); // false
 ```
 
 </details>

@@ -1,6 +1,7 @@
 ## 3.2.0
+* Added roman numerals
+* Added trigonometry functions supports to work with complex numbers
 * Added limit
-* Added support for complex numbers in basic math operations.
 * Added factors
 * Fixed README file
 
