@@ -65,6 +65,11 @@ class RomanNumerals {
   static int _fromRoman(String roman) {
     roman = roman.toUpperCase();
 
+    // Validate the provided Roman numeral
+    if (!_validateRoman(roman)) {
+      throw ArgumentError('Invalid Roman numeral: $roman');
+    }
+
     // Using cache's putIfAbsent to streamline caching
     return _romanToNumCache.putIfAbsent(roman, () {
       int result = 0;
@@ -190,6 +195,70 @@ class RomanNumerals {
     }
 
     return result.toString();
+  }
+
+  /// Helper private method to check the roman numeral string
+  static bool _validateRoman(String roman) {
+    // 1. Invalid Characters
+    if (RegExp(r"[^MDCLXVI()]").hasMatch(roman)) {
+      return false;
+    }
+
+    // 2. Invalid Repetitions
+    if (RegExp(r"D{2,}|L{2,}|V{2,}").hasMatch(roman)) {
+      return false;
+    }
+
+    // 3. Check for more than three consecutive I, X, or C characters
+    if (RegExp(r"I{4,}|X{4,}|C{4,}").hasMatch(roman)) {
+      return false;
+    }
+
+    // 4. Invalid subtractive combinations
+    if (RegExp(r"IL|IC|ID|IM|XD|XM|VX|VL|VC|VD|VM|LC|LD|LM|DM")
+        .hasMatch(roman)) {
+      return false;
+    }
+
+    // 5. Bracket Check
+    int openBrackets = roman.split('(').length - 1;
+    int closeBrackets = roman.split(')').length - 1;
+    if (openBrackets != closeBrackets) {
+      return false;
+    }
+
+    // 6. Subtractive Notation Inside Brackets
+    RegExp bracketPattern = RegExp(r"\(([^)]+)\)");
+    Iterable<Match> matches = bracketPattern.allMatches(roman);
+    for (Match match in matches) {
+      if (RegExp(r"[^M]").hasMatch(match.group(1)!)) {
+        return false;
+      }
+    }
+
+    // 7. Non-Decreasing Inside Brackets
+    for (Match match in matches) {
+      String bracketContent = match.group(1)!;
+      for (int i = 1; i < bracketContent.length; i++) {
+        if (_numerals[bracketContent[i]]! > _numerals[bracketContent[i - 1]]!) {
+          return false;
+        }
+      }
+    }
+
+    // Additional: Invalid Order (outside of subtractive notations)
+    // E.g., MC (1100) is valid, CM (900) is valid
+    List<String> romanChars = roman.split('');
+    for (int i = 1; i < romanChars.length; i++) {
+      if (_numerals.containsKey(romanChars[i - 1] + romanChars[i])) {
+        continue; // Skip valid subtractive pairs
+      }
+      if (_numerals[romanChars[i]]! > _numerals[romanChars[i - 1]]!) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /// Validates if a given string [roman] is a valid Roman numeral.

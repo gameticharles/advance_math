@@ -1,3 +1,6 @@
+## 3.2.1
+* Improved the checks on roman numerals
+
 ## 3.2.0
 * Added roman numerals
 * Added trigonometry functions supports to work with complex numbers
