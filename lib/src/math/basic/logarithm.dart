@@ -85,8 +85,14 @@ dynamic log(dynamic x, [dynamic b]) {
 /// print(logBase(Complex(2, 2), Complex(1, 2)));  // Output: 1.004927367132127 + 0.30573651908857313i
 /// ```
 dynamic logBase(dynamic base, dynamic x) {
-  if (base is num && x is num) {
-    return math.log(x) / math.log(base);
+  if ((base is num ||
+          base is Double ||
+          base is Integer ||
+          base is Real ||
+          base is Precise) &&
+      x is num) {
+    num nBase = base is! num ? numberToNum(base) : base;
+    return math.log(x) / math.log(nBase);
   } else if (base is Complex ||
       x is Complex ||
       base is Imaginary ||

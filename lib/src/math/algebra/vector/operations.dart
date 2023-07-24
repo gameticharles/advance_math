@@ -475,7 +475,7 @@ extension VectorOperations on Vector {
   /// print(vector.exp());  // Output: [2.718281828459045, 7.3890560989306495]
   /// ```
   Vector exp() {
-    return Vector.fromList(_data.map(math.exp).toList());
+    return Vector.fromList(_data.map((n) => math.exp(n) as num).toList());
   }
 
   /// Returns a new vector with each element being raised to the provided exponent.

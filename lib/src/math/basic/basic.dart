@@ -25,17 +25,16 @@ num abs(num x) => x.abs();
 /// print(sqrt(9));  // Output: 3.0
 /// ```
 dynamic sqrt(dynamic x) {
-  if (x is num || x is Double || x is Integer || x is Real || x is Precise) {
-    num nx = x is! num ? numberToNum(x) : x;
-    if (nx >= 0) {
-      return math.sqrt(nx);
+  if (x is num) {
+    if (x >= 0) {
+      return math.sqrt(x);
     } else {
-      return Complex(0, math.sqrt(-nx));
+      return Complex(0, math.sqrt(-x));
     }
-  } else if (x is Complex || x is Imaginary) {
-    return x is Complex ? x.sqrt() : Complex.num(Integer.zero, x);
+  } else if (x is Number) {
+    return x.sqrt();
   } else {
-    throw ArgumentError('Input should be either num or Complex');
+    throw ArgumentError('Input should be either num or Number');
   }
 }
 
@@ -56,11 +55,17 @@ dynamic cbrt(num x) {
 /// // The cube root of 8 will be:
 /// print(nthRoot(8, 3));  // Output: 2.0
 /// ```
-dynamic nthRoot(num x, double nth) {
-  if (x >= 0) {
-    return math.pow(x, 1 / nth);
+dynamic nthRoot(dynamic x, double nth) {
+  if (x is num) {
+    if (x >= 0) {
+      return math.pow(x, 1 / nth);
+    } else {
+      return Complex(0, math.pow(-x, 1 / nth));
+    }
+  } else if (x is Number) {
+    return x.nthRoot(nth);
   } else {
-    return Complex(0, math.pow(-x, 1 / nth));
+    throw ArgumentError('Input should be either num or Number');
   }
 }
 
@@ -70,7 +75,15 @@ dynamic nthRoot(num x, double nth) {
 /// ```dart
 /// print(exp(1));  // Output: 2.718281828459045
 /// ```
-double exp(num x) => math.exp(x);
+dynamic exp(dynamic x) {
+  if (x is num) {
+    return math.exp(x);
+  } else if (x is Number) {
+    return x.exp();
+  } else {
+    throw ArgumentError('Input should be either num or Number');
+  }
+}
 
 /// Raises a number to the power of another number.
 ///
@@ -91,10 +104,10 @@ dynamic pow(dynamic x, dynamic exponent) {
     } else {
       return Complex(x, 0).pow(exponent);
     }
-  } else if (x is Complex) {
+  } else if (x is Number) {
     return x.pow(exponent);
   } else {
-    throw ArgumentError('Input should be either num or Complex');
+    throw ArgumentError('Input should be either num or Number');
   }
 }
 

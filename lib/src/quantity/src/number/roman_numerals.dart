@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 /// A class to convert between Roman and decimal numerals.
 ///
 /// The class provides functionality to represent an integer as a Roman numeral
@@ -64,6 +66,11 @@ class RomanNumerals {
   /// A private method to convert a Roman numeral string to an integer.
   static int _fromRoman(String roman) {
     roman = roman.toUpperCase();
+
+    // Handle the special case for zero
+    if (roman == 'N') {
+      return 0;
+    }
 
     // Validate the provided Roman numeral
     if (!_validateRoman(roman)) {
@@ -153,9 +160,14 @@ class RomanNumerals {
   /// print(numeral.toRoman());  // Outputs: XIV
   /// ```
   String toRoman() {
+    // Handle the special case for zero
+    if (value == 0) {
+      return 'N';
+    }
+
     // Using cache's putIfAbsent to streamline caching
     return _numToRomanCache.putIfAbsent(value, () {
-      if (value <= 0) {
+      if (value < 0) {
         throw ArgumentError(
             'Number out of range. Roman numerals support positive numbers.');
       }
@@ -279,71 +291,257 @@ class RomanNumerals {
     }
   }
 
-  /// Adds the values of two [RomanNumerals] objects and returns a new one.
-  RomanNumerals operator +(RomanNumerals other) {
-    return RomanNumerals(value + other.value);
+  /// Converts a date represented as a string to its Roman numeral representation.
+  ///
+  /// The [date] parameter should be the date string and [format] should be the corresponding format of the date.
+  /// Supported formats are those supported by the `DateFormat` class from the `intl` package.
+  ///
+  /// The separator between the Roman numerals in the output string can also be
+  /// customized using the `sep` parameter. By default, it is ' • '.
+  ///
+  /// Example:
+  /// ```dart
+  /// print(RomanNumerals.dateToRoman('August 22, 1989', format: 'MMMM d, y')); // Outputs: VIII • XXII • MCMLXXXIX
+  /// print(RomanNumerals.dateToRoman('Dec-23, 2017', format: 'MMM-d, y'));    // Outputs: XII • XXIII • MMXVII
+  /// print(RomanNumerals.dateToRoman('Jul-21, 2016', format: 'MMM-d, y'));    // Outputs: VII • XXI • MMXVI
+  /// ```
+  ///
+  /// Returns the date in Roman numeral format.
+  static String dateToRoman(String date,
+      {String sep = ' • ', String format = 'MMM-d, y'}) {
+    // Parse the date using the provided format
+    DateTime parsedDate = DateFormat(format).parse(date);
+
+    // Convert the day, month, and year components to Roman numerals
+    String dayRoman = RomanNumerals(parsedDate.day).toRoman();
+    String monthRoman = RomanNumerals(parsedDate.month).toRoman();
+    String yearRoman = RomanNumerals(parsedDate.year).toRoman();
+
+    // Return the formatted string
+    return '$monthRoman$sep$dayRoman$sep$yearRoman';
+  }
+
+  /// Converts a Roman numeral representation of a date back to a standard date.
+  ///
+  /// The date format can be customized using the `format` parameter. By default,
+  /// the returned date will be in the format 'MMM-d, y' (e.g., 'Aug-22, 1989').
+  ///
+  /// The separator between the Roman numerals in the input string can also be
+  /// customized using the `sep` parameter. By default, it is ' • '.
+  ///
+  /// Example:
+  /// ```dart
+  /// print(RomanNumerals.romanToDate('VIII • XXII • MCMLXXXIX')); // Outputs: Aug-22, 1989
+  /// print(RomanNumerals.romanToDate('VIII・XXII・MCMLXXXIX', sep: '・', format: 'MMMM d, y')); // Outputs: August 22, 1989
+  /// ```
+  ///
+  /// Returns the date in the specified format.
+  static String romanToDate(String romanDate,
+      {String sep = ' • ', String format = 'MMM-d, y'}) {
+    final parts = romanDate.split(sep);
+    if (parts.length != 3) {
+      throw ArgumentError('Invalid Roman numeral date format.');
+    }
+
+    final month = RomanNumerals.fromRoman(parts[0].trim()).value;
+    final day = RomanNumerals.fromRoman(parts[1].trim()).value;
+    final year = RomanNumerals.fromRoman(parts[2].trim()).value;
+
+    final dt = DateTime(year, month, day);
+    return DateFormat(format).format(dt);
+  }
+
+  /// Adds the values of two [dynamic] objects and returns a new one.
+  RomanNumerals operator +(dynamic other) {
+    int newValue = 0;
+    if (other is num) {
+      newValue = value + other.toInt();
+    } else if (other is String && _validateRoman(other)) {
+      newValue = value + RomanNumerals.fromRoman(other).value;
+    } else if (other is RomanNumerals) {
+      newValue = value + other.value;
+    } else {
+      throw ArgumentError('Not valid type for Roman numerals.');
+    }
+    return RomanNumerals(newValue);
   }
 
   /// Subtracts the value of another [RomanNumerals] from this one and returns a new one.
-  RomanNumerals operator -(RomanNumerals other) {
-    if (value - other.value < 0) {
+  RomanNumerals operator -(dynamic other) {
+    int newValue = 0;
+    if (other is num) {
+      newValue = value - other.toInt();
+    } else if (other is String && _validateRoman(other)) {
+      newValue = value - RomanNumerals.fromRoman(other).value;
+    } else if (other is RomanNumerals) {
+      newValue = value - other.value;
+    } else {
+      throw ArgumentError('Not valid type for Roman numerals.');
+    }
+    print(newValue);
+    if (newValue < 0) {
       throw ArgumentError(
           'Result of subtraction cannot be a negative value in Roman numerals.');
     }
-    return RomanNumerals(value - other.value);
+
+    return RomanNumerals(newValue);
   }
 
   /// Multiplies the values of two [RomanNumerals] objects and returns a new one.
-  RomanNumerals operator *(RomanNumerals other) {
-    return RomanNumerals(value * other.value);
+  RomanNumerals operator *(dynamic other) {
+    int newValue = 0;
+    if (other is num) {
+      newValue = value * other.toInt();
+    } else if (other is String && _validateRoman(other)) {
+      newValue = value * RomanNumerals.fromRoman(other).value;
+    } else if (other is RomanNumerals) {
+      newValue = value * other.value;
+    } else {
+      throw ArgumentError('Not valid type for Roman numerals.');
+    }
+    return RomanNumerals(newValue);
   }
 
   /// Divides the value of this [RomanNumerals] by another and returns a new one.
-  RomanNumerals operator /(RomanNumerals other) {
-    if (other.value == 0) {
-      throw ArgumentError('Division by zero is not allowed.');
+  RomanNumerals operator /(dynamic other) {
+    if ((other is RomanNumerals && other.value == 0) ||
+        (other is num && other <= 0)) {
+      throw ArgumentError('Division by negative or zero is not allowed.');
     }
-    return RomanNumerals((value / other.value).round());
+
+    int newValue = 0;
+    if (other is num) {
+      newValue = (value / other).round();
+    } else if (other is String && _validateRoman(other)) {
+      newValue = (value / RomanNumerals.fromRoman(other).value).round();
+    } else if (other is RomanNumerals) {
+      newValue = (value / other.value).round();
+    } else {
+      throw ArgumentError('Not valid type for Roman numerals.');
+    }
+    return RomanNumerals(newValue);
   }
 
-  bool operator <(RomanNumerals other) {
-    return value < other.value;
+  /// Bit-wise and operator.
+  RomanNumerals operator &(dynamic other) {
+    int newValue = 0;
+    if (other is num) {
+      newValue = value & other.toInt();
+    } else if (other is String && _validateRoman(other)) {
+      newValue = value & RomanNumerals.fromRoman(other).value;
+    } else if (other is RomanNumerals) {
+      newValue = value & other.value;
+    } else {
+      throw ArgumentError('Not valid type for Roman numerals.');
+    }
+    return RomanNumerals(newValue);
   }
 
-  bool operator <=(RomanNumerals other) {
-    return value <= other.value;
+  /// Bit-wise or operator
+  RomanNumerals operator |(dynamic other) {
+    int newValue = 0;
+    if (other is num) {
+      newValue = value | other.toInt();
+    } else if (other is String && _validateRoman(other)) {
+      newValue = value | RomanNumerals.fromRoman(other).value;
+    } else if (other is RomanNumerals) {
+      newValue = value | other.value;
+    } else {
+      throw ArgumentError('Not valid type for Roman numerals.');
+    }
+    return RomanNumerals(newValue);
   }
 
-  bool operator >(RomanNumerals other) {
-    return value > other.value;
+  /// Bit-wise exclusive-or operator.
+  RomanNumerals operator ^(dynamic other) {
+    int newValue = 0;
+    if (other is num) {
+      newValue = value ^ other.toInt();
+    } else if (other is String && _validateRoman(other)) {
+      newValue = value ^ RomanNumerals.fromRoman(other).value;
+    } else if (other is RomanNumerals) {
+      newValue = value ^ other.value;
+    } else {
+      throw ArgumentError('Not valid type for Roman numerals.');
+    }
+    return RomanNumerals(newValue);
   }
 
-  bool operator >=(RomanNumerals other) {
-    return value >= other.value;
+  /// Euclidean modulo of this number by [other].
+  RomanNumerals operator %(dynamic other) {
+    int newValue = 0;
+    if (other is num) {
+      newValue = value % other.toInt();
+    } else if (other is String && _validateRoman(other)) {
+      newValue = value % RomanNumerals.fromRoman(other).value;
+    } else if (other is RomanNumerals) {
+      newValue = value % other.value;
+    } else {
+      throw ArgumentError('Not valid type for Roman numerals.');
+    }
+    return RomanNumerals(newValue);
   }
 
-  RomanNumerals operator &(RomanNumerals other) {
-    return RomanNumerals(value & other.value);
+  /// Shift the bits of this integer to the left by [shiftAmount].
+  RomanNumerals operator <<(int shiftAmount) {
+    return RomanNumerals(value << shiftAmount);
   }
 
-  RomanNumerals operator |(RomanNumerals other) {
-    return RomanNumerals(value | other.value);
+  /// Shift the bits of this integer to the right by [shiftAmount].
+  RomanNumerals operator >>(int shiftAmount) {
+    return RomanNumerals(value >> shiftAmount);
   }
 
-  RomanNumerals operator ^(RomanNumerals other) {
-    return RomanNumerals(value ^ other.value);
+  /// Check if this [RomanNumerals] is less than another and returns boolean value.
+  bool operator <(dynamic other) {
+    if (other is num) {
+      return value < other.toInt();
+    } else if (other is String && _validateRoman(other)) {
+      return value < RomanNumerals.fromRoman(other).value;
+    } else if (other is RomanNumerals) {
+      return value < other.value;
+    } else {
+      throw ArgumentError('Not valid type for Roman numerals.');
+    }
   }
 
-  RomanNumerals operator %(RomanNumerals other) {
-    return RomanNumerals(value % other.value);
+  /// Check if this [RomanNumerals] is less than or equal to another and returns boolean value.
+  bool operator <=(dynamic other) {
+    if (other is num) {
+      return value <= other.toInt();
+    } else if (other is String && _validateRoman(other)) {
+      return value <= RomanNumerals.fromRoman(other).value;
+    } else if (other is RomanNumerals) {
+      return value <= other.value;
+    } else {
+      throw ArgumentError('Not valid type for Roman numerals.');
+    }
   }
 
-  RomanNumerals operator <<(int shift) {
-    return RomanNumerals(value << shift);
+  /// Check if this [RomanNumerals] is greater than another and returns boolean value.
+  bool operator >(dynamic other) {
+    if (other is num) {
+      return value > other.toInt();
+    } else if (other is String && _validateRoman(other)) {
+      return value > RomanNumerals.fromRoman(other).value;
+    } else if (other is RomanNumerals) {
+      return value > other.value;
+    } else {
+      throw ArgumentError('Not valid type for Roman numerals.');
+    }
   }
 
-  RomanNumerals operator >>(int shift) {
-    return RomanNumerals(value >> shift);
+  /// Check if this [RomanNumerals] is greater than or equal to another and returns boolean value.
+  bool operator >=(dynamic other) {
+    if (other is num) {
+      return value >= other.toInt();
+    } else if (other is String && _validateRoman(other)) {
+      return value >= RomanNumerals.fromRoman(other).value;
+    } else if (other is RomanNumerals) {
+      return value >= other.value;
+    } else {
+      throw ArgumentError('Not valid type for Roman numerals.');
+    }
   }
 
   @override

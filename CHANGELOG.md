@@ -1,3 +1,9 @@
+## 3.2.2
+* Improved the checks on roman numerals
+* Added conversion between roman numerals and dates
+* Improved the flexibility in arithmetic with integer, roman strings and roman numbers
+* Fixed README file
+
 ## 3.2.1
 * Improved the checks on roman numerals
 

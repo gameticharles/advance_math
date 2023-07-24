@@ -524,6 +524,7 @@ class Complex extends Number {
   ///
   /// print(z_exp); // Output: -1.0 + 1.2246467991473532e-16i
   /// ```
+  @override
   Complex exp() {
     final r = math.exp(real.value);
     return Complex(

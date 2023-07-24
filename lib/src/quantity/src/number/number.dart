@@ -259,7 +259,7 @@ abstract class Number implements Comparable<dynamic> {
   }
 
   /// Get the nth root of the number
-  dynamic nthRoot(int nth, {bool allRoots = false}) {
+  dynamic nthRoot(double nth, {bool allRoots = false}) {
     Complex complex = Complex.zero();
     if (this is Integer || this is Precise || this is Double || this is Real) {
       complex = Complex.fromReal(numberToNum(this));
@@ -306,6 +306,17 @@ abstract class Number implements Comparable<dynamic> {
     }
 
     return Complex(a, b);
+  }
+
+  /// Returns the natural exponentiation of a number.
+  Number exp() {
+    if (this is Integer || this is Precise || this is Double || this is Real) {
+      return math.exp(numberToNum(this));
+    } else if (this is Imaginary) {
+      return Complex.num(Integer.zero, this as Imaginary).exp();
+    } else {
+      return (this as Complex).exp();
+    }
   }
 
   /// Returns the fractional type of the value

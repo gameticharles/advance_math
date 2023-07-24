@@ -529,7 +529,7 @@ String degree2DMSString(num degDEC,
       : '';
   var pn = !isLatLon
       ? degDEC >= 0
-          ? '+ '
+          ? '' // '+ '
           : '- '
       : '';
 

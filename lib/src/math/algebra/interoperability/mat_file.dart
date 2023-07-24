@@ -253,21 +253,15 @@ Future<Map<String, dynamic>> readVarHeader(
     var decoder = ZLibDecoder();
     var decodedData = decoder.convert(data);
 
-    // From here, read of the decompressed data
-    // var fdVar = ByteData(decodedData.length);
-    // fdVar.buffer.asUint8List().setUint8List(0, decodedData);
-    // fd = fdVar.openSync(mode: FileMode.read);
-    var fdVar = BytesBuilder();
-    fdVar.add(decodedData);
+    // Create a new RandomAccessFile from the decompressed data
+    var tempFile =
+        File('${Directory.systemTemp.createTempSync().path}/tempFile.mat');
 
-    // // Check the stream is not so broken as to leave cruft behind
-    // if (decoder. != '') {
-    //   // dcor.bytesRead != data.length
-    //   throw Exception('Error in compressed data.');
-    // }
+    await tempFile.writeAsBytes(decodedData);
+    var fdVar = await tempFile.open();
 
     // Read full tag from the uncompressed data
-    tag = await fd.read(8);
+    tag = await fdVar.read(8);
     mtpn = unpack(endian, 'I', tag.sublist(0, 4));
     numBytes = unpack(endian, 'I', tag.sublist(4));
 

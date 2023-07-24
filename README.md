@@ -498,6 +498,16 @@ print(a >= b); // true
 print(a <= b); // false
 ```
 
+### Date to and from Roman numerals
+
+```dart
+  print(RomanNumerals.dateToRoman('August 22, 1989', format: 'MMMM d, y', sep: '・')); // Outputs: VIII・XXII・MCMLXXXIX
+  print(RomanNumerals.dateToRoman('Dec-23, 2017', format: 'MMM-d, y')); // Outputs: XII • XXIII • MMXVII
+  print(RomanNumerals.dateToRoman('Jul-21, 2016', format: 'MMM-d, y')); // Outputs: VII • XXI • MMXVI
+
+  print(RomanNumerals.romanToDate('VIII・XXII・MCMLXXXIX', format: 'MMMM d, y', sep: '・')); // Outputs: August 22, 1989
+```
+
 </details>
 
 <details>

@@ -5,6 +5,18 @@ void printLine(String s) {
   print('\n$l$s $l\n');
 }
 
+// Complex asec(Complex z) {
+//   return acos(Complex(1, 0) / z);
+// }
+
+// Complex acsc(Complex z) {
+//   return asin(Complex(1, 0) / z);
+// }
+
+// Complex acot(Complex z) {
+//   return atan(Complex(1, 0) / z);
+// }
+
 void main() {
   var vertices = [
     Point(1613.26, 2418.11),
