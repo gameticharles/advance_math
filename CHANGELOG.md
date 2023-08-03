@@ -1,3 +1,6 @@
+## 3.2.4
+* Fixed error in angles
+
 ## 3.2.3
 * Fixed error in angles conversion
 
