@@ -1,3 +1,6 @@
+## 3.2.3
+* Fixed error in angles conversion
+
 ## 3.2.2
 * Improved the checks on roman numerals
 * Added conversion between roman numerals and dates

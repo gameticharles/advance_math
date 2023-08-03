@@ -77,8 +77,7 @@ class Angle extends Quantity {
   ///  This constructor creates an angle value from the three values
   ///  passed in for degrees, minutes, and seconds of arc.
   Angle.fromDegMinSec(int d, int m, num s, [double uncert = 0.0])
-      : super(degrees.toMks(d) + minutesArc.toMks(m) + secondsArc.toMks(s),
-            AngleUnits.radians, uncert);
+      : super(dms2Degree(d, m, s), AngleUnits.radians, uncert);
 
   /// Creates an angle from a number of degrees.
   ///
