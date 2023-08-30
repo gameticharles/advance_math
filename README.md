@@ -120,21 +120,59 @@ var confidenceLevels = [
     print("Z-score for $cl% confidence level is $zScore");
   }
 
-  // Z-score for 10% confidence level is 0.12538099310291884
-  // Z-score for 20% confidence level is 0.25293326782658254
-  // Z-score for 30% confidence level is 0.3848770849965131
-  // Z-score for 40% confidence level is 0.5240018703826799
-  // Z-score for 50% confidence level is 0.6741891400433162
-  // Z-score for 60% confidence level is 0.8414567173547839
-  // Z-score for 70% confidence level is 1.0364314851895606
-  // Z-score for 80% confidence level is 1.281728756502709
-  // Z-score for 85% confidence level is 1.4398004696260025
-  // Z-score for 90% confidence level is 1.645211440143815
-  // Z-score for 95% confidence level is 1.9603949169253396
-  // Z-score for 99.0% confidence level is 2.5762360813095704
-  // Z-score for 99.999% confidence level is 4.417087697546128
-  // Z-score for 99.99999% confidence level is 5.326446072058037
-  // Z-score for 99.9999999% confidence level is 6.109029815669355
+// Z-score for 10% confidence level is 0.12538099310291884
+// Z-score for 20% confidence level is 0.25293326782658254
+// Z-score for 30% confidence level is 0.3848770849965131
+// Z-score for 40% confidence level is 0.5240018703826799
+// Z-score for 50% confidence level is 0.6741891400433162
+// Z-score for 60% confidence level is 0.8414567173547839
+// Z-score for 70% confidence level is 1.0364314851895606
+// Z-score for 80% confidence level is 1.281728756502709
+// Z-score for 85% confidence level is 1.4398004696260025
+// Z-score for 90% confidence level is 1.645211440143815
+// Z-score for 95% confidence level is 1.9603949169253396
+// Z-score for 99.0% confidence level is 2.5762360813095704
+// Z-score for 99.999% confidence level is 4.417087697546128
+// Z-score for 99.99999% confidence level is 5.326446072058037
+// Z-score for 99.9999999% confidence level is 6.109029815669355
+```
+
+Compute the confidence level using the Z-Scroe value
+
+```dart
+print(ZScore.computeConfidenceLevel(1.9603949169253396)); // 95.00503548449109
+print(ZScore.computeConfidenceLevel(5.326446072058037)); // 99.99998998470075
+```
+
+Confidence interval around a sample mean, you generally need the sample mean (x), the sample size (n), and the standard deviation (σ) or the standard error of the sample mean (SE). The Z-score corresponding to the desired confidence level is also required.
+
+```dart
+var interval = ZScore.computeConfidenceInterval(50, 100, 10, 95);
+print("Confidence Interval: (${interval.lower}, ${interval.upper})");
+// Output: Confidence Interval: (48.040605084588995, 51.959394915411005)
+```
+
+Compute the Probability Density Function (PDF) and Cumulative Density Function (CDF) for a standard normal distribution to the ZScore class.
+
+```dart
+print(ZScore.computeCDF(0)); // 0.49999998499999976
+print(ZScore.computePDF(0)); // 0.3989422804014327
+```
+
+other computational functions includes:
+
+```dart
+// Compute p-value from a given Z-score.
+print(ZScore.computePValue(1.96)); // 0.025
+
+// Convert Z-score to T-score.
+print(ZScore.convertZToT(1.96)); // 69.6
+
+// Compute the percentile from a given Z-score.
+print(ZScore.computePercentile(1.96)); // 97.5
+
+// Compute Z-score from a raw score.
+print(ZScore.computeZScoreFromRawScore(110, 100, 15)); // 0.6666666666666666
 ```
 
 </details>
