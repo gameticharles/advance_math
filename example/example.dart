@@ -5,18 +5,6 @@ void printLine(String s) {
   print('\n$l$s $l\n');
 }
 
-// Complex asec(Complex z) {
-//   return acos(Complex(1, 0) / z);
-// }
-
-// Complex acsc(Complex z) {
-//   return asin(Complex(1, 0) / z);
-// }
-
-// Complex acot(Complex z) {
-//   return atan(Complex(1, 0) / z);
-// }
-
 void main() {
   var vertices = [
     Point(1613.26, 2418.11),
@@ -58,14 +46,16 @@ void main() {
   print("\nTranslated by (1.0, 1.0): ${polygon.vertices}");
 
   print(
-      "\nNearest point to polygon: ${polygon.nearestPointOnPolygon(Point(1920.17, 2200.18))}");
+      "\nNearest point on the polygon to (1920.17, 2200.18): ${polygon.nearestPointOnPolygon(Point(1920.17, 2200.18))}");
+
+  printLine('Regular Polygon');
 
   var regPolygon = RegularPolygon(numSides: 5, sideLength: 4);
 
-  print("\n\nArea: ${regPolygon.areaPolygon()}");
+  print("Area: ${regPolygon.areaPolygon()}");
   print("Perimeter: ${regPolygon.perimeter()}");
   print("Interior angle: ${regPolygon.interiorAngle()}");
-  print("Exterior angle: ${regPolygon.exteriorAngle()}");
+  print("Exterior angle: ${regPolygon.exteriorAngle()}\n\n");
 
   var perimeter = regPolygon.perimeter();
   var area = regPolygon.areaPolygon();

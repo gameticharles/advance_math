@@ -1,3 +1,10 @@
+## 3.3.0
+* Added ZScore computation
+* Added more functions matrix statistics
+* Added multiple supports for determinant
+* Fixed bugs in Roman numerals
+* Fixed documentation inconsistencies
+
 ## 3.2.4
 * Fixed error in angles
 

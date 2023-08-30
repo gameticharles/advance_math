@@ -184,6 +184,186 @@ extension MatrixStatsExtension on Matrix {
     return [minRow, minCol];
   }
 
+  /// Calculates the minimum value for each column in the matrix.
+  ///
+  /// Returns a list of minimum values, one for each column.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// final matrix = Matrix([
+  ///   [1, 2],
+  ///   [3, 4],
+  ///   [5, 6]
+  /// ]);
+  /// final mins = matrix.columnMins();
+  /// print(mins);  // Output: [1, 2]
+  /// ```
+  List<double> columnMins() {
+    List<double> mins = List.filled(columnCount, double.infinity);
+    for (var row in _data) {
+      for (int j = 0; j < columnCount; j++) {
+        mins[j] = math.min(mins[j], row[j]);
+      }
+    }
+    return mins;
+  }
+
+  /// Calculates the maximum value for each column in the matrix.
+  ///
+  /// Returns a list of maximum values, one for each column.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// final matrix = Matrix([
+  ///   [1, 2],
+  ///   [3, 4],
+  ///   [5, 6]
+  /// ]);
+  /// final maxs = matrix.columnMaxs();
+  /// print(maxs);  // Output: [5, 6]
+  /// ```
+  List<double> columnMaxs() {
+    List<double> maxs = List.filled(columnCount, double.negativeInfinity);
+    for (var row in _data) {
+      for (int j = 0; j < columnCount; j++) {
+        maxs[j] = math.max(maxs[j], row[j]);
+      }
+    }
+    return maxs;
+  }
+
+  /// Calculates the mean value for each column in the matrix.
+  ///
+  /// Returns a list of mean values, one for each column.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// final matrix = Matrix([
+  ///   [1, 2],
+  ///   [3, 4],
+  ///   [5, 6]
+  /// ]);
+  /// final means = matrix.columnMeans();
+  /// print(means);  // Output: [3.0, 4.0]
+  /// ```
+  List<double> columnMeans() {
+    List<double> sums = List.filled(columnCount, 0.0);
+    for (var row in _data) {
+      for (int j = 0; j < columnCount; j++) {
+        sums[j] += row[j];
+      }
+    }
+    return sums.map((sum) => sum / rowCount).toList();
+  }
+
+  /// Calculates the standard deviation for each column in the matrix.
+  ///
+  /// Returns a list of standard deviation values, one for each column.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// final matrix = Matrix([
+  ///   [1, 2],
+  ///   [3, 4],
+  ///   [5, 6]
+  /// ]);
+  /// final stdDevs = matrix.columnStdDevs();
+  /// print(stdDevs);  // Output: [1.632993161855452, 1.632993161855452]
+  /// ```
+  List<dynamic> columnStdDevs() {
+    List<double> means = columnMeans();
+    List<double> variances = List.filled(columnCount, 0.0);
+
+    for (var row in _data) {
+      for (int j = 0; j < columnCount; j++) {
+        variances[j] += math.pow(row[j] - means[j], 2);
+      }
+    }
+
+    return variances.map((variance) => math.sqrt(variance / rowCount)).toList();
+  }
+
+  /// Calculates the minimum value for each row in the matrix.
+  ///
+  /// Returns a list of minimum values, one for each row.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// final matrix = Matrix([
+  ///   [1, 2],
+  ///   [3, 4],
+  ///   [5, 6]
+  /// ]);
+  /// final mins = matrix.rowMins();
+  /// print(mins);  // Output: [1, 3, 5]
+  /// ```
+  List<dynamic> rowMins() {
+    return _Utils.toNumList(_data).map((row) => row.reduce(math.min)).toList();
+  }
+
+  /// Calculates the maximum value for each row in the matrix.
+  ///
+  /// Returns a list of maximum values, one for each row.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// final matrix = Matrix([
+  ///   [1, 2],
+  ///   [3, 4],
+  ///   [5, 6]
+  /// ]);
+  /// final maxs = matrix.rowMaxs();
+  /// print(maxs);  // Output: [2, 4, 6]
+  /// ```
+  List<dynamic> rowMaxs() {
+    return _Utils.toNumList(_data).map((row) => row.reduce(math.max)).toList();
+  }
+
+  /// Calculates the mean value for each row in the matrix.
+  ///
+  /// Returns a list of mean values, one for each row.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// final matrix = Matrix([
+  ///   [1, 2],
+  ///   [3, 4],
+  ///   [5, 6]
+  /// ]);
+  /// final means = matrix.rowMeans();
+  /// print(means);  // Output: [1.5, 3.5, 5.5]
+  /// ```
+  List<double> rowMeans() {
+    return _data
+        .map((row) =>
+            ((row.reduce((a, b) => a + b) / row.length) as num).toDouble())
+        .toList();
+  }
+
+  /// Calculates the standard deviation for each row in the matrix.
+  ///
+  /// Returns a list of standard deviation values, one for each row.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// final matrix = Matrix([
+  ///   [1, 2],
+  ///   [3, 4],
+  ///   [5, 6]
+  /// ]);
+  /// final stdDevs = matrix.rowStdDevs();
+  /// print(stdDevs);  // Output: [0.7071067811865476, 0.7071067811865476, 0.7071067811865476]
+  /// ```
+  List<dynamic> rowStdDevs() {
+    return _data.map((row) {
+      double mean = row.reduce((a, b) => a + b) / row.length;
+      double variance =
+          row.map((x) => math.pow(x - mean, 2)).reduce((a, b) => a + b) /
+              row.length;
+      return math.sqrt(variance);
+    }).toList();
+  }
+
   /// Returns the rank of the matrix.
   ///
   /// Example:

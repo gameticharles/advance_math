@@ -9,8 +9,8 @@ part of maths;
 ///
 /// Example 2:
 /// ```dart
-/// var z = Complex.num(pi / 2, 0);
-/// var z_sin = z.sin();
+/// var z = Complex(pi / 2, 0);
+/// var z_sin = sin(z);
 ///
 /// print(z_sin); // Output: 1.0 + 0.0i
 /// ```
@@ -35,8 +35,8 @@ dynamic sin(dynamic x) {
 ///
 ///  Example 2:
 /// ```dart
-/// var z = Complex.num(0, 0);
-/// var z_cos = z.cos();
+/// var z = Complex(0, 0);
+/// var z_cos = cos(z);
 ///
 /// print(z_cos); // Output: 1.0 + 0.0i
 /// ```
@@ -61,8 +61,8 @@ dynamic cos(dynamic x) {
 ///
 /// Example 2:
 /// ```dart
-/// var z = Complex.num(0, 0);
-/// var z_cos = z.tan();
+/// var z = Complex(0, 0);
+/// var z_cos = tan(z);
 ///
 /// print(z_cos); // Output: 1.0 + 0.0i
 /// ```
@@ -88,7 +88,7 @@ dynamic tan(dynamic x) {
 /// print(sec(Complex(1, 2))); // Output: 0.15117629826557724 + 0.22697367539372162i
 /// ```
 dynamic sec(dynamic x) {
-  return (x is num ? 1 / cos(x) : Complex(1, 0) / cos(x));
+  return x is num ? 1 / cos(x) : Complex(1, 0) / cos(x);
 }
 
 /// Returns the cosecant of a number in radians.
@@ -103,7 +103,7 @@ dynamic sec(dynamic x) {
 /// print(csc(Complex(1, 2))); // Output: 0.22837506559968657 - 0.1413630216124078i
 /// ```
 dynamic csc(dynamic x) {
-  return (x is num ? 1 / sin(x) : Complex(1, 0) / sin(x));
+  return x is num ? 1 / sin(x) : Complex(1, 0) / sin(x);
 }
 
 /// Returns the cotangent of a number in radians.
@@ -118,7 +118,7 @@ dynamic csc(dynamic x) {
 /// print(cot(Complex(1, 2))); // Output: 0.032797755533752505 - 0.984329226458191i
 /// ```
 dynamic cot(dynamic x) {
-  return (x is num ? 1 / tan(x) : Complex(1, 0) / tan(x));
+  return x is num ? 1 / tan(x) : Complex(1, 0) / tan(x);
 }
 
 /// Returns the arcsine of a number in radians.
@@ -244,16 +244,21 @@ dynamic atan2(dynamic a, dynamic b) {
 
 /// Returns the arcsecant (inverse of the secant) of `x`.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(asec(2)); // prints: 1.0471975511965979
 /// ```
-double asec(num x) {
+///
+/// Example 2:
+/// ```dart
+/// print(asec(Complex(1, 2))); // Output: 1.3844782726870812 + 0.3965682301123288i
+/// ```
+dynamic asec(dynamic x) {
   if (x.abs() < 1) {
     throw ArgumentError(
         'Invalid input for asec: absolute value of input must be >= 1');
   }
-  return math.acos(1 / x);
+  return x is num ? math.acos(1 / x) : acos(Complex(1, 0) / x);
 }
 
 /// Returns the arccosecant (inverse of the cosecant) of `x`.
@@ -262,31 +267,49 @@ double asec(num x) {
 /// ```dart
 /// print(acsc(2)); // prints: 0.5235987755982989
 /// ```
-double acsc(num x) {
+///
+/// Example 2:
+/// ```dart
+/// print(acsc(Complex(1, 2))); // Output: 0.18631805410781554 - 0.39656823011232917i
+/// ```
+dynamic acsc(dynamic x) {
   if (x.abs() < 1) {
     throw ArgumentError(
         'Invalid input for acsc: absolute value of input must be >= 1');
   }
-  return math.asin(1 / x);
+  return x is num ? math.asin(1 / x) : asin(Complex(1, 0) / x);
 }
 
 /// Returns the arccotangent (inverse of the cotangent) of `x`.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(acot(1)); // prints: 0.7853981633974483
 /// ```
-double acot(num x) {
-  return pi / 2 - math.atan(x);
+///
+/// Example 2:
+/// ```dart
+/// print(acot(Complex(1, 2))); // Output: 0.23182380450040307 - 0.402359478108525i
+/// ```
+dynamic acot(dynamic x) {
+  //pi / 2 - math.atan(x)
+  return x is num ? atan(1 / x) : atan(Complex(1, 0) / x);
 }
 
 /// Returns the hyperbolic sine of a number.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(sinh(1));  // Output: 1.1752011936438014
 /// ```
-double sinh(num x) => (exp(x) - exp(-x)) / 2;
+///
+/// Example 2:
+/// ```dart
+/// print(sinh(Complex(1, 2))); // Output: -0.4890562590412937 + 1.4031192506220405i
+/// ```
+dynamic sinh(dynamic x) {
+  return x is num ? (exp(x) - exp(-x)) / 2 : x.sinh();
+}
 
 /// Returns the hyperbolic cosine of a number.
 ///
@@ -294,44 +317,71 @@ double sinh(num x) => (exp(x) - exp(-x)) / 2;
 /// ```dart
 /// print(cosh(1));  // Output: 1.5430806348152437
 /// ```
-double cosh(num x) => (exp(x) + exp(-x)) / 2;
+///
+/// Example 2:
+/// ```dart
+/// print(cosh(Complex(1, 2))); // Output: -0.64214812471552 + 1.0686074213827783i
+/// ```
+dynamic cosh(dynamic x) {
+  return x is num ? (exp(x) + exp(-x)) / 2 : x.cosh();
+}
 
 /// Returns the hyperbolic tangent of a number.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(tanh(1));  // Output: 0.7615941559557649
 /// ```
-double tanh(num x) => sinh(x) / cosh(x);
+///
+/// Example 2:
+/// ```dart
+/// print(tanh(Complex(1, 2))); // Output: 1.16673625724092 - 0.24345820118572517i
+/// ```
+dynamic tanh(dynamic x) => sinh(x) / cosh(x);
 
 /// Returns the hyperbolic secant of a number.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(sech(1)); // Output: 0.6480542736638853
 /// ```
-double sech(num x) {
-  return 1 / cosh(x);
+///
+/// Example 2:
+/// ```dart
+/// print(sech(Complex(1, 2))); // Output: -0.41314934426694 - 0.6875274386554789i
+/// ```
+dynamic sech(dynamic x) {
+  return Complex(1, 0) / cosh(x);
 }
 
 /// Returns the hyperbolic cosecant of a number.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(csch(1)); // Output: 0.8509181282393215
 /// ```
-double csch(num x) {
-  return 1 / sinh(x);
+///
+/// Example 2:
+/// ```dart
+/// print(csch(Complex(1, 2))); // Output: -0.22150093085050945 - 0.6354937992539i
+/// ```
+dynamic csch(dynamic x) {
+  return Complex(1, 0) / sinh(x);
 }
 
 /// Returns the hyperbolic cotangent of a number.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(coth(1)); // Output: 1.3130352854993312
 /// ```
-double coth(num x) {
-  return 1 / tanh(x);
+///
+/// Example 2:
+/// ```dart
+/// print(coth(Complex(1, 2))); // Output: 0.8213297974938517 + 0.17138361290918497i
+/// ```
+dynamic coth(dynamic x) {
+  return Complex(1, 0) / tanh(x);
 }
 
 /// Returns the inverse hyperbolic sine (asinh) of the number.

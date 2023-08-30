@@ -1173,41 +1173,67 @@ extension MatrixOperationExtension on Matrix {
     return cofactors().transpose();
   }
 
-  /// Calculates the determinant of a square matrix.
+  /// Computes the determinant of the matrix.
   ///
-  /// Returns the determinant of the matrix.
+  /// Throws an [Exception] if the matrix is not square.
+  ///
+  /// Takes an optional [method] parameter to specify the method for calculating
+  /// the determinant. The default method is [DeterminantMethod.LU].
   ///
   /// Example:
   /// ```dart
-  /// var matrix = Matrix([[1, 2], [3, 4]]);
-  /// var result = matrix.determinant();
-  /// print(result); // Output: -2
+  /// var matrix = Matrix([
+  ///   [1, 2],
+  ///   [3, 4]
+  /// ]);
+  /// var det = matrix.determinant();  // Output: -2.0
+  /// var detLaplace = matrix.determinant(method: DeterminantMethod.Laplace);  // Output: -2.0
   /// ```
-  num determinant() {
+  ///
+  /// \[ \text{Determinant} = 1 \times 4 - 2 \times 3 = -2 \]
+  ///
+  /// @param method The method used for calculating the determinant. One of [DeterminantMethod.Laplace] or [DeterminantMethod.LU].
+  /// @return The determinant of the matrix as a [num].
+  num determinant({DeterminantMethod method = DeterminantMethod.LU}) {
     int n = rowCount;
     if (n != columnCount) {
       throw Exception('Matrix must be square to calculate determinant');
     }
+    double det = 1.0;
+    if (method == DeterminantMethod.LU) {
+      // Perform LU decomposition
+      // (Replace with your actual LU decomposition implementation)
+      var lu = decomposition.luDecompositionDoolittle();
+      // var l = lu.L;
+      var u = lu.U;
 
-    if (n == 1) {
-      return this[0][0];
-    }
+      // Compute the product of the diagonal elements of U
 
-    if (n == 2) {
-      return (_data[0][0] * _data[1][1]) - (_data[0][1] * _data[1][0]);
-    }
+      for (int i = 0; i < n; i++) {
+        det *= u[i][i];
+      }
+      return det;
+    } else {
+      // Laplace Expansion
+      if (n == 1) {
+        return this[0][0];
+      }
 
-    double det = 0;
-    for (int p = 0; p < n; p++) {
-      Matrix subMatrix = Matrix([
-        for (int i = 1; i < n; i++)
-          [
-            for (int j = 0; j < n; j++)
-              if (j != p) _data[i][j]
-          ]
-      ]);
+      if (n == 2) {
+        return (_data[0][0] * _data[1][1]) - (_data[0][1] * _data[1][0]);
+      }
 
-      det += _data[0][p] * (p % 2 == 0 ? 1 : -1) * subMatrix.determinant();
+      for (int p = 0; p < n; p++) {
+        Matrix subMatrix = Matrix([
+          for (int i = 1; i < n; i++)
+            [
+              for (int j = 0; j < n; j++)
+                if (j != p) _data[i][j]
+            ]
+        ]);
+
+        det += _data[0][p] * (p % 2 == 0 ? 1 : -1) * subMatrix.determinant();
+      }
     }
 
     return det;

@@ -1145,7 +1145,7 @@ class RegularPolygon extends Polygon {
 }
 
 class IrregularPolygon extends Polygon {
-  IrregularPolygon({List<Point>? vertices}) : super(vertices: vertices) {}
+  IrregularPolygon({List<Point>? vertices}) : super(vertices: vertices);
 
   // irregular polygon specific methods go here...
   // the above class does not include any irregular polygon specific methods,

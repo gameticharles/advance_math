@@ -2,12 +2,6 @@
 
 part of algebra;
 
-/// An enumeration of different methods that can be used to solve the least squares problem.
-enum EquationMethod {
-  linear,
-  decomposition,
-}
-
 /// The `BaseLeastSquares` class is used to perform a least squares fit to the
 /// given model, specified by matrix `A` and column vector `b`.
 /// It supports weighted least squares with an optional weight matrix `W`,

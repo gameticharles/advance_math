@@ -378,7 +378,7 @@ class RomanNumerals {
     } else {
       throw ArgumentError('Not valid type for Roman numerals.');
     }
-    print(newValue);
+
     if (newValue < 0) {
       throw ArgumentError(
           'Result of subtraction cannot be a negative value in Roman numerals.');

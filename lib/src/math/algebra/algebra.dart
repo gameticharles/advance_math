@@ -19,8 +19,10 @@ part 'enum/rescale.dart';
 part 'enum/matrix_types.dart';
 part 'enum/distance_types.dart';
 part 'enum/linear_methods.dart';
+part 'enum/equation_methods.dart';
 part 'enum/sparse_format.dart';
 part 'enum/decomposition_methods.dart';
+part 'enum/determinant_method.dart';
 
 part 'matrix/eigen/eigen.dart';
 part 'matrix/eigen/divide_conquer.dart';
@@ -62,6 +64,7 @@ part 'nonlinear/nonlinear.dart';
 part 'linear/linear.dart';
 part 'least_squares/base_least_square.dart';
 part 'least_squares/special_least_square.dart';
+part 'least_squares/z_score.dart';
 
 part 'polynomial/constant.dart';
 part 'polynomial/linear.dart';

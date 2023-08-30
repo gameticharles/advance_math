@@ -88,6 +88,58 @@ print(logBase(2, 32));  // Output: 5.0
 </details>
 
 <details>
+<summary>ZScore</summary>
+
+# ZScore
+
+Computes Z-scores based on a given confidence level.
+The class provides functionalities to compute Z-scores, which are used in statistical hypothesis testing. 
+
+The Z-score represents how many standard deviations an element is from the mean.
+
+```dart
+var confidenceLevels = [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    85,
+    90,
+    95,
+    99.0,
+    99.999,
+    99.99999,
+    99.9999999
+  ];
+  for (var cl in confidenceLevels) {
+    double zScore = ZScore.computeZScore(cl);
+    print("Z-score for $cl% confidence level is $zScore");
+  }
+
+  // Z-score for 10% confidence level is 0.12538099310291884
+  // Z-score for 20% confidence level is 0.25293326782658254
+  // Z-score for 30% confidence level is 0.3848770849965131
+  // Z-score for 40% confidence level is 0.5240018703826799
+  // Z-score for 50% confidence level is 0.6741891400433162
+  // Z-score for 60% confidence level is 0.8414567173547839
+  // Z-score for 70% confidence level is 1.0364314851895606
+  // Z-score for 80% confidence level is 1.281728756502709
+  // Z-score for 85% confidence level is 1.4398004696260025
+  // Z-score for 90% confidence level is 1.645211440143815
+  // Z-score for 95% confidence level is 1.9603949169253396
+  // Z-score for 99.0% confidence level is 2.5762360813095704
+  // Z-score for 99.999% confidence level is 4.417087697546128
+  // Z-score for 99.99999% confidence level is 5.326446072058037
+  // Z-score for 99.9999999% confidence level is 6.109029815669355
+```
+
+</details>
+
+<details>
 <summary>ANGLE</summary>
 
 # Angle Class

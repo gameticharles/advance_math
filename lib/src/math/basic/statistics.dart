@@ -51,9 +51,19 @@ List<num> mode(List<num> list) {
 /// print(variance([1, 2, 3, 4, 5])); // prints: 2.5
 /// ```
 num variance(List<num> list) {
-  double m = mean(list);
+  num m = mean(list);
   return list.map((num x) => math.pow(x - m, 2)).reduce((a, b) => a + b) /
-      list.length;
+      (list.length - 1);
+}
+
+/// Returns the standard deviation of a list of numbers.
+///
+/// Example:
+/// ```dart
+/// print(stdDev([1, 2, 3, 4, 5])); // prints: 1.5811388300841898
+/// ```
+double stdDev(List<num> list) {
+  return sqrt(variance(list));
 }
 
 /// Returns the standard deviation of a list of numbers.
@@ -62,8 +72,48 @@ num variance(List<num> list) {
 /// ```dart
 /// print(standardDeviation([1, 2, 3, 4, 5])); // prints: 1.5811388300841898
 /// ```
-num standardDeviation(List<num> list) {
-  return math.sqrt(variance(list));
+double standardDeviation(List<num> list) => stdDev(list);
+
+/// Returns the standard error of the sample mean
+///
+/// Example:
+/// ```
+/// print(stdErrMean([1, 2, 3, 4, 5])); // prints: 0.7071067811865476
+/// ```
+double stdErrMean(List<num> list) {
+  // if the list is empty or has only one element
+  if (list.isEmpty || list.length == 1) return 0;
+
+  return stdDev(list) / sqrt(list.length);
+}
+
+/// Standard error of estimate
+///
+/// Example:
+/// ```
+/// print(stdErrEst([1, 2, 3, 4, 5])); // prints: 0.6324555320336759
+/// ```
+double stdErrEst(List<num> x, List<num> y) {
+  num meanX = mean(x);
+  num meanY = mean(y);
+  double numerator = 0;
+  for (int i = 0; i < x.length; i++) {
+    numerator += pow(y[i] - meanY - (x[i] - meanX), 2);
+  }
+  return sqrt(numerator / (x.length - 2));
+}
+
+/// Returns the t-Value of the list
+/// Example:
+/// ```
+/// print(tValue([1, 2, 3, 4, 5])); // prints: 4.242640687119285
+/// ```
+double tValue(List<num> list) {
+  // if the list is empty or has only one element
+  if (list.isEmpty || list.length == 1) return 0;
+
+  // Calculate the t-Value
+  return mean(list) / stdErrMean(list);
 }
 
 /// Returns the 1st, 2nd, and 3rd quartiles of a list of numbers.
@@ -128,4 +178,40 @@ int lcm(num a, num b) {
     int hcf = gcd(a, b);
     return ((a * b) ~/ hcf).abs();
   }
+}
+
+// To do
+
+double correlation(List<double> x, List<double> y) {
+  double meanX = mean(x);
+  double meanY = mean(y);
+
+  double numerator = 0;
+  double denominator1 = 0;
+  double denominator2 = 0;
+
+  for (int i = 0; i < x.length; i++) {
+    numerator += (x[i] - meanX) * (y[i] - meanY);
+    denominator1 += pow(x[i] - meanX, 2);
+    denominator2 += pow(y[i] - meanY, 2);
+  }
+
+  return numerator / sqrt(denominator1 * denominator2);
+}
+
+List<num> confidenceInterval(List<double> data, double confidenceLevel) {
+  double sampleMean = mean(data);
+  double stdErr = stdErrMean(data);
+  double margin = tValue(data) * stdErr;
+  return [sampleMean - margin, sampleMean + margin];
+}
+
+List regression(List<double> x, List<double> y) {
+  double meanX = mean(x);
+  double meanY = mean(y);
+
+  double m = correlation(x, y) * (stdDev(y) / stdDev(x));
+  double b = meanY - m * meanX;
+
+  return [m, b]; // slope, intercept
 }
