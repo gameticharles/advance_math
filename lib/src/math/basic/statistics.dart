@@ -180,8 +180,12 @@ int lcm(num a, num b) {
   }
 }
 
-// To do
-
+/// Returns the correlation of two lists
+///
+/// Example:
+/// ```dart
+/// print(correlation());
+/// ```
 double correlation(List<double> x, List<double> y) {
   double meanX = mean(x);
   double meanY = mean(y);
@@ -199,6 +203,7 @@ double correlation(List<double> x, List<double> y) {
   return numerator / sqrt(denominator1 * denominator2);
 }
 
+///
 List<num> confidenceInterval(List<double> data, double confidenceLevel) {
   double sampleMean = mean(data);
   double stdErr = stdErrMean(data);

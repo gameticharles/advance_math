@@ -1,6 +1,6 @@
 part of algebra;
 
-/// Computes Z-scores based on a given confidence level.
+/// Computes Z-score based on a given confidence level.
 ///
 /// The class provides functionalities to compute Z-scores, which are used
 /// in statistical hypothesis testing. The Z-score represents how many standard

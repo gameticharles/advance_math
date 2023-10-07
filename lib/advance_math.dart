@@ -10,5 +10,6 @@ export 'src/math/basic/math.dart';
 export 'src/math/geometry/geometry.dart';
 export 'src/math/algebra/algebra.dart';
 export 'src/quantity/quantity.dart';
+export 'src/interpolate/interpolate.dart';
 
 part 'src/utils/num_ext.dart';

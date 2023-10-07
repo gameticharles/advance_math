@@ -1,3 +1,6 @@
+## 3.3.1
+* Added Interpolation
+
 ## 3.3.0
 * Added ZScore computation
 * Added more functions matrix statistics
