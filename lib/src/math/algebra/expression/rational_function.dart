@@ -1,7 +1,5 @@
 part of algebra;
 
-// To handle the ratio of polynomials, which is common in calculus, you could create a class:
-
 class RationalFunction implements Expression {
   final Polynomial numerator;
   final Polynomial denominator;

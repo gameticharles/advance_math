@@ -1,3 +1,9 @@
+## 3.3.2
+* Added some math constants
+* Fixed error in angles
+* Fixed error in parsing linear and constant polynomial strings
+* Increased the SDK
+
 ## 3.3.1
 * Added Interpolation
 

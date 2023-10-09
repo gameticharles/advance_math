@@ -12,7 +12,7 @@ class Polynomial implements Expression {
   ///
   /// The coefficients should be provided in decreasing order of degree,
   /// i.e., from the coefficient of the highest-degree term to the constant term.
-  Polynomial fromList(List<dynamic> coefficientList) {
+  static Polynomial fromList(List<dynamic> coefficientList) {
     {
       List<Number> coefficients = coefficientList
           .map((e) => e is num ? numToNumber(e) : e as Number)
@@ -69,20 +69,20 @@ class Polynomial implements Expression {
   ///
   /// Example 1:
   /// ```dart
-  /// var Polynomial = Polynomial.fromString("x^2 + 2x + 1");
-  /// print(Polynomial); // Expected output: x² + 2x + 1
+  /// var polynomial1 = Polynomial.fromString("x^2 + 2x + 1");
+  /// print(polynomial1); // Expected output: x² + 2x + 1
   /// ```
   ///
   /// Example 2:
   /// ```dart
-  /// var Polynomial = Polynomial.fromString("- 20x⁴ + 163x³ - 676x² + 1424x - 1209");
-  /// print(Polynomial); // Expected output: - 20x⁴ + 163x³ - 676x² + 1424x - 1209
+  /// var polynomial2 = Polynomial.fromString("- 20x⁴ + 163x³ - 676x² + 1424x - 1209");
+  /// print(polynomial2); // Expected output: - 20x⁴ + 163x³ - 676x² + 1424x - 1209
   /// ```
   ///
   /// Example 3:
   /// ```dart
-  /// var Polynomial = Polynomial.fromString("-1 + 2x + x^4");
-  /// print(Polynomial); // Expected output: x⁴ + 2x - 1
+  /// var polynomial3 = Polynomial.fromString("-1 + 2x + x^4");
+  /// print(polynomial3); // Expected output: x⁴ + 2x - 1
   /// ```
   factory Polynomial.fromString(String source) {
     try {
@@ -128,12 +128,15 @@ class Polynomial implements Expression {
       }
 
       var degree = matches
-          .where((m) => m.group(2) != null || m.group(5) != null)
           .map((m) => m.group(2) != null
               ? int.parse(m.group(2)!.substring(1))
-              : (m.group(1)!.contains('x') || m.group(4)!.contains('x')
-                  ? int.parse(m.group(5)!.substring(1))
-                  : 1))
+              : m.group(1)?.contains('x') ?? false
+                  ? 1
+                  : m.group(4)?.contains('x') ?? false
+                      ? m.group(5) != null
+                          ? int.parse(m.group(5)!.substring(1))
+                          : 1
+                      : 0)
           .reduce(math.max);
 
       var coefficients = List<Number>.filled(degree + 1, Integer.zero);

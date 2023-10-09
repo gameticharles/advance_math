@@ -16,6 +16,35 @@ const double pi = math.pi;
 /// ```
 const double e = math.e;
 
+/// Natural logarithm of 10.
+///
+/// The natural logarithm of 10 is the number such that `pow(E, LN10) == 10`.
+/// This value is not exact, but it is the closest representable double to the
+/// exact mathematical value.
+const double ln10 = 2.302585092994046;
+
+/// Natural logarithm of 2.
+///
+/// The natural logarithm of 2 is the number such that `pow(E, LN2) == 2`.
+/// This value is not exact, but it is the closest representable double to the
+/// exact mathematical value.
+const double ln2 = 0.6931471805599453;
+
+/// Base-2 logarithm of [e].
+const double log2e = 1.4426950408889634;
+
+/// Base-10 logarithm of [e].
+const double log10e = 0.4342944819032518;
+
+/// Square root of 1/2.
+const double sqrt1_2 = 0.7071067811865476;
+
+/// Square root of 2.
+const double sqrt2 = 1.4142135623730951;
+
+/// Square root of 3.
+const double sqrt3 = 1.7320508075688;
+
 /*
 Angle constants
  */
