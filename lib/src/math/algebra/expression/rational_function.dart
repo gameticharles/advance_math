@@ -7,12 +7,12 @@ class RationalFunction implements Expression {
   RationalFunction(this.numerator, this.denominator);
 
   @override
-  Number evaluate(dynamic x) {
+  Number evaluate([dynamic x]) {
     return numerator.evaluate(x) / denominator.evaluate(x);
   }
 
   @override
-  Expression differentiate() {
+  Expression differentiate([dynamic x]) {
     // Using the quotient rule for differentiation
     Polynomial num = (numerator.differentiate() * denominator) -
         (numerator * denominator.differentiate());
@@ -21,7 +21,7 @@ class RationalFunction implements Expression {
   }
 
   @override
-  Expression integrate() {
+  Expression integrate([dynamic start, dynamic end]) {
     // Integration of rational functions can be complex and often involves partial fraction decomposition.
     // This is just a placeholder. You'd need a robust algorithm or library for handling this.
     throw UnimplementedError(
@@ -40,5 +40,10 @@ class RationalFunction implements Expression {
   bool isInfinity(num x) {
     Number value = evaluate(x);
     return value.isInfinite;
+  }
+
+  @override
+  Expression simplify() {
+    return this;
   }
 }

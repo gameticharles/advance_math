@@ -319,7 +319,7 @@ class Polynomial implements Expression {
   /// print(quad.differentiate()); // Output: 4x - 3
   /// ```
   @override
-  dynamic differentiate([Number? x]) {
+  dynamic differentiate([dynamic x]) {
     if (coefficients.length <= 1) {
       return Polynomial([Integer.zero]);
     }
@@ -344,7 +344,7 @@ class Polynomial implements Expression {
   /// ```
   /// Assuming indefinite integral, the constant of integration (C) is 0
   @override
-  dynamic integrate([Number? start, Number? end]) {
+  dynamic integrate([dynamic start, dynamic end]) {
     var newCoefficients = <Number>[Integer.zero];
     for (var i = 0; i < coefficients.length; i++) {
       newCoefficients.add(coefficients[i] / (coefficients.length - i));
@@ -431,7 +431,7 @@ class Polynomial implements Expression {
 
   /// Evaluates the Polynomial for a given x value.
   @override
-  Number evaluate(dynamic x) {
+  Number evaluate([dynamic x]) {
     Number result = Double.zero;
     for (var i = 0; i < coefficients.length; i++) {
       result += coefficients[i] *
@@ -444,6 +444,7 @@ class Polynomial implements Expression {
   /// Simplify the Polynomial using factoring by grouping and difference of squares.
   /// This is a placeholder and should be replaced with actual implementation.
   /// Return a new simplified Polynomial
+  @override
   Polynomial simplify() {
     Number gcd = coefficients.reduce((value, element) =>
         numToNumber(math.gcd(value.toDouble(), element.toDouble())));

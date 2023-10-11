@@ -105,6 +105,11 @@ dynamic pow(dynamic x, dynamic exponent) {
       return Complex(x, 0).pow(exponent);
     }
   } else if (x is Number) {
+    if (exponent is Number) {
+      if (x is Complex) return x.pow(exponent);
+      if (x is Imaginary) return Complex.num(Double.zero, x).pow(exponent);
+      if (x is Real) return Complex.num(x, Imaginary(0)).pow(exponent);
+    }
     return x.pow(exponent);
   } else {
     throw ArgumentError('Input should be either num or Number');

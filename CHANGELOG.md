@@ -1,3 +1,7 @@
+## 3.3.3
+* Setting support for expressions
+* Fixed errors in pow for both real and Complex numbers
+
 ## 3.3.2
 * Added some math constants
 * Fixed error in angles

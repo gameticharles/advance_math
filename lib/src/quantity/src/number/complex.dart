@@ -488,7 +488,15 @@ class Complex extends Number {
       final theta = angle * exponent;
       return Number.simplifyType(Complex.fromPolar(r, theta.toDouble()));
     }
-    exponent as Complex;
+
+    if (exponent is Complex) {
+      exponent = exponent;
+    } else if (exponent is Imaginary) {
+      exponent = Complex.num(Double.zero, exponent);
+    } else if (exponent is Real) {
+      exponent = Complex.num(exponent, Imaginary(0));
+    }
+
     var r = magnitude;
     var theta = phase;
     var realExp = exponent.real;
