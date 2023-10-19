@@ -11,5 +11,7 @@ export 'src/math/geometry/geometry.dart';
 export 'src/math/algebra/algebra.dart';
 export 'src/quantity/quantity.dart';
 export 'src/interpolate/interpolate.dart';
+export 'src/num_words/num_words.dart';
 
 part 'src/utils/num_ext.dart';
+part 'src/utils/string_ext.dart';

@@ -1,3 +1,9 @@
+## 3.3.4
+* Added support for converting number to words
+* Added test for roman numerals.
+* Fixed bugs in Roman numerals
+* Added some string extension (e.g. capitalization, removeSpecialCharacters etc)
+
 ## 3.3.3
 * Setting support for expressions
 * Fixed errors in pow for both real and Complex numbers

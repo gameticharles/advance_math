@@ -1,5 +1,7 @@
 import 'package:intl/intl.dart';
 
+import 'util/romans_exception.dart';
+
 /// A class to convert between Roman and decimal numerals.
 ///
 /// The class provides functionality to represent an integer as a Roman numeral
@@ -36,24 +38,23 @@ class RomanNumerals {
   /// The integer value represented by this instance.
   final int value;
 
+  /// Determines if the numeral is represented as a negative.
+  final bool _isNegative;
+
   /// Private cache to improve performance for the conversion methods.
   static final Map<int, String> _numToRomanCache = {};
   static final Map<String, int> _romanToNumCache = {};
 
   /// Constructs a [RomanNumerals] object from a given integer [value].
   ///
-  /// Throws an [ArgumentError] if [value] is negative.
+  /// Throws an [InvalidRomanNumeralException] if [value] is negative.
   ///
   /// Example:
   /// ```dart
   /// print(RomanNumerals(69)); // LXIX
   /// print(RomanNumerals(8785)); // (VIII)DCCLXXXV
   /// ```
-  RomanNumerals(this.value) {
-    if (value < 0) {
-      throw ArgumentError('Roman numerals cannot represent negative numbers.');
-    }
-  }
+  RomanNumerals(this.value) : _isNegative = value < 0;
 
   /// Constructs a [RomanNumerals] object from a given Roman numeral [roman].
   ///
@@ -61,67 +62,67 @@ class RomanNumerals {
   /// ```dart
   /// var numeral = RomanNumerals.fromRoman('XIV'); // 14
   /// ```
-  RomanNumerals.fromRoman(String roman) : value = _fromRoman(roman);
+  RomanNumerals.fromRoman(String roman)
+      : _isNegative = roman.startsWith('-'),
+        value = _fromRoman(roman.startsWith('-') ? roman.substring(1) : roman) *
+            (roman.startsWith('-') ? -1 : 1);
 
   /// A private method to convert a Roman numeral string to an integer.
   static int _fromRoman(String roman) {
     roman = roman.toUpperCase();
 
     // Handle the special case for zero
-    if (roman == 'N') {
-      return 0;
-    }
+    if (roman == 'N') return 0;
 
     // Validate the provided Roman numeral
     if (!_validateRoman(roman)) {
-      throw ArgumentError('Invalid Roman numeral: $roman');
+      throw InvalidRomanNumeralException('Invalid Roman numeral: $roman');
     }
 
     // Using cache's putIfAbsent to streamline caching
-    return _romanToNumCache.putIfAbsent(roman, () {
-      int result = 0;
-      int prevValue = 0;
-      int i = roman.length - 1;
+    return _romanToNumCache.putIfAbsent(roman, () => _decodeRoman(roman));
+  }
 
-      while (i >= 0) {
-        // Check if the current character is a parenthesis
-        if (roman[i] == ')') {
-          // Find the matching opening parenthesis
-          int j = roman.lastIndexOf('(', i);
-          if (j == -1) {
-            throw ArgumentError('Invalid Roman numeral: $roman');
-          }
+  /// Helper method to convert a Roman numeral string to an integer
+  static int _decodeRoman(String roman) {
+    int result = 0;
+    int prevValue = 0;
+    int i = roman.length - 1;
 
-          // Convert the part of the string inside the parentheses
-          String innerRoman = roman.substring(j + 1, i);
-          int innerValue = _fromRomanWithoutParentheses(innerRoman);
-          result += innerValue * 1000;
-
-          i = j - 1;
-        } else {
-          String currentSymbol = roman[i];
-
-          int? currentValue = _numerals[currentSymbol];
-          if (currentValue == null) {
-            throw ArgumentError('Invalid Roman numeral: $roman');
-          }
-
-          if (currentValue < prevValue) {
-            result -= currentValue;
-          } else {
-            result += currentValue;
-          }
-          prevValue = currentValue;
-
-          i--;
+    while (i >= 0) {
+      // Check if the current character is a parenthesis
+      if (roman[i] == ')') {
+        // Find the matching opening parenthesis
+        int j = roman.lastIndexOf('(', i);
+        if (j == -1) {
+          throw InvalidRomanNumeralException('Invalid Roman numeral: $roman');
         }
+
+        // Convert the part of the string inside the parentheses
+        String innerRoman = roman.substring(j + 1, i);
+        int innerValue = _fromRomanWithoutParentheses(innerRoman);
+        result += innerValue * 1000;
+
+        i = j - 1;
+      } else {
+        String currentSymbol = roman[i];
+
+        int? currentValue = _numerals[currentSymbol];
+        if (currentValue == null) {
+          throw InvalidRomanNumeralException('Invalid Roman numeral: $roman');
+        }
+
+        result += (currentValue < prevValue) ? -currentValue : currentValue;
+        prevValue = currentValue;
+
+        i--;
       }
+    }
 
-      // Cache the converse for improved performance
-      _numToRomanCache[result] = roman;
+    // Cache the converse for improved performance
+    _numToRomanCache[result] = roman;
 
-      return result;
-    });
+    return result;
   }
 
   /// A helper private method to convert a Roman numeral string
@@ -136,7 +137,7 @@ class RomanNumerals {
 
       int? currentValue = _numerals[currentSymbol];
       if (currentValue == null) {
-        throw ArgumentError('Invalid Roman numeral: $roman');
+        throw InvalidRomanNumeralException('Invalid Roman numeral: $roman');
       }
 
       if (currentValue < prevValue) {
@@ -150,6 +151,66 @@ class RomanNumerals {
     }
 
     return result;
+  }
+
+  /// Converts a date represented as a string to its Roman numeral representation.
+  ///
+  /// The [date] parameter should be the date string and [format] should be the corresponding format of the date.
+  /// Supported formats are those supported by the `DateFormat` class from the `intl` package.
+  ///
+  /// The separator between the Roman numerals in the output string can also be
+  /// customized using the `sep` parameter. By default, it is ' • '.
+  ///
+  /// Example:
+  /// ```dart
+  /// print(RomanNumerals.dateToRoman('August 22, 1989', format: 'MMMM d, y')); // Outputs: VIII • XXII • MCMLXXXIX
+  /// print(RomanNumerals.dateToRoman('Dec-23, 2017', format: 'MMM-d, y'));    // Outputs: XII • XXIII • MMXVII
+  /// print(RomanNumerals.dateToRoman('Jul-21, 2016', format: 'MMM-d, y'));    // Outputs: VII • XXI • MMXVI
+  /// ```
+  ///
+  /// Returns the date in Roman numeral format.
+  static String dateToRoman(String date,
+      {String sep = ' • ', String format = 'MMM-d, y'}) {
+    // Parse the date using the provided format
+    DateTime parsedDate = DateFormat(format).parse(date);
+
+    // Convert the day, month, and year components to Roman numerals
+    String dayRoman = RomanNumerals(parsedDate.day).toRoman();
+    String monthRoman = RomanNumerals(parsedDate.month).toRoman();
+    String yearRoman = RomanNumerals(parsedDate.year).toRoman();
+
+    // Return the formatted string
+    return '$monthRoman$sep$dayRoman$sep$yearRoman';
+  }
+
+  /// Converts a Roman numeral representation of a date back to a standard date.
+  ///
+  /// The date format can be customized using the `format` parameter. By default,
+  /// the returned date will be in the format 'MMM-d, y' (e.g., 'Aug-22, 1989').
+  ///
+  /// The separator between the Roman numerals in the input string can also be
+  /// customized using the `sep` parameter. By default, it is ' • '.
+  ///
+  /// Example:
+  /// ```dart
+  /// print(RomanNumerals.romanToDate('VIII • XXII • MCMLXXXIX')); // Outputs: Aug-22, 1989
+  /// print(RomanNumerals.romanToDate('VIII・XXII・MCMLXXXIX', sep: '・', format: 'MMMM d, y')); // Outputs: August 22, 1989
+  /// ```
+  ///
+  /// Returns the date in the specified format.
+  static String romanToDate(String romanDate,
+      {String sep = ' • ', String format = 'MMM-d, y'}) {
+    final parts = romanDate.split(sep);
+    if (parts.length != 3) {
+      throw InvalidRomanNumeralException('Invalid Roman numeral date format.');
+    }
+
+    final month = RomanNumerals.fromRoman(parts[0].trim()).value;
+    final day = RomanNumerals.fromRoman(parts[1].trim()).value;
+    final year = RomanNumerals.fromRoman(parts[2].trim()).value;
+
+    final dt = DateTime(year, month, day);
+    return DateFormat(format).format(dt);
   }
 
   /// Converts the integer value of this instance to a Roman numeral string.
@@ -167,12 +228,12 @@ class RomanNumerals {
 
     // Using cache's putIfAbsent to streamline caching
     return _numToRomanCache.putIfAbsent(value, () {
-      if (value < 0) {
-        throw ArgumentError(
-            'Number out of range. Roman numerals support positive numbers.');
-      }
+      // if (value < 0) {
+      //   throw InvalidRomanNumeralException(
+      //       'Number out of range. Roman numerals support positive numbers.');
+      // }
 
-      int number = value;
+      int number = value.abs();
       StringBuffer result = StringBuffer();
 
       // If the value is more than 3999, use brackets for the thousands part
@@ -188,7 +249,7 @@ class RomanNumerals {
       // Cache the converse for improved performance
       _romanToNumCache[result.toString()] = value;
 
-      return result.toString();
+      return _isNegative ? '-${result.toString()}' : result.toString();
     });
   }
 
@@ -291,65 +352,15 @@ class RomanNumerals {
     }
   }
 
-  /// Converts a date represented as a string to its Roman numeral representation.
-  ///
-  /// The [date] parameter should be the date string and [format] should be the corresponding format of the date.
-  /// Supported formats are those supported by the `DateFormat` class from the `intl` package.
-  ///
-  /// The separator between the Roman numerals in the output string can also be
-  /// customized using the `sep` parameter. By default, it is ' • '.
-  ///
-  /// Example:
-  /// ```dart
-  /// print(RomanNumerals.dateToRoman('August 22, 1989', format: 'MMMM d, y')); // Outputs: VIII • XXII • MCMLXXXIX
-  /// print(RomanNumerals.dateToRoman('Dec-23, 2017', format: 'MMM-d, y'));    // Outputs: XII • XXIII • MMXVII
-  /// print(RomanNumerals.dateToRoman('Jul-21, 2016', format: 'MMM-d, y'));    // Outputs: VII • XXI • MMXVI
-  /// ```
-  ///
-  /// Returns the date in Roman numeral format.
-  static String dateToRoman(String date,
-      {String sep = ' • ', String format = 'MMM-d, y'}) {
-    // Parse the date using the provided format
-    DateTime parsedDate = DateFormat(format).parse(date);
+  /// Checks if the numeral is zero.
+  bool isZero() => value == 0;
 
-    // Convert the day, month, and year components to Roman numerals
-    String dayRoman = RomanNumerals(parsedDate.day).toRoman();
-    String monthRoman = RomanNumerals(parsedDate.month).toRoman();
-    String yearRoman = RomanNumerals(parsedDate.year).toRoman();
+  /// Checks if the numeral is positive.
+  bool isPositive() => value > 0 && !_isNegative;
 
-    // Return the formatted string
-    return '$monthRoman$sep$dayRoman$sep$yearRoman';
-  }
-
-  /// Converts a Roman numeral representation of a date back to a standard date.
-  ///
-  /// The date format can be customized using the `format` parameter. By default,
-  /// the returned date will be in the format 'MMM-d, y' (e.g., 'Aug-22, 1989').
-  ///
-  /// The separator between the Roman numerals in the input string can also be
-  /// customized using the `sep` parameter. By default, it is ' • '.
-  ///
-  /// Example:
-  /// ```dart
-  /// print(RomanNumerals.romanToDate('VIII • XXII • MCMLXXXIX')); // Outputs: Aug-22, 1989
-  /// print(RomanNumerals.romanToDate('VIII・XXII・MCMLXXXIX', sep: '・', format: 'MMMM d, y')); // Outputs: August 22, 1989
-  /// ```
-  ///
-  /// Returns the date in the specified format.
-  static String romanToDate(String romanDate,
-      {String sep = ' • ', String format = 'MMM-d, y'}) {
-    final parts = romanDate.split(sep);
-    if (parts.length != 3) {
-      throw ArgumentError('Invalid Roman numeral date format.');
-    }
-
-    final month = RomanNumerals.fromRoman(parts[0].trim()).value;
-    final day = RomanNumerals.fromRoman(parts[1].trim()).value;
-    final year = RomanNumerals.fromRoman(parts[2].trim()).value;
-
-    final dt = DateTime(year, month, day);
-    return DateFormat(format).format(dt);
-  }
+  /// Since Roman numerals cannot be negative, this will always return false.
+  /// However, it's added for consistency.
+  bool isNegative() => _isNegative;
 
   /// Adds the values of two [dynamic] objects and returns a new one.
   RomanNumerals operator +(dynamic other) {
@@ -361,7 +372,7 @@ class RomanNumerals {
     } else if (other is RomanNumerals) {
       newValue = value + other.value;
     } else {
-      throw ArgumentError('Not valid type for Roman numerals.');
+      throw InvalidRomanNumeralException('Not valid type for Roman numerals.');
     }
     return RomanNumerals(newValue);
   }
@@ -376,12 +387,7 @@ class RomanNumerals {
     } else if (other is RomanNumerals) {
       newValue = value - other.value;
     } else {
-      throw ArgumentError('Not valid type for Roman numerals.');
-    }
-
-    if (newValue < 0) {
-      throw ArgumentError(
-          'Result of subtraction cannot be a negative value in Roman numerals.');
+      throw InvalidRomanNumeralException('Not valid type for Roman numerals.');
     }
 
     return RomanNumerals(newValue);
@@ -397,7 +403,7 @@ class RomanNumerals {
     } else if (other is RomanNumerals) {
       newValue = value * other.value;
     } else {
-      throw ArgumentError('Not valid type for Roman numerals.');
+      throw InvalidRomanNumeralException('Not valid type for Roman numerals.');
     }
     return RomanNumerals(newValue);
   }
@@ -406,7 +412,8 @@ class RomanNumerals {
   RomanNumerals operator /(dynamic other) {
     if ((other is RomanNumerals && other.value == 0) ||
         (other is num && other <= 0)) {
-      throw ArgumentError('Division by negative or zero is not allowed.');
+      throw InvalidRomanNumeralException(
+          'Division by negative or zero is not allowed.');
     }
 
     int newValue = 0;
@@ -417,7 +424,7 @@ class RomanNumerals {
     } else if (other is RomanNumerals) {
       newValue = (value / other.value).round();
     } else {
-      throw ArgumentError('Not valid type for Roman numerals.');
+      throw InvalidRomanNumeralException('Not valid type for Roman numerals.');
     }
     return RomanNumerals(newValue);
   }
@@ -432,7 +439,7 @@ class RomanNumerals {
     } else if (other is RomanNumerals) {
       newValue = value & other.value;
     } else {
-      throw ArgumentError('Not valid type for Roman numerals.');
+      throw InvalidRomanNumeralException('Not valid type for Roman numerals.');
     }
     return RomanNumerals(newValue);
   }
@@ -447,7 +454,7 @@ class RomanNumerals {
     } else if (other is RomanNumerals) {
       newValue = value | other.value;
     } else {
-      throw ArgumentError('Not valid type for Roman numerals.');
+      throw InvalidRomanNumeralException('Not valid type for Roman numerals.');
     }
     return RomanNumerals(newValue);
   }
@@ -462,7 +469,7 @@ class RomanNumerals {
     } else if (other is RomanNumerals) {
       newValue = value ^ other.value;
     } else {
-      throw ArgumentError('Not valid type for Roman numerals.');
+      throw InvalidRomanNumeralException('Not valid type for Roman numerals.');
     }
     return RomanNumerals(newValue);
   }
@@ -477,7 +484,7 @@ class RomanNumerals {
     } else if (other is RomanNumerals) {
       newValue = value % other.value;
     } else {
-      throw ArgumentError('Not valid type for Roman numerals.');
+      throw InvalidRomanNumeralException('Not valid type for Roman numerals.');
     }
     return RomanNumerals(newValue);
   }
@@ -501,7 +508,7 @@ class RomanNumerals {
     } else if (other is RomanNumerals) {
       return value < other.value;
     } else {
-      throw ArgumentError('Not valid type for Roman numerals.');
+      throw InvalidRomanNumeralException('Not valid type for Roman numerals.');
     }
   }
 
@@ -514,7 +521,7 @@ class RomanNumerals {
     } else if (other is RomanNumerals) {
       return value <= other.value;
     } else {
-      throw ArgumentError('Not valid type for Roman numerals.');
+      throw InvalidRomanNumeralException('Not valid type for Roman numerals.');
     }
   }
 
@@ -527,7 +534,7 @@ class RomanNumerals {
     } else if (other is RomanNumerals) {
       return value > other.value;
     } else {
-      throw ArgumentError('Not valid type for Roman numerals.');
+      throw InvalidRomanNumeralException('Not valid type for Roman numerals.');
     }
   }
 
@@ -540,7 +547,7 @@ class RomanNumerals {
     } else if (other is RomanNumerals) {
       return value >= other.value;
     } else {
-      throw ArgumentError('Not valid type for Roman numerals.');
+      throw InvalidRomanNumeralException('Not valid type for Roman numerals.');
     }
   }
 

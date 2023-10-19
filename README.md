@@ -21,6 +21,7 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
 ## Features
 
 - Basic statistics: Statistics operations like mean, median, mode, min, max, variance, standardDeviation, quartiles,permutations, combinations, greatest common divisor(gcd), least common multiple(lcm).
+- Convert number types to words. It also supports to currency formats for cheques and ordinal words representations.
 - Logarithmic operations: natural logarithm of a number, base-10 logarithm and logarithm of a number to a given base.
 - Support angle conversion (degrees, minutes, seconds, radians, gradians, DMS).
 - Trigonometry: It provides computation on all the trigonometric functions on the angle. These includes inverse and hyperbolic function (sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, sec, csc, cot, asec, acsc, acot, sech, csch, coth, asech, acsch, acoth, vers, covers, havers, exsec, excsc).
@@ -85,6 +86,398 @@ print(logBase(2, 8));  // Output: 3.0
 print(logBase(2, 32));  // Output: 5.0
 ```
 
+</details>
+
+<details>
+<summary>NumOrWords</summary>
+
+# NumOrWords
+
+NumOrWords is a Dart package designed to convert numerical values into their word representations. It is highly customizable, catering to multiple languages, currency representations, and more.
+
+## Features
+
+- **Basic Number Conversion**: Convert any number into its word representation.
+- **Currency Representation**: Represent numbers in their currency form (e.g., Dollars, Euros).
+- **Decimal Precision**: Define the precision for decimal numbers.
+- **Ordinal Numbers**: Convert numbers into their ordinal form (e.g., 1st, 2nd, 3rd).
+- **Multiple Languages Support**: Easily extendable for multiple languages.
+- **Number Extension**: Conveniently use the Dart extension on numbers for quick conversion.
+
+## Basic Usage
+
+To begin, instantiate the `NumOrWords` class by providing language configurations.
+
+```dart
+var converter = NumOrWords(languages: {'en': englishConfig});
+```
+
+### Converting a Number to Words
+
+Simply call the `convert` method on the converter instance.
+
+```dart
+print(converter.toWords(45.6743));  // Forty-Five Point Six Seven Four Three
+```
+
+### Defining Decimal Precision
+
+You can also specify the precision for decimal numbers.
+
+```dart
+print(converter.toWords(45.6743, decimalPlaces: 10));  // Forty-Five Point Six Seven Four Three
+```
+
+### Currency Representation
+
+To represent numbers in their currency form, specify the currency.
+
+```dart
+print(converter.convert(45.6743, currency: usd));  // Forty-Five Dollars And Sixty-Seven Cents Only
+```
+
+## Using the Number Extension
+
+For convenience, the package also provides an extension on the number type.
+
+```dart
+print(45.67.toWords(currency: usd));  // Forty-Five Dollars And Sixty-Seven Cents Only
+```
+
+## Advanced Number Conversions
+
+The package can handle a variety of number forms and scenarios.
+
+```dart
+print(converter.toWords(0));  // Zero
+print(converter.toWords(1));  // One
+print(converter.toWords(10));  // Ten
+print(converter.toWords(100));  // One Hundred
+print(converter.toWords(101));  // One Hundred And One
+print(converter.toWords(111));  // One Hundred And Eleven
+```
+
+### Ordinal Numbers
+
+To convert numbers into their ordinal form, use the `useOrdinal` parameter.
+
+```dart
+print(converter.toWords(111, useOrdinal: true));  // One Hundred And Eleventh
+print(converter.toWords(13, useOrdinal: true));  // Thirteenth
+print(converter.toWords(21, useOrdinal: true));  // Twenty-First
+print(converter.toWords(30, useOrdinal: true));  // Thirtieth
+print(converter.toWords(40, useOrdinal: true));  // Fortieth
+```
+
+### Words to Numver 
+
+The supports only French and English for the mean time. You can convert number to either English or French and back to number with losing precision.
+
+```dart
+  void displayConversion(NumOrWords converter, num value,
+      {String lang = 'en',
+      int decimalPlaces = 2,
+      bool useOrdinal = false,
+      bool isFeminine = false,
+      Currency? currency}) {
+    var result = converter.toWords(value,
+        lang: lang,
+        decimalPlaces: decimalPlaces,
+        useOrdinal: useOrdinal,
+        isFeminine: isFeminine,
+        currency: currency);
+    print(result);
+    print(converter.toNum(result, lang: lang, currency: currency));
+    print('---');
+  }
+
+  var converter = NumOrWords();
+
+  print('--- French ---');
+  displayConversion(converter, 301, lang: 'fr', useOrdinal: true);
+  displayConversion(converter, 123, lang: 'fr', decimalPlaces: 10);
+  displayConversion(converter, 6743, lang: 'fr', decimalPlaces: 10);
+  displayConversion(converter, 123.6743, lang: 'fr', decimalPlaces: 10);
+  displayConversion(converter, 123.6743, lang: 'fr', currency: cefaCurrency);
+  displayConversion(converter, 84656789, lang: 'fr');
+  displayConversion(converter, 9181601, lang: 'fr');
+  displayConversion(converter, 8666529123484656789, lang: 'fr');
+
+  print('\n--- English ---');
+  displayConversion(converter, 301, lang: 'en', useOrdinal: true);
+  displayConversion(converter, 123, lang: 'en', decimalPlaces: 10);
+  displayConversion(converter, 6743, lang: 'en', decimalPlaces: 10);
+  displayConversion(converter, 123.6743, lang: 'en', decimalPlaces: 10);
+  displayConversion(converter, 123.6743, lang: 'en', currency: usdCurrency);
+  displayConversion(converter, 9181601, lang: 'en');
+  displayConversion(converter, 8666529123484656789, lang: 'en');
+
+
+// --- French ---
+// Trois Cents-et-Un
+// 301
+// ---
+// Cent et Vingt-et-Trois
+// 123
+// ---
+// Six Mille Sept Cents et Quarante-et-Trois
+// 6743
+// ---
+// Cent et Vingt-et-Trois Point Six Mille Sept Cents et Quarante-et-Trois
+// 123.6743
+// ---
+// Cent et Vingt-et-Trois Francs et Soixante-et-Sept Centimes Seulement
+// 123.67
+// ---
+// Quatre-Vingt-et-Quatre Million Six Cents et Cinquante-et-Six Mille Sept Cents et Quatre-Vingt-et-Neuf
+// 84656789
+// ---
+// Neuf Million Cent et Quatre-Vingt-et-Un Mille Six Cents et Un
+// 9181601
+// ---
+// Huit Trillion Six Cents et Soixante-et-Six Billiard Cinq Cents et Vingt-et-Neuf Billion Cent et Vingt-et-Trois Milliard Quatre Cents et Quatre-Vingt-et-Quatre Million Six Cents et Cinquante-et-Six Mille Sept Cents et Quatre-Vingt-et-Neuf
+// 8666529123484656789
+// ---
+//
+// --- English ---
+// Three Hundred And First
+// 301
+// ---
+// One Hundred And Twenty-Three
+// 123
+// ---
+// Six Thousand Seven Hundred And Forty-Three
+// 6743
+// ---
+// One Hundred And Twenty-Three Point Six Thousand Seven Hundred And Forty-Three
+// 123.6743
+// ---
+// One Hundred And Twenty-Three Dollars And Sixty-Seven Cents Only
+// 123.67
+// ---
+// Nine Million One Hundred And Eighty-One Thousand Six Hundred And One
+// 9181601
+// ---
+// Eight Quintillion Six Hundred And Sixty-Six Quadrillion Five Hundred And Twenty-Nine Trillion One Hundred And Twenty-Three Billion Four Hundred And Eighty-Four Million Six Hundred And Fifty-Six Thousand Seven Hundred And Eighty-Nine
+// 8666529123484656789
+// ---
+```
+
+## LanguageConfig and Currency Configurations
+
+The `LanguageConfig` and `Currency` classes are central to the NumOrWords package. They allow for deep customization and extensibility to cater to different languages and currency formats.
+
+### Currency Configuration
+
+For currency representation, you can define the singular and plural forms of both main and fractional units using the `Currency` class.
+
+These configurations (`Currency` and `LanguageConfig`) form the backbone of the NumOrWords package. By leveraging their flexibility, users can accurately convert numbers to word representations for a vast range of languages and currency formats. Whether you're targeting a single language or a global audience, NumOrWords ensures precision and extensibility.
+
+**Example:**
+
+```dart
+final Currency usd = Currency.inUnits(
+  1.0,
+  CurrencyUnits(
+    'United States Dollars',
+    '\$',
+    'USD',
+    null,
+    1.0,
+    false,
+  mainUnitSingular: 'Dollar',
+  mainUnitPlural: 'Dollars',
+  fractionalUnitSingular: 'Cent',
+  fractionalUnitPlural: 'Cents',
+  ),
+);
+
+```
+
+In the above example, the `Currency` configuration is set for US Dollars, with "Dollar" as the singular form, "Dollars" as the plural, "Cent" as the fractional singular, and "Cents" as the fractional plural.
+
+### LanguageConfig
+
+The `LanguageConfig` class provides a comprehensive configuration for number-word conversion in a specific language. It defines the word representations for different number sections, such as ones, tens, hundreds, magnitudes, etc., and also handles special conditions like ordinals.
+
+**Example:**
+
+```dart
+/// An English configuration for conversion
+final LanguageConfig englishConfig = LanguageConfig(
+  ones: {
+    '0': "Zero",
+    '1': "One",
+    '2': "Two",
+    '3': "Three",
+    '4': "Four",
+    '5': "Five",
+    '6': "Six",
+    '7': "Seven",
+    '8': "Eight",
+    '9': "Nine"
+  },
+  teens: {
+    '10': "Ten",
+    '11': "Eleven",
+    '12': "Twelve",
+    '13': "Thirteen",
+    '14': "Fourteen",
+    '15': "Fifteen",
+    '16': "Sixteen",
+    '17': "Seventeen",
+    '18': "Eighteen",
+    '19': "Nineteen"
+  },
+  tens: {
+    '2': "Twenty",
+    '3': "Thirty",
+    '4': "Forty",
+    '5': "Fifty",
+    '6': "Sixty",
+    '7': "Seventy",
+    '8': "Eighty",
+    '9': "Ninety"
+  },
+  hundreds: {
+    '1': "One Hundred",
+    '2': "Two Hundred",
+    '3': "Three Hundred",
+    '4': "Four Hundred",
+    '5': "Five Hundred",
+    '6': "Six Hundred",
+    '7': "Seven Hundred",
+    '8': "Eight Hundred",
+    '9': "Nine Hundred"
+  },
+  magnitudes: [
+    "",
+    "Thousand",
+    "Million",
+    "Billion",
+    "Trillion",
+    "Quadrillion",
+    "Quintillion",
+    "Sextillion",
+    "Septillion",
+    "Octillion",
+    "Nonillion",
+    "Decillion",
+    "Undecillion",
+    "Duodecillion",
+    "Tredecillion",
+    "Quattuordecillion",
+    "Quindecillion",
+    "Sexdecillion",
+    "Septendecillion",
+    "Octodecillion",
+    "Novemdecillion",
+    "Vigintillion"
+  ],
+  fractionalSeparator: 'Point',
+  negativeTerm: 'Negative',
+  currencySuffix: 'Only',
+  tensDelimiter: "-",
+  ordinalSuffixes: {1: "st", 2: "nd", 3: "rd", -1: "th"},
+  ordinalFunction: (value, {bool isFeminine = false}) {
+    // Helper function to get the ordinal for numbers from 1 to 19
+    String simpleOrdinal(int num) {
+      if (num == 1) return 'First';
+      if (num == 2) return 'Second';
+      if (num == 3) return 'Third';
+      if (num == 4) return 'Fourth';
+      if (num == 5) return 'Fifth';
+      if (num == 6) return 'Sixth';
+      if (num == 7) return 'Seventh';
+      if (num == 8) return 'Eighth';
+      if (num == 9) return 'Ninth';
+      if (num == 12) return 'Twelfth';
+
+      return "${englishConfig.convertChunk(num)}${englishConfig.ordinalSuffixes[-1]!}";
+    }
+
+    String twoDigitOrdinal(int num) {
+      if (num >= 10 && num < 20) {
+        // Special cases for 11th to 19th
+        return englishConfig.teens["$num"]! +
+            englishConfig.ordinalSuffixes[-1]!;
+      }
+      if (num >= 20) {
+        int tensPart = num ~/ 10;
+        int onesPart = num % 10;
+        var v = englishConfig.tens["$tensPart"]!;
+        if (onesPart == 0) {
+          return "${v.substring(0, v.length - 1)}ieth";
+        } else {
+          return "$v-${simpleOrdinal(onesPart)}";
+        }
+      }
+      return simpleOrdinal(num);
+    }
+
+    if (value < 100) {
+      return twoDigitOrdinal(value);
+    }
+
+    String cardinal = englishConfig.convertChunk(value);
+    List<String> parts = cardinal.split(' ');
+
+    // For numbers above 99, replace only the last part with its ordinal
+    String lastPartOrdinal = twoDigitOrdinal(value % 100);
+    parts[parts.length - 1] = lastPartOrdinal;
+
+    return parts.join(' ');
+  },
+  reverseOrdinalFunction: (value) {
+    value = value.replaceFirst('First', 'One');
+    value = value.replaceFirst('Second', 'Two');
+    value = value.replaceFirst('Third', 'Three');
+    value = value.replaceFirst('Fourth', 'Four');
+    value = value.replaceFirst('Fifth', 'Five');
+    value = value.replaceFirst('Sixth', 'Six');
+    value = value.replaceFirst('Seventh', 'Seven');
+    value = value.replaceFirst('Eighth', 'Eight');
+    value = value.replaceFirst('Ninth', 'Nine');
+    value = value.replaceFirst('Twelfth', 'Twelve');
+
+    // Split the input into words
+    List<String> words = value.split(RegExp(r'[\s\-]'));
+
+    if (words.last.endsWith('ieth')) {
+      value = value.replaceFirst(
+          words.last, '${words.last.substring(0, words.last.length - 4)}y');
+    } else if (words.last.endsWith('th')) {
+      value = value.replaceFirst(
+          words.last, words.last.substring(0, words.last.length - 2));
+    }
+
+    return value;
+  },
+  chunkConversionRule: (num currentValue, String word, LanguageConfig config) {
+    if (word == "Hundred") {
+      return currentValue == 0 ? 100 : currentValue * 100;
+    } else if (config.magnitudes.contains(word)) {
+      num magnitudeValue = pow(10, config.magnitudes.indexOf(word) * 3);
+      return currentValue * magnitudeValue;
+    }
+
+    return 0; // Default case, can be adjusted as needed
+  },
+  defaultConjunction: "And",
+  unitsBeforeTens: false,
+);
+
+```
+
+In the provided example, the `LanguageConfig` is set for English. It specifies the words for ones, tens, hundreds, etc., and also handles the logic for ordinals. The configuration also includes details like the word for negative numbers (`Negative`), currency suffix (`Only`), and the delimiter used between tens and ones (`-`).
+
+### Extending for Multiple Languages
+
+To support multiple languages, simply extend the `LanguageConfig` for each language and provide it to the `NumOrWords` class.
+
+## Conclusion
+
+NumOrWords offers a comprehensive solution for converting numbers into words, supporting a wide range of use-cases and customization. Whether you need simple word representation or complex multi-language support with currency, NumOrWords has got you covered.
 </details>
 
 <details>
