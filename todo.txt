@@ -1,7 +1,11 @@
-The Matrix class provides various methods and extensions for working with matrices in Dart. 
-Here is a summary of the available methods and extensions:
+
 
 https://pub.dev/packages/vector_math
+
+https://mathworld.wolfram.com/
+
+The Matrix class provides various methods and extensions for working with matrices in Dart. 
+Here is a summary of the available methods and extensions:
 
 1. Constructors:
    - Matrix() (and its variants)

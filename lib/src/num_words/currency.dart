@@ -1,4 +1,4 @@
-import '../quantity/quantity.dart';
+part of num_words;
 
 final Currency usdCurrency = Currency(
   USD: 1.0,

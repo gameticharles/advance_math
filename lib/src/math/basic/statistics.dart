@@ -150,19 +150,43 @@ int combinations(int n, int r) {
   return factorial(n) ~/ (factorial(r) * factorial(n - r));
 }
 
-/// Returns the greatest common divisor of two numbers.
+/// Returns the greatest common divisor of a list of numbers.
+///
+/// This function uses the Euclidean algorithm to compute the GCD.
+///
+/// Parameters:
+///  - [numbers]: A list of numbers for which the GCD is computed.
+///
+/// Returns:
+///  - An integer representing the GCD of the provided numbers.
 ///
 /// Example:
 /// ```dart
-/// print(gcd(48, 18));  // Output: 6
+/// print(gcdList([48, 18, 24]));  // Output: 6
 /// ```
-int gcd(num a, num b) {
-  while (b != 0) {
-    num t = b;
-    b = a % b;
-    a = t;
+num gcd(List<num> numbers) {
+  if (numbers.isEmpty) {
+    throw ArgumentError('List of numbers cannot be empty.');
   }
-  return a.toInt();
+
+  // Sort and ensure all numbers are positive
+  numbers = numbers.map((x) => x.abs()).toList()..sort();
+
+  num a = numbers.removeAt(0);
+
+  for (var b in numbers) {
+    while (true) {
+      a %= b;
+      if (a == 0) {
+        a = b;
+        break;
+      }
+      b %= a;
+      if (b == 0) break;
+    }
+  }
+
+  return a;
 }
 
 /// Returns the least common multiple of two numbers.
@@ -175,7 +199,7 @@ int lcm(num a, num b) {
   if (a == 0 || b == 0) {
     return 0;
   } else {
-    int hcf = gcd(a, b);
+    num hcf = gcd([a, b]);
     return ((a * b) ~/ hcf).abs();
   }
 }

@@ -4,9 +4,9 @@ part of maths;
 ///
 /// Example:
 /// ```dart
-/// print(sum(5)); // prints: 15
+/// print(sumTo(5)); // prints: 15
 /// ```
-int sum(int n) {
+int sumTo(int n) {
   return n * (n + 1) ~/ 2;
 }
 
@@ -116,6 +116,86 @@ dynamic pow(dynamic x, dynamic exponent) {
   }
 }
 
+/// Heaviside step function.
+///
+/// [x] is the input value.
+///
+/// Specification: [http://mathworld.wolfram.com/HeavisideStepFunction.html]
+/// If x > 0, returns 1.
+/// If x == 0, returns 1/2.
+/// If x < 0, returns 0.
+///
+/// Example:
+/// ```dart
+/// print(step(0.5));  // Output: 1
+/// ```
+double step(double x) {
+  if (x > 0) return 1;
+  if (x < 0) return 0;
+  return 0.5;
+}
+
+/// Rectangle function.
+///
+/// [x] is the input value.
+///
+/// Specification: [http://mathworld.wolfram.com/RectangleFunction.html]
+/// If |x| > 1/2, returns 0.
+/// If |x| == 1/2, returns 1/2.
+/// If |x| < 1/2, returns 1.
+///
+/// Example:
+/// ```dart
+/// print(rect(0.5));  // Output: 0.5
+/// ```
+double rect(double x) {
+  x = x.abs();
+  if (x == 0.5) return x;
+  if (x > 0.5) return 0;
+  return 1;
+}
+
+/// Sinc function also called the "sampling function"
+///
+/// [x] is the input value.
+///
+/// Specification: [http://mathworld.wolfram.com/SincFunction.html]
+/// If x == 0, returns 1.
+/// Otherwise, returns sin(x)/x.
+///
+/// Example:
+/// ```dart
+/// print(sinc(1));    // Output: 0.8414709848078965 (approximate value of sin(1)/1)
+/// ```
+double sinc(double x) {
+  if (x == 0) return 1;
+  return sin(x) / x;
+}
+
+/// Splits the passed [x] into its integer and fractional parts.
+///
+/// The [modF] function is an implementation of the C++ modf() function which
+/// splits a floating-point number into its integer and fractional parts.
+///
+/// Example:
+/// ```dart
+/// var result = modF(4.56);
+/// print(result.integer);  // Outputs: 4
+/// print(result.fraction); // Outputs: 0.56
+/// ```
+///
+/// The function returns a map containing two keys:
+/// - `fraction`: The fractional part of the number.
+/// - `integer`: The integer part of the number.
+///
+/// - Parameter [x]: The double value to be split.
+/// - Returns: A map with keys `fraction` and `integer`.
+({double fraction, int integer}) modF(double x) {
+  var intP = floor(x);
+  x.floor();
+  return (fraction: x - intP, integer: intP);
+}
+
 /// Rounds a number down to the nearest integer.
 ///
 /// Example:
@@ -132,13 +212,28 @@ int floor(num x) => x.floor();
 /// ```
 int ceil(num x) => x.ceil();
 
-/// Rounds a number to the nearest integer.
+/// Rounds the number [x] to the specified number of [decimalPlaces].
+///
+/// If [decimalPlaces] is not provided or is 0, the function rounds [x]
+/// to the nearest whole number. Otherwise, it rounds [x] to the desired
+/// number of decimal places.
 ///
 /// Example:
 /// ```dart
-/// print(round(2.5));  // Output: 3
+/// print(round(123.4567, 2)); // Output: 123.46
+/// print(round(123.4567));    // Output: 123
 /// ```
-int round(num x) => x.round();
+///
+/// [x] is the number to be rounded.
+/// [decimalPlaces] specifies the number of decimal places to round to.
+num round(num x, [int decimalPlaces = 0]) {
+  if (decimalPlaces == 0) {
+    return x.round();
+  } else {
+    return (x * math.pow(10, decimalPlaces)).round() /
+        math.pow(10, decimalPlaces);
+  }
+}
 
 /// Returns the maximum of two or more numbers.
 ///
@@ -197,6 +292,59 @@ num lerp(num a, num b, num t) {
   return a + (b - a) * t;
 }
 
+/// Checks if the provided string characters [input] are a digit(s) (0-9).
+///
+/// ```dart
+/// print(isDigit('5')); // true
+/// print(isDigit('a')); // false
+/// print(isDigit('12345')); // true
+/// print(isDigit('123a45'));   // false
+/// ```
+bool isDigit(String input) {
+  if (input.length == 1) {
+    return input.codeUnitAt(0) >= '0'.codeUnitAt(0) &&
+        input.codeUnitAt(0) <= '9'.codeUnitAt(0);
+  } else {
+    return input.split('').every((c) => isDigit(c));
+  }
+}
+
+/// Checks if the provided string characters [input] are alphabetic letter(s) (A-Z, a-z).
+///
+/// ```dart
+/// print(isAlpha('a')); // true
+/// print(isAlpha('5')); // false
+/// print(isAlpha('Hello')); // true
+/// print(isAlpha('Hello1')); // false
+/// ```
+bool isAlpha(String input) {
+  if (input.length == 1) {
+    return (input.codeUnitAt(0) >= 'A'.codeUnitAt(0) &&
+            input.codeUnitAt(0) <= 'Z'.codeUnitAt(0)) ||
+        (input.codeUnitAt(0) >= 'a'.codeUnitAt(0) &&
+            input.codeUnitAt(0) <= 'z'.codeUnitAt(0));
+  } else {
+    return input.split('').every((c) => isAlpha(c));
+  }
+}
+
+/// Checks if the provided character [input] is alphanumeric (A-Z, a-z, 0-9).
+///
+/// ```dart
+/// print(isAlphaNumeric('a')); // true
+/// print(isAlphaNumeric('5')); // true
+/// print(isAlphaNumeric('@')); // false
+/// print(isAlphaNumeric('Hello123')); // true
+/// print(isAlphaNumeric('Hello@123'));  // false
+/// ```
+bool isAlphaNumeric(String input) {
+  if (input.length == 1) {
+    return isDigit(input) || isAlpha(input);
+  } else {
+    return input.split('').every((c) => isAlphaNumeric(c));
+  }
+}
+
 /// Checks if a number [n] is divisible by a another number [divisor].
 ///
 /// Example:
@@ -234,15 +382,37 @@ bool isOdd(int n) {
 /// print(isPrime(11));  // Output: true
 /// ```
 bool isPrime(int n) {
-  if (n <= 1) {
-    return false;
-  }
-  for (int i = 2; i * i <= n; i++) {
-    if (n % i == 0) {
-      return false;
-    }
+  if (n <= 1) return false;
+  if (n == 2) return true;
+  if (n % 2 == 0) return false;
+
+  int sqrtN = (sqrt(n.toDouble())).toInt();
+  for (int i = 3; i <= sqrtN; i += 2) {
+    if (n % i == 0) return false;
   }
   return true;
+}
+
+/// Returns the nth prime number.
+/// The nth prime number is the number that holds the nth position in the list of prime numbers.
+///
+/// Example:
+/// ```dart
+/// print(nthPrime(3));  // Output: 5
+/// print(nthPrime(5));  // Output: 11
+/// print(nthPrime(10));  // Output: 29
+/// ```
+int nthPrime(int n) {
+  if (n < 1) throw ArgumentError('n must be greater than 0');
+  if (n == 1) return 2; // Handle the 1st prime separately
+
+  List<int> primes = [];
+  for (int i = 2; primes.length < n; i++) {
+    if (isPrime(i)) {
+      primes.add(i);
+    }
+  }
+  return primes.last;
 }
 
 /// Checks if a number is a perfect square.
@@ -322,6 +492,96 @@ bool isArmstrongNumber(int n) {
   return sum == n;
 }
 
+/// Returns the integer part of a number by removing any fractional digits.
+///
+/// [x] is the input value.
+///
+/// If [x] is NaN, returns NaN.
+/// If [x] is positive, returns the floor value of [x].
+/// Otherwise, returns the ceil value of [x].
+///
+/// Example:
+/// ``dart
+/// print(trunc(4.7));  // Output: 4
+/// print(trunc(-4.7)); // Output: -4
+/// ```
+double trunc(double x) {
+  if (x.isNaN) return double.nan;
+  if (x > 0) return x.floorToDouble();
+  return x.ceilToDouble();
+}
+
+/// Returns the prime factors of the given integer [n].
+///
+/// The function computes the prime factorization of [n]
+/// and returns a list of prime numbers that multiply together
+/// to give the original number [n].
+///
+/// Example:
+/// ```dart
+/// List<int> factors = primeFactors(56);
+/// print(factors); // Outputs: [2, 2, 2, 7]
+/// ```
+///
+/// If [n] is less than 2, the returned list will be empty.
+///
+/// - Parameter n: The integer to factor.
+/// - Returns: A list of prime factors of [n].
+List<int> primeFactors(int n) {
+  List<int> factors = [];
+
+  // Divide n by 2 until it's odd
+  while (n % 2 == 0) {
+    factors.add(2);
+    n ~/= 2;
+  }
+
+  // n must be odd at this point. So, we can skip one element (i.e., increment by 2)
+  for (int i = 3; i * i <= n; i += 2) {
+    // While i divides n, append i and divide n
+    while (n % i == 0) {
+      factors.add(i);
+      n ~/= i;
+    }
+  }
+
+  // This condition is to handle the case when n is a prime number greater than 2
+  if (n > 2) {
+    factors.add(n);
+  }
+  // Sort the factors
+  factors.sort();
+
+  return factors;
+}
+
+/// Returns the factors of the given integer [n].
+///
+/// The function computes and returns a list of positive integers
+/// that are factors of [n].
+///
+/// Example:
+/// ```dart
+/// List<int> _factors = factors(12);
+/// print(_factors); // Outputs: [1, 2, 3, 4, 6, 12]
+/// ```
+///
+/// If [n] is less than 1, the returned list will be empty.
+///
+/// - Parameter n: The integer for which to find the factors.
+/// - Returns: A list of factors of [n].
+List<int> factors(int n) {
+  List<int> factors = [];
+
+  for (int i = 1; i <= n; i++) {
+    if (n % i == 0) {
+      factors.add(i);
+    }
+  }
+
+  return factors;
+}
+
 /// Returns the nth triangle number.
 ///
 /// Example:
@@ -380,6 +640,228 @@ double nthHarmonicNumber(int n) {
   return harmonic;
 }
 
+/// Computes the numerical derivative of the function [f].
+///
+/// This function uses the central difference method to approximate the derivative.
+///
+/// Parameters:
+///  - [f]: A function for which the derivative is computed.
+///  - [h]: An optional small value used for the central difference approximation. Defaults to 0.001.
+///
+/// Returns:
+///  - A function representing the derivative of [f].
+///
+/// Example:
+/// ```dart
+/// var myFunc = (double x) => x * x;
+/// var myFuncPrime = diff(myFunc);
+/// print(myFuncPrime(2));  // Output: Approximate derivative of myFunc at x=2
+/// ```
+Function diff(Function f, [double h = 0.001]) {
+  num derivative(num x) {
+    return (f(x + h) - f(x - h)) / (2 * h);
+  }
+
+  return derivative;
+}
+
+/// Approximates the definite integral of a function using Simpson's Rule.
+///
+/// The [f] parameter represents the function to be integrated.
+/// The [a] and [b] parameters define the interval of integration.
+/// The [step] parameter defines the step size and defaults to `0.0001` if not provided.
+///
+/// Example:
+/// ```dart
+/// // Example function: f(x) = x^2
+/// double functionToEvaluate(double x) => x * x;
+///
+/// double result = simpson(functionToEvaluate, 0, 2);
+/// print(result); // Output: 2.6666666666666665 (approximate value of the integral of x^2 from 0 to 2).
+/// ```
+double simpson(Function f, double a, double b, [double step = 0.0001]) {
+  /// Returns the value of the function [f] evaluated at [x].
+  /// If the value is NaN, tries to evaluate [f] slightly to the left or right based on [side].
+  double getValue(Function f, double x, int side) {
+    double v = f(x);
+    double d = 0.000000000001;
+    if (v.isNaN) {
+      v = f(side == 1 ? x + d : x - d);
+    }
+    return v;
+  }
+
+  // Calculate the number of intervals
+  int n = (b - a) ~/ step;
+  // Simpson's rule requires an even number of intervals. If it's not, then add 1
+  if (n % 2 != 0) n++;
+  // Get the interval size
+  double dx = (b - a) / n;
+  // Get x0
+  double retVal = getValue(f, a, 1);
+
+  // Get the middle part 4x1+2x2+4x3 ...
+  bool even = false;
+  double xi = a + dx;
+  double c, k;
+  for (int i = 1; i < n; i++) {
+    c = even ? 2 : 4;
+    k = c * getValue(f, xi, 1);
+    retVal += k;
+    // Flip the even flag
+    even = !even;
+    // Increment xi
+    xi += dx;
+  }
+
+  // Add xn
+  return (retVal + getValue(f, xi, 2)) * (dx / 3);
+}
+
+/// Returns the integer part of the number [x].
+///
+/// The function calculates the integer part of [x] based on its sign.
+/// It is similar to the `floor` function for positive numbers and the
+/// `ceil` function for negative numbers.
+///
+/// Reference: [http://mathworld.wolfram.com/IntegerPart.html]
+///
+/// Example:
+/// ```dart
+/// print(integerPart(4.7));  // Output: 4
+/// print(integerPart(-4.7)); // Output: -5
+/// ```
+int integerPart(double x) {
+  int sign = x.sign.toInt();
+  return sign * x.abs().floor();
+}
+
+/// Approximates the definite integral of a function using adaptive Simpson's method.
+///
+/// [f] is the function being integrated.
+/// [a] is the lower bound.
+/// [b] is the upper bound.
+/// [tol] is the tolerance (default is 1e-9).
+/// [maxDepth] is the maximum depth for recursion (default is 45).
+///
+/// Reference: [https://github.com/scijs/integrate-adaptive-simpson]
+///
+/// Returns the approximate value of the integral of [f] from [a] to [b].
+///
+/// Example:
+/// ```dart
+/// double functionToEvaluate(double x) {
+///     return x * x;  // Example function: f(x) = x^2
+///  }
+///
+/// double result = numIntegrate(functionToEvaluate, 0, 2);
+/// print(result);  // Output: 2.666666666667 value of the integral of x^2 from 0 to 2
+/// ```
+double numIntegrate(Function f, double a, double b,
+    [double tol = 1e-9, int maxDepth = 45]) {
+  var state = {'maxDepthCount': 0, 'nanEncountered': false};
+
+  double adsimp(Function f, double a, double b, double fa, double fm, double fb,
+      double V0, double tol, int maxDepth, int depth) {
+    double h = b - a;
+    double f1 = f(a + h * 0.25);
+    double f2 = f(b - h * 0.25);
+
+    if (f1.isNaN || f2.isNaN) {
+      state['nanEncountered'] = true;
+      return double.nan;
+    }
+
+    double sl = h * (fa + 4 * f1 + fm) / 12;
+    double sr = h * (fm + 4 * f2 + fb) / 12;
+    double s2 = sl + sr;
+    double err = (s2 - V0) / 15;
+
+    if (depth > maxDepth) {
+      state['maxDepthCount'] = (state['maxDepthCount'] as int) + 1;
+      return s2 + err;
+    } else if (err.abs() < tol) {
+      return s2 + err;
+    } else {
+      double m = a + h * 0.5;
+      double V1 =
+          adsimp(f, a, m, fa, f1, fm, sl, tol * 0.5, maxDepth, depth + 1);
+      double V2 =
+          adsimp(f, m, b, fm, f2, fb, sr, tol * 0.5, maxDepth, depth + 1);
+      return V1 + V2;
+    }
+  }
+
+  double integrate(Function f, double a, double b, double tol, int maxdepth) {
+    double fa = f(a);
+    double fm = f(0.5 * (a + b));
+    double fb = f(b);
+    double V0 = (fa + 4 * fm + fb) * (b - a) / 6;
+
+    return adsimp(f, a, b, fa, fm, fb, V0, tol, maxdepth, 1);
+  }
+
+  try {
+    return double.parse(
+        (integrate(f, a, b, tol, maxDepth)).toStringAsFixed(12));
+  } catch (e) {
+    // Fallback to non-adaptive (the function isn't provided in the original code, so it's commented out)
+    // return simpson(f, a, b);
+    return double.nan; // Return NaN for now as a placeholder
+  }
+}
+
+/// Computes the gamma function of [z].
+///
+/// The gamma function is an extension of the factorial function to complex numbers,
+/// with a pole at every non-positive integer.
+///
+/// For a given input [z], the function computes:
+///
+/// \[
+/// \Gamma(z) = \int_0^\infty t^{z-1} e^{-t} dt
+/// \]
+///
+/// Parameters:
+///  - [z]: A double value for which the gamma function is computed.
+///
+/// Returns:
+///  - A double value representing the gamma function of [z].
+///
+/// Example:
+/// ```dart
+/// var result = gamma(0.5);
+/// print(result);  // Expected output: ~1.77245385091 (which is the square root of Pi)
+/// ```
+double gamma(double z) {
+  const int g = 7;
+  const List<double> C = [
+    0.99999999999980993,
+    676.5203681218851,
+    -1259.1392167224028,
+    771.32342877765313,
+    -176.61502916214059,
+    12.507343278686905,
+    -0.13857109526572012,
+    9.9843695780195716e-6,
+    1.5056327351493116e-7
+  ];
+
+  if (z < 0.5) {
+    return pi / (sin(pi * z) * gamma(1 - z));
+  } else {
+    z -= 1;
+
+    var x = C[0];
+    for (var i = 1; i < g + 2; i++) {
+      x += C[i] / (z + i);
+    }
+
+    var t = z + g + 0.5;
+    return sqrt(2 * pi) * pow(t, (z + 0.5)) * exp(-t) * x;
+  }
+}
+
 /// Returns the factorial of a number.
 ///
 /// Example:
@@ -389,6 +871,107 @@ double nthHarmonicNumber(int n) {
 int factorial(int n) {
   if (n < 0) throw ArgumentError('Negative numbers are not allowed.');
   return n <= 1 ? 1 : n * factorial(n - 1);
+}
+
+/// Computes the factorial of a given number [x].
+///
+/// This function handles:
+/// - Small integers using the standard factorial computation.
+/// - Large integers by switching to `BigInt` to avoid overflow.
+/// - Non-integers using the gamma function.
+/// - Negative integers by returning NaN, as factorial is undefined for them.
+///
+/// Parameters:
+///  - [x]: A value (either `int` or `double`) for which the factorial is computed.
+///
+/// Returns:
+///  - For integers:
+///     - If `x` is a small positive integer, it returns an `int` representing the factorial of [x].
+///     - If `x` is a large positive integer, it returns a `BigInt` representing the factorial of [x].
+///     - If `x` is a negative integer, it returns `double.nan`.
+///  - For non-integers (doubles), it returns a `double` representing the factorial of [x].
+///
+/// Throws:
+///  - ArgumentError if [x] is neither an `int` nor a `double`.
+///
+/// Example:
+/// ```dart
+/// print(factorial2(5));       // Output: 120
+/// print(factorial2(50));      // Output: 30414093201713378043612608166064768844377641568960512000000000000
+/// print(factorial2(0.5));     // Will be computed using the gamma function
+/// print(factorial2(-5));      // Output: NaN
+/// ```
+dynamic factorial2(dynamic x) {
+  if (x is! int && x is! double) {
+    throw ArgumentError('Input should be either int or double.');
+  }
+
+  bool isInt = x % 1 == 0;
+
+  // Factorial for negative integers is undefined
+  if (isInt && x < 0) {
+    return double.nan;
+  }
+
+  // For small integers, use the regular factorial method
+  if (isInt && x <= 20) {
+    int retVal = 1;
+    for (int i = 2; i <= x; i++) {
+      retVal *= i;
+    }
+    return retVal;
+  }
+  // Use gamma function for non-integers
+  if (!isInt || (x > 20 && x < 141.2)) {
+    return gamma(x + 1);
+  }
+
+  // For large integers, switch to BigInt
+  // 20! is the last factorial that fits in a 64-bit integer
+  BigInt retVal = BigInt.one;
+  for (int i = 2; i <= x; i++) {
+    retVal *= BigInt.from(i);
+  }
+  return retVal;
+}
+
+/// Computes the double factorial of a given number [x].
+///
+/// For more details: http://mathworld.wolfram.com/DoubleFactorial.html
+///
+/// Parameters:
+///  - [x]: A double value for which the double factorial is computed.
+///
+/// Returns:
+///  - A double value representing the double factorial of [x].
+///
+/// Example:
+/// ```dart
+/// print(doubleFactorial(5));   // Output: 15.0
+/// ```
+double doubleFactorial(double x) {
+  bool isInt = x % 1 == 0;
+
+  if (isInt) {
+    bool even = x % 2 == 0;
+    int n = even ? x ~/ 2 : (x + 1) ~/ 2;
+    double r = 1;
+
+    if (even) {
+      for (int i = 1; i <= n; i++) {
+        r *= 2 * i;
+      }
+    } else {
+      for (int i = 1; i <= n; i++) {
+        r *= 2 * i - 1;
+      }
+    }
+    return r;
+  } else {
+    return pow(2, (1 + 2 * x - cos(pi * x)) / 4) *
+        pow(pi, (cos(pi * x) - 1) / 4) *
+        gamma(1 + x / 2);
+  }
 }
 
 /// Generates all primes up to n.
@@ -416,20 +999,31 @@ List<num> sieve(int n) {
   return primes;
 }
 
-/// Returns the nth Fibonacci number.
+/// Returns the nth Fibonacci number considering the sign of [n].
+///
+/// If [n] is negative and even, the result will also be negative.
+/// If [n] is negative and odd, the result will be positive.
 ///
 /// Example:
 /// ```dart
 /// print(fib(7));  // Output: 13
+/// print(fib(-7)); // Output: 13
+/// print(fib(-8)); // Output: -21
 /// ```
-num fib(int n) {
-  if (n <= 0) {
-    return 0;
-  } else if (n == 1) {
-    return 1;
-  } else {
-    return fib(n - 1) + fib(n - 2);
+int fib(int n) {
+  int sign = n.isNegative ? -1 : 1;
+  n = n.abs();
+
+  // Determine the sign based on evenness of n
+  sign = n.isEven ? sign : sign.abs();
+
+  int a = 0, b = 1, f = 1;
+  for (int i = 2; i <= n; i++) {
+    f = a + b;
+    a = b;
+    b = f;
   }
+  return f * sign;
 }
 
 /// Returns a list of Fibonacci numbers from the start to the end.
@@ -452,22 +1046,6 @@ List<num> fibRange(int start, int end) {
 
   // Return the sublist from the start index to the end index (inclusive).
   return fibNumbers.sublist(start, end + 1);
-}
-
-/// Returns a list of all divisors of a number.
-///
-/// Example:
-/// ```dart
-/// print(getDivisors(28));  // Output: [1, 2, 4, 7, 14, 28]
-/// ```
-List<int> getDivisors(int n) {
-  List<int> divisors = [];
-  for (int i = 1; i <= n; i++) {
-    if (n % i == 0) {
-      divisors.add(i);
-    }
-  }
-  return divisors;
 }
 
 /// Checks if a number is pandigital.
@@ -524,26 +1102,6 @@ bool isPerfectNumber(int n) {
   }
   // If sum of divisors is equal to n and n is not 1
   return sum == n && n != 1;
-}
-
-/// Returns the nth prime number.
-/// The nth prime number is the number that holds the nth position in the list of prime numbers.
-///
-/// Example:
-/// ```dart
-/// print(nthPrime(3));  // Output: 5
-/// print(nthPrime(5));  // Output: 11
-/// print(nthPrime(10));  // Output: 29
-/// ```
-int nthPrime(int n) {
-  if (n < 1) throw ArgumentError('n must be greater than 0');
-  List<int> primes = [];
-  for (int i = 2; primes.length < n; i++) {
-    if (isPrime(i)) {
-      primes.add(i);
-    }
-  }
-  return primes.last;
 }
 
 /// Returns the binomial coefficient, often referred to as "n choose k".

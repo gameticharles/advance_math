@@ -9,6 +9,7 @@ part 'statistics.dart';
 part 'constants.dart';
 part 'trigonometry.dart';
 part 'logarithm.dart';
+part 'extension.dart';
 
 /// A generator of random bool, int, or double values.
 ///

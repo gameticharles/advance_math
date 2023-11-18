@@ -378,27 +378,67 @@ class Polynomial implements Expression {
     return evaluate(x).isInfinite;
   }
 
+  /// Convert superscripts to normal digits
+  static final _superscripts = {
+    '¹': '1',
+    '²': '2',
+    '³': '3',
+    '⁴': '4',
+    '⁵': '5',
+    '⁶': '6',
+    '⁷': '7',
+    '⁸': '8',
+    '⁹': '9',
+    '⁰': '0',
+  };
+
+  static bool isPolynomial(String expression) {
+    expression = expression.replaceAllMapped(
+      RegExp(
+          r'x([\u2070-\u2079\u00B9\u00B2\u00B3]+)|([\u2070-\u2079\u00B9\u00B2\u00B3]+)'),
+      (match) {
+        if (match.group(1) != null) {
+          // This is the case when 'x' is followed by superscripts
+          return 'x^${match.group(1)!.split('').map((digit) => _superscripts[digit]!).join()}';
+        } else {
+          // This is the case when only superscripts are matched
+          return match
+              .group(2)!
+              .split('')
+              .map((digit) => _superscripts[digit]!)
+              .join();
+        }
+      },
+    );
+
+    // Check if any term has a negative or fractional exponent
+    final RegExp expPattern = RegExp(r"x\^-?\d+|x\^\d+/\d+");
+    if (expPattern.hasMatch(expression)) {
+      return false;
+    }
+
+    // Check for any non-polynomial functions
+    final RegExp nonPolyPattern = RegExp(r"\w+\(x\)");
+    if (nonPolyPattern.hasMatch(expression)) {
+      return false;
+    }
+
+    // If the expression passed the above checks, it's a polynomial
+    return true;
+  }
+
   @override
   String toString() {
-    final superscripts = {
-      '1': '¹',
-      '2': '²',
-      '3': '³',
-      '4': '⁴',
-      '5': '⁵',
-      '6': '⁶',
-      '7': '⁷',
-      '8': '⁸',
-      '9': '⁹',
-      '0': '⁰',
-    };
+    // if (coefficients.every((coeff) => coeff == Integer.zero)) {
+    //   return "0";
+    // }
 
     // Polynomial to convert an integer to its superscript representation
     String toSuperscript(Number number) {
       return number
           .toString()
           .split('')
-          .map((digit) => superscripts[digit]!)
+          .map((digit) => _superscripts[digit]!)
           .join();
     }
 
@@ -447,7 +487,7 @@ class Polynomial implements Expression {
   @override
   Polynomial simplify() {
     Number gcd = coefficients.reduce((value, element) =>
-        numToNumber(math.gcd(value.toDouble(), element.toDouble())));
+        numToNumber(math.gcd([value.toDouble(), element.toDouble()])));
 
     List<Number> newCoefficients = coefficients.map((c) => c ~/ gcd).toList();
 

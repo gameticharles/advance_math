@@ -1,9 +1,6 @@
-import '../quantity/number.dart';
-import '../quantity/src/si/types/currency.dart';
-import 'languages.dart';
-import 'num_words.dart';
+part of num_words;
 
-extension NumOrWordsExtension on num {
+extension NumWordsExtension on num {
   String toWords({
     String lang = 'en',
     String? conjunction,
@@ -12,7 +9,7 @@ extension NumOrWordsExtension on num {
     bool useOrdinal = false,
   }) {
     var converter =
-        NumOrWords(languages: {'en': englishConfig, 'fr': frenchConfig});
+        NumWords(languages: {'en': englishConfig, 'fr': frenchConfig});
     return converter.toWords(
       this,
       lang: lang,
@@ -32,7 +29,7 @@ extension NumberToWordsExtension on Number {
     bool useOrdinal = false,
   }) {
     var converter =
-        NumOrWords(languages: {'en': englishConfig, 'fr': frenchConfig});
+        NumWords(languages: {'en': englishConfig, 'fr': frenchConfig});
     return converter.toWords(
       numberToNum(this),
       lang: lang,

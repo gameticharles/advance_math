@@ -1,3 +1,9 @@
+## 3.3.5
+* Added morse code
+* Added more math functions
+* Improved documentation and performance
+* Fixed bugs and aligned code
+
 ## 3.3.4
 * Added support for converting number to words
 * Added test for roman numerals.

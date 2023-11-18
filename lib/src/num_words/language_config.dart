@@ -1,3 +1,5 @@
+part of num_words;
+
 typedef Base20Converter = String Function(int value);
 
 /// Represents the configuration for converting numbers to words in a specific language.

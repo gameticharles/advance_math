@@ -2,8 +2,10 @@ library num_words;
 
 import 'package:advance_math/advance_math.dart';
 
-import 'language_config.dart';
-import 'languages.dart';
+part 'currency.dart';
+part 'language_config.dart';
+part 'languages.dart';
+part 'ext.dart';
 
 /// A utility class to convert numerical values to their word representation
 /// in various languages with support for currency and ordinal conversion.
@@ -12,14 +14,14 @@ import 'languages.dart';
 /// var converter = NumOrWords(languages: {'en': englishConfig});
 /// print(converter.convert(45.67));  // Outputs: Forty-Five Point Sixty-Seven
 /// ```
-class NumOrWords {
+class NumWords {
   /// Map of supported languages and their configurations.
   final Map<String, LanguageConfig> languages;
 
   /// Default currency configuration for the conversion.
   final Currency? defaultCurrency;
 
-  /// Creates an instance of [NumOrWords] with English as the default language.
+  /// Creates an instance of [NumWords] with English as the default language.
   ///
   /// ```dart
   /// var converter = NumOrWords();
@@ -28,7 +30,7 @@ class NumOrWords {
   /// [languages] is a map of supported languages and their configurations. By default, only English is supported.
   /// [defaultCurrency] provides a default currency configuration for the conversion.
   /// [fractionalSeparator] specifies the default separator for fractional parts.
-  NumOrWords({
+  NumWords({
     Map<String, LanguageConfig>? languages,
     this.defaultCurrency,
   }) : languages = languages ?? {'en': englishConfig, 'fr': frenchConfig};

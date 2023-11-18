@@ -1,6 +1,4 @@
-import 'dart:math';
-
-import 'language_config.dart';
+part of num_words;
 
 /// An English configuration for conversion
 final LanguageConfig englishConfig = LanguageConfig(

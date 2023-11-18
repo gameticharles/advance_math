@@ -5,7 +5,17 @@ void printLine(String s) {
   print('\n$l$s $l\n');
 }
 
-void main() {
+void main(List<String> args) {
+  print(gcd([-4.5, 18])); // Output: 6
+
+  print(gcd([-12, -18, -24])); // Output: 6
+
+  print(nthPrime(2));
+
+  print(Fraction.tryParse("4 8/2")!.isImproper());
+}
+
+void main1() {
   var vertices = [
     Point(1613.26, 2418.11),
     Point(1806.71, 2523.16),
