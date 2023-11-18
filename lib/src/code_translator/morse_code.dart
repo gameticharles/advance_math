@@ -192,10 +192,12 @@ class MorseCodeTranslator {
           .split(wordDelimiter)
           .map((word) => word
               .split(charDelimiter)
-              .map((code) => code == newlineDelimiter
-                  ? '\n'
-                  : (throw FormatException(
-                      'Unsupported Morse code sequence: $code')))
+              .map((code) =>
+                  _reverseMorseCodeMap[code] ??
+                  (code == newlineDelimiter
+                      ? '\n'
+                      : throw FormatException(
+                          'Unsupported Morse code sequence: $code')))
               .join(''))
           .join(' ');
 
@@ -224,32 +226,4 @@ class MorseCodeTranslator {
   void setLogging(bool enabled) {
     _loggingEnabled = enabled;
   }
-}
-
-void main() {
-  var rateLimiter = RateLimiter(
-    maxRequests: 10,
-    interval: Duration(seconds: 10),
-  );
-  var translator = MorseCodeTranslator(
-    loggingEnabled: true,
-    rateLimiter: rateLimiter,
-  );
-  var encoded = translator.encode('SOS');
-  print('Encoded: $encoded');
-
-  var decoded = translator.decode(encoded);
-  print('Decoded: $decoded');
-
-  print('');
-
-  encoded = translator.encode('Enable logging for debugging');
-  decoded = translator.decode(encoded);
-  print('Decoded: $decoded');
-
-  print('');
-  String decodingValue =
-      ".... .. / - .... . .-. . / .... --- .-- / .- .-. . / -.-- --- ..- ..--..";
-  decoded = translator.decode(decodingValue);
-  print('Decoded: $decoded');
 }
