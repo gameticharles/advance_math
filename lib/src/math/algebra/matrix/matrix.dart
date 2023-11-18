@@ -250,9 +250,10 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// 2 5 8
   /// 3 6 9
   /// ```
-  factory Matrix.fromColumns(List<Column> columns, {bool resize = false}) {
+  factory Matrix.fromColumns(List<ColumnMatrix> columns,
+      {bool resize = false}) {
     final numRows = columns[0].rowCount;
-    for (Column col in columns) {
+    for (ColumnMatrix col in columns) {
       if (col.rowCount != numRows) {
         throw Exception('All columns must have the same number of rows');
       }
@@ -287,9 +288,9 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// 4 5 6
   /// 7 8 9
   /// ```
-  factory Matrix.fromRows(List<Row> rows, {bool resize = false}) {
+  factory Matrix.fromRows(List<RowMatrix> rows, {bool resize = false}) {
     final numCols = rows[0].columnCount;
-    for (Row row in rows) {
+    for (RowMatrix row in rows) {
       if (row.columnCount != numCols) {
         throw Exception('All rows must have the same number of columns');
       }
@@ -1104,7 +1105,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// // Matrix: 1x2
   /// // [ 3 4 ]
   /// ```
-  Row row(int index) => Row(_data[index]);
+  RowMatrix row(int index) => RowMatrix(_data[index]);
 
   /// Returns the column at the specified index as a Column object.
   ///
@@ -1120,7 +1121,8 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// // ┌ 2 ┐
   /// // └ 4 ┘
   /// ```
-  Column column(int index) => Column(_data.map((row) => row[index]).toList());
+  ColumnMatrix column(int index) =>
+      ColumnMatrix(_data.map((row) => row[index]).toList());
 
   /// Extracts the diagonal elements from the matrix based on the given offset.
   ///

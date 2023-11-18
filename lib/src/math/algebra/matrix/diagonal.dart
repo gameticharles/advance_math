@@ -17,10 +17,10 @@ part of algebra;
 /// 0 2 0
 /// 0 0 3
 /// ```
-class Diagonal extends Matrix {
+class DiagonalMatrix extends Matrix {
   /// Creates a `Diagonal` matrix using a list of dynamic data.
   /// The provided list `data` contains the elements of the main diagonal.
-  Diagonal(List<dynamic> data) : super(_createDiagonalMatrix(data));
+  DiagonalMatrix(List<dynamic> data) : super(_createDiagonalMatrix(data));
 
   /// Generates the 2D list for the diagonal matrix based on the provided `data`.
   static List<List<dynamic>> _createDiagonalMatrix(List<dynamic> data) {

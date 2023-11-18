@@ -84,7 +84,7 @@ class LeastSquares extends BaseLeastSquares {
   ///
   /// The `method` parameter is an optional parameter specifying the equation method to be used.
   /// By default, it is set to `EquationMethod.linear`.
-  LeastSquares(Matrix A, Column b, Diagonal W,
+  LeastSquares(Matrix A, ColumnMatrix b, DiagonalMatrix W,
       {EquationMethod method = EquationMethod.linear})
       : super(A, b, W: W, method: method);
 }
@@ -111,8 +111,8 @@ class OrdinaryLeastSquares extends BaseLeastSquares {
   ///
   /// The `method` parameter is an optional parameter specifying the equation method to be used.
   /// By default, it is set to `EquationMethod.linear`.
-  OrdinaryLeastSquares(Matrix A, Column b,
-      {Diagonal? W, EquationMethod method = EquationMethod.linear})
+  OrdinaryLeastSquares(Matrix A, ColumnMatrix b,
+      {DiagonalMatrix? W, EquationMethod method = EquationMethod.linear})
       : super(A, b, method: method);
 }
 
@@ -141,7 +141,7 @@ class WeightedLeastSquares extends BaseLeastSquares {
   ///
   /// The `method` parameter is an optional parameter specifying the equation method to be used.
   /// By default, it is set to `EquationMethod.linear`.
-  WeightedLeastSquares(Matrix A, Column b, Diagonal W,
+  WeightedLeastSquares(Matrix A, ColumnMatrix b, DiagonalMatrix W,
       {EquationMethod method = EquationMethod.linear})
       : super(A, b, W: W, method: method);
 
@@ -183,7 +183,7 @@ class GeneralizedLeastSquares extends BaseLeastSquares {
   ///
   /// The `method` parameter is an optional parameter specifying the equation method to be used.
   /// By default, it is set to `EquationMethod.linear`.
-  GeneralizedLeastSquares(Matrix A, Column b, Diagonal W,
+  GeneralizedLeastSquares(Matrix A, ColumnMatrix b, DiagonalMatrix W,
       {EquationMethod method = EquationMethod.linear})
       : super(A, b, W: W, method: method);
 
@@ -210,7 +210,7 @@ class TotalLeastSquares extends BaseLeastSquares {
   ///
   /// [A] is the matrix of observations, [b] is the vector of dependent variable values
   /// [method] determines the solving method, defaults to linear.
-  TotalLeastSquares(Matrix A, Column b,
+  TotalLeastSquares(Matrix A, ColumnMatrix b,
       {EquationMethod method = EquationMethod.linear})
       : super(A, b, method: method);
 
@@ -293,8 +293,8 @@ class TotalLeastSquares extends BaseLeastSquares {
 class RidgeRegression extends BaseLeastSquares {
   final double alpha;
 
-  RidgeRegression(Matrix A, Column b, this.alpha,
-      {Diagonal? W, EquationMethod method = EquationMethod.linear})
+  RidgeRegression(Matrix A, ColumnMatrix b, this.alpha,
+      {DiagonalMatrix? W, EquationMethod method = EquationMethod.linear})
       : super(A, b, W: W, method: method);
 
   @override
@@ -345,8 +345,8 @@ class RidgeRegression extends BaseLeastSquares {
 class LassoRegression extends BaseLeastSquares {
   final double alpha;
 
-  LassoRegression(Matrix A, Column b, this.alpha,
-      {Diagonal? W, EquationMethod method = EquationMethod.linear})
+  LassoRegression(Matrix A, ColumnMatrix b, this.alpha,
+      {DiagonalMatrix? W, EquationMethod method = EquationMethod.linear})
       : super(A, b, W: W, method: method);
 
   @override
@@ -387,8 +387,8 @@ class ElasticNetRegression extends BaseLeastSquares {
   final double alpha;
   final double l1Ratio;
 
-  ElasticNetRegression(Matrix A, Column b, this.alpha, this.l1Ratio,
-      {Diagonal? W, EquationMethod method = EquationMethod.linear})
+  ElasticNetRegression(Matrix A, ColumnMatrix b, this.alpha, this.l1Ratio,
+      {DiagonalMatrix? W, EquationMethod method = EquationMethod.linear})
       : super(A, b, W: W, method: method);
 
   @override
@@ -418,8 +418,8 @@ class ElasticNetRegression extends BaseLeastSquares {
 /// // Output: Column Matrix of the residuals (difference between observed and predicted responses)
 /// ```
 class RobustLeastSquares extends BaseLeastSquares {
-  RobustLeastSquares(Matrix A, Column b,
-      {Diagonal? W, EquationMethod method = EquationMethod.linear})
+  RobustLeastSquares(Matrix A, ColumnMatrix b,
+      {DiagonalMatrix? W, EquationMethod method = EquationMethod.linear})
       : super(A, b, W: W, method: method);
 
   // Implement the special method here

@@ -754,7 +754,7 @@ class MatrixDecomposition {
     }
 
     // Extract eigenvalues
-    Matrix lambda = Diagonal(ak.diagonal());
+    Matrix lambda = DiagonalMatrix(ak.diagonal());
     return EigenvalueDecomposition(lambda, q);
   }
 

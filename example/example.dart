@@ -114,9 +114,9 @@ void main1() {
     3,
     3
   ], [
-    Column([1, 1, 1]),
-    Column([-1, 0, 1]),
-    Column([-1, 1, 0]),
+    ColumnMatrix([1, 1, 1]),
+    ColumnMatrix([-1, 0, 1]),
+    ColumnMatrix([-1, 1, 0]),
   ]);
   print('Check Matrix: ${eigen.check}');
 }

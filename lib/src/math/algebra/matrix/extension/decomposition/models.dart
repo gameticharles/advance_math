@@ -135,7 +135,7 @@ class EigenvalueDecompositions {
     Matrix t = schurDecomposition.T;
 
     // Extract eigenvalues
-    Matrix lambda = Diagonal(t.diagonal());
+    Matrix lambda = DiagonalMatrix(t.diagonal());
 
     // Compute eigenvectors
     // Extract eigenvalues from the diagonal of the upper-triangular matrix T

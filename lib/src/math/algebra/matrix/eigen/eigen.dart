@@ -25,7 +25,7 @@ class Eigen {
   /// J = Diagonal(eigenvalues)
   Matrix get check {
     var S = Matrix(vectors.map((e) => e.flatten()).toList()).transpose();
-    var J = Diagonal(values);
+    var J = DiagonalMatrix(values);
     return S * J * S.inverse();
   }
 

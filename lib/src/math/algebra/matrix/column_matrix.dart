@@ -3,7 +3,7 @@ part of algebra;
 /// Column class extends Matrix and represents a single column in a matrix.
 ///
 /// Inherits all Matrix properties and methods, but the data is stored in an Nx1 matrix.
-class Column extends Matrix {
+class ColumnMatrix extends Matrix {
   /// Constructs a Column object from a list of dynamic data.
   ///
   /// [data]: List of dynamic data elements representing a single column.
@@ -17,7 +17,7 @@ class Column extends Matrix {
   /// // 2
   /// // 3
   /// ```
-  Column(List<dynamic> data) : super(data.map((x) => [x]).toList());
+  ColumnMatrix(List<dynamic> data) : super(data.map((x) => [x]).toList());
 
   /// Retrieves the value at a specific row index from the Column.
   ///
@@ -70,21 +70,21 @@ class Column extends Matrix {
   /// print(filledRow);
   /// ```
   ///
-  factory Column.fill(int rows, dynamic value) {
+  factory ColumnMatrix.fill(int rows, dynamic value) {
     if (rows < 1) {
       throw Exception("Rows must be greater than 0");
     }
 
     List<dynamic> row = List.generate(rows, (index) => value);
 
-    return Column(row);
+    return ColumnMatrix(row);
   }
 
   /// Generates a `Column` with the given `length`, filled with random values
   /// between `min` and `max`. If `isDouble` is `true`, then the values will be doubles.
   /// Otherwise, they will be integers. If `random` is not `null`, it will be used
   /// as the random number generator.
-  static Column random(int length,
+  static ColumnMatrix random(int length,
       {double min = 0,
       double max = 1,
       bool isDouble = true,
@@ -94,7 +94,7 @@ class Column extends Matrix {
       random = math.Random(seed);
     }
     random ??= math.Random();
-    return Column(List.generate(
+    return ColumnMatrix(List.generate(
       length,
       (_) => (isDouble
           ? random!.nextDouble() * (max - min) + min
@@ -185,11 +185,11 @@ class Column extends Matrix {
   /// // 0 2 0
   /// // 0 0 3
   /// ```
-  Diagonal toDiagonal() {
+  DiagonalMatrix toDiagonal() {
     List<dynamic> diagonal = [];
     for (int i = 0; i < _data.length; i++) {
       diagonal.add(_data[i][0]);
     }
-    return Diagonal(diagonal);
+    return DiagonalMatrix(diagonal);
   }
 }

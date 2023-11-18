@@ -683,7 +683,7 @@ class Vector extends IterableMixin<num> {
   /// // 0 0 3
   /// ```
   Matrix toDiagonal() {
-    return Diagonal(_data);
+    return DiagonalMatrix(_data);
   }
 
   /// Constructs a new Matrix from a vector.

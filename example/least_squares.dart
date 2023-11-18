@@ -13,8 +13,8 @@ void main(List<String> args) {
     [0, -1, 1],
   ]);
 
-  var B = Column([0, 0, 0, -0.015, 0.102, 0.097]);
-  var W = Diagonal([1 / 5, 1 / 10, 1 / 7, 1 / 7, 1 / 12, 1 / 9]);
+  var B = ColumnMatrix([0, 0, 0, -0.015, 0.102, 0.097]);
+  var W = DiagonalMatrix([1 / 5, 1 / 10, 1 / 7, 1 / 7, 1 / 12, 1 / 9]);
 
   print('Design Matrix (A): \n$A\n');
   print('Matrix of Absolute Terms (B): \n$B\n');

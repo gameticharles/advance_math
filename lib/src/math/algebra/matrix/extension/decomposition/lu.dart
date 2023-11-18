@@ -207,8 +207,8 @@ class LU {
 
   /// Return pivot permutation vector
   /// return piv
-  Row pivot() {
-    var p = Row.fill(_m, 0.0);
+  RowMatrix pivot() {
+    var p = RowMatrix.fill(_m, 0.0);
     for (var i = 0; i < _m; i++) {
       p[i] = _piv[0][i];
     }
@@ -217,8 +217,8 @@ class LU {
 
   /// Return pivot permutation vector as a one-dimensional double array
   /// return (double) piv
-  Row doublePivot() {
-    var val = Row.fill(_m, 0.0);
+  RowMatrix doublePivot() {
+    var val = RowMatrix.fill(_m, 0.0);
     for (var i = 0; i < _m; i++) {
       val[i] = _piv[0][i];
     }

@@ -19,10 +19,10 @@ abstract class BaseLeastSquares {
   final Matrix A;
 
   /// The absolute terms or output column matrix for the model.
-  final Column b;
+  final ColumnMatrix b;
 
   /// An optional diagonal matrix of weights.
-  final Diagonal? W;
+  final DiagonalMatrix? W;
 
   /// Coefficients vector, solved in the fit method.
   late Matrix beta;

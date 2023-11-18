@@ -11,7 +11,7 @@ void main() {
     [16.0, 4.0, 1.0],
     [64.0, 8.0, 1.0]
   ]);
-  var b = Column([106.8, 177.2, 279.2]);
+  var b = ColumnMatrix([106.8, 177.2, 279.2]);
 
   Matrix A = Matrix.fromList([
     [4, 1, -1],

@@ -3,7 +3,7 @@ part of algebra;
 /// Row class extends Matrix and represents a single row in a matrix.
 ///
 /// Inherits all Matrix properties and methods, but the data is stored in a 1xN matrix.
-class Row extends Matrix {
+class RowMatrix extends Matrix {
   /// Constructs a Row object from a list of dynamic data.
   ///
   /// [data]: List of dynamic data elements representing a single row.
@@ -14,7 +14,7 @@ class Row extends Matrix {
   /// print(row);
   /// // Output: 1 2 3
   /// ```
-  Row(List<dynamic> data) : super([data]);
+  RowMatrix(List<dynamic> data) : super([data]);
 
   /// Retrieves the value at a specific column index from the Row.
   ///
@@ -67,21 +67,21 @@ class Row extends Matrix {
   /// print(filledRow);
   /// ```
   ///
-  factory Row.fill(int cols, dynamic value) {
+  factory RowMatrix.fill(int cols, dynamic value) {
     if (cols < 1) {
       throw Exception("Columns must be greater than 0");
     }
 
     List<dynamic> row = List.generate(cols, (index) => value);
 
-    return Row(row);
+    return RowMatrix(row);
   }
 
   /// Generates a `Row` with the given `length`, filled with random values
   /// between `min` and `max`. If `isDouble` is `true`, then the values will be doubles.
   /// Otherwise, they will be integers. If `random` is not `null`, it will be used
   /// as the random number generator.
-  static Row random(int length,
+  static RowMatrix random(int length,
       {double min = 0,
       double max = 1,
       bool isDouble = true,
@@ -91,7 +91,7 @@ class Row extends Matrix {
       random = math.Random(seed);
     }
     random ??= math.Random();
-    return Row(List.generate(
+    return RowMatrix(List.generate(
       length,
       (_) => (isDouble
           ? random!.nextDouble() * (max - min) + min
@@ -186,6 +186,6 @@ class Row extends Matrix {
     for (int i = 0; i < columnCount; i++) {
       diagonal.add(_data[0][i]);
     }
-    return Diagonal(diagonal);
+    return DiagonalMatrix(diagonal);
   }
 }

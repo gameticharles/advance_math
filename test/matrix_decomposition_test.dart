@@ -179,7 +179,7 @@ void main() {
       [16.0, 4.0, 1.0],
       [64.0, 8.0, 1.0]
     ]);
-    Matrix b = Column([106.8, 177.2, 279.2]);
+    Matrix b = ColumnMatrix([106.8, 177.2, 279.2]);
 
     var lu = A.decomposition.luDecompositionDoolittle();
     expect(lu.checkMatrix.round(), A);
@@ -198,7 +198,7 @@ void main() {
       [16.0, 4.0, 1.0],
       [64.0, 8.0, 1.0]
     ]);
-    Matrix b = Column([106.8, 177.2, 279.2]);
+    Matrix b = ColumnMatrix([106.8, 177.2, 279.2]);
 
     var lu = A.decomposition.luDecompositionDoolittlePartialPivoting();
     expect(lu.checkMatrix.round(), A);
@@ -217,7 +217,7 @@ void main() {
       [16.0, 4.0, 1.0],
       [64.0, 8.0, 1.0]
     ]);
-    Matrix b = Column([106.8, 177.2, 279.2]);
+    Matrix b = ColumnMatrix([106.8, 177.2, 279.2]);
 
     var lu = A.decomposition.luDecompositionDoolittleCompletePivoting();
 
@@ -237,7 +237,7 @@ void main() {
       [16.0, 4.0, 1.0],
       [64.0, 8.0, 1.0]
     ]);
-    Matrix b = Column([106.8, 177.2, 279.2]);
+    Matrix b = ColumnMatrix([106.8, 177.2, 279.2]);
 
     var lu = A.decomposition.luDecompositionCrout();
     expect(lu.checkMatrix.round(), A);
@@ -256,7 +256,7 @@ void main() {
       [16.0, 4.0, 1.0],
       [64.0, 8.0, 1.0]
     ]);
-    Matrix b = Column([106.8, 177.2, 279.2]);
+    Matrix b = ColumnMatrix([106.8, 177.2, 279.2]);
 
     var lu = A.decomposition.luDecompositionGauss();
     expect(lu.checkMatrix.round(), A);

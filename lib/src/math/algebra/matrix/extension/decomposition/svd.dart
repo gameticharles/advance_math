@@ -542,7 +542,7 @@ class SVD {
   /// Return the diagonal matrix of singular values
   /// return S
   Matrix S() {
-    return Diagonal(_s.flatten());
+    return DiagonalMatrix(_s.flatten());
   }
 
   /// Two norm condition number

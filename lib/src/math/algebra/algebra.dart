@@ -31,8 +31,8 @@ part 'matrix/iterators/matrix_iterator.dart';
 part 'matrix/iterators/vector_iterator.dart';
 part 'matrix/iterators/element_iterator.dart';
 
-part 'matrix/row.dart';
-part 'matrix/column.dart';
+part 'matrix/row_matrix.dart';
+part 'matrix/column_matrix.dart';
 part 'matrix/diagonal.dart';
 part 'matrix/sylvester_matrix.dart';
 part 'matrix/sparse_matrix.dart';

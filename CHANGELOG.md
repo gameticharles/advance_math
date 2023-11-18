@@ -1,5 +1,6 @@
 ## 3.3.6
 * Fixed bugs
+* Renamed Row Column, and Diagonal matrices to RowMatrix, ColumnMatrix and DiagonalMatrix repectively
 
 ## 3.3.5
 * Added morse code

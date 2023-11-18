@@ -216,12 +216,12 @@ void main() {
   });
 
   test('test #1 Column to Diagonal', () {
-    var column = Column([1, 2, 3]);
-    expect(column.toDiagonal(), Diagonal([1, 2, 3]));
+    var column = ColumnMatrix([1, 2, 3]);
+    expect(column.toDiagonal(), DiagonalMatrix([1, 2, 3]));
   });
 
   test('test #2 Column to Matrix', () {
-    var column = Column([1, 2, 3]);
+    var column = ColumnMatrix([1, 2, 3]);
     expect(
         column,
         Matrix([
@@ -232,12 +232,12 @@ void main() {
   });
 
   test('test #3 Row to Diagonal', () {
-    var row = Row([1, 2, 3]);
-    expect(row.toDiagonal(), Diagonal([1, 2, 3]));
+    var row = RowMatrix([1, 2, 3]);
+    expect(row.toDiagonal(), DiagonalMatrix([1, 2, 3]));
   });
 
   test('test #4 Row to Matrix', () {
-    var row = Row([1, 2, 3]);
+    var row = RowMatrix([1, 2, 3]);
     expect(
         row,
         Matrix([

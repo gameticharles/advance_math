@@ -171,7 +171,7 @@ extension MatrixOperationExtension on Matrix {
         }
       }
 
-      return Column(result.toList());
+      return ColumnMatrix(result.toList());
     } else if (other is num) {
       return scale(other);
     } else {
@@ -1857,7 +1857,7 @@ extension MatrixOperationExtension on Matrix {
 
       if (k < n - 1) {
         // Compute Householder reflection for the k-th row of B
-        var rowVector = Column(B.slice(k, k + 1, k, n).flatten());
+        var rowVector = ColumnMatrix(B.slice(k, k + 1, k, n).flatten());
 
         Matrix qk = _Utils.householderReflection(rowVector);
         Matrix Q = Matrix.eye(n);

@@ -1052,9 +1052,9 @@ print(ma);
 Create a matrix from list of columns
 
 ```dart
-var col1 = Column([1, 2, 3]);
-var col2 = Column([4, 5, 6]);
-var col3 = Column([7, 8, 9]);
+var col1 = ColumnMatrix([1, 2, 3]);
+var col2 = ColumnMatrix([4, 5, 6]);
+var col3 = ColumnMatrix([7, 8, 9]);
 var matrix = Matrix.fromColumns([col1, col2, col3]);
 print(matrix);
 // Output:
@@ -1067,9 +1067,9 @@ print(matrix);
 Create a matrix from list of rows
 
 ```dart
-var row1 = Row([1, 2, 3]);
-var row2 = Row([4, 5, 6]);
-var row3 = Row([7, 8, 9]);
+var row1 = RowMatrix([1, 2, 3]);
+var row2 = RowMatrix([4, 5, 6]);
+var row3 = RowMatrix([7, 8, 9]);
 var matrix = Matrix.fromRows([row1, row2, row3]);
 print(matrix);
 // Output:
@@ -1650,9 +1650,9 @@ var b = Matrix([
   [1, 2, 3]
 ]);
 
-var r = Row([7, 8, 9]);
-var c = Column([7, 4, 1]);
-var d = Diagonal([1, 2, 3]);
+var r = RowMatrix([7, 8, 9]);
+var c = ColumnMatrix([7, 4, 1]);
+var d = DiagonalMatrix([1, 2, 3]);
 
 print(d);
 // Output:
