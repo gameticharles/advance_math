@@ -1,3 +1,6 @@
+## 3.3.6
+* Fixed bugs
+
 ## 3.3.5
 * Added morse code
 * Added more math functions

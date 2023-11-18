@@ -193,4 +193,17 @@ extension ExtString on String {
 
     return replaceAll(regExp, replaceWith);
   }
+
+  ///Replace characters from a list of strings that
+  List<String> replaceCharactersInList(
+      List<String> originalList, Map<String, String> replacements) {
+    // Map each string in the list to a new string with replacements
+    return originalList.map((string) {
+      // For each replacement pair, apply the replacement
+      replacements.forEach((oldValue, newValue) {
+        string = string.replaceAll(oldValue, newValue);
+      });
+      return string; // Return the modified string
+    }).toList(); // Convert the Iterable back to a List
+  }
 }
