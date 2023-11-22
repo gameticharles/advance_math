@@ -2517,11 +2517,18 @@ The above sections provide a basic introduction to vectors, complex numbers, and
 
 Tests are located in the test directory. To run tests, execute dart test in the project root.
 
-## Features and bugs
+## Contributing Features and bugs
+### :beer: Pull requests are welcome!
+Don't forget that `open-source` makes no sense without contributors. No matter how big your changes are, it helps us a lot even it is a line of change.
+
+There might be a lot of grammar issues in the docs. It's a big help to us to fix them if you are fluent in English.
+
+Reporting bugs and issues are contribution too, yes it is.
 
 Please file feature requests and bugs at the [issue tracker][tracker].
 
 [tracker]: https://github.com/gameticharles/advance_math/issues
+
 
 ## Author
 

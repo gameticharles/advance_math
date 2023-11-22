@@ -1,3 +1,7 @@
+## 3.3.7
+* Fixed README
+* Added functions
+
 ## 3.3.6
 * Fixed bugs
 * Renamed Row Column, and Diagonal matrices to RowMatrix, ColumnMatrix and DiagonalMatrix repectively
