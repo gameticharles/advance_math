@@ -1,9 +1,6 @@
 import 'package:advance_math/advance_math.dart';
 
 void main(List<String> args) {
-  /*
-  
-  */
   var A = Matrix([
     [1, 0, 0],
     [0, 1, 0],

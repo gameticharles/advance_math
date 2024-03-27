@@ -181,23 +181,6 @@ extension MatrixFunctions on Matrix {
     return result;
   }
 
-  // /// Matrix power of a positive integer value
-  // Matrix pow(int p) {
-  //   if (rowCount != columnCount) {
-  //     throw ArgumentError('Matrix must be square for power operation.');
-  //   }
-
-  //   if (p < 0) {
-  //     throw ArgumentError('Power must be non-negative.');
-  //   }
-
-  //   Matrix result = Matrix.eye(rowCount);
-  //   for (int i = 0; i < p; i++) {
-  //     result = result * this;
-  //   }
-  //   return result;
-  // }
-
   /// Raises this matrix to a given power.
   /// Uses eigenvalue decomposition for non-integer powers and binary exponentiation for integer powers.
   ///

@@ -1,4 +1,6 @@
-
+1. pol and rec functions
+2. Expressions
+3. cumsum
 
 https://pub.dev/packages/vector_math
 

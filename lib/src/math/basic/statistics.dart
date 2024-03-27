@@ -6,7 +6,7 @@ part of maths;
 /// ```dart
 /// print(mean([1, 2, 3, 4, 5])); // prints: 3.0
 /// ```
-double mean(List<num> list) {
+num mean(List<num> list) {
   return list.reduce((a, b) => a + b) / list.length;
 }
 
@@ -50,7 +50,7 @@ List<num> mode(List<num> list) {
 /// ```dart
 /// print(variance([1, 2, 3, 4, 5])); // prints: 2.5
 /// ```
-num variance(List<num> list) {
+double variance(List<num> list) {
   num m = mean(list);
   return list.map((num x) => math.pow(x - m, 2)).reduce((a, b) => a + b) /
       (list.length - 1);
@@ -130,24 +130,220 @@ List<num> quartiles(List<num> list) {
   return [q1, q2, q3];
 }
 
-/// Returns the number of ways to choose r items from n items without repetition and with order.
+/// Generates all permutations of elements from `n` taken `r` at a time.
 ///
-/// Example:
+/// Mimics the behavior of the `sample` function in R.
+///
+/// Parameters:
+/// - `n`:
+///   - If `n` is a positive integer, generates permutations from `1` to `n`.
+///   - If `n` is a List, generates permutations from the elements of the list.
+/// - `r`: The number of elements to take in each permutation (must be between 1 and the length of `n`).
+/// - `func` (optional): A function to apply to each permutation.
+/// - `simplify` (optional, default: true):
+///   - If true, returns a flat List of results from applying `func` to each permutation.
+///   - If false, returns a List of Lists, where each inner list contains the permutation and the result of applying `func`.
+/// - `seed` (optional): A seed value for the random number generator to ensure repeatability.
+/// - `random` (optional): Random number generator to ensure repeatability.
+///
+/// **Note:** When `simplify` is true, the structure of the result depends on the output of `func` for the first permutation. This might cause issues if `func` doesn't produce consistent output lengths.
+///
+/// Examples:
+///
+/// 1. Get all permutations of 2 elements from [1, 2, 3]:
 /// ```dart
-/// print(permutations(5, 3));  // Output: 60
+/// var permutationsList = permutation(3, 2);
+/// print(permutationsList);
+/// // Output: [[1, 2], [2, 1], [1, 3], [3, 1], [2, 3], [3, 2]]
 /// ```
-int permutations(int n, int r) {
-  return factorial(n) ~/ factorial(n - r);
+///
+/// 2. Calculate the product of each permutation:
+/// ```dart
+/// var productPermutations = permutation(3, 2,
+///     func: (perm) => perm.reduce((a, b) => a * b));
+/// print(productPermutations); // Output: [2, 2, 3, 3, 6, 6] (simplified)
+/// ```
+/// 3. Get the length of the permutations:
+/// ```dart
+/// print(permutations(5, 3).length); // Output: 60
+/// ```
+/// ```
+dynamic permutations(dynamic n, int r,
+    {Function? func, bool simplify = true, Random? random, int? seed}) {
+  // Initialize random number generator with seed (if provided)
+  if (random == null) {
+    random = seed != null ? Random(seed) : Random();
+  } else if (seed != null) {
+    throw ArgumentError("Cannot provide both seed and random");
+  }
+
+  if (n is int) {
+    n = List<int>.generate(n, (i) => i + 1);
+  } else if (n is! List) {
+    throw ArgumentError("x must be an integer or a List");
+  }
+  if (r < 1 || r > n.length) {
+    throw ArgumentError("m must be between 1 and the length of x");
+  }
+
+  List<List> result = [];
+
+  void generatePermutations(int index, List<dynamic> current) {
+    if (index == r) {
+      result.add(List.from(current)); // Add a copy of the permutation
+      return;
+    }
+
+    for (int i = 0; i < n.length; i++) {
+      if (!current.contains(n[i])) {
+        // Avoid duplicates
+        current.add(n[i]);
+        generatePermutations(index + 1, current);
+        current.removeLast();
+      }
+    }
+  }
+
+  generatePermutations(0, []);
+
+  if (func != null) {
+    if (simplify) {
+      return result.map((perm) => func(perm)).toList();
+    } else {
+      return result.map((perm) => [perm, func(perm)]).toList();
+    }
+  } else {
+    return result;
+  }
 }
 
-/// Returns the number of ways to choose r items from n items without repetition and without order.
+/// Generates all combinations of elements from `n` taken `r` at a time.
 ///
-/// Example:
+/// Mimics the behavior of the `combinations` function in R.
+///
+/// Parameters:
+/// - `n`:
+///   - If `n` is a positive integer, generates combinations from `1` to `n`.
+///   - If `n` is a List, generates combinations from the elements of the list.
+/// - `r`: The number of elements to take in each combination (must be between 1 and the length of `n`).
+/// - `func` (optional): A function to apply to each combination.
+/// - `simplify` (optional, default: true):
+///   - If true, returns a flat List of results from applying `func` to each combination.
+///   - If false, returns a List of Lists, where each inner list contains the combination and the result of applying `func`.
+/// - `generateCombinations` (optional, default: true):
+///   - If true, generates the actual combinations.
+///   - If false, only calculates and returns the number of possible combinations.
+///
+/// **Note:** When `simplify` is true, the structure of the result depends on the output of `func` for the first combination.
+/// This might cause issues if `func` doesn't produce consistent output lengths.
+///
+/// Examples:
+///
+/// 1. Get all combinations of 3 elements from [1, 2, 3, 4]:
 /// ```dart
-/// print(combinations(5, 3));  // Output: 10
+/// var combinations = combinations(4, 3);
+/// print(combinations); // Output: [[1, 2, 3], [1, 2, 4], [1, 3, 4], [2, 3, 4]]
 /// ```
-int combinations(int n, int r) {
-  return factorial(n) ~/ (factorial(r) * factorial(n - r));
+///
+/// 2. Calculate the sum of each combination:
+/// ```dart
+/// var sumCombinations = combinations(4, 3,
+///     func: (comb) => comb.reduce((a, b) => a + b));
+/// print(sumCombinations); // Output: [6, 7, 8, 9] (simplified)
+/// ```
+///
+/// 3. Get combinations of letters and apply a function (not simplified):
+/// ```dart
+/// var alphaCombn = combinations(["A", "B", "C", "D"], 2, simplify: false);
+/// print(alphaCombn);
+/// // Output:
+/// // [["A", "B"], ["A", "C"], ["A", "D"], ["B", "C"], ["B", "D"], ["C", "D"]]
+/// ```
+///
+/// 4. Calculate the minimum of consecutive elements in each combination:
+/// ```dart
+/// var minCombo = combinations(4, 3, simplify: true, func: (comb) {
+///   List<num> result = [];
+///   for (int i = 0; i < comb.length - 1; i++) {
+///     result.add(min(comb[i], comb[i + 1]));
+///   }
+///   return result;
+/// });
+/// print(minCombo); // Output: [[1, 2], [1, 2], [1, 3], [2, 3]]
+/// ```
+///
+/// 5. Get the number of combinations
+/// ```dart
+/// print(combinations(5, 3).length); // Output: 10
+/// ```
+/// ```
+dynamic combinations(dynamic n, int r,
+    {Function? func, bool simplify = true, bool generateCombinations = true}) {
+  if (n is int) {
+    n = List<int>.generate(n, (i) => i + 1);
+  } else if (n is! List) {
+    throw ArgumentError("x must be an integer or a List");
+  }
+
+  if (r < 1 || r > n.length) {
+    throw ArgumentError("m must be between 1 and the length of x");
+  }
+
+  if (!generateCombinations) {
+    int x = n is int ? n : n.length;
+    return factorial(x) ~/
+        (factorial(r) * factorial(x - r)); // Return count as a List
+  }
+
+  List<List> result = [];
+
+  void getCombinations(int start, List<dynamic> current) {
+    if (current.length == r) {
+      result.add(List.from(current)); // Add a copy of the combination
+      return;
+    }
+
+    for (int i = start; i < n.length; i++) {
+      current.add(n[i]);
+      getCombinations(i + 1, current);
+      current.removeLast();
+    }
+  }
+
+  getCombinations(0, []);
+
+  if (func != null) {
+    if (simplify) {
+      // Apply func to each combination and return a flat List
+      return result.map((combo) => func(combo)).toList();
+    } else {
+      // Return a List of Lists with [combination, func(combination)]
+      List results = [];
+      for (var combo in result) {
+        var funcResult = func(combo);
+        if (results.isEmpty) {
+          // Determine output structure based on the first result
+          if (funcResult is List) {
+            // If first result is a List, create nested Lists for all results
+            results.add([combo, funcResult]);
+          } else {
+            // Otherwise, store results directly
+            results.add(funcResult);
+          }
+        } else {
+          // Process subsequent results based on the determined structure
+          if (results[0] is List) {
+            results.add([combo, funcResult]);
+          } else {
+            results.add(funcResult);
+          }
+        }
+      }
+      return results;
+    }
+  } else {
+    return result;
+  }
 }
 
 /// Returns the greatest common divisor of a list of numbers.
@@ -208,15 +404,15 @@ int lcm(num a, num b) {
 ///
 /// Example:
 /// ```dart
-/// print(correlation());
+/// print(correlation(x,y));
 /// ```
-double correlation(List<double> x, List<double> y) {
-  double meanX = mean(x);
-  double meanY = mean(y);
+double correlation(List<num> x, List<num> y) {
+  num meanX = mean(x);
+  num meanY = mean(y);
 
-  double numerator = 0;
-  double denominator1 = 0;
-  double denominator2 = 0;
+  num numerator = 0;
+  num denominator1 = 0;
+  num denominator2 = 0;
 
   for (int i = 0; i < x.length; i++) {
     numerator += (x[i] - meanX) * (y[i] - meanY);
@@ -227,20 +423,26 @@ double correlation(List<double> x, List<double> y) {
   return numerator / sqrt(denominator1 * denominator2);
 }
 
+/// Returns the confidence Interval of a dataset when a confidence level is provided
 ///
-List<num> confidenceInterval(List<double> data, double confidenceLevel) {
-  double sampleMean = mean(data);
-  double stdErr = stdErrMean(data);
-  double margin = tValue(data) * stdErr;
+/// Example:
+/// ```dart
+/// print(confidence([1, 2, 3, 4, 5])
+/// ```
+List<num> confidenceInterval(List<num> data, double confidenceLevel) {
+  num sampleMean = mean(data);
+  num stdErr = stdErrMean(data);
+  num margin = tValue(data) * stdErr;
   return [sampleMean - margin, sampleMean + margin];
 }
 
-List regression(List<double> x, List<double> y) {
-  double meanX = mean(x);
-  double meanY = mean(y);
+/// Returns slope and intercept of two datasets
+List<num> regression(List<num> x, List<num> y) {
+  num meanX = mean(x);
+  num meanY = mean(y);
 
-  double m = correlation(x, y) * (stdDev(y) / stdDev(x));
-  double b = meanY - m * meanX;
+  num m = correlation(x, y) * (stdDev(y) / stdDev(x));
+  num b = meanY - m * meanX;
 
   return [m, b]; // slope, intercept
 }

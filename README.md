@@ -22,6 +22,7 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
 
 - Basic statistics: Statistics operations like mean, median, mode, min, max, variance, standardDeviation, quartiles,permutations, combinations, greatest common divisor(gcd), least common multiple(lcm).
 - Convert number types to words. It also supports to currency formats for cheques and ordinal words representations.
+- Morse code translations for encoding and decoding.
 - Logarithmic operations: natural logarithm of a number, base-10 logarithm and logarithm of a number to a given base.
 - Support angle conversion (degrees, minutes, seconds, radians, gradians, DMS).
 - Trigonometry: It provides computation on all the trigonometric functions on the angle. These includes inverse and hyperbolic function (sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, sec, csc, cot, asec, acsc, acot, sech, csch, coth, asech, acsch, acoth, vers, covers, havers, exsec, excsc).
@@ -30,23 +31,25 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
 - Polynomial functions: Solve and find roots of a function to any degree (including Linear, Quadratic, Cubic, Quartic etc).
 - Roman numerals: Convert roman numerals to integers and vice versa. It also supports basic arithmetic operations and comparisons.
 - Matrix creation, filling and generation: Methods for filling the matrix with specific values or generating matrices with certain properties, such as zero, ones, identity, diagonal, list, or random matrices.
-- Import and export matrices to and from other formats (e.g., CSV, JSON, binary)
-- Matrix operations: Implement common matrix operations such as addition, subtraction, multiplication (element-wise and matrix-matrix), and division (element-wise) etc.
-- Matrix transformation methods: Add methods for matrix transformations, such as transpose, inverse, pseudoInverse, and rank etc.
-- Matrix manipulation (concatenate, sort, removeRow, removeRows, removeCol, removeCols, reshape, swapping rows and columns etc.)
-- Statistical methods: Methods for calculating statistical properties of the matrix, such as min, max, sum, mean, median, mode, skewness, standard deviation, and variance.
-- Element-wise operations: Methods for performing element-wise operations on the matrix, such as applying a function to each element or filtering elements based on a condition.
-- Solving linear systems of equations
-- Solve matrix decompositions like LU decomposition, QR decomposition, LQ decomposition, Cholesky, Singular Value Decomposition (SVD)  with different algorithms Crout's, Doolittle, Gauss Elimination Method, Gram Schmidt, Householder, Partial and Complete Pivoting, etc.
-- Matrix slicing and partitioning: Methods for extracting sub-Matrices or slices from the matrix.
-- Matrix concatenation and stacking: Methods for concatenating or stacking matrices horizontally or vertically.
-- Matrix norms: Methods for calculating matrix norms, such as L1 (Marathan), L2 (Euclidean), and infinity norms.
-- Determine the properties of a matrix.
-- From the matrix, row and columns of the matrix are iterables and also iterate on every element.
+    - Import and export matrices to and from other formats (e.g., CSV, JSON, binary)
+    - Matrix operations: Implement common matrix operations such as addition, subtraction, multiplication (element-wise and matrix-matrix), and division (element-wise) etc.
+    - Matrix transformation methods: Add methods for matrix transformations, such as transpose, inverse, pseudoInverse, and rank etc.
+    - Matrix manipulation (concatenate, sort, removeRow, removeRows, removeCol, removeCols, reshape, swapping rows and columns etc.)
+    - Statistical methods: Methods for calculating statistical properties of the matrix, such as min, max, sum, mean, median, mode, skewness, standard deviation, and variance.
+    - Element-wise operations: Methods for performing element-wise operations on the matrix, such as applying a function to each element or filtering elements based on a condition.
+    - Solving linear systems of equations (Using Inverse Matrix, LU Decomposition,Gauss-Jordan Elimination, Ridge Regression, Gauss Elimination, Least Squares, Jacobi, Successive Over-Relaxation (SOR), Gauss-Seidel method, Gram Schmidt, Conjugate Gradient, Montante's Method (Bareiss algorithm) and Cramers Rule)
+    - Solve matrix decompositions like LU decomposition, QR decomposition, LQ decomposition, Cholesky, Singular Value Decomposition (SVD)  with different algorithms Crout's, Doolittle, Gauss Elimination Method, Gram Schmidt, Householder, Partial and Complete Pivoting, etc.
+    - Matrix slicing and partitioning: Methods for extracting sub-Matrices or slices from the matrix.
+    - Matrix concatenation and stacking: Methods for concatenating or stacking matrices horizontally or vertically.
+    - Matrix norms: Methods for calculating matrix norms, such as L1 (Marathan), L2 (Euclidean), and infinity norms.
+    - Determine the properties of a matrix.
+    - From the matrix, row and columns of the matrix are iterables and also iterate on every element.
+    - Eigen values and vectors.
 - Supports vectors, complex numbers and complex vectors with most of the basic functionalities and operations.
 
 ## Todo
 
+- Implement Expression
 - Improve speed and performance
 
 ## Usage
@@ -89,11 +92,76 @@ print(logBase(2, 32));  // Output: 5.0
 </details>
 
 <details>
-<summary>NumOrWords</summary>
+<summary>CODE TRANSLATOR</summary>
+
+# Morse Code
+
+This library provides a class, `MorseCode`, for encoding and decoding messages using the Morse code system. It offers custom delimiters for characters, words, and new lines in Morse code. The class also includes a rate limiter to prevent abuse of the encode/decode functions and optional logging for debugging purposes.
+
+```dart
+main(){
+  // Create an instance of morse code translator
+  var translator = MorseCode();
+
+  // Convert words to morse code
+  var encoded = translator.encode('SOS');
+  print('Encoded: $encoded'); // Encoded: ... --- ...
+  print('');
+
+  // Convert the morse code to words
+  var decoded = translator.decode(encoded);
+  print('Decoded: $decoded'); // Decoded: SOS
+}
+```
+
+## Rate Limiting and Logging
+
+The `MorseCodeTranslator` class includes a rate limiter to prevent abuse of the encode/decode functions. You can enable or disable logging by setting the `loggingEnabled` flag to `true` or `false`. When logging is enabled, informational messages will be logged to the console.
+
+## Caching
+
+To improve efficiency, the translator caches previously decoded Morse code strings. This allows for faster decoding of repeated messages without having to recompute them.
+
+```dart
+void main() {
+  // Create an instance of rate limiter
+  var rateLimiter = RateLimiter(
+    maxRequests: 10,
+    interval: Duration(seconds: 10),
+  );
+
+  // An instance of morse code translator with logging enabled and rate limiter parsed
+  var translator = MorseCode(
+    loggingEnabled: true,
+    rateLimiter: rateLimiter,
+  );
+
+  encoded = translator.encode('Enable logging for debugging');
+  print('Encoded: $encoded');
+
+  decoded = translator.decode(encoded);
+  print('Decoded: $decoded');
+
+  print('');
+  print('Decoded directly');
+  String decodingValue =
+      ".... .. / - .... . .-. . / .... --- .-- / .- .-. . / -.-- --- ..- ..--..";
+  decoded = translator.decode(decodingValue);
+  print('Decoded: $decoded');
+}
+
+// Encoding input: Enable logging for debugging
+// Encoded: . -. .- -... .-.. . / .-.. --- --. --. .. -. --. / ..-. --- .-. / -.. . -... ..- --. --. .. -. --.
+// Decoded: ENABLE LOGGING FOR DEBUGGING
+// 
+// Decoded directly
+// Decoded: HI THERE HOW ARE YOU?
+```
+
 
 # NumOrWords
 
-NumOrWords is a Dart package designed to convert numerical values into their word representations. It is highly customizable, catering to multiple languages, currency representations, and more.
+NumOrWords (Numbers or Words) is a Dart class designed to convert numerical values into their word representations and vice-versa. It is highly customizable, catering to multiple languages, currency representations, and more.
 
 ## Features
 
@@ -169,7 +237,7 @@ print(converter.toWords(30, useOrdinal: true));  // Thirtieth
 print(converter.toWords(40, useOrdinal: true));  // Fortieth
 ```
 
-### Words to Numver 
+### Words to Numver
 
 The supports only French and English for the mean time. You can convert number to either English or French and back to number with losing precision.
 
@@ -478,7 +546,9 @@ To support multiple languages, simply extend the `LanguageConfig` for each langu
 ## Conclusion
 
 NumOrWords offers a comprehensive solution for converting numbers into words, supporting a wide range of use-cases and customization. Whether you need simple word representation or complex multi-language support with currency, NumOrWords has got you covered.
+
 </details>
+
 
 <details>
 <summary>ZScore</summary>
@@ -486,7 +556,7 @@ NumOrWords offers a comprehensive solution for converting numbers into words, su
 # ZScore
 
 Computes Z-scores based on a given confidence level.
-The class provides functionalities to compute Z-scores, which are used in statistical hypothesis testing. 
+The class provides functionalities to compute Z-scores, which are used in statistical hypothesis testing.
 
 The Z-score represents how many standard deviations an element is from the mean.
 
@@ -720,7 +790,6 @@ print(point.scale(2)); // Output: Point(2, 4, 6)
 print(point.reflect(Point(0, 0, 0))); // Output: Point(-1, -2, -3)
 ```
 
-
 ### Line
 
 A `Line` represents a line in a 2D space, defined by two points.
@@ -746,6 +815,7 @@ print(line6); // Output: Line(Point(1.0, 1.0), Point(2.0, 3.0))
 ```
 
 ### Plane
+
 A class that represents a plane in a three-dimensional space.
 Each instance of this class is defined by a [Point] and a normal [Vector].
 
@@ -784,6 +854,131 @@ Point p2 = Point(1, 0);
 Point p3 = Point(0, 1);
 Polygon triangle = Polygon([p1, p2, p3]);
 print(triangle.area); // prints: 0.5
+```
+
+Other things you could do with polygon are area with different methods, compute lengths, scale, perimeter etc.
+
+```dart
+var vertices = [
+  Point(1613.26, 2418.11),
+  Point(1806.71, 2523.16),
+  Point(1942.17, 2366.84),
+  Point(1901.89, 2203.18),
+  Point(1652.08, 2259.26)
+];
+
+var polygon = Polygon(vertices: vertices);
+print(polygon);
+print('');
+
+print('Area:');
+print("Shoelace formula: ${polygon.shoelace()}");
+print("Triangulation: ${polygon.triangulation()}");
+print("Trapezoidal rule: ${polygon.trapezoidal()}");
+print("Monte Carlo method (10,000 points): ${polygon.monteCarlo()}");
+print("Green's theorem: ${polygon.greensTheorem()}");
+
+print("\nCentroid: ${polygon.centroid()}");
+print("Moment of inertia: ${polygon.momentOfInertia()}");
+
+print("\nAngle Between Side 1 and 2: ${polygon.angleBetweenSides(0, 1)}");
+print("Length of side 1: ${polygon.sideLengthIrregular(0)}");
+print("Length of side 2: ${polygon.sideLengthIrregular(1)}");
+
+print(
+    "\nIs Point(1806.71, 2523.16) inside: ${polygon.isPointInsidePolygon(Point(1806.71, 2400.16))}");
+print("Is convex: ${polygon.isConvex()}");
+
+print("\nBounding box: ${polygon.boundingBox()}");
+
+print("\nOriginal: ${polygon.vertices}");
+polygon.scale(2.5);
+print("\nScaled by 2.5: ${polygon.vertices}");
+
+polygon.scale(1 / 2.5);
+print("\nUnScale by 1/2.5: ${polygon.vertices}");
+
+polygon.translate(1.0, 1.0);
+print("\nTranslated by (1.0, 1.0): ${polygon.vertices}");
+
+print(
+    "\nNearest point on the polygon to (1920.17, 2200.18): ${polygon.nearestPointOnPolygon(Point(1920.17, 2200.18))}");
+
+printLine('Regular Polygon');
+
+var regPolygon = RegularPolygon(numSides: 5, sideLength: 4);
+
+print("Area: ${regPolygon.areaPolygon()}");
+print("Perimeter: ${regPolygon.perimeter()}");
+print("Interior angle: ${regPolygon.interiorAngle()}");
+print("Exterior angle: ${regPolygon.exteriorAngle()}\n\n");
+
+var perimeter = regPolygon.perimeter();
+var area = regPolygon.areaPolygon();
+var circumradius = regPolygon.circumradius();
+var inradius = regPolygon.inradius();
+
+polygon = Polygon(numSides: regPolygon.numSides);
+
+print(
+    "Side length from perimeter: ${polygon.getSideLength(perimeter: perimeter)}");
+print("Side length from area: ${polygon.getSideLength(area: area)}");
+print(
+    "Side length from circumradius: ${polygon.getSideLength(circumradius: circumradius)}");
+print(
+    "Side length from inradius: ${polygon.getSideLength(inradius: inradius)}");
+```
+
+Results:
+
+```txt
+
+Polygon( 
+num_sides=5,
+side_length=null,
+vertices=[Point(1613.26, 2418.11), Point(1806.71, 2523.16), Point(1942.17, 2366.84), Point(1901.89, 2203.18), Point(1652.08, 2259.26)])
+
+Area:
+Shoelace formula: 68935.01805000007
+Triangulation: 68935.01804999998
+Trapezoidal rule: 68935.01805000001
+Monte Carlo method (10,000 points): 69777.18425340003
+Green's theorem: 68935.01805000007
+
+Centroid: Point(1783.2220000000002, 2354.11)
+Moment of inertia: 219478041763.1118
+
+Angle Between Side 1 and 2: 1.313000433887411
+Length of side 1: 220.13269861608467
+Length of side 2: 206.84620857052207
+
+Is Point(1806.71, 2523.16) inside: true
+Is convex: true
+
+Bounding box: [Point(1613.26, 2203.18), Point(1942.17, 2203.18), Point(1942.17, 2523.16), Point(1613.26, 2523.16)]
+
+Original: [Point(1613.26, 2418.11), Point(1806.71, 2523.16), Point(1942.17, 2366.84), Point(1901.89, 2203.18), Point(1652.08, 2259.26)]
+
+Scaled by 2.5: [Point(4033.15, 6045.275000000001), Point(4516.775, 6307.9), Point(4855.425, 5917.1), Point(4754.725, 5507.95), Point(4130.2, 5648.150000000001)]
+
+UnScale by 1/2.5: [Point(1613.2600000000002, 2418.11), Point(1806.71, 2523.16), Point(1942.17, 2366.84), Point(1901.8900000000003, 2203.18), Point(1652.08, 2259.26)]
+
+Translated by (1.0, 1.0): [Point(1614.2600000000002, 2419.11), Point(1807.71, 2524.16), Point(1943.17, 2367.84), Point(1902.8900000000003, 2204.18), Point(1653.08, 2260.26)]
+
+Nearest point on the polygon to (1920.17, 2200.18): Point(1920.17, 2200.18)
+
+--- --- --- --- --- --- --- --- --- --- Regular Polygon --- --- --- --- --- --- --- --- --- --- 
+
+Area: 27.52763840942347
+Perimeter: 20.0
+Interior angle: 108.0
+Exterior angle: 72.0
+
+
+Side length from perimeter: 4.0
+Side length from area: 4.0
+Side length from circumradius: 4.0
+Side length from inradius: 4.0
 ```
 
 ### Triangle
@@ -1811,7 +2006,7 @@ Matrix sub = m.subMatrix(rowRange: "1:2", colRange: "0:1");
 
 Matrix sub = m.subMatrix(rowStart: 1, rowEnd: 2, colStart: 0, colEnd: 1);
 
-// submatrix will be:
+// sub-matrix will be:
 // [
 //   [6]
 // ]
@@ -1830,7 +2025,7 @@ sub = m.subMatrix(columnIndices: [4, 4, 2]);
 // │ 10 10 8 │
 // └ 10 10 8 ┘
 
-// Get a submatrix
+// Get a sub-matrix
 Matrix subMatrix = m.slice(0, 1, 1, 3);
 ```
 
@@ -2060,6 +2255,7 @@ print(xSortedColumn2Descending);
 Roll elements along a given axis. Elements that roll beyond the last position are re-introduced at the first.
 
 This function work exactly like the NumPy's roll.
+
 - shift : int or tuple of ints
     The number of places by which elements are shifted. If a tuple, then axis must be a tuple of the same size, and each of the given axes is shifted by the corresponding number. If an int while axis is a tuple of ints, then the same value is used for all given axes.
 - axis : int or tuple of ints or null
@@ -2126,6 +2322,98 @@ print(x2.roll(7));
 // Matrix: 2x5
 // ┌ 3 4 5 6 7 ┐
 // └ 8 9 0 1 2 ┘
+```
+
+## Eigen Values and Vectors
+
+```dart
+var matr = Matrix.fromList([
+  [4, 1, 1],
+  [1, 4, 1],
+  [1, 1, 4]
+]);
+
+var eigen = matr.eigen();
+print('Eigen Values:\n${eigen.values}\n');
+print('Eigenvectors:');
+for (Matrix eigenvector in eigen.vectors) {
+  print(eigenvector.round(1));
+}
+
+print('\nVerification: ${eigen.verify(matr)}');
+print('Reconstruct Original:\n ${eigen.check}\n');
+
+List<Matrix> normalizedEigenvectors =
+    eigen.vectors.map((vector) => vector.normalize()).toList();
+Eigen normalizedEigen = Eigen(eigen.values, normalizedEigenvectors);
+
+print('Normalized eigenvectors:');
+for (Matrix eigenvector in normalizedEigen.vectors) {
+  print(eigenvector.round());
+}
+print('Reconstruct Original:\n ${normalizedEigen.check}\n');
+
+eigen = Eigen([
+    6,
+    3,
+    3
+  ], [
+  ColumnMatrix([1, 1, 1]),
+  ColumnMatrix([-1, 1, 0]),
+  ColumnMatrix([-1, 0, 1]),
+]);
+print('Check Matrix: ${eigen.check}');
+```
+
+```txt
+Eigen Values:
+[5.999999999999997, 2.9999999999999996, 3.000000000000001]
+
+Eigenvectors:
+Matrix: 3x1
+┌ 0.6 ┐
+│ 0.6 │
+└ 0.6 ┘
+Matrix: 3x1
+┌ -0.7 ┐
+│  0.7 │
+└  0.0 ┘
+Matrix: 3x1
+┌ -0.4 ┐
+│ -0.4 │
+└  0.8 ┘
+
+Verification: true
+Reconstruct Original:
+ Matrix: 3x3
+┌  4.000000000058206 1.0000000000145517 1.0000000000145504 ┐
+│ 1.0000000000145506 3.9999999999708953 0.9999999999708946 │
+└ 1.0000000000145506 0.9999999999708964 3.9999999999708966 ┘
+
+Normalized eigenvectors:
+Matrix: 3x1
+┌ 1 ┐
+│ 1 │
+└ 1 ┘
+Matrix: 3x1
+┌ -1 ┐
+│  1 │
+└  0 ┘
+Matrix: 3x1
+┌ 0 ┐
+│ 0 │
+└ 1 ┘
+
+Reconstruct Original:
+ Matrix: 3x3
+┌  4.000000000058206 1.0000000000145512 1.0000000000145506 ┐
+│ 1.0000000000145506 3.9999999999708953 0.9999999999708954 │
+└ 1.0000000000145506 0.9999999999708962 3.9999999999708966 ┘
+
+Check Matrix: Matrix: 3x3
+┌ 4.0 1.0 1.0 ┐
+│ 1.0 4.0 1.0 │
+└ 1.0 1.0 4.0 ┘
 ```
 
 ## Other Functions of matrices
@@ -2200,7 +2488,7 @@ v5 = Vector.arrange(10, start: 1, step: 2);
 
 ## Operators
 
-Supports operations for elementwise operations by scalar value or vector
+Supports operations for element-wise operations by scalar value or vector
 
 ```dart
 // Get the value at index 2 of v2
@@ -2254,6 +2542,7 @@ var normalizedV1 = v1.normalize();
 ```
 
 Others metrics include:
+
 - `List<num> toList()`: Converts the vector to a list of numerical values.
 - `int get length`: Returns the length (number of elements) of the vector.
 - `void setAll(num value)`: Sets all elements of this vector to [value].
@@ -2391,7 +2680,6 @@ Complex numbers are crucial in many areas of mathematics and engineering.
 
 The Complex class in this library lets you create complex numbers, access their real and imaginary parts, and obtain their conjugate.
 
-
 #### Constructors
 
 The class provides several constructors to create complex numbers in different ways:
@@ -2513,12 +2801,89 @@ The above sections provide a basic introduction to vectors, complex numbers, and
 
 </details>
 
+<details>
+<summary>DATAFRAMES</summary>
+
+## DataFrame
+
+A class representing a DataFrame, which is a 2-dimensional labeled data structure with columns of potentially different types.
+
+### Introduction
+
+The DataFrame class in Dart provides functionalities similar to data frames in languages like Python and R. It allows you to work with structured data, perform data manipulations, and conduct data analysis efficiently.
+
+### Usage
+
+To use the DataFrame class, you can create an instance by providing column names and data:
+
+```dart
+var columnNames = ['Name', 'Age', 'City'];
+var data = [
+  ['Alice', 30, 'New York'],
+  ['Bob', 25, 'Los Angeles'],
+  ['Charlie', 35, 'Chicago'],
+];
+var df = DataFrame(columnNames, data);
+```
+
+You can also create a DataFrame from a CSV string or a JSON string:
+
+```dart
+var csvData = 'Name,Age,City\nAlice,30,New York\nBob,25,Los Angeles\nCharlie,35,Chicago';
+var dfFromCSV = DataFrame.fromCSV(csv: csvData, delimiter: ',');
+
+var jsonData = '[{"Name": "Alice", "Age": 30, "City": "New York"}, '
+                '{"Name": "Bob", "Age": 25, "City": "Los Angeles"}, '
+                '{"Name": "Charlie", "Age": 35, "City": "Chicago"}]';
+var dfFromJSON = DataFrame.fromJson(jsonString: jsonData);
+```
+
+### Features
+
+- **Select Columns**: Select columns from the DataFrame by their names or indices.
+- **Select Rows**: Select rows from the DataFrame by their indices.
+- **Filter Data**: Filter rows from the DataFrame based on a condition.
+- **Replace Values**: Replace occurrences of values in the DataFrame.
+- **Sort Data**: Sort the DataFrame based on a column.
+- **Describe Data**: Provide a summary of numerical columns in the DataFrame.
+- **Add/Remove Rows and Columns**: Add or remove rows and columns from the DataFrame.
+- **Count Zeros and Nulls**: Count the number of zeros and null values in a specified column.
+- **Limit Rows**: Limit the DataFrame to a specified number of rows.
+- **Group By**: Group the DataFrame by a specified column.
+- **Value Counts**: Count the frequency of each unique value in a specified column.
+- **Customized toString()**: A robust toString() method that formats the DataFrame as a table.
+
+### Example
+
+```dart
+var df = DataFrame(['Name', 'Age', 'City'], [
+  ['Alice', 30, 'New York'],
+  ['Bob', 25, 'Los Angeles'],
+  ['Charlie', 35, 'Chicago'],
+]);
+
+print(df.toString());
+```
+
+This will output:
+
+```
+Name    Age   City        
+Alice   30    New York    
+Bob     25    Los Angeles 
+Charlie 35    Chicago     
+```
+
+</details>
+
 ## Testing
 
 Tests are located in the test directory. To run tests, execute dart test in the project root.
 
 ## Contributing Features and bugs
-### :beer: Pull requests are welcome!
+
+### :beer: Pull requests are welcome
+
 Don't forget that `open-source` makes no sense without contributors. No matter how big your changes are, it helps us a lot even it is a line of change.
 
 There might be a lot of grammar issues in the docs. It's a big help to us to fix them if you are fluent in English.
@@ -2528,7 +2893,6 @@ Reporting bugs and issues are contribution too, yes it is.
 Please file feature requests and bugs at the [issue tracker][tracker].
 
 [tracker]: https://github.com/gameticharles/advance_math/issues
-
 
 ## Author
 

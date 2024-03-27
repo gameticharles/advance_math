@@ -12,14 +12,14 @@ part 'rate_limiter.dart';
 ///
 /// Example:
 /// ```
-/// var translator = MorseCodeTranslator(loggingEnabled: true);
+/// var translator = MorseCode(loggingEnabled: true);
 /// var encoded = translator.encode('SOS');
 /// print('Encoded: $encoded');  // Encoded: ... --- ...
 ///
 /// var decoded = translator.decode('... --- ...');
 /// print('Decoded: $decoded');  // Decoded: SOS
 /// ```
-class MorseCodeTranslator {
+class MorseCode {
   static const Map<String, String> _morseCodeMap = {
     'A': '.-',
     'B': '-...',
@@ -91,12 +91,12 @@ class MorseCodeTranslator {
   /// A flag to enable logging for debugging purposes.
   bool _loggingEnabled;
 
-  /// Constructs a `MorseCodeTranslator` with optional logging and rate limiting.
+  /// Constructs a `MorseCode` with optional logging and rate limiting.
   ///
   /// Parameters:
   /// - `loggingEnabled`: If set to `true`, enables logging of actions.
   /// - `rateLimiter`: An optional `RateLimiter` to limit the rate of operations.
-  MorseCodeTranslator({bool loggingEnabled = false, RateLimiter? rateLimiter})
+  MorseCode({bool loggingEnabled = false, RateLimiter? rateLimiter})
       : _loggingEnabled = loggingEnabled,
         _reverseMorseCodeMap =
             _morseCodeMap.map((key, value) => MapEntry(value, key)),

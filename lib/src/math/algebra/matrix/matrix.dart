@@ -962,7 +962,6 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// myMatrix will be constructed from the data in the specified JSON file.
   static Matrix fromJSON({String? jsonString, String? inputFilePath}) {
     if (jsonString == null && inputFilePath != null) {
-      // File inputFile = File(inputFilePath);
 
       // Read file
       fileIO.readFromFile(inputFilePath).then((data) {
