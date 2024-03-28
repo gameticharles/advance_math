@@ -248,6 +248,7 @@ class Complex extends Number {
       );
 
   @override
+  // ignore: non_nullable_equals_parameter
   bool operator ==(dynamic obj) {
     if (obj is num) return real.value == obj && imaginary.value.value == 0.0;
     if (obj is Complex) return real == obj.real && imaginary == obj.imaginary;

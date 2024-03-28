@@ -12,9 +12,10 @@
 [![Code size](https://img.shields.io/github/languages/code-size/gameticharles/advance_math?ogo=github&logoColor=white)](https://github.com/gameticharles/advance_math)
 [![License](https://img.shields.io/github/license/gameticharles/advance_math?ogo=github&logoColor=white)](https://github.com/gameticharles/advance_math/blob/main/LICENSE)
 
-[![stars](https://img.shields.io/github/stars/gameticharles/advance_math)](https://github.com/gameticharles/advance_math/stargazers)
+[![Stars](https://img.shields.io/github/stars/gameticharles/advance_math)](https://github.com/gameticharles/advance_math/stargazers)
 [![forks](https://img.shields.io/github/forks/gameticharles/advance_math)](https://github.com/gameticharles/advance_math/network/members)
-[![CI](https://img.shields.io/github/workflow/status/gameticharles/advance_math/Dart%20CI/master?logo=github-actions&logoColor=white)](https://github.com/gameticharles/matrix/actions)
+[![Github watchers](https://img.shields.io./github/watchers/gameticharles/advance_math)](https://github.com/gameticharles/advance_math/MyBadges)
+[![Issues](https://img.shields.io./github/issues-raw/gameticharles/advance_math)](https://github.com/gameticharles/advance_math/issues)
 
 Advance math is a comprehensive Dart library that enriches mathematical programming in Dart with a wide range of features beyond vectors and matrices. Offering functionality for complex numbers, advanced linear algebra, statistics, geometry, and more. The library opens up new possibilities for mathematical computation and data analysis. Whether you're developing a cutting-edge machine learning application, or simply need to perform calculations with complex numbers. It also provides the tools you need in a well-organized and easy-to-use package.
 

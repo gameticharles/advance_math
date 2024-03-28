@@ -68,6 +68,7 @@ class Imaginary extends Number {
   bool get isInteger => true;
 
   @override
+  // ignore: non_nullable_equals_parameter
   bool operator ==(dynamic obj) {
     if (obj is Imaginary) return value == obj.value;
     if (obj is Complex) return obj.real.value == 0.0 && this == obj.imaginary;

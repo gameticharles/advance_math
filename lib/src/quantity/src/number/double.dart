@@ -94,6 +94,7 @@ class Double extends Real {
   }
 
   @override
+  // ignore: non_nullable_equals_parameter
   bool operator ==(dynamic obj) {
     if (obj is num && obj.isNaN) return value.isNaN;
     if (obj is Real || obj is num) return obj == value;

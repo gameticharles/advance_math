@@ -56,10 +56,13 @@ mixin Units {
   /// Two units are considered equal if their conversions to MKS are equal and
   /// they have the same singular name.
   @override
+  // ignore: non_nullable_equals_parameter
   bool operator ==(dynamic obj) {
     if (identical(this, obj)) return true;
 
-    if (obj is Units) return singular == obj.singular && convToMKS == obj.convToMKS;
+    if (obj is Units) {
+      return singular == obj.singular && convToMKS == obj.convToMKS;
+    }
     return false;
   }
 
@@ -75,7 +78,8 @@ mixin Units {
   /// found when inspecting secondary abbreviation, primary abbreviation and full name,
   /// in that order.  If [sing] is true and no symbol or alternate name are available
   /// then the singular version of the name will be returned.
-  String getShortestName(bool sing) => abbrev2 ?? abbrev1 ?? (sing ? (singular ?? name) : name);
+  String getShortestName(bool sing) =>
+      abbrev2 ?? abbrev1 ?? (sing ? (singular ?? name) : name);
 
   /// Calculates and returns the value in SI-MKS units of the specified [value]
   /// (that is implicitly in these units).

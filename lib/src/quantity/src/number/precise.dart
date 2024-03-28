@@ -442,6 +442,7 @@ class Precise extends Real {
 
   /// Equals operator.
   @override
+  // ignore: non_nullable_equals_parameter
   bool operator ==(dynamic other) {
     if (other is double && (other.isNaN || other.isInfinite)) return false;
     final p2 = toPrecise(other);
@@ -739,6 +740,7 @@ class Digit {
   final ByteData value = ByteData(1);
 
   @override
+  // ignore: non_nullable_equals_parameter
   bool operator ==(dynamic other) {
     if (other is Digit) return value.getUint8(0) == other.value.getUint8(0);
     if (other is num) return value.getUint8(0) == other;

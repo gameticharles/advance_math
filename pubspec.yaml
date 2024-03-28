@@ -6,8 +6,7 @@ repository: https://github.com/gameticharles/advance_math
 environment:
   sdk: ^3.0.3
 
-documentation:
-  - "https://github.com/gameticharles/advance_math"
+documentation: "https://github.com/gameticharles/advance_math"
 
 dependencies:
   buffer: ^1.2.2

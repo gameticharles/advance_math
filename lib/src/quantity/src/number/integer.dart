@@ -97,6 +97,7 @@ class Integer extends Real {
   /// Only [num] and [Number] objects having the same real
   /// integer value (and no imaginary component) are considered equal.
   @override
+  // ignore: non_nullable_equals_parameter
   bool operator ==(dynamic obj) {
     if (obj is Number || obj is num) return obj == value;
     if (obj is Complex) {

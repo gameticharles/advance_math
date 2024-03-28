@@ -43,6 +43,7 @@ abstract class Number implements Comparable<dynamic> {
   /// Two Numbers will be equal when the represented values are equal,
   /// even if the Number subtypes are different.
   @override
+  // ignore: non_nullable_equals_parameter
   bool operator ==(dynamic obj);
 
   /// The hash codes for two Numbers will be equal when the represented values are equal,

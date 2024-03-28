@@ -159,6 +159,7 @@ class Dimensions {
   /// Two Dimensions objects are only equal if they have exactly equal
   /// values for each component dimension.
   @override
+  // ignore: non_nullable_equals_parameter
   bool operator ==(dynamic d2) {
     if (d2 is Dimensions) {
       if (identical(this, d2)) return true;
