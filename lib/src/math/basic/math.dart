@@ -2,7 +2,7 @@ library maths;
 
 import 'dart:math' as math;
 
-import '../../quantity/number.dart';
+import '../../quantity/quantity.dart';
 
 part 'basic.dart';
 part 'statistics.dart';

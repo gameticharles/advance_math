@@ -1,4 +1,4 @@
-part of num_words;
+part of 'num_words.dart';
 
 extension NumWordsExtension on num {
   String toWords({

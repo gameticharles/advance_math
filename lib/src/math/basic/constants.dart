@@ -1,4 +1,4 @@
-part of maths;
+part of 'math.dart';
 
 /// Returns the mathematical constant Pi.
 ///

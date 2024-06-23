@@ -1,5 +1,5 @@
 class Matrix {
-  final List<List<int>> _matrix;
+  final List<List<num>> _matrix;
 
   Matrix(this._matrix);
 
@@ -7,7 +7,7 @@ class Matrix {
     int rows = _matrix.length;
     int cols = _matrix[0].length;
 
-    List<List<int>> result = List.generate(rows, (i) => List.filled(cols, 0));
+    List<List<num>> result = List.generate(rows, (i) => List.filled(cols, 0));
 
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {

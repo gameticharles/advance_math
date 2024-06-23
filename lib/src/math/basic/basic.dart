@@ -1,4 +1,4 @@
-part of maths;
+part of "math.dart";
 
 /// Returns the sum of all numbers up to `n`.
 ///
@@ -290,6 +290,35 @@ num clamp(num x, num min, num max) {
 /// ```
 num lerp(num a, num b, num t) {
   return a + (b - a) * t;
+}
+
+/// Converts polar coordinates (r, theta) to rectangular coordinates (x, y).
+///
+/// Parameters:
+/// - `r`: The magnitude (radius) of the polar coordinates.
+/// - `theta`: The angle (in radians) of the polar coordinates.
+///
+/// Returns:
+/// A List containing the rectangular coordinates [x, y].
+
+({num x, num y}) rec(double r, double theta) {
+  double x = r * cos(theta);
+  double y = r * sin(theta);
+  return (x: x, y: y);
+}
+
+/// Converts rectangular coordinates (x, y) to polar coordinates (r, theta).
+///
+/// Parameters:
+/// - `x`: The x-coordinate of the rectangular coordinates.
+/// - `y`: The y-coordinate of the rectangular coordinates.
+///
+/// Returns:
+/// A List containing the polar coordinates [r, theta].
+({num r, num theta}) pol(num y, num x) {
+  double r = sqrt(x * x + y * y);
+  double theta = atan2(y, x);
+  return (r: r, theta: theta);
 }
 
 /// Checks if the provided string characters [input] are a digit(s) (0-9).

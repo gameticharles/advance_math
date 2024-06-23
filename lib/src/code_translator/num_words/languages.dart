@@ -1,4 +1,4 @@
-part of num_words;
+part of 'num_words.dart';
 
 /// An English configuration for conversion
 final LanguageConfig englishConfig = LanguageConfig(

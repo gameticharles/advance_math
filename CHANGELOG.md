@@ -1,3 +1,11 @@
+## 3.3.9
+
+* **[IMPROVEMENT]** Added `Dataframe` empty initializer
+* **[FEATURE]** Converted `Dataframe` columns to a class `Series`
+* **[IMPROVEMENT]** Following the Dart format for libraries
+* **[IMPROVEMENT]** Fixed README
+* **[FEATURE]** Added converts polar coordinate `rec` and converts rectangular coordinates`pol` functions
+
 ## 3.3.8
 
 * **[BUG_FIX]** CoordinateType not set to UTM
@@ -117,7 +125,7 @@
 
 ## 2.1.0
 
-* Added arguments for diagonal 
+* Added arguments for diagonal
 * Improved min, max and sum functions with axes
 * Fixed bug with magic matrix not working for singly even numbers (6, 10, 14, 18, 22 etc).
 * Fixed bugs
@@ -147,7 +155,7 @@
 
 ## 1.0.2
 
-* Conversion of angles(radians, degrees, gradients, DMS, and DM) 
+* Conversion of angles(radians, degrees, gradients, DMS, and DM)
 * Organized code
 * Fixed bugs
 * Fixed README
@@ -155,7 +163,7 @@
 ## 1.0.0
 
 * Moved codes and reorganized functions
-* Fixed bugs 
+* Fixed bugs
 
 ## 0.1.8
 
@@ -197,7 +205,7 @@
 ## 0.1.0
 
 * Improved indexOf() and random functionalities
-* Fixed README 
+* Fixed README
 * Fixed bugs
 
 ## 0.0.9
@@ -207,7 +215,7 @@
 * Implemented Vectors, Complex nyumbers and Complex Vectors
 * Improved copyFrom() to retain or resize matrices
 * Improved matrix concatenate
-* Fixed README 
+* Fixed README
 * Corrected anonotations
 * Fixed bugs
 

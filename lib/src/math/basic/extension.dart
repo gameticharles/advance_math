@@ -1,4 +1,5 @@
-part of maths;
+part of 'math.dart';
+
 
 extension MathExtension on num {
   // Example of sum extension method

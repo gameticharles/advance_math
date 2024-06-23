@@ -1,4 +1,4 @@
-part of num_words;
+part of 'num_words.dart';
 
 final Currency usdCurrency = Currency(
   USD: 1.0,

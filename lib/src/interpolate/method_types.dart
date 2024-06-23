@@ -1,4 +1,4 @@
-part of interpolate;
+part of 'interpolate.dart';
 
 /// An enumeration of interpolation methods.
 enum MethodType {

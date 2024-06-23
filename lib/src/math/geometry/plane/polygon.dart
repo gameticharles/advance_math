@@ -1,4 +1,4 @@
-part of geometry;
+part of '../geometry.dart';
 
 /// A class representing a polygon, which can be used to compute various properties
 /// such as area, perimeter, interior and exterior angles, as well as to check

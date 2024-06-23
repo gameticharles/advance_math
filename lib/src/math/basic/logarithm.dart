@@ -1,4 +1,4 @@
-part of maths;
+part of 'math.dart';
 
 /// Returns the base-10 logarithm of a number.
 ///

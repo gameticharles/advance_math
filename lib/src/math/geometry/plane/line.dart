@@ -1,4 +1,4 @@
-part of geometry;
+part of '../geometry.dart';
 
 /// Todo: constructors for gradients , intercepts , x or y, etc
 

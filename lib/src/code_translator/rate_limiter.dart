@@ -1,4 +1,4 @@
-part of morse_code;
+part of 'morse_code.dart';
 
 /// A utility class that implements rate limiting functionality.
 ///

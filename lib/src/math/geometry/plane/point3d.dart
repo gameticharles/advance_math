@@ -1,4 +1,4 @@
-part of geometry;
+part of '../geometry.dart';
 
 /// Class `Point3D` represents a point in two or three-dimensional space.
 /// The point coordinates are represented by `x`, `y` and `z`.

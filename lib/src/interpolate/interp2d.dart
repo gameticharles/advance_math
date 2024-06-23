@@ -1,4 +1,4 @@
-part of interpolate;
+part of 'interpolate.dart';
 
 /// Provides interpolation for a 2-D function.
 ///

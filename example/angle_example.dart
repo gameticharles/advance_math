@@ -1,7 +1,13 @@
 // Import the core SI library.
-import 'package:advance_math/src/quantity/quantity.dart';
+import 'package:advance_math/advance_math.dart';
 
 void main() {
+  //A (123.345, 678.901); B (100.321, 876.555); C (110, 410.234)
+  print(Point(100.321, 876.555).bearingTo(Point(123.345, 678.901)));
+  print(Point(100.321, 876.555)
+      .bearingTo(Point(123.345, 678.901), isXAxis: false));
+  print(Point(100.321, 876.555).bearingTo(Point(110, 410.234)));
+  print(Point(100.321, 876.555).bearingTo(Point(110, 410.234), isXAxis: false));
   // Construct an Angle in radians.
   var ang = Angle(rad: 1.1);
   print('Angle1 (deg): ${ang.valueInUnits(AngleUnits.degrees)}');

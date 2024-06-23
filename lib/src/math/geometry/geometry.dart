@@ -5,12 +5,12 @@ import '../algebra/algebra.dart';
 
 import '/src/math/basic/math.dart';
 
-part 'point.dart';
-part 'point3d.dart';
-part 'line.dart';
-part 'plane.dart';
-part 'circle.dart';
+part 'plane/point.dart';
+part 'plane/point3d.dart';
+part 'plane/line.dart';
+part 'plane/plane.dart';
+part 'plane/circle.dart';
 
-part 'polygon.dart';
-part 'spherical_triangle.dart';
-part 'triangle.dart';
+part 'plane/polygon.dart';
+part 'plane/spherical_triangle.dart';
+part 'plane/triangle.dart';

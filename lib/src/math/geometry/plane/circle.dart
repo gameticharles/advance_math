@@ -1,4 +1,4 @@
-part of geometry;
+part of '../geometry.dart';
 
 /// Represents a Circle in a 2D space.
 ///

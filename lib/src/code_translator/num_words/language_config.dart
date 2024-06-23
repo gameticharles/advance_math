@@ -1,4 +1,4 @@
-part of num_words;
+part of 'num_words.dart';
 
 typedef Base20Converter = String Function(int value);
 

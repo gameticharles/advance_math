@@ -1,4 +1,4 @@
-part of geometry;
+part of '../geometry.dart';
 
 /// A class that represents a plane in a three-dimensional space.
 /// Each instance of this class is defined by a [Point] and a normal [Vector].

@@ -1,11 +1,11 @@
 # Advance Math Library for Dart
 
-[![pub package](https://img.shields.io/pub/v/advance_math.svg?logo=dart&logoColor=00b9fc)](https://pub.dartlang.org/packages/advance_math)
+[![Pub package](https://img.shields.io/pub/v/advance_math.svg?logo=dart&logoColor=00b9fc)](https://pub.dartlang.org/packages/advance_math)
 [![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
-[![likes](https://img.shields.io/pub/likes/advance_math)](https://pub.dartlang.org/packages/advance_math/score)
-[![points](https://img.shields.io/pub/points/advance_math)](https://pub.dartlang.org/packages/advance_math/score)
-[![popularity](https://img.shields.io/pub/popularity/advance_math)](https://pub.dartlang.org/packages/advance_math/score)
-[![sdk version](https://badgen.net/pub/sdk-version/advance_math)](https://pub.dartlang.org/packages/advance_math)
+[![Likes](https://img.shields.io/pub/likes/advance_math)](https://pub.dartlang.org/packages/advance_math/score)
+[![Points](https://img.shields.io/pub/points/advance_math)](https://pub.dartlang.org/packages/advance_math/score)
+[![Popularity](https://img.shields.io/pub/popularity/advance_math)](https://pub.dartlang.org/packages/advance_math/score)
+[![SDK Version](https://badgen.net/pub/sdk-version/advance_math)](https://pub.dartlang.org/packages/advance_math)
 
 [![Last Commits](https://img.shields.io/github/last-commit/gameticharles/advance_math?ogo=github&logoColor=white)](https://github.com/gameticharles/advance_math/commits/master)
 [![Pull Requests](https://img.shields.io/github/issues-pr/gameticharles/advance_math?ogo=github&logoColor=white)](https://github.com/gameticharles/advance_math/pulls)
@@ -13,7 +13,7 @@
 [![License](https://img.shields.io/github/license/gameticharles/advance_math?ogo=github&logoColor=white)](https://github.com/gameticharles/advance_math/blob/main/LICENSE)
 
 [![Stars](https://img.shields.io/github/stars/gameticharles/advance_math)](https://github.com/gameticharles/advance_math/stargazers)
-[![forks](https://img.shields.io/github/forks/gameticharles/advance_math)](https://github.com/gameticharles/advance_math/network/members)
+[![Forks](https://img.shields.io/github/forks/gameticharles/advance_math)](https://github.com/gameticharles/advance_math/network/members)
 [![Github watchers](https://img.shields.io./github/watchers/gameticharles/advance_math)](https://github.com/gameticharles/advance_math/MyBadges)
 [![Issues](https://img.shields.io./github/issues-raw/gameticharles/advance_math)](https://github.com/gameticharles/advance_math/issues)
 
@@ -2824,7 +2824,7 @@ var data = [
   ['Bob', 25, 'Los Angeles'],
   ['Charlie', 35, 'Chicago'],
 ];
-var df = DataFrame(columnNames, data);
+var df = DataFrame(columns:columnNames, data: data);
 ```
 
 You can also create a DataFrame from a CSV string or a JSON string:
@@ -2841,23 +2841,32 @@ var dfFromJSON = DataFrame.fromJson(jsonString: jsonData);
 
 ### Features
 
-- **Select Columns**: Select columns from the DataFrame by their names or indices.
-- **Select Rows**: Select rows from the DataFrame by their indices.
-- **Filter Data**: Filter rows from the DataFrame based on a condition.
-- **Replace Values**: Replace occurrences of values in the DataFrame.
-- **Sort Data**: Sort the DataFrame based on a column.
-- **Describe Data**: Provide a summary of numerical columns in the DataFrame.
-- **Add/Remove Rows and Columns**: Add or remove rows and columns from the DataFrame.
-- **Count Zeros and Nulls**: Count the number of zeros and null values in a specified column.
-- **Limit Rows**: Limit the DataFrame to a specified number of rows.
-- **Group By**: Group the DataFrame by a specified column.
-- **Value Counts**: Count the frequency of each unique value in a specified column.
-- **Customized toString()**: A robust toString() method that formats the DataFrame as a table.
+-	**DataFrame**
+  -	Create DataFrames from lists, CSV files, JSON data, or from a map.
+  -	Access columns by name or index.
+  -	Select, filter, sort, and group data.
+  -	Perform calculations and transformations (mean, standard deviation, etc.).
+  -	Add, remove, and modify rows and columns.
+  -	Merge/concatenate DataFrames.
+  -	Handle missing data.
+  - Count the number of zeros and null values in a specified column.
+  - Limit the DataFrame to a specified number of rows.
+  - Replace occurrences of values in the DataFrame.
+
+-	**Series**
+  -	Create Series with various data types.
+  -	Perform element-wise operations (+, -, *, /, etc.).
+  -	Apply transformations (square, convert to string, etc.).
+  -	Basic statistical analysis (mean, std, min, max, quantiles).
+  -	Concatenate Series.
+
 
 ### Example
 
 ```dart
-var df = DataFrame(['Name', 'Age', 'City'], [
+var df = DataFrame(
+  columns:['Name', 'Age', 'City'], 
+  data: [
   ['Alice', 30, 'New York'],
   ['Bob', 25, 'Los Angeles'],
   ['Charlie', 35, 'Chicago'],
@@ -2873,6 +2882,84 @@ Name    Age   City
 Alice   30    New York    
 Bob     25    Los Angeles 
 Charlie 35    Chicago     
+```
+
+Access and update elements
+
+```dart
+Series numbers = Series([1, 2, 3, 4], name: "Numbers");
+
+// Update a single element
+numbers[1] = 10;
+
+// Update multiple elements
+numbers[[0, 2]] = [5, 6];
+
+// Update based on a condition
+numbers[numbers > 7] = 99;
+
+print(numbers); //Numbers: [5, 99, 6, 4]
+```
+
+Concatenate series
+
+```dart
+// Series concatenation
+Series s1 = Series([1, 2, 3], name: 'A');
+Series s2 = Series([4, 5, 6], name: 'B');
+
+// Vertical concatenation
+Series s_vertical = s1.concatenate(s2);
+print(s_vertical); // A - B: [1, 2, 3, 4, 5, 6]
+
+// Horizontal concatenation
+Series s_horizontal = s1.concatenate(s2, axis: 1);
+print(s_horizontal); // A - B: [1, 2, 3, 4, 5, 6]
+```
+
+Similarly for DataFrames
+
+```dart
+// DataFrame concatenation
+var df1 = DataFrame(
+  columns: ['A','B'], 
+  data: [
+    [1, 2],
+    [3, 4]
+  ]
+);
+var df2 = DataFrame(
+  columns: ['A','B'], 
+  data: [
+    [5, 6],
+    [7, 8]
+  ]
+);
+var df3 = DataFrame(
+  columns: ['C', 'D' ], 
+  data: [
+    [10, 11],
+    [12, 13]
+  ]
+);
+
+// Vertical concatenation
+var df_vertical = df1.concatenate(df2);
+print(df_vertical);
+
+// A  B  
+// 1  2  
+// 3  4  
+// 5  6  
+// 7  8  
+
+// Horizontal concatenation
+var df_horizontal = df1.concatenate(df3, axis: 1);
+print(df_horizontal);
+
+// A  B  C   D   
+// 1  2  10  11  
+// 3  4  12  13  
 ```
 
 </details>

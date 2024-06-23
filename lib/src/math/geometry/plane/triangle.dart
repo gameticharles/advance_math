@@ -1,4 +1,4 @@
-part of geometry;
+part of '../geometry.dart';
 
 enum AreaMethod {
   /// Requires the lengths of all three sides of the triangle.

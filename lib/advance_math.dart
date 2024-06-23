@@ -13,7 +13,7 @@ export 'src/quantity/quantity.dart';
 export 'src/interpolate/interpolate.dart';
 export 'src/code_translator/num_words/num_words.dart';
 export 'src/code_translator/morse_code.dart';
-export 'src/models/data_frame.dart';
+export 'src/models/data_frame/data_frame.dart';
 
 part 'src/utils/num_ext.dart';
 part 'src/utils/string_ext.dart';

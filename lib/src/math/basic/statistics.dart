@@ -1,4 +1,4 @@
-part of maths;
+part of 'math.dart';
 
 /// Returns the mean (average) of a list of numbers.
 ///
