@@ -57,8 +57,8 @@ class Mass extends Quantity {
 
   /// Returns the [Energy] equivalent of this Mass using the famous E=mc^2 relationship.
   Energy toEnergy() {
-    if (valueSI is Precise) {
-      final c = Precise('2.99792458e8');
+    if (valueSI is Decimal) {
+      final c = Decimal('2.99792458e8');
       return Energy(J: valueSI * c * c, uncert: relativeUncertainty);
     } else {
       // ignore: prefer_int_literals

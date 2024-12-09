@@ -27,7 +27,7 @@ abstract class Number implements Comparable<dynamic> {
       return Integer.fromMap(m as Map<String, int>);
     }
     if (m.containsKey('precise') && m['precise'] is Map<String, String>) {
-      return Precise.fromMap(m as Map<String, String>);
+      return Decimal.fromMap(m as Map<String, String>);
     }
     if (m.containsKey('real') && m is Map<String, Map<String, dynamic>>) {
       return Complex.fromMap(m);
@@ -140,10 +140,10 @@ abstract class Number implements Comparable<dynamic> {
   /// If [n] is already the most simple type possible, then it will be returned directly.
   /// Precise Numbers always remain Precise.
   static Number simplifyType(Number n) {
-    if (n is Integer || n is Precise) return n;
+    if (n is Integer || n is Decimal) return n;
     if (n is Double) return n.isInteger ? Integer(n.toInt()) : n;
     if (n is Imaginary) {
-      if (n.value is Precise) return n;
+      if (n.value is Decimal) return n;
       if (n.value.toDouble() == 0) return Integer(0);
       if (n.value.isInteger && n.value is Double) {
         return Imaginary(Integer(n.value.toInt()));
@@ -152,9 +152,9 @@ abstract class Number implements Comparable<dynamic> {
     }
     if (n is Complex) {
       final realZero =
-          n.real.value == 0 && (n.real is! Precise || n.real == Precise.zero);
+          n.real.value == 0 && (n.real is! Decimal || n.real == Decimal.zero);
       final imagZero = n.imag.value.value.toDouble() == 0 &&
-          (n.imag.value is! Precise || n.imag.value == Precise.zero);
+          (n.imag.value is! Decimal || n.imag.value == Decimal.zero);
       if (realZero) {
         if (imagZero) return simplifyType(n.real);
         return Imaginary(simplifyType(n.imag.value));
@@ -238,7 +238,7 @@ abstract class Number implements Comparable<dynamic> {
 
   /// Find the square root of the number
   Number pow(num exponent) {
-    if (this is Integer || this is Precise || this is Double || this is Real) {
+    if (this is Integer || this is Decimal || this is Double || this is Real) {
       return numToNumber(math.pow(numberToNum(this), exponent));
     } else if (this is Imaginary) {
       return Complex.num(Integer.zero, this as Imaginary).pow(exponent);
@@ -249,7 +249,7 @@ abstract class Number implements Comparable<dynamic> {
 
   /// Find the square root of the number
   Number sqrt() {
-    if (this is Integer || this is Precise || this is Double || this is Real) {
+    if (this is Integer || this is Decimal || this is Double || this is Real) {
       var re = math.sqrt(numberToNum(this));
       return re is num ? numToNumber(re) : re;
     } else if (this is Imaginary) {
@@ -262,7 +262,7 @@ abstract class Number implements Comparable<dynamic> {
   /// Get the nth root of the number
   dynamic nthRoot(double nth, {bool allRoots = false}) {
     Complex complex = Complex.zero();
-    if (this is Integer || this is Precise || this is Double || this is Real) {
+    if (this is Integer || this is Decimal || this is Double || this is Real) {
       complex = Complex.fromReal(numberToNum(this));
     }
     if (this is Imaginary) {
@@ -311,7 +311,7 @@ abstract class Number implements Comparable<dynamic> {
 
   /// Returns the natural exponentiation of a number.
   Number exp() {
-    if (this is Integer || this is Precise || this is Double || this is Real) {
+    if (this is Integer || this is Decimal || this is Double || this is Real) {
       return math.exp(numberToNum(this));
     } else if (this is Imaginary) {
       return Complex.num(Integer.zero, this as Imaginary).exp();

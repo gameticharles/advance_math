@@ -1,4 +1,4 @@
-part of '../geometry.dart';
+part of '../../geometry.dart';
 
 /// Represents a spherical triangle, defined by its three angles (A, B, C)
 /// and the lengths of the three sides opposite those angles (a, b, c).

@@ -1,10 +1,5 @@
 import 'package:advance_math/advance_math.dart';
 
-void printLine(String s) {
-  var l = '--- ' * 10;
-  print('\n$l$s $l\n');
-}
-
 void main() {
   // 2x2 simple symmetric matrix
   var a1 = Matrix([

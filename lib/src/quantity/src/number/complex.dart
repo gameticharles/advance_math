@@ -228,8 +228,8 @@ class Complex extends Number {
   @override
   int get hashCode {
     if (imaginary.value.toDouble() == 0) {
-      if (real is Precise) return real.hashCode;
-      return Precise.num(real.toDouble()).hashCode;
+      if (real is Decimal) return real.hashCode;
+      return Decimal(real.toDouble()).hashCode;
     } else {
       if (real.toDouble() == 0) {
         return hashObjects(<Object>[0, imaginary.value]);

@@ -1,6 +1,10 @@
-1. pol and rec functions
-2. Expressions
-3. cumsum
+1. Expressions
+2. cumsum
+
+// Add more from
+//https://www.aqua-calc.com/calculate/area-triangle
+
+//https://www.askiitians.com/revision-notes-new/maths/ellipse.html
 
 https://pub.dev/packages/vector_math
 

@@ -196,6 +196,147 @@ double sinc(double x) {
   return (fraction: x - intP, integer: intP);
 }
 
+/// Returns the remainder of the division of [a] by [b].
+///
+/// The [mod] function is an implementation of the C++ mod() function which
+/// returns the remainder of the division of [a] by [b].
+///
+/// Example:
+/// ```dart
+/// print(mod(10, 3));  // Output: 1
+/// ```
+num mod(num a, num b) {
+  if (a is int && b is int) {
+    return a % b;
+  } else {
+    return a - (a / b).floor() * b;
+  }
+}
+
+/// Returns the modular inverse of 'a' mod 'm' if it exists.
+///
+/// Make sure 'm' > 0 and 'a' & 'm' are relatively prime.
+///
+/// - Parameter
+///  [a] the number for which to find the modular inverse
+///  [m] the modulus (must be > 0)
+///
+/// - Returns: the modular inverse of 'a' mod 'm', or null if it does not exist
+///
+/// Example:
+/// ```dart
+///  // Prints 3 since 2*3 mod 5 = 1
+///  print(modInv(2, 5));
+///
+///  // Prints null because there is no
+///  // modular inverse such that 4*x mod 18 = 1
+///  print(modInv(4, 18));
+/// ```
+dynamic modInv(num a, num m) {
+  if (m <= 0) throw ArgumentError("mod must be > 0");
+
+  // Avoid a being negative
+  a = ((a % m) + m) % m;
+
+  var v = egcd([a, m]).first;
+  num gcd = v[0];
+  num x = v[1];
+
+  if (gcd != 1) return null;
+  return ((x + m) % m) % m;
+}
+
+/// Computes the value of C(N, R) % P using Fermat's Little Theorem.
+///
+/// This method calculates the binomial coefficient (N choose R) modulo P,
+/// which is the number of ways to choose R elements from a set of N elements,
+/// modulo a prime number P. The calculation is efficient and works for large
+/// values of N and R.
+///
+/// Parameters:
+/// - [N]: The total number of elements.
+/// - [R]: The number of elements to choose.
+/// - [P]: The prime modulus.
+///
+/// Returns:
+/// - The value of C(N, R) % P.
+///
+/// Example:
+///```dart
+/// int N = 500;
+/// int R = 250;
+/// int P = 1000000007;
+///
+/// num actual = nChooseRModPrime(N, R, P);
+/// print(actual); // 515561345
+///```
+num nChooseRModPrime(int N, int R, int P) {
+  if (R == 0) return 1;
+
+  List<num> factorial = List.filled(N + 1, 0);
+  factorial[0] = 1;
+
+  for (int i = 1; i <= N; i++) {
+    factorial[i] = (factorial[i - 1] * i) % P;
+  }
+
+  return ((factorial[N] *
+          modInv(factorial[R], P) %
+          P *
+          modInv(factorial[N - R], P) %
+          P) %
+      P);
+}
+
+/// Computes the value of C(N, R) % P using BigInt for large numbers.
+///
+/// This method calculates the binomial coefficient (N choose R) modulo P,
+/// which is the number of ways to choose R elements from a set of N elements,
+/// modulo a prime number P. This version uses BigInt to handle very large
+/// numbers, ensuring accurate results for large N and R values.
+///
+/// Parameters:
+/// - [N]: The total number of elements.
+/// - [R]: The number of elements to choose.
+/// - [P]: The prime modulus.
+///
+/// Returns:
+/// - The value of C(N, R) % P as a BigInt.
+///
+/// Example:
+///```dart
+/// int N = 500;
+/// int R = 250;
+/// int P = 1000000007;
+///
+/// num actual = bigIntNChooseRModPrime(N, R, P);
+/// print(actual); // 515561345
+///```
+BigInt bigIntNChooseRModPrime(int N, int R, int P) {
+  if (R == 0) return BigInt.one;
+
+  BigInt num = BigInt.one;
+  BigInt den = BigInt.one;
+  BigInt pBigInt = BigInt.from(P);
+
+  while (R > 0) {
+    num *= BigInt.from(N);
+    den *= BigInt.from(R);
+
+    BigInt gcd = num.gcd(den);
+    num = num ~/ gcd;
+    den = den ~/ gcd;
+
+    N--;
+    R--;
+  }
+
+  num = num ~/ den;
+  num = num % pBigInt;
+
+  return num;
+}
+
 /// Rounds a number down to the nearest integer.
 ///
 /// Example:
@@ -295,29 +436,48 @@ num lerp(num a, num b, num t) {
 /// Converts polar coordinates (r, theta) to rectangular coordinates (x, y).
 ///
 /// Parameters:
-/// - `r`: The magnitude (radius) of the polar coordinates.
-/// - `theta`: The angle (in radians) of the polar coordinates.
+/// - `r`: The magnitude (radius) of the polar coordinates (as a `double`).
+/// - `theta`: The angle of the polar coordinates (as a `double`).
+/// - `isDegrees`: A boolean indicating if the angle `theta` is in degrees. Defaults to `false`.
 ///
 /// Returns:
-/// A List containing the rectangular coordinates [x, y].
-
-({num x, num y}) rec(double r, double theta) {
-  double x = r * cos(theta);
-  double y = r * sin(theta);
+/// A Tuple containing the rectangular coordinates (x, y) as `double`.
+///
+/// Examples:
+/// ```dart
+/// print(rec(56, degToRad(27))); // {'x': 49.8963653545486, 'y': 25.42346798541462}
+/// print(rec(56, 27, isDegrees: true)); // {'x': 49.8963653545486, 'y': 25.42346798541462}
+/// ```
+({double x, double y}) rec(num r, num theta, {bool isDegrees = false}) {
+  if (isDegrees) {
+    theta = toRadians(theta);
+  }
+  double x = r.toDouble() * cos(theta);
+  double y = r.toDouble() * sin(theta);
   return (x: x, y: y);
 }
 
 /// Converts rectangular coordinates (x, y) to polar coordinates (r, theta).
 ///
 /// Parameters:
-/// - `x`: The x-coordinate of the rectangular coordinates.
-/// - `y`: The y-coordinate of the rectangular coordinates.
+/// - `x`: The x-coordinate of the rectangular coordinates (as a `num`).
+/// - `y`: The y-coordinate of the rectangular coordinates (as a `num`).
+/// - `isDegrees`: A boolean indicating if the angle `theta` should be returned in degrees. Defaults to `false`.
 ///
 /// Returns:
-/// A List containing the polar coordinates [r, theta].
-({num r, num theta}) pol(num y, num x) {
+/// A Tuple containing the polar coordinates (r, theta) as `double`.
+///
+/// Examples:
+/// ```dart
+/// print(pol(49.8963653545486, 25.42346798541462)); // {'r': 56.0, 'theta': 0.471238898038469}
+/// print(pol(49.8963653545486, 25.42346798541462, isDegrees: true)); // {'r': 56.0, 'theta': 27.000000000000004}
+/// ```
+({double r, double theta}) pol(num x, num y, {bool isDegrees = false}) {
   double r = sqrt(x * x + y * y);
   double theta = atan2(y, x);
+  if (isDegrees) {
+    theta = toDegrees(theta);
+  }
   return (r: r, theta: theta);
 }
 
@@ -404,21 +564,98 @@ bool isOdd(int n) {
   return n % 2 != 0;
 }
 
-/// Checks if a number is prime.
+/// Checks if a number is prime using trial division for small numbers and Rabin-Miller for large numbers.
+///
+/// The method performs the Rabin-Miller probabilistic test for primality.
+/// It is efficient and has a very low failure rate, making it suitable for
+/// testing large numbers for primality with high confidence.
+///
+/// Parameters:
+/// - [number]: The number (int, BigInt, or String) to be tested for primality.
+/// - [certainty]: The number of iterations to run the Rabin-Miller test. Higher values increase
+///   the confidence that the number is prime. Default is 12.
+///
+/// Returns:
+/// - `true` if the number is probably prime, `false` otherwise.
+///
+/// Throws:
+/// - [ArgumentError] if the number is less than 2 or cannot be converted to a BigInt.
 ///
 /// Example:
 /// ```dart
-/// print(isPrime(11));  // Output: true
+/// print(isPrime(5));               // Output: true (int)
+/// print(isPrime(BigInt.from(1433))); // Output: true (BigInt)
+/// print(isPrime('567887653'));     // Output: true (String)
+/// print(isPrime('75611592179197710042')); // Output: false (String)
+/// print(isPrime(BigInt.parse('205561530235962095930138512256047424384916810786171737181163'))); // Output: true (BigInt)
 /// ```
-bool isPrime(int n) {
-  if (n <= 1) return false;
-  if (n == 2) return true;
-  if (n % 2 == 0) return false;
-
-  int sqrtN = (sqrt(n.toDouble())).toInt();
-  for (int i = 3; i <= sqrtN; i += 2) {
-    if (n % i == 0) return false;
+bool isPrime(dynamic number, [int certainty = 12]) {
+  // Ensure valid input data type
+  if (number is! int && number is! BigInt && number is! String) {
+    throw ArgumentError(
+        'Invalid input type. Number must be an int, BigInt, or String.');
   }
+
+  BigInt n;
+  try {
+    n = BigInt.parse(number.toString());
+  } on FormatException catch (_) {
+    throw ArgumentError(
+        'Invalid number format. String input must be a valid integer.');
+  }
+
+  // Handle base cases (less than 2 or even numbers)
+  if (n < BigInt.from(2)) {
+    return false;
+  }
+  if (n != BigInt.from(2) && n.isEven) {
+    return false;
+  }
+
+  // Quick check for small numbers using trial division (efficient)
+  if (n <= BigInt.from(3)) {
+    return true;
+  }
+  if (n % BigInt.from(2) == BigInt.zero || n % BigInt.from(3) == BigInt.zero) {
+    return false;
+  }
+
+  // If the number is small, use trial division
+  if (n.bitLength <= 31) {
+    int num = n.toInt();
+    int limit = sqrt(num).toInt();
+    for (int i = 5; i <= limit; i += 6) {
+      if (num % i == 0 || num % (i + 2) == 0) return false;
+    }
+    return true;
+  }
+
+  // For large numbers, use Rabin-Miller primality test
+  BigInt s = n - BigInt.one;
+  while (s.isEven) {
+    s >>= 1;
+  }
+
+  for (int i = 0; i < certainty; i++) {
+    BigInt r;
+    do {
+      r = Random.secure().nextBigInt(n);
+    } while (r <= BigInt.zero);
+
+    BigInt tmp = s;
+    BigInt mod = r.modPow(tmp, n);
+
+    while (
+        tmp != n - BigInt.one && mod != BigInt.one && mod != n - BigInt.one) {
+      mod = (mod * mod) % n;
+      tmp <<= 1;
+    }
+
+    if (mod != n - BigInt.one && tmp.isEven) {
+      return false;
+    }
+  }
+
   return true;
 }
 

@@ -12,7 +12,7 @@ part of 'math.dart';
 /// print(log10(Complex(1, 2))); // Output: 0.3494850021680094 + 0.480828578784234i
 /// ```
 dynamic log10(dynamic x) {
-  if (x is num || x is Double || x is Integer || x is Real || x is Precise) {
+  if (x is num || x is Double || x is Integer || x is Real || x is Decimal) {
     num nx = x is! num ? numberToNum(x) : x;
     return math.log(nx) / math.ln10;
   } else if (x is Complex || x is Imaginary) {
@@ -41,7 +41,7 @@ dynamic log10(dynamic x) {
 /// print(log(math.e));  // Output: 1.0
 /// ```
 dynamic log(dynamic x, [dynamic b]) {
-  if (x is num || x is Double || x is Integer || x is Real || x is Precise) {
+  if (x is num || x is Double || x is Integer || x is Real || x is Decimal) {
     num nx = x is! num ? numberToNum(x) : x;
     if (nx <= 0 || (b != null && b <= 0)) {
       throw ArgumentError('Invalid input for log: n and b must be > 0');
@@ -89,7 +89,7 @@ dynamic logBase(dynamic base, dynamic x) {
           base is Double ||
           base is Integer ||
           base is Real ||
-          base is Precise) &&
+          base is Decimal) &&
       x is num) {
     num nBase = base is! num ? numberToNum(base) : base;
     return math.log(x) / math.log(nBase);

@@ -1,4 +1,4 @@
-part of '../geometry.dart';
+part of '../../geometry.dart';
 
 /// Represents a Circle in a 2D space.
 ///
@@ -7,20 +7,83 @@ part of '../geometry.dart';
 /// Example:
 /// ```dart
 /// var center = Point(0, 0);
-/// var circle = Circle(center, 5);
+/// var circle = Circle(center:center, 5);
 /// print(circle.area()); // Expected output: 78.53981633974483
-/// print(circle.circumference()); // Expected output: 31.41592653589793
+/// print(circle.circumference); // Expected output: 31.41592653589793
 /// print(circle.isPointInside(Point(3, 4))); // Expected output: true
 /// ```
-class Circle {
+class Circle extends PlaneGeometry {
   /// Center [Point] of the Circle.
   Point center;
 
   /// Radius of the Circle.
   num radius;
 
+  /// Central Angle of the Circle in radians.
+  Angle? centralAngle;
+
   /// Constructs a Circle with a [center] Point and a [radius].
-  Circle(this.center, this.radius);
+  /// Primary constructor for the Circle class.
+  ///
+  /// Requires a radius and optionally a center point.
+  Circle(this.radius, {Point? center})
+      : center = center ?? Point(0, 0),
+        super("Circle");
+
+  /// Named constructor to create a Circle from various parameters.
+  ///
+  /// You can specify exactly one of the following parameters:
+  /// - radius: Radius of the circle.
+  /// - diameter: Diameter of the circle.
+  /// - area: Area of the circle.
+  /// - perimeter: Perimeter (circumference) of the circle.
+  /// - distanceFromCenterToChord: Distance from the center to the chord.
+  /// - areaOfSegment: Area of the segment.
+  /// - chordLength: Length of the chord.
+  /// - areaOfSector: Area of the sector.
+  /// - arcLength: Length of the arc.
+  /// - centralAngle: Central angle in radians.
+  ///
+  /// If multiple parameters are provided, precedence is given to `radius`,
+  /// then to the first valid parameter in the order specified above.
+  Circle.from({
+    num? radius,
+    num? diameter,
+    num? area,
+    num? perimeter,
+    num? distanceFromCenterToChord,
+    num? areaOfSegment,
+    num? chordLength,
+    num? areaOfSector,
+    num? arcLength,
+    Angle? centralAngle,
+    Point? center,
+  })  : radius = radius ??
+            getRadiusFromPart(
+              diameter: diameter,
+              area: area,
+              perimeter: perimeter,
+            ) ??
+            getRadiusFromSection(
+              distanceFromCenterToChord: distanceFromCenterToChord,
+              areaOfSegment: areaOfSegment,
+              chordLength: chordLength,
+              areaOfSector: areaOfSector,
+              arcLength: arcLength,
+              centralAngle: centralAngle,
+            ),
+        center = center ?? Point(0, 0),
+        super("Circle") {
+    this.centralAngle = centralAngle ??
+        getCentralAngle(
+          this.radius,
+          distanceFromCenterToChord: distanceFromCenterToChord,
+          areaOfSegment: areaOfSegment,
+          chordLength: chordLength,
+          areaOfSector: areaOfSector,
+          arcLength: arcLength,
+        );
+  }
 
   /// Returns a string representation of the Circle.
   @override
@@ -29,13 +92,139 @@ class Circle {
   }
 
   /// Calculates and returns the area of the Circle.
-  num area() {
-    return pi * pow(radius, 2);
+  @override
+  double area() {
+    return pi * radius * radius;
   }
 
   /// Calculates and returns the circumference of the Circle.
-  num circumference() {
-    return 2 * pi * radius;
+  double get circumference => 2 * pi * radius;
+
+  /// Gets the perimeter (circumference) of the circle.
+  @override
+  double perimeter() => circumference;
+
+  /// Gets the diameter of the circle.
+  double get diameter => radius * 2;
+
+  /// Calculates the length of an arc given a central angle.
+  double get arcLength => radius.toDouble() * centralAngle!.rad;
+
+  /// Calculates the area of a sector given a central angle.
+  double get sectorArea => 0.5 * radius * radius * centralAngle!.rad;
+
+  /// Calculates the length of a chord given a central angle in radians.
+  double get chordLength {
+    return 2.0 * radius * sin(centralAngle!.rad / 2);
+  }
+
+  /// Calculates the area of a segment given a central angle in radians.
+  double get segmentArea {
+    double triangleArea = 0.5 * radius * radius * centralAngle!.sin();
+    return sectorArea - triangleArea;
+  }
+
+  /// Calculates the distance from the center to the chord given a central angle in radians.
+  double get distanceFromCenterToChord =>
+      radius.toDouble() * cos(centralAngle!.rad / 2);
+
+  /// Calculates the central angle (in radians) given various parameters.
+  ///
+  /// Specify exactly one of the following parameters:
+  /// - distanceFromCenterToChord: Distance from the center to the chord.
+  /// - areaOfSegment: Area of the segment.
+  /// - chordLength: Length of the chord.
+  /// - areaOfSector: Area of the sector.
+  /// - arcLength: Length of the arc.
+  ///
+  /// Returns the central angle in radians.
+  static Angle? getCentralAngle(
+    num radius, {
+    num? distanceFromCenterToChord,
+    num? areaOfSegment,
+    num? chordLength,
+    num? areaOfSector,
+    num? arcLength,
+  }) {
+    num phi = 0.0;
+
+    if (distanceFromCenterToChord != null) {
+      phi = 2 * acos(distanceFromCenterToChord / radius);
+    } else if (areaOfSegment != null) {
+      num theta = 2 * acos(1 - (areaOfSegment / radius) / radius);
+      phi = theta;
+    } else if (chordLength != null) {
+      phi = 2 * asin(chordLength / (2 * radius));
+    } else if (areaOfSector != null) {
+      phi = (2 * areaOfSector) / (radius * radius);
+    } else if (arcLength != null) {
+      phi = arcLength / radius;
+    } else {
+      // throw ArgumentError('Exactly one parameter must be provided.');
+      return null;
+    }
+
+    return Angle(deg: phi);
+  }
+
+  /// Calculates the radius of a circle given a section parameter.
+  ///
+  /// Specify exactly one of the following parameters:
+  /// - distanceFromCenterToChord: Distance from the center to the chord.
+  /// - areaOfSegment: Area of the segment.
+  /// - chordLength: Length of the chord.
+  /// - areaOfSector: Area of the sector.
+  /// - arcLength: Length of the arc.
+  /// - centralAngle: Central angle.
+  ///
+  /// Returns the radius of the circle.
+  static num getRadiusFromSection({
+    num? distanceFromCenterToChord,
+    num? areaOfSegment,
+    num? chordLength,
+    num? areaOfSector,
+    num? arcLength,
+    Angle? centralAngle,
+  }) {
+    if (distanceFromCenterToChord != null && centralAngle != null) {
+      return distanceFromCenterToChord / acos(centralAngle / 2);
+    } else if (areaOfSegment != null && centralAngle != null) {
+      return sqrt(2 * areaOfSegment / centralAngle.rad);
+    } else if (chordLength != null && centralAngle != null) {
+      return chordLength / (2 * sin(centralAngle / 2));
+    } else if (areaOfSector != null && centralAngle != null) {
+      return sqrt(areaOfSector / (0.5 * centralAngle.rad));
+    } else if (arcLength != null && centralAngle != null) {
+      return arcLength / centralAngle.rad;
+    } else {
+      throw ArgumentError(
+          'Exactly one parameter must be provided along with centralAngle.');
+    }
+  }
+
+  /// Calculates the radius of a circle given a part parameter.
+  ///
+  /// Specify exactly one of the following parameters:
+  /// - diameter: Diameter of the circle.
+  /// - area: Area of the circle.
+  /// - perimeter: Perimeter (circumference) of the circle.
+  ///
+  /// Returns the radius of the circle.
+  static num? getRadiusFromPart({
+    num? diameter,
+    num? area,
+    num? perimeter,
+  }) {
+    if (diameter != null) {
+      return diameter / 2;
+    } else if (area != null) {
+      return sqrt(area / pi);
+    } else if (perimeter != null) {
+      return perimeter / (2 * pi);
+    } else {
+      return null;
+      // throw ArgumentError('Exactly one parameter must be provided.');
+    }
   }
 
   /// Checks if a [point] lies inside the Circle.
@@ -55,7 +244,8 @@ class Circle {
 
   /// Calculates the arc length between [point1] and [point2].
   /// Direction of arc is determined by [direction] which can be 'ccw' for counter clockwise or 'cw' for clockwise.
-  double arcLength(Point point1, Point point2, {String direction = 'ccw'}) {
+  double arcLengthBetween(Point point1, Point point2,
+      {String direction = 'ccw'}) {
     if (!isPointInside(point1) || !isPointInside(point2)) {
       throw ArgumentError("Both points must lie on the circle.");
     }
@@ -104,20 +294,21 @@ class Circle {
       throw ArgumentError("The point must be on the circle.");
     }
     var midpoint = center.midpointTo(pointOnCircle);
-    var circle = Circle(midpoint, radius);
+    var circle = Circle(radius, center: midpoint);
     var tangentLines = circle.tangentLines(center);
 
     var tangentCircles = <Circle>[];
     for (var line in tangentLines) {
       var pointOnLine = line.pointAtDistance(circle.center, radius);
-      tangentCircles.add(Circle(pointOnLine, radius));
+      tangentCircles.add(Circle(radius, center: pointOnLine));
     }
     return tangentCircles;
   }
 
   /// Calculates the area of the sector formed by [point1] and [point2] on the Circle.
-  double sectorArea(Point point1, Point point2, {String direction = 'ccw'}) {
-    var arcLen = arcLength(point1, point2, direction: direction);
+  double areaOfSectorBetween(Point point1, Point point2,
+      {String direction = 'ccw'}) {
+    var arcLen = arcLengthBetween(point1, point2, direction: direction);
     var angle = arcLen / radius;
     return 0.5 * pow(radius, 2) * (angle - sin(angle));
   }
@@ -203,13 +394,13 @@ class Circle {
   /// Constructs a Circle from a List of boundary [Point]s.
   static Circle fromBoundaryPoints(List<Point> boundaryPoints) {
     if (boundaryPoints.isEmpty) {
-      return Circle(Point(0, 0), 0);
+      return Circle(center: Point(0, 0), 0);
     } else if (boundaryPoints.length == 1) {
-      return Circle(boundaryPoints[0], 0);
+      return Circle(center: boundaryPoints[0], 0);
     } else if (boundaryPoints.length == 2) {
       var center = boundaryPoints[0].midpointTo(boundaryPoints[1]);
       var radius = boundaryPoints[0].distanceTo(center);
-      return Circle(center, radius);
+      return Circle(center: center, radius);
     } else {
       // length == 3
       var p1 = boundaryPoints[0];
@@ -236,7 +427,7 @@ class Circle {
       var center = Point(ux, uy);
       var radius = p1.distanceTo(center);
 
-      return Circle(center, radius);
+      return Circle(center: center, radius);
     }
   }
 

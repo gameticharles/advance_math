@@ -346,6 +346,32 @@ dynamic combinations(dynamic n, int r,
   }
 }
 
+/// Calculates the greatest common factor (GCF) of all numbers in the input list.
+///
+/// This function uses the Euclidean algorithm to find the GCF for each pair
+/// of consecutive numbers in the list.
+///
+/// Parameters:
+///  - [numbers]: A list of numbers for which the GCD is computed.
+///
+/// Returns:
+///  - The greatest common factor of all numbers in the input list.
+num gcf(List<num> numbers) {
+  if (numbers.isEmpty) {
+    throw ArgumentError('List of numbers cannot be empty.');
+  }
+
+  num _gcf(num a, num b) {
+    return b == 0 ? a : _gcf(b, a % b);
+  }
+
+  num result = numbers[0];
+  for (int i = 1; i < numbers.length; i++) {
+    result = _gcf(result, numbers[i]);
+  }
+  return result;
+}
+
 /// Returns the greatest common divisor of a list of numbers.
 ///
 /// This function uses the Euclidean algorithm to compute the GCD.
@@ -354,11 +380,11 @@ dynamic combinations(dynamic n, int r,
 ///  - [numbers]: A list of numbers for which the GCD is computed.
 ///
 /// Returns:
-///  - An integer representing the GCD of the provided numbers.
+///  - An number representing the GCD of the provided numbers.
 ///
 /// Example:
 /// ```dart
-/// print(gcdList([48, 18, 24]));  // Output: 6
+/// print(gcd([48, 18, 24]));  // Output: 6
 /// ```
 num gcd(List<num> numbers) {
   if (numbers.isEmpty) {
@@ -385,19 +411,78 @@ num gcd(List<num> numbers) {
   return a;
 }
 
+/// Extended Euclidean algorithm to find gcd and coefficients of Bezel identity for a list of numbers.
+///
+/// Returns a list of lists where each sublist contains [d, x, y] for each pair of consecutive numbers
+/// in the input list such that:
+///
+/// `d = gcd(numbers[i], numbers[i+1]), numbers[i] * x + numbers[i+1] * y = d`
+///
+/// (ie `ax + by = d`) where a and b are the consecutive numbers in the list.
+///
+/// Parameters:
+///  - [numbers]: A list of numbers for which the GCD and coefficients are computed.
+///
+/// Returns:
+///  - A list of lists, where each sublist contains [d, x, y] for the corresponding pair of numbers.
+///
+/// Example:
+/// ```dart
+/// print(egcd([48, 18, 24]));  // Output: [[6, -1, 3], [6, -1, 1]]
+/// ```
+List<List<num>> egcd(List<num> numbers) {
+  List<List<num>> results = [];
+
+  // Helper function to compute egcd for a pair of numbers
+  List<num> egcdPair(num a, num b) {
+    num x = 1, y = 0, x1 = 0, y1 = 1;
+    while (b != 0) {
+      num q = a ~/ b;
+      num r = mod(a, b); // Modulo operation using custom function
+      num x2 = x - q * x1;
+      num y2 = y - q * y1;
+      x = x1;
+      y = y1;
+      x1 = x2;
+      y1 = y2;
+      a = b;
+      b = r;
+    }
+    return [a, x, y];
+  }
+
+  // Iterate through pairs of numbers and compute egcd using the iterative function
+  for (int i = 0; i < numbers.length - 1; i++) {
+    results.add(egcdPair(numbers[i], numbers[i + 1]));
+  }
+
+  return results;
+}
+
 /// Returns the least common multiple of two numbers.
 ///
 /// Example:
 /// ```dart
-/// print(lcm(15, 20));  // Output: 60
+/// print(lcm([15, 20]));  // Output: 60
 /// ```
-int lcm(num a, num b) {
-  if (a == 0 || b == 0) {
-    return 0;
-  } else {
-    num hcf = gcd([a, b]);
-    return ((a * b) ~/ hcf).abs();
+num lcm(List<num> numbers) {
+  if (numbers.isEmpty) {
+    throw ArgumentError('List of numbers cannot be empty.');
   }
+
+  num _lcm(num a, num b) {
+    if (a == 0 || b == 0) {
+      return 0;
+    } else {
+      return (a * b) / gcd([a, b]);
+    }
+  }
+
+  num result = numbers[0];
+  for (int i = 1; i < numbers.length; i++) {
+    result = _lcm(result, numbers[i]);
+  }
+  return result;
 }
 
 /// Returns the correlation of two lists

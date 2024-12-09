@@ -1,4 +1,4 @@
-part of '../geometry.dart';
+part of 'geometry.dart';
 
 /// Class `Point` represents a point in two or three-dimensional space.
 /// The point coordinates are represented by `x`, `y` and optionally `z`.
@@ -48,14 +48,14 @@ class Point extends Vector {
   ///
   /// Example:
   /// ```dart
-  /// var p = Point.fromPolarCoordinates(5, radians(53.13));
+  /// var p = Point.fromPolarCoordinates(5, toRadians(53.13));
   /// print(p); // Output: Point(3.0000000000000004, 3.9999999999999996)
   /// ```
   factory Point.fromPolarCoordinates(num r, num theta, [Point? origin]) {
     origin = origin ?? Point.origin(false);
-    var x = origin.x + r * cos(theta);
-    var y = origin.y + r * sin(theta);
-    return Point(x, y);
+    var rr = rec(r, theta);
+
+    return Point(origin.x + rr.x, origin.y + rr.y);
   }
 
   /// Creates a 3D point and sets the coordinates of the point given spherical
@@ -66,7 +66,7 @@ class Point extends Vector {
   ///
   /// Example:
   /// ```dart
-  /// var p = Point.fromSphericalCoordinates(5, radians(53.13), radians(30));
+  /// var p = Point.fromSphericalCoordinates(5, toRadians(53.13), toRadians(30));
   /// print(p); // Output: Point(1.50, 1.999997320371271, 4.330127018922194)
   /// ```
   factory Point.fromSphericalCoordinates(num r, num theta, num phi) {
@@ -513,7 +513,7 @@ class Point extends Vector {
   ///
   /// Returns `true` if the points are collinear, and `false` otherwise.
   bool isCollinear(Point a, Point b) {
-    return (b.y - a.y) * (b.x - x) == (b.y - y) * (b.x - a.x);
+    return collinear(this, a, b);
   }
 
   /// Calculates the shortest distance from this point to a line defined by two points.

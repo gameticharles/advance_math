@@ -1,24 +1,6 @@
 import 'package:advance_math/advance_math.dart';
 
 void main() {
-  int num = 35;
-  List<int> primefactors = primeFactors(num);
-  print('Prime factors of $num are: $primefactors');
-
-  List<int> _factors = factors(num);
-  print('Factors of $num are: $_factors');
-
-  double functionToEvaluate(double x) {
-    return x * x; // Example function: f(x) = x^2
-  }
-
-  double result = numIntegrate(functionToEvaluate, 0, 2);
-  print(result); // Output: Approximate value of the integral of x^2 from 0 to 2
-
-  print(Fraction(5, 15).simplify());
-}
-
-void main1() {
   void displayConversion(NumWords converter, num value,
       {String lang = 'en',
       int decimalPlaces = 2,

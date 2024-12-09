@@ -10,8 +10,10 @@ documentation: "https://github.com/gameticharles/advance_math"
 
 dependencies:
   buffer: ^1.2.2
-  intl: ^0.18.1
+  decimal: ^2.3.3
+  intl: ^0.19.0
   logging: ^1.2.0
+
 
 dev_dependencies:
   benchmark_harness: ^2.2.2

@@ -20,13 +20,13 @@ void main() {
       final f = Energy(J: Complex.num(Double(5), Imaginary(0)));
       expect(a.hashCode, f.hashCode);
 
-      final g = Energy(J: Precise('5.0'));
+      final g = Energy(J: Decimal('5.0'));
       expect(a.hashCode, g.hashCode);
 
-      final h = Energy(J: Precise.num(5));
+      final h = Energy(J: Decimal(5));
       expect(a.hashCode, h.hashCode);
 
-      final i = Energy(J: Precise.num(5.0));
+      final i = Energy(J: Decimal(5.0));
       expect(a.hashCode, i.hashCode);
     });
 
@@ -47,13 +47,13 @@ void main() {
       final f = Energy(J: Complex.num(Double(5.01), Imaginary(0)));
       expect(a.hashCode == f.hashCode, false);
 
-      final g = Energy(J: Precise('5.000000000000000000000000000001'));
+      final g = Energy(J: Decimal('5.000000000000000000000000000001'));
       expect(a.hashCode == g.hashCode, false);
 
-      final h = Energy(J: Precise.num(-5));
+      final h = Energy(J: Decimal(-5));
       expect(a.hashCode == h.hashCode, false);
 
-      final i = Energy(J: Precise.num(5.0000001));
+      final i = Energy(J: Decimal(5.0000001));
       expect(a.hashCode == i.hashCode, false);
 
       final j = Energy(J: Imaginary(5));
@@ -78,13 +78,13 @@ void main() {
       final f = Scalar(value: Complex.num(Double(5), Imaginary(0)));
       expect(f.hashCode, 5.hashCode);
 
-      final g = Scalar(value: Precise('5.0000000000000000000'));
+      final g = Scalar(value: Decimal('5.0000000000000000000'));
       expect(g.hashCode, 5.hashCode);
 
-      final h = Scalar(value: Precise.num(-5));
+      final h = Scalar(value: Decimal(-5));
       expect(h.hashCode, -5.hashCode);
 
-      final i = Scalar(value: Precise.num(5.0));
+      final i = Scalar(value: Decimal(5.0));
       expect(i.hashCode, 5.hashCode);
 
       final j = Scalar(value: -5);
@@ -94,8 +94,8 @@ void main() {
     test('Scalar double same as Precise', () {
       final a = Scalar(value: 5.5);
       final b = Scalar(value: -5.5);
-      expect(a.hashCode, Precise('5.5').hashCode);
-      expect(b.hashCode, Precise('-5.5').hashCode);
+      expect(a.hashCode, Decimal('5.5').hashCode);
+      expect(b.hashCode, Decimal('-5.5').hashCode);
     });
 
     test('scalar in map', () {

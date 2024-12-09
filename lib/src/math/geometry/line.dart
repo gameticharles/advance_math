@@ -1,6 +1,6 @@
-part of '../geometry.dart';
+part of 'geometry.dart';
 
-/// Todo: constructors for gradients , intercepts , x or y, etc
+// Todo: constructors for gradients , intercepts , x or y, etc
 
 /// A class representing a line in a 2-dimensional space.
 ///

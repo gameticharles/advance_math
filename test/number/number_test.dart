@@ -35,7 +35,7 @@ void main() {
 
       expect(
           Number.simplifyType(
-              Complex.num(Precise('0'), Imaginary(Precise('0')))) is Precise,
+              Complex.num(Decimal('0'), Imaginary(Decimal('0')))) is Decimal,
           true);
     });
   });

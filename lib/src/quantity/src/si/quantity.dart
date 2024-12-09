@@ -45,7 +45,7 @@ import 'utilities.dart';
 /// ## Value Representation,  Arbitrary Precision
 /// Quantity supports values specified by [num] or [Number] objects.  `Number` subtypes
 /// include [Real], [Imaginary] and [Complex].  Various [Real] subtypes are
-/// available, including [Precise], which supports arbitrary precision calculations.
+/// available, including [Decimal], which supports arbitrary precision calculations.
 ///
 /// ## Uncertainty
 /// A Quantity object optionally includes an uncertainty, as quantities are
@@ -67,7 +67,7 @@ import 'utilities.dart';
 abstract class Quantity implements Comparable<dynamic> {
   /// This constructor sets the [value] (as expressed in the accompanying units)
   /// and the relative standard uncertainty.  The value is may be set using any
-  /// `num` or `Number` object, including [Precise] for arbitrary precision.
+  /// `num` or `Number` object, including [Decimal] for arbitrary precision.
   ///
   /// Both the value and the uncertainty default to zero.
   ///
@@ -128,13 +128,13 @@ abstract class Quantity implements Comparable<dynamic> {
   ///  Whether or not this Quantity is represented using arbitrary precision.
   ///
   /// The values of arbitrarily precise Quantities are stored internally as
-  /// [Precise] Number objects.
+  /// [Decimal] Number objects.
   ///
   /// Arbitrary precision calculations will generally be
   /// significantly slower than limited precision (double) calculations because
   /// arbitrary precision calculations typically occur in software while
   /// double precision calculations often are accelerated directly in hardware.
-  bool get arbitraryPrecision => valueSI is Precise;
+  bool get arbitraryPrecision => valueSI is Decimal;
 
   /// Whether or not this Quantity has scalar dimensions, including having no angle or
   /// solid angle dimensions.

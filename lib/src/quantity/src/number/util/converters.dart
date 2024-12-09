@@ -3,7 +3,7 @@ import '../double.dart';
 import '../imaginary.dart';
 import '../integer.dart';
 import '../number.dart';
-import '../precise.dart';
+import '../decimal.dart';
 
 export '../complex.dart';
 export '../double.dart';
@@ -11,7 +11,7 @@ export '../fraction.dart';
 export '../imaginary.dart';
 export '../integer.dart';
 export '../number.dart';
-export '../precise.dart';
+export '../decimal.dart';
 export '../real.dart';
 export '../util/jenkins_hash.dart';
 
@@ -39,7 +39,7 @@ num numberToNum(Number number) {
   if (number is Integer) return number.value;
   if (number is Imaginary) return 0;
   if (number is Complex) return number.real.toDouble();
-  if (number is Precise) {
+  if (number is Decimal) {
     if (number.isInteger) return number.toInt();
     return number.toDouble();
   } else {

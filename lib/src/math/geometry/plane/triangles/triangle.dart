@@ -1,37 +1,33 @@
-part of '../geometry.dart';
-
-enum AreaMethod {
-  /// Requires the lengths of all three sides of the triangle.
-  /// The formula is √[s(s - a)(s - b)(s - c)],
-  /// where s is the semi-perimeter of the triangle (a + b + c) / 2,
-  /// and a, b, and c are the lengths of the sides.
-  heron,
-
-  /// Requires the length of a base and the height from that base.
-  /// The formula is 0.5 * base * height.
-  baseHeight,
-
-  /// Requires two side lengths and the included angle.
-  /// The formula is 0.5 * a * b * sin(C),
-  /// where a and b are the lengths of the sides, and C is the included angle.
-  trigonometry,
-
-  /// If you know the coordinates of the triangle vertices,
-  /// you can calculate the area as well.
-  /// Formula: 0.5 * abs[(x1*(y2-y3) + x2*(y3-y1) + x3*(y1-y2))]
-  coordinates
-}
+part of '../../geometry.dart';
 
 /// Represents a triangle in 2D space.
-class Triangle {
-  // Sides of the triangle
-  num? a, b, c;
+class Triangle extends PlaneGeometry {
+  /// Side `a` of the triangle
+  num? a;
 
-  // Angles of the triangle
-  Angle? angleA, angleB, angleC;
+  /// Side `b` of the triangle
+  num? b;
 
-  // Points of the triangle
-  Point? A, B, C;
+  /// Side `c` of the triangle
+  num? c;
+
+  /// The angle opposite side `a` of the triangle.
+  Angle? angleA;
+
+  /// The angle opposite side `b` of the triangle.
+  Angle? angleB;
+
+  /// The angle opposite side `c` of the triangle.
+  Angle? angleC;
+
+  /// The point `A` of the triangle.
+  Point? A;
+
+  /// The point `B` of the triangle.
+  Point? B;
+
+  /// The point `C` of the triangle.
+  Point? C;
 
   /// Creates a new triangle from provided sides, angles, and points.
   ///
@@ -46,7 +42,8 @@ class Triangle {
       this.angleC,
       this.A,
       this.B,
-      this.C}) {
+      this.C})
+      : super("Triangle") {
     if (A != null && B != null && C != null) {
       a = _distance(B!, C!);
       b = _distance(A!, C!);
@@ -61,12 +58,99 @@ class Triangle {
 
   num? get base => a;
 
-  num? get height {
+  /// The height of side `a` of the triangle.
+  num? get heightA {
     if (b == null || angleC == null) {
       throw Exception(
           "Side b and angleC must be known to calculate the height.");
     }
     return b! * sin(angleC!.rad); // Assuming angleC is in radians
+  }
+
+  /// The height of side `b` of the triangle.
+  num? get heightB {
+    if (c == null || angleA == null) {
+      throw Exception(
+          "Side c and angleA must be known to calculate the height.");
+    }
+    return c! * sin(angleA!.rad); // Assuming angleC is in radians
+  }
+
+  /// The height of side `c` of the triangle
+  num? get heightC {
+    if (a == null || angleB == null) {
+      throw Exception(
+          "Side a and angleB must be known to calculate the height.");
+    }
+    return a! * sin(angleB!.rad); // Assuming angleC is in radians
+  }
+
+  /// The median of side `a` of the triangle.
+  ///
+  /// ma = 1 ⁄ 2×√(b²+c²+2b×c×cos(α))
+  num? get medianA {
+    if (b == null || c == null || angleC == null) {
+      throw Exception(
+          "Sides b, c and angleC must be known to calculate the median.");
+    }
+    return 0.5 *
+        sqrt((b! * b!) + (c! * c!) + ((2 * b!) * c! * cos(angleC!.rad)));
+  }
+
+  /// The median of side `b` of the triangle.
+  ///
+  /// mb = 1 ⁄ 2×√(a²+c²+2a×c×cos(β))
+  num? get medianB {
+    if (a == null || c == null || angleC == null) {
+      throw Exception(
+          "Sides a, c and angleC must be known to calculate the median.");
+    }
+    return 0.5 *
+        sqrt((a! * a!) + (c! * c!) + ((2 * a!) * c! * cos(angleC!.rad)));
+  }
+
+  /// The median of side `c` of the triangle.
+  ///
+  /// mc = 1 ⁄ 2×√(a²+b²+2a×b×cos(γ))
+  num? get medianC {
+    if (a == null || b == null || angleC == null) {
+      throw Exception(
+          "Sides a, b and angleC must be known to calculate the median.");
+    }
+    return 0.5 *
+        sqrt((a! * a!) + (b! * b!) + ((2 * a!) * b! * cos(angleC!.rad)));
+  }
+
+  /// Get the circumcircle radius of the triangle.
+  ///
+  /// The circumcircle is the circle that touches all three sides of the triangle.
+  /// ie. the circle that touches all three points of the triangle.
+  ///
+  /// R  = a ⁄ (2 sin(α))  = b ⁄ (2 sin(β))  = c ⁄ (2 sin(γ))
+  ///
+  /// Returns the circumcircle radius as a [double].
+  ///
+  /// If the triangle is degenerate (a triangle with zero area), the radius is infinite.
+  double get circumCircleRadius {
+    if (a == null || b == null || c == null) {
+      throw Exception(
+          "All sides must be known to calculate the circumcircle radius.");
+    }
+    return a! / (2 * sin(angleA!.rad));
+  }
+
+  /// Get the incircle radius of the triangle.
+  ///
+  /// The incircle is the circle that touches all three angles of the triangle.
+  /// ie. the circle that touches all three sides of the triangle.
+  ///
+  /// r  =  √((s−a)(s−b)(s−c) ⁄ s)
+  double get inCircleRadius {
+    if (a == null || b == null || c == null) {
+      throw Exception(
+          "All sides must be known to calculate the incircle radius.");
+    }
+    return sqrt(((s - a!) * (s - b!) * (s - c!)) / s);
   }
 
   /// Private helper function to calculate distance between two points.
@@ -274,12 +358,13 @@ class Triangle {
   /// Returns the area of the triangle.
   /// Throws Exception if the method argument is not a valid enumeration value.
   ///
-  double area(AreaMethod method) {
+  @override
+  double area([AreaMethod method = AreaMethod.heron]) {
     switch (method) {
       case AreaMethod.heron:
         return heron();
       case AreaMethod.baseHeight:
-        return baseHeightFormula(base!, height!);
+        return baseHeightFormula(base!, heightA!);
       case AreaMethod.trigonometry:
         return trigonometric();
       case AreaMethod.coordinates:
@@ -288,6 +373,28 @@ class Triangle {
         throw Exception("Invalid area calculation method.");
     }
   }
+
+  /// Calculates the perimeter of the triangle.
+  ///
+  /// The perimeter is the sum of the lengths of all three sides of the triangle.
+  ///
+  /// Returns the perimeter of the triangle as a [double].
+  @override
+  double perimeter() {
+    return a! + b! + c!.toDouble();
+  }
+
+  /// Get the semi-perimeter of a triangle
+  double get s => (a! + b! + c!) / 2;
+
+  /// The height of the triangle, which is equal to the length of side b.
+  double get height1 => b!.toDouble();
+
+  /// The heightII of the triangle, which is equal to the length of side a.
+  double get height2 => a!.toDouble();
+
+  /// The heightIII of the triangle, calculated from the lengths of its sides.
+  double get height3 => (2.0 * ((a! * b!) / 2)) / c!;
 
   /// Calculate the missing coordinates (point C) if points A and B, sides a, b and angleC are given.
   List<Point> calculateOtherCoordinates() {
@@ -307,5 +414,10 @@ class Triangle {
     } else {
       throw Exception("All points (A, B, C) are already known.");
     }
+  }
+
+  @override
+  String toString() {
+    return 'Triangle(a: $a, b: $b, c: $c, angleA: $angleA, angleB: $angleB, angleC: $angleC, A: $A, B: $B, C: $C)';
   }
 }

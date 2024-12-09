@@ -59,8 +59,8 @@ void main() {
       expect(Integer(0).hashCode, 0.hashCode);
       expect(Integer(1).hashCode, 1.hashCode);
       expect(Integer(-5).hashCode, (-5).hashCode);
-      expect(Integer(99).hashCode, Precise('99').hashCode);
-      expect(Integer(-99).hashCode, Precise('-99').hashCode);
+      expect(Integer(99).hashCode, Decimal('99').hashCode);
+      expect(Integer(-99).hashCode, Decimal('-99').hashCode);
       expect(Integer(-99).hashCode == Integer(99).hashCode, false);
     });
 
@@ -112,12 +112,12 @@ void main() {
       expect(sum.imag.value.toDouble(), -9.6);
 
       // + Precise
-      var p = Precise('34.21');
-      expect(d + p is Precise, true);
-      expect((d + p as Precise).value == 76.21, true);
-      p = Precise('-21.7');
-      expect(d + p is Precise, true);
-      expect((d + p as Precise).value == 20.3, true);
+      var p = Decimal('34.21');
+      expect(d + p is Decimal, true);
+      expect((d + p as Decimal).value == 76.21, true);
+      p = Decimal('-21.7');
+      expect(d + p is Decimal, true);
+      expect((d + p as Decimal).value == 20.3, true);
     });
 
     test('operator -', () {
@@ -180,14 +180,14 @@ void main() {
       expect(diff.imag.value.toDouble(), 9.6);
 
       // - Precise
-      var p = Precise('1');
+      var p = Decimal('1');
       diff = i - p;
-      expect(diff is Precise, true);
-      expect(diff, Precise('41'));
-      p = Precise('-1.013');
+      expect(diff is Decimal, true);
+      expect(diff, Decimal('41'));
+      p = Decimal('-1.013');
       diff = i - p;
-      expect(diff is Precise, true);
-      expect(diff, Precise('43.013'));
+      expect(diff is Decimal, true);
+      expect(diff, Decimal('43.013'));
     });
 
     test('operator unary-', () {
@@ -260,14 +260,14 @@ void main() {
       expect(prod.imag.value.toDouble(), -48);
 
       // * Precise
-      var p = Precise('1.013');
+      var p = Decimal('1.013');
       prod = d * p;
-      expect(prod is Precise, true);
-      expect(prod, Precise('5.065'));
-      p = Precise('-1.013');
+      expect(prod is Decimal, true);
+      expect(prod, Decimal('5.065'));
+      p = Decimal('-1.013');
       prod = d * p;
-      expect(prod is Precise, true);
-      expect(prod, Precise('-5.065'));
+      expect(prod is Decimal, true);
+      expect(prod, Decimal('-5.065'));
     });
 
     test('operator /', () {
@@ -336,17 +336,17 @@ void main() {
       expect(quot.imag.value.toDouble(), 1.6);
 
       // / Precise
-      var p = Precise('16.00');
+      var p = Decimal('16.00');
       quot = d / p;
-      expect(quot is Precise, true);
-      expect(quot, Precise('0.25'));
-      p = Precise('-4.876876858');
+      expect(quot is Decimal, true);
+      expect(quot, Decimal('0.25'));
+      p = Decimal('-4.876876858');
       quot = d / p;
-      expect(quot is Precise, true);
+      expect(quot is Decimal, true);
       expect(quot.toDouble(), closeTo(-0.0821970475097036, 0.000000000000001));
-      expect(Integer(0) / Precise('0'), Double.NaN);
-      expect(Integer(1) / Precise('0'), Double.infinity);
-      expect(Integer(-1) / Precise('0'), Double.negInfinity);
+      expect(Integer(0) / Decimal('0'), Double.NaN);
+      expect(Integer(1) / Decimal('0'), Double.infinity);
+      expect(Integer(-1) / Decimal('0'), Double.negInfinity);
     });
 
     test('operator ~/', () {
@@ -403,14 +403,14 @@ void main() {
       expect(n.imag.value.toDouble(), -24 / 5);
 
       // / Precise
-      var p = Precise('16.00');
+      var p = Decimal('16.00');
       n = d ~/ p;
-      expect(n is Precise, true);
-      expect(n, Precise('2.0'));
-      p = Precise('-4.876876858');
+      expect(n is Decimal, true);
+      expect(n, Decimal('2.0'));
+      p = Decimal('-4.876876858');
       n = d ~/ p;
-      expect(n is Precise, true);
-      expect(n, Precise('-8.0'));
+      expect(n is Decimal, true);
+      expect(n, Decimal('-8.0'));
     });
 
     test('operator <', () {
@@ -435,9 +435,9 @@ void main() {
       expect(Integer(77) < Complex.num(Double(6.5), Imaginary(99)), false);
       expect(Integer(-77) < Complex.num(Double(77.001), Imaginary(55)), true);
 
-      expect(Integer(88) < Precise('87.999999999999999999'), false);
-      expect(Integer(88) < Precise('88.000000000000000000'), false);
-      expect(Integer(88) < Precise('88.000000000000000001'), true);
+      expect(Integer(88) < Decimal('87.999999999999999999'), false);
+      expect(Integer(88) < Decimal('88.000000000000000000'), false);
+      expect(Integer(88) < Decimal('88.000000000000000001'), true);
     });
 
     test('operator <=', () {
@@ -465,9 +465,9 @@ void main() {
       expect(Integer(77) <= Complex.num(Double(76.999999999), Imaginary(55)),
           false);
 
-      expect(Integer(88) <= Precise('87.999999999999999999'), false);
-      expect(Integer(88) <= Precise('88.000000000000000000'), true);
-      expect(Integer(88) <= Precise('88.000000000000000001'), true);
+      expect(Integer(88) <= Decimal('87.999999999999999999'), false);
+      expect(Integer(88) <= Decimal('88.000000000000000000'), true);
+      expect(Integer(88) <= Decimal('88.000000000000000001'), true);
     });
 
     test('operator >', () {
@@ -492,9 +492,9 @@ void main() {
       expect(Integer(77) > Complex.num(Double(6.5), Imaginary(99)), true);
       expect(Integer(77) > Complex.num(Double(77.001), Imaginary(55)), false);
 
-      expect(Integer(88) > Precise('87.999999999999999999'), true);
-      expect(Integer(88) > Precise('88.000000000000000000'), false);
-      expect(Integer(88) > Precise('88.000000000000000001'), false);
+      expect(Integer(88) > Decimal('87.999999999999999999'), true);
+      expect(Integer(88) > Decimal('88.000000000000000000'), false);
+      expect(Integer(88) > Decimal('88.000000000000000001'), false);
     });
 
     test('operator >=', () {
@@ -522,9 +522,9 @@ void main() {
       expect(Integer(77) >= Complex.num(Double(77), Imaginary(55)), false);
       expect(Integer(77) >= Complex.num(Double(77), Imaginary(0)), true);
 
-      expect(Integer(88) >= Precise('87.999999999999999999'), true);
-      expect(Integer(88) >= Precise('88.000000000000000000'), true);
-      expect(Integer(88) >= Precise('88.000000000000000001'), false);
+      expect(Integer(88) >= Decimal('87.999999999999999999'), true);
+      expect(Integer(88) >= Decimal('88.000000000000000000'), true);
+      expect(Integer(88) >= Decimal('88.000000000000000001'), false);
     });
 
     test('operator ^', () {

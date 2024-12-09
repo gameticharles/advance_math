@@ -115,10 +115,10 @@ void main() {
       expect((g.valueSI as Complex).real.toDouble(), 13.2);
       expect((g.valueSI as Complex).imag.value.toDouble(), 9.3);
 
-      g = s1 + Precise('4.0032');
+      g = s1 + Decimal('4.0032');
       expect(g is Scalar, true);
-      expect(g.valueSI is Precise, true);
-      expect(g.valueSI, Precise('15.0032'));
+      expect(g.valueSI is Decimal, true);
+      expect(g.valueSI, Decimal('15.0032'));
     });
 
     test('operator -', () {
@@ -173,10 +173,10 @@ void main() {
       expect((g.valueSI as Complex).real.toDouble(), 8.8);
       expect((g.valueSI as Complex).imag.value.toDouble(), -9.3);
 
-      g = s1 - Precise('4.0032');
+      g = s1 - Decimal('4.0032');
       expect(g is Scalar, true);
-      expect(g.valueSI is Precise, true);
-      expect(g.valueSI, Precise('6.9968'));
+      expect(g.valueSI is Decimal, true);
+      expect(g.valueSI, Decimal('6.9968'));
     });
 
     test('operator *', () {

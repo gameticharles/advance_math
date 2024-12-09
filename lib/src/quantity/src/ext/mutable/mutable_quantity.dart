@@ -216,7 +216,7 @@ class MutableQuantity implements Quantity {
   }
 
   @override
-  bool get arbitraryPrecision => valueSI is Precise;
+  bool get arbitraryPrecision => valueSI is Decimal;
 
   @override
   Quantity calcExpandedUncertainty(double k) =>

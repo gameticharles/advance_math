@@ -2,7 +2,7 @@ import 'complex.dart';
 import 'imaginary.dart';
 import 'integer.dart';
 import 'number.dart';
-import 'precise.dart';
+import 'decimal.dart';
 import 'real.dart';
 
 /// Wraps Dart's core [double] type, so that it can share a common base type with other [Number]s.
@@ -85,12 +85,12 @@ class Double extends Real {
   int toInt() => _value.toInt();
 
   /// An integer value returns the same hash as the [int] with the same value.
-  /// Otherwise returns the same hash as the [Precise] number representing the value.
+  /// Otherwise returns the same hash as the [Decimal] number representing the value.
   @override
   int get hashCode {
     if (_value.isNaN || _value.isInfinite) return _value.hashCode;
     if (isInteger) return toInt().hashCode;
-    return Precise.num(_value).hashCode;
+    return Decimal(_value).hashCode;
   }
 
   @override

@@ -2,9 +2,50 @@
 
 * **[IMPROVEMENT]** Added `Dataframe` empty initializer
 * **[FEATURE]** Converted `Dataframe` columns to a class `Series`
-* **[IMPROVEMENT]** Following the Dart format for libraries
-* **[IMPROVEMENT]** Fixed README
+* **[FEATURE]** Added more functionalities to the Random class eg: nextIntInRange, nextDoubleInRange, nextBytes, nextBigIntInRange, nextBigInt, nextDateTime, nextElementFromList, nextNonRepeatingIntList etc.
+* **[IMPROVEMENT]** isPrime function has been improved to use the trial division method for small numbers and Rabin-Miller for large numbers. Now support various data types:
+
+  ```dart
+  print(isPrime(5)); // Output: true (int)
+  print(isPrime(6)); // Output: false (int)
+  print(isPrime(BigInt.from(1433))); // Output: true (BigInt)
+  print(isPrime('567887653')); // Output: true (String)
+  print(isPrime('75611592179197710042')); // Output: false (String)
+  print(isPrime('205561530235962095930138512256047424384916810786171737181163')); // Output: true (String)
+  ```
+
+* **[FEATURE]** Added more basic math functions: mod, modInv, nChooseRModPrime, bigIntNChooseRModPrime etc.
+* **[FEATURE]** Added more statistics math functions: gcf, egcd, lcm etc.
+* **[IMPROVEMENT]** In the Geometry class:
+  * The class is splitted into Plane and Solid geometries.
+  * In Point class: fixed example function calling, isCollinear computation is moved into GeoUtils, and use `rec` in the constructor fromPolarCoordinates.
+* **[IMPROVEMENT]** Added an argument `isDegrees` for `rec` and `pol` easy computation.
+* **[IMPROVEMENT]** Roman numerals to work with overline characters and parentheses.
 * **[FEATURE]** Added converts polar coordinate `rec` and converts rectangular coordinates`pol` functions
+* **[FEATURE]** Added an extension `groupBy` to the iterables and `groupByKey` to maps.
+* **[FEATURE]** Added more extensions to String class:
+  
+  ```dart
+    String testString = "Hello123World456! Café au lait costs 3.50€. Contact: test@example.com or visit https://example.com";
+
+    print(testString.extractLetters()); // Includes 'é'
+    print(testString.extractNumbers(excludeDecimalsAndSymbols: false));
+    print(testString.extractWords(excludeNumbers: false));
+    print(testString.extractAlphanumeric(excludeSymbols: false));
+
+    print(testString.extractLettersList(excludeSymbols: false));
+    print(testString.extractNumbersList(excludeDecimalsAndSymbols: false));
+    print(testString.extractEmails()); // Extracts email addresses
+    print(testString.extractUrls()); // Extracts URLs
+
+    // Custom pattern example: extract words starting with 'C'
+    print(testString.extractCustomPattern(r'\bC\w+', unicode: false));
+
+    ```
+
+* **[IMPROVEMENT]** Following the Dart format for libraries
+* **[IMPROVEMENT]** Cleaned code base and examples files
+* **[IMPROVEMENT]** Fixed README
 
 ## 3.3.8
 

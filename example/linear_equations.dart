@@ -1,9 +1,5 @@
 import 'package:advance_math/advance_math.dart';
 
-void printLine(String s) {
-  var l = '--- ' * 10;
-  print('\n$l$s $l\n');
-}
 
 void main() {
   var mat = Matrix([

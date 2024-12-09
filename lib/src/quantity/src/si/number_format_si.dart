@@ -1,12 +1,13 @@
 import 'dart:math';
 import 'package:intl/intl.dart' show NumberFormat;
 import 'package:intl/number_symbols.dart';
+import 'package:intl/src/intl/number_parser_base.dart';
 import '../number/complex.dart';
 import '../number/double.dart';
 import '../number/imaginary.dart';
 import '../number/integer.dart';
 import '../number/number.dart';
-import '../number/precise.dart';
+import '../number/decimal.dart';
 import 'quantity.dart';
 import 'utilities.dart' show expUnicodeMap, logger;
 
@@ -70,7 +71,7 @@ class NumberFormatSI implements NumberFormat {
               : number.imag.value.toString();
         }
         if (realStr == null && imagStr == null) realStr = '0';
-      } else if (number is Precise) {
+      } else if (number is Decimal) {
         realStr = number.toString();
       }
     }
@@ -329,4 +330,22 @@ class NumberFormatSI implements NumberFormat {
 
   @override
   void turnOffGrouping() => _scientific.turnOffGrouping();
+
+  @override
+  R parseWith<R, P extends NumberParserBase<R>>(P Function(NumberFormat p1, String p2) parserGenerator, String text) {
+    // TODO: implement parseWith
+    throw UnimplementedError();
+  }
+
+  @override
+  num? tryParse(String text) {
+    // TODO: implement tryParse
+    throw UnimplementedError();
+  }
+
+  @override
+  R? tryParseWith<R, P extends NumberParserBase<R>>(P Function(NumberFormat p1, String p2) parserGenerator, String text) {
+    // TODO: implement tryParseWith
+    throw UnimplementedError();
+  }
 }
