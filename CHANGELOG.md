@@ -21,8 +21,8 @@
   print(isPrime('205561530235962095930138512256047424384916810786171737181163')); // Output: true (String)
   ```
 
-* **[FEATURE]** Added more basic math functions: mod, modInv, nChooseRModPrime, bigIntNChooseRModPrime etc.
-* **[FEATURE]** Added more statistics math functions: gcf, egcd, lcm etc.
+* **[FEATURE]** Added more basic math functions: `mod`, `modInv`, nChooseRModPrime, bigIntNChooseRModPrime etc.
+* **[FEATURE]** Added more statistics math functions: `gcf`, `egcd`, `lcm` etc.
 * **[IMPROVEMENT]** In the `Geometry` class:
   * The class is splitted into Plane and Solid geometries.
   * In Point class: fixed example function calling, isCollinear computation is moved into GeoUtils, and use `rec` in the constructor fromPolarCoordinates.

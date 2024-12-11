@@ -266,3 +266,4 @@ class Ellipse extends PlaneGeometry {
     return 'Ellipse(semiMajorAxis: $semiMajorAxis, semiMinorAxis: $semiMinorAxis, center: $center)';
   }
 }
+

@@ -604,10 +604,16 @@ bool isPrime(dynamic number, [int certainty = 12]) {
         'Invalid number format. String input must be a valid integer.');
   }
 
+  // handle if the last digit is even
+  if (int.parse(number.toString()[-1]) % 2 == 0) {
+    return false;
+  }
+
   // Handle base cases (less than 2 or even numbers)
   if (n < BigInt.from(2)) {
     return false;
   }
+
   if (n != BigInt.from(2) && n.isEven) {
     return false;
   }

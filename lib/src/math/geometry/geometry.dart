@@ -293,7 +293,7 @@ void square() {
 
 void trapezoid() {
   // Example 1: Create a trapezoid using base1, base2, and height
-  var trapezoid1 = Trapezoid.from(base1: 5, base2: 3, height: 4);
+  var trapezoid1 = Trapezoid.from(base1: 7, base2: 5, height: 6);
   print('Trapezoid 1');
   print('Base 1: ${trapezoid1.base1}');
   print('Base 2: ${trapezoid1.base2}');

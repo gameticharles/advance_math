@@ -84,12 +84,12 @@ void dataframe2() {
   Series s2 = Series([4, 5, 6], name: 'B');
 
 // Vertical concatenation
-  Series s_vertical = s1.concatenate(s2);
-  print(s_vertical);
+  Series sVertical = s1.concatenate(s2);
+  print(sVertical);
 
 // Horizontal concatenation
-  Series s_horizontal = s1.concatenate(s2, axis: 1);
-  print(s_horizontal);
+  Series sHorizontal = s1.concatenate(s2, axis: 1);
+  print(sHorizontal);
 
 // DataFrame concatenation
   var df1 = DataFrame(columns: [
