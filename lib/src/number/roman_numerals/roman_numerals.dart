@@ -1,6 +1,16 @@
+import 'package:characters/characters.dart';
 import 'package:intl/intl.dart';
 
 import '../util/romans_exception.dart';
+
+part 'config.dart';
+part 'int_ext.dart';
+part 'string_ext.dart';
+
+/// Sets the [RomanNumeralsConfig] to be used globally for all [RomanNumerals] instances.
+/// This allows customizing the behavior of the [RomanNumerals] class, such as the
+/// representation of zero or the use of overline.
+RomanNumeralsConfig romanNumeralConfig = CommonRomanNumeralsConfig();
 
 /// A class to convert between Roman and decimal numerals.
 ///
@@ -18,6 +28,16 @@ import '../util/romans_exception.dart';
 /// print(numeralFromRoman.value); // Outputs: 4567
 /// ```
 class RomanNumerals {
+  /// The [RomanNumeralsConfig] used to create this [RomanNumerals] instance.
+  final RomanNumeralsConfig _config;
+
+  /// Sets the [RomanNumeralsConfig] to be used globally for all [RomanNumerals] instances.
+  /// This allows customizing the behavior of the [RomanNumerals] class, such as the
+  /// representation of zero or the use of overline.
+  static set romanNumeralsConfig(RomanNumeralsConfig config) {
+    romanNumeralConfig = config;
+  }
+
   /// A private constant map that represents the standard numerals.
   static const Map<String, int> _numerals = {
     'M\u0305': 1000000,
@@ -66,8 +86,12 @@ class RomanNumerals {
   /// print(RomanNumerals(69)); // LXIX
   /// print(RomanNumerals(8785)); // (VIII)DCCLXXXV
   /// ```
-  RomanNumerals(this.value, {this.zeroChar = 'N', this.useOverline = false})
-      : _isNegative = value < 0;
+  RomanNumerals(this.value,
+      {RomanNumeralsConfig? config,
+      this.zeroChar = 'N',
+      this.useOverline = false})
+      : _isNegative = value < 0,
+        _config = config ?? romanNumeralConfig;
 
   /// Constructs a [RomanNumerals] object from a given Roman numeral [roman].
   ///
@@ -76,8 +100,11 @@ class RomanNumerals {
   /// var numeral = RomanNumerals.fromRoman('XIV'); // 14
   /// ```
   RomanNumerals.fromRoman(String roman,
-      {this.zeroChar = 'N', this.useOverline = false})
+      {RomanNumeralsConfig? config,
+      this.zeroChar = 'N',
+      this.useOverline = false})
       : _isNegative = roman.startsWith('-'),
+        _config = config ?? romanNumeralConfig,
         value = _fromRoman(roman.startsWith('-') ? roman.substring(1) : roman,
                 zeroChar: zeroChar) *
             (roman.startsWith('-') ? -1 : 1);
@@ -178,66 +205,6 @@ class RomanNumerals {
     return result;
   }
 
-  /// Converts a date represented as a string to its Roman numeral representation.
-  ///
-  /// The [date] parameter should be the date string and [format] should be the corresponding format of the date.
-  /// Supported formats are those supported by the `DateFormat` class from the `intl` package.
-  ///
-  /// The separator between the Roman numerals in the output string can also be
-  /// customized using the `sep` parameter. By default, it is ' • '.
-  ///
-  /// Example:
-  /// ```dart
-  /// print(RomanNumerals.dateToRoman('August 22, 1989', format: 'MMMM d, y')); // Outputs: VIII • XXII • MCMLXXXIX
-  /// print(RomanNumerals.dateToRoman('Dec-23, 2017', format: 'MMM-d, y'));    // Outputs: XII • XXIII • MMXVII
-  /// print(RomanNumerals.dateToRoman('Jul-21, 2016', format: 'MMM-d, y'));    // Outputs: VII • XXI • MMXVI
-  /// ```
-  ///
-  /// Returns the date in Roman numeral format.
-  static String dateToRoman(String date,
-      {String sep = ' • ', String format = 'MMM-d, y'}) {
-    // Parse the date using the provided format
-    DateTime parsedDate = DateFormat(format).parse(date);
-
-    // Convert the day, month, and year components to Roman numerals
-    String dayRoman = RomanNumerals(parsedDate.day).toRoman();
-    String monthRoman = RomanNumerals(parsedDate.month).toRoman();
-    String yearRoman = RomanNumerals(parsedDate.year).toRoman();
-
-    // Return the formatted string
-    return '$monthRoman$sep$dayRoman$sep$yearRoman';
-  }
-
-  /// Converts a Roman numeral representation of a date back to a standard date.
-  ///
-  /// The date format can be customized using the `format` parameter. By default,
-  /// the returned date will be in the format 'MMM-d, y' (e.g., 'Aug-22, 1989').
-  ///
-  /// The separator between the Roman numerals in the input string can also be
-  /// customized using the `sep` parameter. By default, it is ' • '.
-  ///
-  /// Example:
-  /// ```dart
-  /// print(RomanNumerals.romanToDate('VIII • XXII • MCMLXXXIX')); // Outputs: Aug-22, 1989
-  /// print(RomanNumerals.romanToDate('VIII・XXII・MCMLXXXIX', sep: '・', format: 'MMMM d, y')); // Outputs: August 22, 1989
-  /// ```
-  ///
-  /// Returns the date in the specified format.
-  static String romanToDate(String romanDate,
-      {String sep = ' • ', String format = 'MMM-d, y'}) {
-    final parts = romanDate.split(sep);
-    if (parts.length != 3) {
-      throw InvalidRomanNumeralException('Invalid Roman numeral date format.');
-    }
-
-    final month = RomanNumerals.fromRoman(parts[0].trim()).value;
-    final day = RomanNumerals.fromRoman(parts[1].trim()).value;
-    final year = RomanNumerals.fromRoman(parts[2].trim()).value;
-
-    final dt = DateTime(year, month, day);
-    return DateFormat(format).format(dt);
-  }
-
   /// Converts the integer value of this instance to a Roman numeral string.
   ///
   /// Example:
@@ -305,12 +272,14 @@ class RomanNumerals {
     }
 
     // 2. Invalid Repetitions
-    if (RegExp(r"D{2,}|\u0305D{2,}|L{2,}|\u0305L{2,}|V{2,}|\u0305V{2,}").hasMatch(roman)) {
+    if (RegExp(r"D{2,}|\u0305D{2,}|L{2,}|\u0305L{2,}|V{2,}|\u0305V{2,}")
+        .hasMatch(roman)) {
       return false;
     }
 
     // 3. Check for more than three consecutive I, X, or C characters
-    if (RegExp(r"I{4,}|\u0305I{4,}|X{4,}|\u0305X{4,}|C{4,}|\u0305C{4,}").hasMatch(roman)) {
+    if (RegExp(r"I{4,}|\u0305I{4,}|X{4,}|\u0305X{4,}|C{4,}|\u0305C{4,}")
+        .hasMatch(roman)) {
       return false;
     }
 
@@ -378,6 +347,66 @@ class RomanNumerals {
     } catch (_) {
       return false;
     }
+  }
+
+  /// Converts a date represented as a string to its Roman numeral representation.
+  ///
+  /// The [date] parameter should be the date string and [format] should be the corresponding format of the date.
+  /// Supported formats are those supported by the `DateFormat` class from the `intl` package.
+  ///
+  /// The separator between the Roman numerals in the output string can also be
+  /// customized using the `sep` parameter. By default, it is ' • '.
+  ///
+  /// Example:
+  /// ```dart
+  /// print(RomanNumerals.dateToRoman('August 22, 1989', format: 'MMMM d, y')); // Outputs: VIII • XXII • MCMLXXXIX
+  /// print(RomanNumerals.dateToRoman('Dec-23, 2017', format: 'MMM-d, y'));    // Outputs: XII • XXIII • MMXVII
+  /// print(RomanNumerals.dateToRoman('Jul-21, 2016', format: 'MMM-d, y'));    // Outputs: VII • XXI • MMXVI
+  /// ```
+  ///
+  /// Returns the date in Roman numeral format.
+  static String dateToRoman(String date,
+      {String sep = ' • ', String format = 'MMM-d, y'}) {
+    // Parse the date using the provided format
+    DateTime parsedDate = DateFormat(format).parse(date);
+
+    // Convert the day, month, and year components to Roman numerals
+    String dayRoman = RomanNumerals(parsedDate.day).toRoman();
+    String monthRoman = RomanNumerals(parsedDate.month).toRoman();
+    String yearRoman = RomanNumerals(parsedDate.year).toRoman();
+
+    // Return the formatted string
+    return '$monthRoman$sep$dayRoman$sep$yearRoman';
+  }
+
+  /// Converts a Roman numeral representation of a date back to a standard date.
+  ///
+  /// The date format can be customized using the `format` parameter. By default,
+  /// the returned date will be in the format 'MMM-d, y' (e.g., 'Aug-22, 1989').
+  ///
+  /// The separator between the Roman numerals in the input string can also be
+  /// customized using the `sep` parameter. By default, it is ' • '.
+  ///
+  /// Example:
+  /// ```dart
+  /// print(RomanNumerals.romanToDate('VIII • XXII • MCMLXXXIX')); // Outputs: Aug-22, 1989
+  /// print(RomanNumerals.romanToDate('VIII・XXII・MCMLXXXIX', sep: '・', format: 'MMMM d, y')); // Outputs: August 22, 1989
+  /// ```
+  ///
+  /// Returns the date in the specified format.
+  static String romanToDate(String romanDate,
+      {String sep = ' • ', String format = 'MMM-d, y'}) {
+    final parts = romanDate.split(sep);
+    if (parts.length != 3) {
+      throw InvalidRomanNumeralException('Invalid Roman numeral date format.');
+    }
+
+    final month = RomanNumerals.fromRoman(parts[0].trim()).value;
+    final day = RomanNumerals.fromRoman(parts[1].trim()).value;
+    final year = RomanNumerals.fromRoman(parts[2].trim()).value;
+
+    final dt = DateTime(year, month, day);
+    return DateFormat(format).format(dt);
   }
 
   /// Checks if the numeral is zero.

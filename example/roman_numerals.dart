@@ -16,75 +16,71 @@ void main(List<String> args) {
   print(RomanNumerals(3449671, zeroChar: 'N', useOverline: false));
   // print(RomanNumerals.fromRoman('V̅MMMDCCLXXXV').value);
 
-  String testString =
-      "Hello123World456! Café au lait costs 3.50€. Contact: test@example.com or visit https://example.com";
+  /// 1) Nice and easy, default config is the "common" config.
 
-  print(testString.extractLetters()); // Includes 'é'
-  print(testString.extractNumbers()); // Includes '3.50'
-  print(testString.extractWords()); // Includes words with numbers
-  print(testString.extractAlphanumeric()); // Outputs: Hello123World456
+  var n = 418;
+  print(n.toRomanNumeralString());
+  // 'CDXVIII'
 
-  print(testString
-      .extractLettersList()); // Outputs: [H, e, l, l, o, W, o, r, l, d]
-  print(testString.extractNumbersList()); // Outputs: [1, 2, 3, 4, 5, 6]
-  print(testString.extractEmails()); // Extracts email address
-  print(testString.extractUrls()); // Extracts URL
+  var str = 'CDXVIII';
+  print(str.isValidRomanNumeralValue());
+  // true
+  print(str.toRomanNumeralValue());
+  // 418
 
-  // Custom pattern example: extract words starting with 'C'
-  print(testString.extractCustomPattern(r'\bC\w+', unicode: false));
+  /// 2) You can specify other [RomanNumeralConfig]'s to change the style.
+  /// You can set the config globally, if you'd like.
+  RomanNumerals.romanNumeralsConfig = VinculumRomanNumeralsConfig();
 
-  List<Parcel> parcelsList = [
-    Parcel(parcelId: "AB123"),
-    Parcel(parcelId: "AB456"),
-    Parcel(parcelId: "WD345"),
-    Parcel(parcelId: "CD789"),
-    Parcel(parcelId: "CD012")
-  ];
+  /// 3) Vinculum config style
+  n = 3449671;
+  print(n.toRomanNumeralString());
+  // M̅M̅M̅C̅D̅X̅L̅MX̅DCLXXI
 
-  Map<String, List<Parcel>> groupedParcels =
-      parcelsList.groupBy((parcel) => parcel.parcelId.extractLetters());
+  str = 'M̅M̅M̅C̅D̅X̅L̅MX̅DCLXXI';
+  print(str.isValidRomanNumeralValue());
+  // true
+  print(str.toRomanNumeralValue());
+  // 3449671
 
-  groupedParcels.forEach((key, value) {
-    print('$key: ${value.map((p) => p.parcelId).join(', ')}');
-  });
+  /// 4) You can specify the config inline, too.
+  /// 5) Apostrophus style
+  n = 2449671;
+  print(n.toRomanNumeralString(config: ApostrophusRomanNumeralsConfig()));
+  // CCCCIↃↃↃↃCCCCIↃↃↃↃCCCIↃↃↃIↃↃↃↃCCIↃↃIↃↃↃCIↃCCIↃↃIↃCLXXI
 
-  // Example list of maps representing parcels
-  List<Map<String, dynamic>> parcels = [
-    {'id': 'AB123', 'area': 100, 'type': 'residential'},
-    {'id': 'AB456', 'area': 150, 'type': 'commercial'},
-    {'id': 'CD789', 'area': 200, 'type': 'residential'},
-    {'id': 'CD012', 'area': 120, 'type': 'industrial'},
-  ];
+  /// 6) ... but frankly, globally set is probably the most common use case
+  RomanNumerals.romanNumeralsConfig = ApostrophusRomanNumeralsConfig();
 
-  // Group by the first two letters of the id
-  var groupedByScheme =
-      parcels.groupBy((parcel) => parcel['id'].substring(0, 2));
-  print('Grouped by scheme:');
-  groupedByScheme.forEach((key, value) {
-    print('$key: ${value.map((p) => p['id']).join(', ')}');
-  });
+  str = 'CCCCIↃↃↃↃCCCCIↃↃↃↃCCCIↃↃↃIↃↃↃↃCCIↃↃIↃↃↃCIↃCCIↃↃIↃCLXXI';
+  print(str.isValidRomanNumeralValue());
+  // true
+  print(str.toRomanNumeralValue());
+  // 2449671
 
-  // Group by type using the groupByKey extension
-  var groupedByType = parcels.groupByKey('type');
-  print('\nGrouped by type:');
-  groupedByType.forEach((key, value) {
-    print('$key: ${value.map((p) => p['id']).join(', ')}');
-  });
+  /// 7) The compact Apostrophus style uses special Unicode characters
+  /// just for these symbols.
+  RomanNumerals.romanNumeralsConfig = CompactApostrophusRomanNumeralsConfig();
+  n = 347449;
+  print(n.toRomanNumeralString());
+  // ↈↈↈↂↇↁↀↀCCCCXLIX
 
-  // Group by area range
-  var groupedByAreaRange = parcels.groupBy((parcel) {
-    int area = parcel['area'];
-    if (area < 120) return 'small';
-    if (area < 180) return 'medium';
-    return 'large';
-  });
-  print('\nGrouped by area range:');
-  groupedByAreaRange.forEach((key, value) {
-    print('$key: ${value.map((p) => p['id']).join(', ')}');
-  });
-}
+  str = 'ↈↈↈↂↇↁↀↀCCCCXLIX';
+  print(str.isValidRomanNumeralValue());
+  // true
+  print(str.toRomanNumeralValue());
+  // 347449
 
-class Parcel {
-  final String parcelId;
-  Parcel({required this.parcelId});
+  /// 8) You can specify a "nulla" (zero placeholder) if you want
+  /// to support zero easily.
+  RomanNumerals.romanNumeralsConfig = CommonRomanNumeralsConfig(nulla: 'N');
+  n = 0;
+  print(n.toRomanNumeralString());
+  // N
+
+  str = 'N';
+  print(str.isValidRomanNumeralValue());
+  // true
+  print(str.toRomanNumeralValue());
+  // 0
 }
