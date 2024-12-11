@@ -1,4 +1,4 @@
-import '../../number.dart';
+import '../../../number/number.dart';
 import '../si/types/length.dart';
 import '../si/units.dart';
 

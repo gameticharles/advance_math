@@ -1,7 +1,7 @@
 // ignore_for_file: unnecessary_type_check
 
 import 'dart:math';
-import 'package:advance_math/src/quantity/number.dart';
+import 'package:advance_math/src/number/number.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -102,14 +102,14 @@ void main() {
 
       test('operator + Precise', () {
         final c0 = Complex(0, 0);
-        expect(c0 + Decimal('7.5'), Decimal('7.5'));
-        expect(c0 + Decimal('7.5') is Decimal, true);
+        expect(c0 + Precision('7.5'), Precision('7.5'));
+        expect(c0 + Precision('7.5') is Precision, true);
 
         final c1 = Complex(1.1, 2.2);
         expect(
-            c1 + Decimal('0.00000000000000000000000002'),
+            c1 + Precision('0.00000000000000000000000002'),
             Complex.num(
-                Decimal('1.10000000000000000000000002'), Imaginary(2.2)));
+                Precision('1.10000000000000000000000002'), Imaginary(2.2)));
       });
     });
 
@@ -181,14 +181,14 @@ void main() {
 
       test('operator - Precise', () {
         final c0 = Complex(0, 0);
-        expect(c0 - Decimal('7.5'), Decimal('-7.5'));
-        expect(c0 - Decimal('7.5') is Decimal, true);
+        expect(c0 - Precision('7.5'), Precision('-7.5'));
+        expect(c0 - Precision('7.5') is Precision, true);
 
         final c1 = Complex(1.1, 2.2);
         expect(
-            c1 - Decimal('0.00000000000000000000000002'),
+            c1 - Precision('0.00000000000000000000000002'),
             Complex.num(
-                Decimal('1.09999999999999999999999998'), Imaginary(2.2)));
+                Precision('1.09999999999999999999999998'), Imaginary(2.2)));
       });
     });
 
@@ -273,24 +273,24 @@ void main() {
 
       test('operator * Precise', () {
         final c0 = Complex(0, 0);
-        expect(c0 * Decimal('0'), Decimal('0'));
-        expect(c0 * Decimal('0') is Decimal, true);
-        expect(c0 * Decimal('1'), Decimal('0'));
-        expect(c0 * Decimal('1') is Decimal, true);
-        expect(c0 * Decimal('-9'), Decimal('0'));
-        expect(c0 * Decimal('-9') is Decimal, true);
+        expect(c0 * Precision('0'), Precision('0'));
+        expect(c0 * Precision('0') is Precision, true);
+        expect(c0 * Precision('1'), Precision('0'));
+        expect(c0 * Precision('1') is Precision, true);
+        expect(c0 * Precision('-9'), Precision('0'));
+        expect(c0 * Precision('-9') is Precision, true);
 
         final c1 = Complex(2, 3);
-        expect(c1 * Decimal('0'), Decimal('0'));
-        expect(c1 * Decimal('1'), Complex(2, 3));
-        expect(c1 * Decimal('-9'), Complex(-18, -27));
+        expect(c1 * Precision('0'), Precision('0'));
+        expect(c1 * Precision('1'), Complex(2, 3));
+        expect(c1 * Precision('-9'), Complex(-18, -27));
 
         final c2 =
-            Complex(2, 3) * Decimal('-2.000000000000000000002') as Complex;
-        expect(c2.real is Decimal, true);
-        expect(c2.real, Decimal('-4.000000000000000000004'));
-        expect(c2.imag.value is Decimal, true);
-        expect(c2.imag.value, Decimal('-6.000000000000000000006'));
+            Complex(2, 3) * Precision('-2.000000000000000000002') as Complex;
+        expect(c2.real is Precision, true);
+        expect(c2.real, Precision('-4.000000000000000000004'));
+        expect(c2.imag.value is Precision, true);
+        expect(c2.imag.value, Precision('-6.000000000000000000006'));
       });
     });
 
@@ -566,9 +566,9 @@ void main() {
       });
 
       test('operator < Precise', () {
-        expect(Complex(6, 2) < Decimal('4.5'), false);
-        expect(Complex(6.1, 6.1) < Decimal('6.10000000000000000000'), false);
-        expect(Complex(2, 8) < Decimal('4.5'), true);
+        expect(Complex(6, 2) < Precision('4.5'), false);
+        expect(Complex(6.1, 6.1) < Precision('6.10000000000000000000'), false);
+        expect(Complex(2, 8) < Precision('4.5'), true);
       });
     });
 
@@ -608,9 +608,9 @@ void main() {
       });
 
       test('operator < Precise', () {
-        expect(Complex(6, 2) <= Decimal('4.5'), false);
-        expect(Complex(6.1, 6.1) <= Decimal('6.10000000000000000000'), true);
-        expect(Complex(2, 8) <= Decimal('4.5'), true);
+        expect(Complex(6, 2) <= Precision('4.5'), false);
+        expect(Complex(6.1, 6.1) <= Precision('6.10000000000000000000'), true);
+        expect(Complex(2, 8) <= Precision('4.5'), true);
       });
     });
 
@@ -650,9 +650,9 @@ void main() {
       });
 
       test('operator > Precise', () {
-        expect(Complex(6, 2) > Decimal('4.5'), true);
-        expect(Complex(6.1, 6.1) > Decimal('6.10000000000000000000'), false);
-        expect(Complex(2, 8) > Decimal('4.5'), false);
+        expect(Complex(6, 2) > Precision('4.5'), true);
+        expect(Complex(6.1, 6.1) > Precision('6.10000000000000000000'), false);
+        expect(Complex(2, 8) > Precision('4.5'), false);
       });
     });
 
@@ -692,9 +692,9 @@ void main() {
       });
 
       test('operator >= Precise', () {
-        expect(Complex(6, 2) >= Decimal('4.5'), true);
-        expect(Complex(6.1, 6.1) >= Decimal('6.10000000000000000000'), true);
-        expect(Complex(2, 8) >= Decimal('4.5'), false);
+        expect(Complex(6, 2) >= Precision('4.5'), true);
+        expect(Complex(6.1, 6.1) >= Precision('6.10000000000000000000'), true);
+        expect(Complex(2, 8) >= Precision('4.5'), false);
       });
     });
 
@@ -739,11 +739,11 @@ void main() {
 
       test('operator == Precise', () {
         // ignore: unrelated_type_equality_checks
-        expect(Complex(5.5, 0) == Decimal('5.5000000'), true);
+        expect(Complex(5.5, 0) == Precision('5.5000000'), true);
         // ignore: unrelated_type_equality_checks
-        expect(Complex(5.5, -1) == Decimal('5.5'), false);
+        expect(Complex(5.5, -1) == Precision('5.5'), false);
         // ignore: unrelated_type_equality_checks
-        expect(Complex(5.5, 0) == Decimal('5.50000000000000000000001'), false);
+        expect(Complex(5.5, 0) == Precision('5.50000000000000000000001'), false);
       });
 
       test('operator == Reals', () {
@@ -761,9 +761,9 @@ void main() {
             Complex.num(Integer(5), Imaginary(8)));
         expect(Complex.num(Double(5), Imaginary(Double(8))),
             Complex.num(Integer(5), Imaginary(8)));
-        expect(Complex.num(Decimal('5.00000'), Imaginary(Double(8))),
+        expect(Complex.num(Precision('5.00000'), Imaginary(Double(8))),
             Complex.num(Integer(5), Imaginary(8)));
-        expect(Complex.num(Decimal('5.00000'), Imaginary(Decimal('8'))),
+        expect(Complex.num(Precision('5.00000'), Imaginary(Precision('8'))),
             Complex.num(Integer(5), Imaginary(8)));
       });
     });

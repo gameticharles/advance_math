@@ -1,4 +1,4 @@
-import '../number/double.dart';
+import '../../../number/number/double.dart';
 import '../si/types/temperature.dart';
 import '../si/types/temperature_interval.dart';
 

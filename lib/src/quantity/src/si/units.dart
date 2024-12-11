@@ -1,4 +1,4 @@
-import '../../number.dart';
+import '../../../number/number.dart';
 import '../si/quantity_exception.dart';
 
 /// A unit is a particular physical quantity, defined and adopted by

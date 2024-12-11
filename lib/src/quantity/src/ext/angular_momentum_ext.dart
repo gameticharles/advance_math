@@ -1,4 +1,4 @@
-import '../number/double.dart';
+import '../../../number/number/double.dart';
 import '../si/types/angular_momentum.dart';
 
 /// The standard SI unit.

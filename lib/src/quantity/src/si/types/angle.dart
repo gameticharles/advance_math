@@ -1,6 +1,6 @@
 import '../../ext/angle_ext.dart';
 import '/src/math/basic/math.dart' as math;
-import '../../number/util/converters.dart';
+import '../../../../number/util/converters.dart';
 import '../../si/dimensions.dart';
 import '../../si/quantity.dart';
 

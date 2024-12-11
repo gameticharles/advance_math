@@ -73,8 +73,8 @@ void main() {
     });
 
     test('Precise', () {
-      final d = Decimal('32.456');
-      final d2 = Decimal('32.456');
+      final d = Precision('32.456');
+      final d2 = Precision('32.456');
       expect(d.hashCode, d2.hashCode);
 
       final d3 = Double(32.456);
@@ -83,7 +83,7 @@ void main() {
       final d4 = Complex.num(Double(32.456), Imaginary(0));
       expect(d2.hashCode, d4.hashCode);
 
-      final d5 = Decimal('-32.456');
+      final d5 = Precision('-32.456');
       expect(d.hashCode == d5.hashCode, false);
     });
   });

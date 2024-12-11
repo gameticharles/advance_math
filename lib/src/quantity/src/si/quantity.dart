@@ -1,6 +1,6 @@
 import '/src/math/basic/math.dart' as math;
 import 'package:intl/intl.dart';
-import '../../number.dart';
+import '../../../number/number.dart';
 import 'dimensions.dart';
 import 'dimensions_exception.dart';
 import 'misc_quantity.dart';

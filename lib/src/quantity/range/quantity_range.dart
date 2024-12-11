@@ -1,6 +1,6 @@
 // ignore_for_file: unnecessary_type_check
 
-import '../src/number/util/jenkins_hash.dart';
+import '../../number/util/jenkins_hash.dart';
 import '../src/si/quantity.dart';
 import '../src/si/quantity_exception.dart';
 

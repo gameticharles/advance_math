@@ -109,14 +109,14 @@ void main() {
       expect(sum.imag.value.toDouble(), -9.6);
 
       // + Precise
-      var p = Decimal('123.456');
+      var p = Precision('123.456');
       sum = d + p;
-      expect(sum is Decimal, true);
-      expect(sum, Decimal('165.512'));
-      p = Decimal('-0.024');
+      expect(sum is Precision, true);
+      expect(sum, Precision('165.512'));
+      p = Precision('-0.024');
       sum = d + p;
-      expect(sum is Decimal, true);
-      expect(sum, Decimal('42.032'));
+      expect(sum is Precision, true);
+      expect(sum, Precision('42.032'));
     });
 
     test('operator -', () {
@@ -189,14 +189,14 @@ void main() {
       expect(diff.imag.value.toDouble(), 9.6);
 
       // - Precise
-      var p = Decimal('1.013');
+      var p = Precision('1.013');
       diff = d - p;
-      expect(diff is Decimal, true);
-      expect(diff, Decimal('41.043'));
-      p = Decimal('-1.013');
+      expect(diff is Precision, true);
+      expect(diff, Precision('41.043'));
+      p = Precision('-1.013');
       diff = d - p;
-      expect(diff is Decimal, true);
-      expect(diff, Decimal('43.069'));
+      expect(diff is Precision, true);
+      expect(diff, Precision('43.069'));
     });
 
     test('operator unary-', () {
@@ -270,14 +270,14 @@ void main() {
       expect(prod.imag.value.toDouble(), -11.52);
 
       // * Precise
-      var p = Decimal('1.013');
+      var p = Precision('1.013');
       prod = d * p;
-      expect(prod is Decimal, true);
-      expect(prod, Decimal('1.2156'));
-      p = Decimal('-1.013');
+      expect(prod is Precision, true);
+      expect(prod, Precision('1.2156'));
+      p = Precision('-1.013');
       prod = d * p;
-      expect(prod is Decimal, true);
-      expect(prod, Decimal('-1.2156'));
+      expect(prod is Precision, true);
+      expect(prod, Precision('-1.2156'));
     });
 
     test('operator /', () {
@@ -343,14 +343,14 @@ void main() {
       expect(quot.imag.value.toDouble(), 1.6);
 
       // / Precise
-      var p = Decimal('4.8');
+      var p = Precision('4.8');
       quot = d / p;
-      expect(quot is Decimal, true);
-      expect(quot, Decimal('0.25'));
-      p = Decimal('-4.8');
+      expect(quot is Precision, true);
+      expect(quot, Precision('0.25'));
+      p = Precision('-4.8');
       quot = d / p;
-      expect(quot is Decimal, true);
-      expect(quot, Decimal('-0.25'));
+      expect(quot is Precision, true);
+      expect(quot, Precision('-0.25'));
     });
 
     test('operator >', () {
@@ -378,12 +378,12 @@ void main() {
       expect(Double(77) > Complex.num(Double(6.5), Imaginary(99)), true);
       expect(Double(-77.7) > Complex.num(Double(6.5), Imaginary(99)), false);
 
-      expect(Double(88.99999) > Decimal('88.99999'), false);
-      expect(Double(88.99999) > Decimal('88.999989999'), true);
-      expect(Double(88.99999) > Decimal('89.000000000'), false);
-      expect(Double(-88.99999) > Decimal('-88.99999'), false);
-      expect(Double(-88.99999) > Decimal('-88.999989999'), false);
-      expect(Double(-88.99999) > Decimal('-89.000000000'), true);
+      expect(Double(88.99999) > Precision('88.99999'), false);
+      expect(Double(88.99999) > Precision('88.999989999'), true);
+      expect(Double(88.99999) > Precision('89.000000000'), false);
+      expect(Double(-88.99999) > Precision('-88.99999'), false);
+      expect(Double(-88.99999) > Precision('-88.999989999'), false);
+      expect(Double(-88.99999) > Precision('-89.000000000'), true);
     });
 
     test('operator >=', () {
@@ -414,11 +414,11 @@ void main() {
       expect(Double(-77.7) >= Complex.num(Double(6.5), Imaginary(99)), false);
 
       //expect(Double(88.99999) >= Precise('88.99999'), true);
-      expect(Double(88.99999) >= Decimal('88.999989999'), true);
-      expect(Double(88.99999) >= Decimal('89.000000000'), false);
-      expect(Double(-88.99999) >= Decimal('-88.99999'), true);
-      expect(Double(-88.99999) >= Decimal('-88.999989999'), false);
-      expect(Double(-88.99999) >= Decimal('-89.000000000'), true);
+      expect(Double(88.99999) >= Precision('88.999989999'), true);
+      expect(Double(88.99999) >= Precision('89.000000000'), false);
+      expect(Double(-88.99999) >= Precision('-88.99999'), true);
+      expect(Double(-88.99999) >= Precision('-88.999989999'), false);
+      expect(Double(-88.99999) >= Precision('-89.000000000'), true);
     });
 
     test('operator <', () {
@@ -446,12 +446,12 @@ void main() {
       expect(Double(77) < Complex.num(Double(6.5), Imaginary(99)), false);
       expect(Double(-77.7) < Complex.num(Double(6.5), Imaginary(99)), true);
 
-      expect(Double(88.99999) < Decimal('88.99999'), false);
-      expect(Double(88.99999) < Decimal('88.999989999'), false);
-      expect(Double(88.99999) < Decimal('89.000000000'), true);
-      expect(Double(-88.99999) < Decimal('-88.99999'), false);
-      expect(Double(-88.99999) < Decimal('-88.999989999'), true);
-      expect(Double(-88.99999) < Decimal('-89.000000000'), false);
+      expect(Double(88.99999) < Precision('88.99999'), false);
+      expect(Double(88.99999) < Precision('88.999989999'), false);
+      expect(Double(88.99999) < Precision('89.000000000'), true);
+      expect(Double(-88.99999) < Precision('-88.99999'), false);
+      expect(Double(-88.99999) < Precision('-88.999989999'), true);
+      expect(Double(-88.99999) < Precision('-89.000000000'), false);
     });
 
     test('operator <=', () {
@@ -480,12 +480,12 @@ void main() {
       expect(Double(77) <= Complex.num(Double(77), Imaginary(22)), true);
       expect(Double(-77.7) <= Complex.num(Double(6.5), Imaginary(99)), true);
 
-      expect(Double(88.99999) <= Decimal('88.99999'), true);
-      expect(Double(88.99999) <= Decimal('88.999989999'), false);
-      expect(Double(88.99999) <= Decimal('89.000000000'), true);
-      expect(Double(-88.99999) <= Decimal('-88.99999'), true);
-      expect(Double(-88.99999) <= Decimal('-88.999989999'), true);
-      expect(Double(-88.99999) <= Decimal('-89.000000000'), false);
+      expect(Double(88.99999) <= Precision('88.99999'), true);
+      expect(Double(88.99999) <= Precision('88.999989999'), false);
+      expect(Double(88.99999) <= Precision('89.000000000'), true);
+      expect(Double(-88.99999) <= Precision('-88.99999'), true);
+      expect(Double(-88.99999) <= Precision('-88.999989999'), true);
+      expect(Double(-88.99999) <= Precision('-89.000000000'), false);
     });
 
     test('operator ^', () {
@@ -507,9 +507,9 @@ void main() {
       expect(Double(0).hashCode, 0.hashCode);
       expect(Double(1).hashCode, 1.hashCode);
       expect(Double(-5).hashCode, (-5).hashCode);
-      expect(Double(99.99).hashCode, Decimal('99.99').hashCode);
-      expect(Double(98765.4321).hashCode, Decimal('98765.4321').hashCode);
-      expect(Double(-98765.4321).hashCode, Decimal('-98765.4321').hashCode);
+      expect(Double(99.99).hashCode, Precision('99.99').hashCode);
+      expect(Double(98765.4321).hashCode, Precision('98765.4321').hashCode);
+      expect(Double(-98765.4321).hashCode, Precision('-98765.4321').hashCode);
     });
 
     test('clamp', () {

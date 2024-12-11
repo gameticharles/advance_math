@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:advance_math/src/quantity/number.dart';
+import 'package:advance_math/src/number/number.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -73,12 +73,12 @@ void main() {
       });
 
       test('operator + Precise', () {
-        expect(Imaginary(0) + Decimal('5.5'), Decimal('5.5'));
-        expect(Imaginary(0) + Decimal('5.5'), isA<Decimal>());
-        expect(Imaginary(1.1) + Decimal('5.5'), Complex(5.5, 1.1));
+        expect(Imaginary(0) + Precision('5.5'), Precision('5.5'));
+        expect(Imaginary(0) + Precision('5.5'), isA<Precision>());
+        expect(Imaginary(1.1) + Precision('5.5'), Complex(5.5, 1.1));
         expect(
-            (Imaginary(1.1) + Decimal('5.5') as Complex).real, isA<Decimal>());
-        expect(Imaginary(-1.1) + Decimal('5.5'), Complex(5.5, -1.1));
+            (Imaginary(1.1) + Precision('5.5') as Complex).real, isA<Precision>());
+        expect(Imaginary(-1.1) + Precision('5.5'), Complex(5.5, -1.1));
       });
     });
 
@@ -136,12 +136,12 @@ void main() {
       });
 
       test('operator - Precise', () {
-        expect(Imaginary(0) - Decimal('5.5'), Decimal('-5.5'));
-        expect(Imaginary(0) - Decimal('5.5'), isA<Decimal>());
-        expect(Imaginary(1.1) - Decimal('5.5'), Complex(-5.5, 1.1));
+        expect(Imaginary(0) - Precision('5.5'), Precision('-5.5'));
+        expect(Imaginary(0) - Precision('5.5'), isA<Precision>());
+        expect(Imaginary(1.1) - Precision('5.5'), Complex(-5.5, 1.1));
         expect(
-            (Imaginary(1.1) - Decimal('5.5') as Complex).real, isA<Decimal>());
-        expect(Imaginary(-1.1) - Decimal('5.5'), Complex(-5.5, -1.1));
+            (Imaginary(1.1) - Precision('5.5') as Complex).real, isA<Precision>());
+        expect(Imaginary(-1.1) - Precision('5.5'), Complex(-5.5, -1.1));
       });
     });
 
@@ -283,26 +283,26 @@ void main() {
         final imag3 = Imaginary(-9);
         final imag4 = Imaginary(-25.987);
 
-        expect(imag0 * Decimal('0'), Imaginary(0));
-        expect(imag0 * Decimal('1.1'), Imaginary(0));
-        expect((imag0 * Decimal('1.1') as Imaginary).value, isA<Decimal>());
-        expect(imag0 * Decimal('2.2'), Imaginary(0));
-        expect(imag1 * Decimal('0'), Imaginary(0));
-        expect((imag1 * Decimal('0') as Imaginary).value, isA<Decimal>());
-        expect(imag1 * Decimal('1.1'), Imaginary(1.1));
-        expect(imag1 * Decimal('2.2'), Imaginary(2.2));
-        expect(imag1 * Decimal('-5.5'), Imaginary(-5.5));
-        expect(imag2 * Decimal('1.1'), Imaginary(6.16));
-        expect(imag2 * Decimal('2.2'), Imaginary(12.32));
-        expect((imag2 * Decimal('-5.5') as Imaginary).value.toDouble(),
+        expect(imag0 * Precision('0'), Imaginary(0));
+        expect(imag0 * Precision('1.1'), Imaginary(0));
+        expect((imag0 * Precision('1.1') as Imaginary).value, isA<Precision>());
+        expect(imag0 * Precision('2.2'), Imaginary(0));
+        expect(imag1 * Precision('0'), Imaginary(0));
+        expect((imag1 * Precision('0') as Imaginary).value, isA<Precision>());
+        expect(imag1 * Precision('1.1'), Imaginary(1.1));
+        expect(imag1 * Precision('2.2'), Imaginary(2.2));
+        expect(imag1 * Precision('-5.5'), Imaginary(-5.5));
+        expect(imag2 * Precision('1.1'), Imaginary(6.16));
+        expect(imag2 * Precision('2.2'), Imaginary(12.32));
+        expect((imag2 * Precision('-5.5') as Imaginary).value.toDouble(),
             closeTo(-30.8, 1e-12));
-        expect((imag2 * Decimal('-5.5') as Imaginary).value, isA<Decimal>());
-        expect(imag3 * Decimal('1.1'), Imaginary(-9.9));
-        expect(imag3 * Decimal('2.2'), Imaginary(-19.8));
-        expect(imag3 * Decimal('-5.5'), Imaginary(49.5));
-        expect(imag4 * Decimal('1.1'), Imaginary(-28.5857));
-        expect(imag4 * Decimal('2.2'), Imaginary(-57.1714));
-        expect((imag4 * Decimal('-5.5') as Imaginary).value.toDouble(),
+        expect((imag2 * Precision('-5.5') as Imaginary).value, isA<Precision>());
+        expect(imag3 * Precision('1.1'), Imaginary(-9.9));
+        expect(imag3 * Precision('2.2'), Imaginary(-19.8));
+        expect(imag3 * Precision('-5.5'), Imaginary(49.5));
+        expect(imag4 * Precision('1.1'), Imaginary(-28.5857));
+        expect(imag4 * Precision('2.2'), Imaginary(-57.1714));
+        expect((imag4 * Precision('-5.5') as Imaginary).value.toDouble(),
             closeTo(142.9285, 1e-12));
       });
     });
@@ -451,21 +451,21 @@ void main() {
         final imag3 = Imaginary(-9);
         final imag4 = Imaginary(-25.987);
 
-        expect(imag0 / Decimal('2.5'), Imaginary(0));
-        expect((imag0 / Decimal('2.5') as Imaginary).value, isA<Decimal>());
-        expect(imag1 / Decimal('2.5'), Imaginary(0.4));
-        expect(imag2 / Decimal('2.5'), Imaginary(2.24));
-        expect(imag3 / Decimal('2.5'), Imaginary(-3.6));
-        expect(imag4 / Decimal('2.5'), Imaginary(-10.3948));
-        expect(imag0 / Decimal('-2.5'), Imaginary(0));
-        expect(imag1 / Decimal('-2.5'), Imaginary(-0.4));
-        expect(imag2 / Decimal('-2.5'), Imaginary(-2.24));
-        expect((imag2 / Decimal('2.5') as Imaginary).value, isA<Decimal>());
-        expect(imag3 / Decimal('-2.5'), Imaginary(3.6));
-        expect(imag4 / Decimal('-2.5'), Imaginary(10.3948));
+        expect(imag0 / Precision('2.5'), Imaginary(0));
+        expect((imag0 / Precision('2.5') as Imaginary).value, isA<Precision>());
+        expect(imag1 / Precision('2.5'), Imaginary(0.4));
+        expect(imag2 / Precision('2.5'), Imaginary(2.24));
+        expect(imag3 / Precision('2.5'), Imaginary(-3.6));
+        expect(imag4 / Precision('2.5'), Imaginary(-10.3948));
+        expect(imag0 / Precision('-2.5'), Imaginary(0));
+        expect(imag1 / Precision('-2.5'), Imaginary(-0.4));
+        expect(imag2 / Precision('-2.5'), Imaginary(-2.24));
+        expect((imag2 / Precision('2.5') as Imaginary).value, isA<Precision>());
+        expect(imag3 / Precision('-2.5'), Imaginary(3.6));
+        expect(imag4 / Precision('-2.5'), Imaginary(10.3948));
 
-        expect((imag0 / Decimal('0') as Imaginary).value.toDouble(), isNaN);
-        expect(imag1 / Decimal('0'), Imaginary(Double.infinity));
+        expect((imag0 / Precision('0') as Imaginary).value.toDouble(), isNaN);
+        expect(imag1 / Precision('0'), Imaginary(Double.infinity));
       });
     });
 
@@ -501,9 +501,9 @@ void main() {
       });
 
       test('operator < Precise', () {
-        expect(Imaginary(3) < Decimal('2.2'), true);
-        expect(Imaginary(-3) < Decimal('0'), false);
-        expect(Imaginary(-3) < Decimal('-1.1'), false);
+        expect(Imaginary(3) < Precision('2.2'), true);
+        expect(Imaginary(-3) < Precision('0'), false);
+        expect(Imaginary(-3) < Precision('-1.1'), false);
       });
     });
 
@@ -539,9 +539,9 @@ void main() {
       });
 
       test('operator <= Precise', () {
-        expect(Imaginary(3) <= Decimal('2.2'), true);
-        expect(Imaginary(-3) <= Decimal('0'), true);
-        expect(Imaginary(-3) <= Decimal('-1.1'), false);
+        expect(Imaginary(3) <= Precision('2.2'), true);
+        expect(Imaginary(-3) <= Precision('0'), true);
+        expect(Imaginary(-3) <= Precision('-1.1'), false);
       });
     });
 
@@ -577,9 +577,9 @@ void main() {
       });
 
       test('operator > Precise', () {
-        expect(Imaginary(3) > Decimal('2.2'), false);
-        expect(Imaginary(-3) > Decimal('0'), false);
-        expect(Imaginary(-3) > Decimal('-1.1'), true);
+        expect(Imaginary(3) > Precision('2.2'), false);
+        expect(Imaginary(-3) > Precision('0'), false);
+        expect(Imaginary(-3) > Precision('-1.1'), true);
       });
     });
 
@@ -615,9 +615,9 @@ void main() {
       });
 
       test('operator >= Precise', () {
-        expect(Imaginary(3) >= Decimal('2.2'), false);
-        expect(Imaginary(-3) >= Decimal('0'), true);
-        expect(Imaginary(-3) >= Decimal('-1.1'), true);
+        expect(Imaginary(3) >= Precision('2.2'), false);
+        expect(Imaginary(-3) >= Precision('0'), true);
+        expect(Imaginary(-3) >= Precision('-1.1'), true);
       });
     });
 

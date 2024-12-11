@@ -9,6 +9,7 @@ part 'utils/geo_utils.dart';
 part 'point.dart';
 part 'point3d.dart';
 part 'line.dart';
+part 'pi.dart';
 
 // Plane Geometry
 part 'plane/plane_geometry.dart';

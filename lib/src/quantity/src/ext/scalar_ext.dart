@@ -1,5 +1,5 @@
-import '../number/double.dart';
-import '../number/decimal.dart';
+import '../../../number/number/double.dart';
+import '../../../number/number/precision.dart';
 import '../si/types/scalar.dart';
 
 /// The standard SI unit.
@@ -191,8 +191,8 @@ const Scalar muonGFactor = Scalar.constant(Double.constant(-2.0023318418),
     uncert: 6.492430339775063e-10);
 
 /// googol (10^100), arbitrary precision.
-Scalar googol =
-    Scalar(value: Decimal.raw(<Digit>[Digit.one], power: 100, sigDigits: 101));
+Scalar googol = Scalar(
+    value: Precision.raw(<Digit>[Digit.one], power: 100, sigDigits: 101));
 
 /// Sackur-Tetrode constant at 1 K and 100 kPa ('S0/R').
 const Scalar sackurTetrode100kPa = Scalar.constant(

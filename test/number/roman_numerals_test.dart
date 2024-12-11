@@ -1,4 +1,4 @@
-import 'package:advance_math/src/quantity/number.dart';
+import 'package:advance_math/src/number/number.dart';
 import 'package:test/test.dart';
 
 void main2() {

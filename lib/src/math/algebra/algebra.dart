@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 //import '../complex.dart';
-import '../../quantity/number.dart';
+import '../../number/number.dart';
 import '../geometry/geometry.dart';
 import '/src/math/basic/math.dart' as math;
 import 'interoperability/file_helper/file_io.dart';

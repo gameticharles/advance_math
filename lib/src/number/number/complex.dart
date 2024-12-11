@@ -1,5 +1,5 @@
-import '../../../math/basic/math.dart' as math;
-import '../../number.dart';
+import '../../math/basic/math.dart' as math;
+import '../number.dart';
 
 /// Complex numbers have both a real and an imaginary part.
 class Complex extends Number {

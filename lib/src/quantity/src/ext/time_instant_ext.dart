@@ -1,6 +1,6 @@
 import 'dart:math';
-import '../number/double.dart';
-import '../number/number.dart';
+import '../../../number/number/double.dart';
+import '../../../number/number/number.dart';
 import '../si/types/time_instant.dart';
 
 /// International Atomic Time scale units

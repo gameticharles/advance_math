@@ -1,4 +1,4 @@
-import '../number/number.dart';
+import '../../../number/number/number.dart';
 import 'dimensions.dart';
 import 'dimensions_exception.dart';
 import 'quantity.dart';

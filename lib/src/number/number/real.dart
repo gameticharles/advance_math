@@ -4,7 +4,7 @@ import 'double.dart';
 import 'imaginary.dart';
 import 'integer.dart';
 import 'number.dart';
-import 'decimal.dart';
+import 'precision.dart';
 
 /// Provides a common handle for all Real Numbers.
 abstract class Real extends Number {
@@ -50,7 +50,7 @@ abstract class Real extends Number {
   @override
   Number operator +(dynamic addend) {
     if (addend is num) return Double((value + addend).toDouble());
-    if (addend is Decimal) return addend + this;
+    if (addend is Precision) return addend + this;
     if (addend is Real) return Double((value + addend.value).toDouble());
     if (addend is Complex) {
       return Complex.num(Double(addend.real.toDouble() + value), addend.imag);
@@ -62,7 +62,7 @@ abstract class Real extends Number {
   @override
   Number operator -(dynamic subtrahend) {
     if (subtrahend is num) return Double((value - subtrahend).toDouble());
-    if (subtrahend is Decimal) return (-subtrahend) + this;
+    if (subtrahend is Precision) return (-subtrahend) + this;
     if (subtrahend is Real) {
       return Double((value - subtrahend.value).toDouble());
     }
@@ -82,7 +82,7 @@ abstract class Real extends Number {
       if (product == product.truncate()) return Integer(product.truncate());
       return Double(product.toDouble());
     }
-    if (multiplicand is Decimal) return multiplicand * this;
+    if (multiplicand is Precision) return multiplicand * this;
     if (multiplicand is Real) {
       if (multiplicand.isNaN) return Double.NaN;
       return Number.simplifyType(this * multiplicand.value);
@@ -118,7 +118,7 @@ abstract class Real extends Number {
           ? Integer(quotient.toInt())
           : Double(quotient.toDouble());
     }
-    if (divisor is Decimal) return (Decimal(value)) / divisor;
+    if (divisor is Precision) return (Precision(value)) / divisor;
     if (divisor is Real) {
       if (divisor.isNaN) return Double.NaN;
       if (divisor.value == 0) {
@@ -158,7 +158,7 @@ abstract class Real extends Number {
   Number operator ~/(dynamic divisor) {
     if (divisor == 0) return Double.infinity;
     if (divisor is num) return Integer(value ~/ divisor);
-    if (divisor is Decimal) return (Decimal(value) / divisor).truncate();
+    if (divisor is Precision) return (Precision(value) / divisor).truncate();
     if (divisor is Real) return Integer(value ~/ divisor.value);
     if (divisor is Complex) {
       // (a + 0i) / (c + di) = (ac - adi) / (c^2 + d^2)
@@ -202,7 +202,7 @@ abstract class Real extends Number {
       if (raised.toInt() == raised) return Integer(raised.toInt());
       return Double(raised as double);
     }
-    if (exponent is Decimal) return (Decimal(value)) ^ exponent;
+    if (exponent is Precision) return (Precision(value)) ^ exponent;
     if (exponent is Real) {
       final raised = pow(value, exponent.value);
       if (raised.toInt() == raised) return Integer(raised.toInt());
@@ -226,7 +226,7 @@ abstract class Real extends Number {
   @override
   bool operator >(dynamic obj) {
     if (obj is num) return value > obj;
-    if (obj is Decimal) return Decimal(value) > obj;
+    if (obj is Precision) return Precision(value) > obj;
     if (obj is Real) return value > obj.value;
     if (obj is Imaginary) return value > 0;
     if (obj is Complex) return this > obj.real;

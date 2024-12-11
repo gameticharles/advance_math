@@ -1,5 +1,5 @@
-import '../../../math/basic/math.dart' as math;
-import '../../number.dart';
+import '../../math/basic/math.dart' as math;
+import '../number.dart';
 
 /// The abstract base class for all Number types.
 abstract class Number implements Comparable<dynamic> {
@@ -27,7 +27,7 @@ abstract class Number implements Comparable<dynamic> {
       return Integer.fromMap(m as Map<String, int>);
     }
     if (m.containsKey('precise') && m['precise'] is Map<String, String>) {
-      return Decimal.fromMap(m as Map<String, String>);
+      return Precision.fromMap(m as Map<String, String>);
     }
     if (m.containsKey('real') && m is Map<String, Map<String, dynamic>>) {
       return Complex.fromMap(m);

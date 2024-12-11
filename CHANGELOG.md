@@ -1,9 +1,16 @@
-## 3.3.9
+## 4.0.0
 
-* **[IMPROVEMENT]** Added `Dataframe` empty initializer
+* **[FEATURE]** Added `PI` class for calculating pi to any precision.
+* **[FEATURE]** Added `Decimal` and `Rational` classes to support arbitrary precision calculations.
+* **[BROKEN]** Old `Decimal` class based on `Number` has been changed to `Precision` class. See `Precision` class for more information.
+* **[FEATURE]** Added `Decimal` and `Rational` class based on `BigInt` with support for arbitrary precision calculations.
+* **[FEATURE]** Added bases to `advance math`. You can now convert from any base to any other base (i.e base 2-36). See `Bases` class for more information.
+* **[IMPROVEMENT]** Matrix inverse has been improved to work with matrices of any size (e.g. 1x1 matrix).
+
+* **[IMPROVEMENT]** Added `Dataframe` empty initializer/constructor.
 * **[FEATURE]** Converted `Dataframe` columns to a class `Series`
-* **[FEATURE]** Added more functionalities to the Random class eg: nextIntInRange, nextDoubleInRange, nextBytes, nextBigIntInRange, nextBigInt, nextDateTime, nextElementFromList, nextNonRepeatingIntList etc.
-* **[IMPROVEMENT]** isPrime function has been improved to use the trial division method for small numbers and Rabin-Miller for large numbers. Now support various data types:
+* **[FEATURE]** Added more functionalities to the `Random` class eg: nextIntInRange, nextDoubleInRange, nextBytes, nextBigIntInRange, nextBigInt, nextDateTime, nextElementFromList, nextNonRepeatingIntList etc.
+* **[IMPROVEMENT]** `isPrime` function has been improved to use the trial division method for small numbers and Rabin-Miller for large numbers. Now support various data types:
 
   ```dart
   print(isPrime(5)); // Output: true (int)
@@ -16,7 +23,7 @@
 
 * **[FEATURE]** Added more basic math functions: mod, modInv, nChooseRModPrime, bigIntNChooseRModPrime etc.
 * **[FEATURE]** Added more statistics math functions: gcf, egcd, lcm etc.
-* **[IMPROVEMENT]** In the Geometry class:
+* **[IMPROVEMENT]** In the `Geometry` class:
   * The class is splitted into Plane and Solid geometries.
   * In Point class: fixed example function calling, isCollinear computation is moved into GeoUtils, and use `rec` in the constructor fromPolarCoordinates.
 * **[IMPROVEMENT]** Added an argument `isDegrees` for `rec` and `pol` easy computation.
@@ -26,22 +33,23 @@
 * **[FEATURE]** Added more extensions to String class:
   
   ```dart
-    String testString = "Hello123World456! Café au lait costs 3.50€. Contact: test@example.com or visit https://example.com";
+  String testString = "Hello123World456! Café au lait costs 3.50€. Contact: test@example.com or visit https://example.com";
 
-    print(testString.extractLetters()); // Includes 'é'
-    print(testString.extractNumbers(excludeDecimalsAndSymbols: false));
-    print(testString.extractWords(excludeNumbers: false));
-    print(testString.extractAlphanumeric(excludeSymbols: false));
+  print(testString.extractLetters()); // Includes 'é'
+  print(testString.extractNumbers(excludeDecimalsAndSymbols: false));
+  print(testString.extractWords(excludeNumbers: false));
+  print(testString.extractAlphanumeric(excludeSymbols: false));
 
-    print(testString.extractLettersList(excludeSymbols: false));
-    print(testString.extractNumbersList(excludeDecimalsAndSymbols: false));
-    print(testString.extractEmails()); // Extracts email addresses
-    print(testString.extractUrls()); // Extracts URLs
+  print(testString.extractLettersList(excludeSymbols: false));
+  print(testString.extractNumbersList(excludeDecimalsAndSymbols: false));
+  print(testString.extractEmails()); // Extracts email addresses
+  print(testString.extractUrls()); // Extracts URLs
+  print(testString.containsSymbol()) //Check if the string contains a symbol
 
-    // Custom pattern example: extract words starting with 'C'
-    print(testString.extractCustomPattern(r'\bC\w+', unicode: false));
+  // Custom pattern example: extract words starting with 'C'
+  print(testString.extractCustomPattern(r'\bC\w+', unicode: false));
 
-    ```
+  ```
 
 * **[IMPROVEMENT]** Following the Dart format for libraries
 * **[IMPROVEMENT]** Cleaned code base and examples files
@@ -51,8 +59,8 @@
 
 * **[BUG_FIX]** CoordinateType not set to UTM
 * **[BUG_FIX]** Change the data types of mean and correlation to num
-* **[BROKEN]** NumOrWords has been moved into code translators with the same name as Morse code.
-* **[BROKEN]** MorseCodeTranslator class has been renamed to MorseCode
+* **[BROKEN]** `NumOrWords` has been moved into code translators with the same name as Morse code.
+* **[BROKEN]** `MorseCodeTranslator` class has been renamed to `MorseCode`
 * **[FEATURE]** Added `Dataframe` class for working with dataframes or tables.
 * **[IMPROVEMENT]** Removed duplicate functions
 * **[IMPROVEMENT]** Enhanced `combinations` and `permutations` function:
@@ -285,20 +293,20 @@
 * Added linear equation solver (cramersRule, ridgeRegression, bareissAlgorithm, inverseMatrix, gaussElimination, gaussJordanElimination, leastSquares, etc.)
 * Added function to compute matrix condition number with both SVD and norm2 approaches.
 * Added matrix decompositions
-  * - LU decompositions
-    * - Crout's algorithm
-    * - Doolittle algorithm
-    * - Doolittle algorithm with Partial Pivoting
-    * - Doolittle algorithm with Complete Pivoting
-    * - Gauss Elimination Method
-  * - QR decompositions
-    * - QR decomposition Gram Schmidt
-    * - QR decomposition Householder
-  * - LQ decomposition
-  * - Cholesky Decomposition
-  * - Eigenvalue Decomposition (incomplete)
-  * - Singular Value Decomposition
-  * - Schur Decomposition
+  * * LU decompositions
+    * * Crout's algorithm
+    * * Doolittle algorithm
+    * * Doolittle algorithm with Partial Pivoting
+    * * Doolittle algorithm with Complete Pivoting
+    * * Gauss Elimination Method
+  * * QR decompositions
+    * * QR decomposition Gram Schmidt
+    * * QR decomposition Householder
+  * * LQ decomposition
+  * * Cholesky Decomposition
+  * * Eigenvalue Decomposition (incomplete)
+  * * Singular Value Decomposition
+  * * Schur Decomposition
 * Added matrix condition
 * Added support for exponential, logarithmic, and trigonometric functions on matrices
 * Added more matrix operations like scale,norm, norm2, l2Norms,

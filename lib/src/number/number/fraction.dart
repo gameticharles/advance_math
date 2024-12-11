@@ -1,5 +1,5 @@
-import '../../../math/basic/math.dart';
-import '../../number.dart';
+import '../../math/basic/math.dart';
+import '../number.dart';
 
 /// Represents a fraction number.
 ///

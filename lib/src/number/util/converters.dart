@@ -1,19 +1,19 @@
-import '../complex.dart';
-import '../double.dart';
-import '../imaginary.dart';
-import '../integer.dart';
-import '../number.dart';
-import '../decimal.dart';
+import '../number/complex.dart';
+import '../number/double.dart';
+import '../number/imaginary.dart';
+import '../number/integer.dart';
+import '../number/number.dart';
+import '../number/precision.dart';
 
-export '../complex.dart';
-export '../double.dart';
-export '../fraction.dart';
-export '../imaginary.dart';
-export '../integer.dart';
-export '../number.dart';
-export '../decimal.dart';
-export '../real.dart';
-export '../util/jenkins_hash.dart';
+export '../number/complex.dart';
+export '../number/double.dart';
+export '../number/fraction.dart';
+export '../number/imaginary.dart';
+export '../number/integer.dart';
+export '../number/number.dart';
+export '../number/precision.dart';
+export '../number/real.dart';
+export 'jenkins_hash.dart';
 
 /// Converts an [object] to a Number.  The [object]
 /// must be either a [num] or [Number], otherwise
@@ -39,7 +39,7 @@ num numberToNum(Number number) {
   if (number is Integer) return number.value;
   if (number is Imaginary) return 0;
   if (number is Complex) return number.real.toDouble();
-  if (number is Decimal) {
+  if (number is Precision) {
     if (number.isInteger) return number.toInt();
     return number.toDouble();
   } else {

@@ -4,7 +4,7 @@
 /// library_ to stick to the types and units consistent with the International System of Units (SI).
 library quantity;
 
-export 'number.dart';
+export '../number/number.dart';
 export 'quantity_ext.dart';
 export 'quantity_range.dart';
 export 'quantity_si.dart';

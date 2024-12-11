@@ -1,4 +1,4 @@
-import '../number/double.dart';
+import '../../../number/number/double.dart';
 import '../si/types/speed.dart';
 import 'length_ext.dart';
 import 'time_ext.dart';

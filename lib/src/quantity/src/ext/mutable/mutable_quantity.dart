@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:intl/intl.dart' show NumberFormat;
-import '../../number/util/converters.dart';
+import '../../../../number/util/converters.dart';
 import '../../si/dimensions.dart';
 import '../../si/dimensions_exception.dart';
 import '../../si/immutable_quantity_exception.dart';
@@ -216,7 +216,7 @@ class MutableQuantity implements Quantity {
   }
 
   @override
-  bool get arbitraryPrecision => valueSI is Decimal;
+  bool get arbitraryPrecision => valueSI is Precision;
 
   @override
   Quantity calcExpandedUncertainty(double k) =>

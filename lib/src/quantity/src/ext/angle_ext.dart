@@ -1,5 +1,5 @@
 import '../../../math/basic/math.dart' as math;
-import '../../number.dart';
+import '../../../number/number.dart';
 import '../si/types/angle.dart';
 import '../si/units.dart';
 

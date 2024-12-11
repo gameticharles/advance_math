@@ -1,4 +1,4 @@
-import '../number/double.dart';
+import '../../../number/number/double.dart';
 import '../si/types/conductance.dart';
 
 /// A non-SI unit of electrical conductance.

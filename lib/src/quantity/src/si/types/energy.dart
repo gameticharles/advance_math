@@ -1,4 +1,4 @@
-import '../../number/util/converters.dart';
+import '../../../../number/util/converters.dart';
 import '../../si/dimensions.dart';
 import '../../si/quantity.dart';
 import '../../si/units.dart';
@@ -46,8 +46,8 @@ class Energy extends Quantity {
 
   /// Returns the [Mass] equivalent of this Energy using the famous E=mc^2 relationship.
   Mass toMass() {
-    if (valueSI is Decimal) {
-      final c = Decimal('2.99792458e8');
+    if (valueSI is Precision) {
+      final c = Precision('2.99792458e8');
       return Mass(kg: valueSI / (c * c), uncert: relativeUncertainty);
     } else {
       const c = 299792458;
