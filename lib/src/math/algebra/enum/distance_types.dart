@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// The DistanceType enum contains different types of distance metrics used
 /// for both Vector and Matrix distance calculations.

@@ -1,6 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
-part of algebra;
+part of '../algebra.dart';
 
 /// Enum representing the available methods for calculating the determinant of a matrix.
 ///

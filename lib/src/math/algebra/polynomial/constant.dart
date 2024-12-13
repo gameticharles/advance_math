@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// Concrete implementation of [Algebraic] that represents a constant value
 /// `a`. It can be either real or complex.

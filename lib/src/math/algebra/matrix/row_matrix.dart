@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// Row class extends Matrix and represents a single row in a matrix.
 ///

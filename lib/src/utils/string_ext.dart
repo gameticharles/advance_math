@@ -47,7 +47,7 @@ extension ExtString on String {
   /// Returns an error message if the password is invalid.
   /// Returns `null` if the password is valid.
   String? passwordValidationMessage([int passwordLength = 6]) {
-    if (this.length < passwordLength) {
+    if (length < passwordLength) {
       return 'Password must be at least $passwordLength characters long.';
     }
     if (!RegExp(r'(?=.*?[A-Z])').hasMatch(this)) {

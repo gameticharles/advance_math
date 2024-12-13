@@ -1,4 +1,4 @@
-part of algebra;
+part of '../../algebra.dart';
 
 /// A custom iterator for traversing the elements of a [Matrix] in row-major order.
 ///

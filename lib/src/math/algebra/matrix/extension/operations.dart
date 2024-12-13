@@ -1,4 +1,6 @@
-part of algebra;
+// ignore_for_file: unreachable_switch_default
+
+part of '../../algebra.dart';
 
 extension NumOperationExtension on num {
   dynamic operator +(dynamic other) {

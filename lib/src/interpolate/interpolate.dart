@@ -1,4 +1,4 @@
-library interpolate;
+library;
 
 part 'method_types.dart';
 part 'interp1d.dart';

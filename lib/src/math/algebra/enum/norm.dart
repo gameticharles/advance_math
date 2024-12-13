@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// Enumeration of supported norms for vectors and matrices.
 ///

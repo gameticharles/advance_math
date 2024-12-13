@@ -1,4 +1,6 @@
-part of algebra;
+// ignore_for_file: unreachable_switch_default
+
+part of '../algebra.dart';
 
 //extends ListBase<num>
 class Vector extends IterableMixin<num> {

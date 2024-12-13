@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// The Durand–Kerner method, also known as Weierstrass method, is a root
 /// finding algorithm for solving polynomial equations. With this class, you

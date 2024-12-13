@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 // extension DynamicVector on dynamic {
 //   Matrix operator +(dynamic other) {

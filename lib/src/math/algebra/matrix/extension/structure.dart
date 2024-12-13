@@ -1,4 +1,4 @@
-part of algebra;
+part of '../../algebra.dart';
 
 extension MatrixStructure on Matrix {
   /// Returns a list of all the properties of the matrix.

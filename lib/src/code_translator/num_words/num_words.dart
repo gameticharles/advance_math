@@ -1,5 +1,3 @@
-library num_words;
-
 import 'package:advance_math/advance_math.dart';
 
 part 'currency.dart';

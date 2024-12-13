@@ -361,13 +361,13 @@ num gcf(List<num> numbers) {
     throw ArgumentError('List of numbers cannot be empty.');
   }
 
-  num _gcf(num a, num b) {
-    return b == 0 ? a : _gcf(b, a % b);
+  num ggcf(num a, num b) {
+    return b == 0 ? a : ggcf(b, a % b);
   }
 
   num result = numbers[0];
   for (int i = 1; i < numbers.length; i++) {
-    result = _gcf(result, numbers[i]);
+    result = ggcf(result, numbers[i]);
   }
   return result;
 }
@@ -470,7 +470,7 @@ num lcm(List<num> numbers) {
     throw ArgumentError('List of numbers cannot be empty.');
   }
 
-  num _lcm(num a, num b) {
+  num llcm(num a, num b) {
     if (a == 0 || b == 0) {
       return 0;
     } else {
@@ -480,7 +480,7 @@ num lcm(List<num> numbers) {
 
   num result = numbers[0];
   for (int i = 1; i < numbers.length; i++) {
-    result = _lcm(result, numbers[i]);
+    result = llcm(result, numbers[i]);
   }
   return result;
 }

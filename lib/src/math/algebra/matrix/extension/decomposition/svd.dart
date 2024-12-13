@@ -1,4 +1,4 @@
-part of algebra;
+part of '../../../algebra.dart';
 
 /*
  * In this implementation, the code for Singular Value Decomposition (SVD)

@@ -127,7 +127,6 @@ class RomanNumerals {
   }
 
   /// Helper method to convert a Roman numeral string to an integer
-
   static int _decodeRoman(String roman) {
     int result = 0;
     int prevValue = 0;

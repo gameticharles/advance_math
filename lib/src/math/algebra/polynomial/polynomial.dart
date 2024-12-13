@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// A class representing a Polynomial of arbitrary degree.
 class Polynomial implements Expression {

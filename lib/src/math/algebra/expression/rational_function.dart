@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 class RationalFunction implements Expression {
   final Polynomial numerator;

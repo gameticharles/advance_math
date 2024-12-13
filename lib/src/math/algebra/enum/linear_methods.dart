@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// Enum representing the available methods for solving linear systems.
 ///

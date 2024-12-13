@@ -445,7 +445,7 @@ void main() {
 
       result = p1 / p1;
       expect(result, Precision.one);
-      expect((result as Precision).digits.length, 1);
+      expect((result).digits.length, 1);
       expect(result.power, 0);
       expect(result.digits[0], Digit.one);
       expect(result.toString(), '1');

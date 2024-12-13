@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 extension MatrixVectorOperations on Matrix {
   /// Add a matrix and a vector

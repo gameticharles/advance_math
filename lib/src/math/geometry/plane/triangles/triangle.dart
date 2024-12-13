@@ -369,8 +369,6 @@ class Triangle extends PlaneGeometry {
         return trigonometric();
       case AreaMethod.coordinates:
         return coordinatesFormula([A!, B!, C!]);
-      default:
-        throw Exception("Invalid area calculation method.");
     }
   }
 

@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// Enumeration for available decomposition methods in the `solve` function.
 enum DecompositionMethod {

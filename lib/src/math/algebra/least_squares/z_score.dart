@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// Computes Z-score based on a given confidence level.
 ///

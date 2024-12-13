@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// Column class extends Matrix and represents a single column in a matrix.
 ///

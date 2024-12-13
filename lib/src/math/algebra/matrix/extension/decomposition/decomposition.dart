@@ -1,4 +1,4 @@
-part of algebra;
+part of '../../../algebra.dart';
 
 abstract class Decomposition {
   Matrix solve(Matrix b);

@@ -1,4 +1,4 @@
-part of algebra;
+part of '../../algebra.dart';
 
 extension MatrixStatsExtension on Matrix {
   /// Returns the smallest value in the matrix along the specified axis.

@@ -1,4 +1,4 @@
-part of algebra;
+part of '../../algebra.dart';
 
 /// Class to store eigenvalues and eigenvectors of a matrix.
 class Eigen {

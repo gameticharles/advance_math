@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// An enum representing the alignment options for matrix elements in a string representation.
 ///

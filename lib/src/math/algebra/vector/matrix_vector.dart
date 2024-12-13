@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 extension MatrixVectorConversion on Matrix {
   // Convert a column vector matrix to a Vector object

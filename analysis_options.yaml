@@ -12,6 +12,11 @@
 # The core lints are also what is used by pub.dev for scoring packages.
 
 include: package:lints/recommended.yaml
+analyzer:
+  errors:
+    no_wildcard_variable_uses: ignore
+    unnecessary_library_name: ignore
+    unreachable_switch_default: ignore
 
 # Uncomment the following section to specify additional rules.
 

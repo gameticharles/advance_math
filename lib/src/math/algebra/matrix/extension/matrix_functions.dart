@@ -1,4 +1,4 @@
-part of algebra;
+part of '../../algebra.dart';
 
 extension MatrixFunctions on Matrix {
   /// Element-wise sine

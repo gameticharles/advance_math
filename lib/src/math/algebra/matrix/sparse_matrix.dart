@@ -1,9 +1,9 @@
-part of algebra;
+part of '../algebra.dart';
 
 // Abstract SparseMatrix class that extends Matrix
 abstract class SparseMatrix extends Matrix {
   SparseFormat format;
-  SparseMatrix(List<List<dynamic>> data, this.format) : super(data);
+  SparseMatrix(List<List<dynamic>> super.data, this.format);
 
   factory SparseMatrix.fromList(List<List<dynamic>> data, SparseFormat format) {
     switch (format) {
@@ -17,8 +17,7 @@ abstract class SparseMatrix extends Matrix {
         return SparseMatrixDOK.fromList(data);
       case SparseFormat.lil:
         return SparseMatrixLIL.fromList(data);
-      default:
-        throw Exception('Unsupported sparse format');
+
     }
   }
 

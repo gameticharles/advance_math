@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// Concrete implementation of [Polynomial] that represents a third degree
 /// polynomial equation in the form `ax^3 + bx^2 + cx + d = 0`.

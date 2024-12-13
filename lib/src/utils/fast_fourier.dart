@@ -1,4 +1,3 @@
-
 /// This class multiplies two polynomials with possibly negative coefficients very efficiently using
 /// the Fast Fourier Transform (FFT). NOTE: This code only works for polynomials with coefficients in the
 /// range of a signed integer.
@@ -35,15 +34,21 @@ class FastFourierTransform {
   /// Returns an array representing the coefficients of the product polynomial.
   static List<int> multiply(List<int> x, List<int> y) {
     // If the coefficients are negative place them in the range of [0, p)
-    for (int i = 0; i < x.length; i++) if (x[i] < 0) x[i] += p;
-    for (int i = 0; i < y.length; i++) if (y[i] < 0) y[i] += p;
+    for (int i = 0; i < x.length; i++) {
+      if (x[i] < 0) x[i] += p;
+    }
+    for (int i = 0; i < y.length; i++) {
+      if (y[i] < 0) y[i] += p;
+    }
 
     int zLength = x.length + y.length - 1;
     int logN = 32 - (zLength - 1).bitLength;
     List<int> xx = _transform(x, logN, false);
     List<int> yy = _transform(y, logN, false);
     List<int> zz = List<int>.filled(1 << logN, 0);
-    for (int i = 0; i < zz.length; i++) zz[i] = _mult(xx[i], yy[i]);
+    for (int i = 0; i < zz.length; i++) {
+      zz[i] = _mult(xx[i], yy[i]);
+    }
     List<int> nZ = _transform(zz, logN, true);
     List<int> z = List<int>.filled(zLength, 0);
     int nInverse = p - ((p - 1) >> logN);

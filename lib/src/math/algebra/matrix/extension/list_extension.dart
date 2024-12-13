@@ -1,4 +1,4 @@
-part of algebra;
+part of '../../algebra.dart';
 
 extension MatrixListExtension on List<List<dynamic>> {
   /// The shape of an array is the number of elements in each dimension.

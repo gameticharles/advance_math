@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// Concrete implementation of [Polynomial] that represents a fourth degree
 /// polynomial equation in the form _ax^4 + bx^3 + cx^2 + dx + e = 0_.

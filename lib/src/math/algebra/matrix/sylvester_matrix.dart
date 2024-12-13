@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 class SylvesterMatrix extends Matrix {
   /// The polynomial used to build the Sylvester matrix.

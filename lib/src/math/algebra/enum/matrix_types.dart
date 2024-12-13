@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// Enum representing different types of matrices and their properties.
 ///

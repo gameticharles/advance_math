@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// The `LeastSquares` class is used to perform a least squares fit to the
 /// given model, specified by matrix `A` and column vector `b`.
@@ -210,9 +210,8 @@ class TotalLeastSquares extends BaseLeastSquares {
   ///
   /// [A] is the matrix of observations, [b] is the vector of dependent variable values
   /// [method] determines the solving method, defaults to linear.
-  TotalLeastSquares(Matrix A, ColumnMatrix b,
-      {EquationMethod method = EquationMethod.linear})
-      : super(A, b, method: method);
+  TotalLeastSquares(super.A, super.b,
+      {super.method});
 
   /// Overridden fit method that solves the Total Least Squares problem
   ///
@@ -293,9 +292,8 @@ class TotalLeastSquares extends BaseLeastSquares {
 class RidgeRegression extends BaseLeastSquares {
   final double alpha;
 
-  RidgeRegression(Matrix A, ColumnMatrix b, this.alpha,
-      {DiagonalMatrix? W, EquationMethod method = EquationMethod.linear})
-      : super(A, b, W: W, method: method);
+  RidgeRegression(super.A, super.b, this.alpha,
+      {super.W, super.method});
 
   @override
   void fit(
@@ -345,9 +343,8 @@ class RidgeRegression extends BaseLeastSquares {
 class LassoRegression extends BaseLeastSquares {
   final double alpha;
 
-  LassoRegression(Matrix A, ColumnMatrix b, this.alpha,
-      {DiagonalMatrix? W, EquationMethod method = EquationMethod.linear})
-      : super(A, b, W: W, method: method);
+  LassoRegression(super.A, super.b, this.alpha,
+      {super.W, super.method});
 
   @override
   void fit(
@@ -387,9 +384,8 @@ class ElasticNetRegression extends BaseLeastSquares {
   final double alpha;
   final double l1Ratio;
 
-  ElasticNetRegression(Matrix A, ColumnMatrix b, this.alpha, this.l1Ratio,
-      {DiagonalMatrix? W, EquationMethod method = EquationMethod.linear})
-      : super(A, b, W: W, method: method);
+  ElasticNetRegression(super.A, super.b, this.alpha, this.l1Ratio,
+      {super.W, super.method});
 
   @override
   void fit(
@@ -418,9 +414,8 @@ class ElasticNetRegression extends BaseLeastSquares {
 /// // Output: Column Matrix of the residuals (difference between observed and predicted responses)
 /// ```
 class RobustLeastSquares extends BaseLeastSquares {
-  RobustLeastSquares(Matrix A, ColumnMatrix b,
-      {DiagonalMatrix? W, EquationMethod method = EquationMethod.linear})
-      : super(A, b, W: W, method: method);
+  RobustLeastSquares(super.A, super.b,
+      {super.W, super.method});
 
   // Implement the special method here
   void fitRobustly() {

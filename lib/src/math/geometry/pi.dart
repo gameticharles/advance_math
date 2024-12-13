@@ -1,4 +1,4 @@
-// ignore_for_file: constant_identifier_names
+// ignore_for_file: constant_identifier_names, non_constant_identifier_names
 
 part of 'geometry.dart';
 
@@ -25,6 +25,28 @@ enum PiCalcAlgorithm {
   NewtonEuler
 }
 
+/// The `PI` class provides methods for calculating the value of pi using
+/// various algorithms, such as the Chudnovsky, Gauss-Legendre, and BBP algorithms.
+/// It also includes methods for retrieving individual digits, checking for
+/// digit patterns, and performing computations that require the value of pi.
+///
+/// The `precision` parameter in the constructor determines the number of
+/// decimal places to compute for the value of pi. If no `precision` is
+/// provided, the default is 100 decimal places.
+///
+/// The computed value of pi is stored in the `_piString` field as a string,
+/// and the `timePerDigit` field stores the time taken to compute one digit
+/// of pi.
+///
+/// Source: https://www.i4cy.com/pi/
+///
+/// The class provides the following methods:
+/// - `getNthDigit(int n)`: Retrieves the nth decimal digit of pi.
+/// - `containsPattern(String pattern)`: Checks if a given digit pattern exists in the decimal representation of pi.
+/// - `getDigits(int start, int end)`: Retrieves the digits of pi from the specified start to end indices.
+/// - `compute<T>(Decimal Function(Decimal) func)`: Applies a function that requires the value of pi to the computed value.
+/// - `countDigitFrequency()`: Counts the frequency of each digit in the decimal representation of pi.
+/// - `findPatternIndices(String pattern)`: Finds the indices of a given pattern in the string representation of pi.
 class PI {
   /// The precision of the computed value of pi, in decimal places.
   final int precision;
@@ -33,8 +55,6 @@ class PI {
 
   /// The time taken per digit of the computed value of pi.
   late final double timePerDigit;
-
-  // Ref Pi:https://stackoverflow.com/questions/56022623/avoid-overflow-when-calculating-%cf%80-by-evaluating-a-series-using-16-bit-arithmetic/56035284#56035284
 
   /// Constructs a [PI] object with the specified precision.
   ///

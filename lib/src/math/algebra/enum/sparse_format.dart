@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 enum SparseFormat {
   /// Coordinate List format

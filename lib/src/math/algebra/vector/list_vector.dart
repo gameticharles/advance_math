@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 extension ListVector on List<num> {
   Vector operator +(dynamic other) {

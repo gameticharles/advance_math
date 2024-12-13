@@ -1,8 +1,7 @@
-library advance_math;
-
 /// Dart package for matrix or list operations
 /// The library was developed, documented, and published by
 /// [Charles Gameti]
+library;
 
 import 'src/math/basic/math.dart' as math;
 

@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /*
 Linear Algebra Utilities:
@@ -717,8 +717,6 @@ class LinearSystemSolvers {
         return luDecompositionSolve(a, b);
       case LinearSystemMethod.ridgeRegression:
         return ridgeRegression(a, b, 0.1);
-      default:
-        throw Exception("Unknown method for solving a linear system.");
     }
   }
 }

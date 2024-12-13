@@ -1034,7 +1034,7 @@ double numIntegrate(Function f, double a, double b,
   var state = {'maxDepthCount': 0, 'nanEncountered': false};
 
   double adsimp(Function f, double a, double b, double fa, double fm, double fb,
-      double V0, double tol, int maxDepth, int depth) {
+      double v0, double tol, int maxDepth, int depth) {
     double h = b - a;
     double f1 = f(a + h * 0.25);
     double f2 = f(b - h * 0.25);
@@ -1047,7 +1047,7 @@ double numIntegrate(Function f, double a, double b,
     double sl = h * (fa + 4 * f1 + fm) / 12;
     double sr = h * (fm + 4 * f2 + fb) / 12;
     double s2 = sl + sr;
-    double err = (s2 - V0) / 15;
+    double err = (s2 - v0) / 15;
 
     if (depth > maxDepth) {
       state['maxDepthCount'] = (state['maxDepthCount'] as int) + 1;
@@ -1056,11 +1056,11 @@ double numIntegrate(Function f, double a, double b,
       return s2 + err;
     } else {
       double m = a + h * 0.5;
-      double V1 =
+      double v1 =
           adsimp(f, a, m, fa, f1, fm, sl, tol * 0.5, maxDepth, depth + 1);
-      double V2 =
+      double v2 =
           adsimp(f, m, b, fm, f2, fb, sr, tol * 0.5, maxDepth, depth + 1);
-      return V1 + V2;
+      return v1 + v2;
     }
   }
 
@@ -1068,9 +1068,9 @@ double numIntegrate(Function f, double a, double b,
     double fa = f(a);
     double fm = f(0.5 * (a + b));
     double fb = f(b);
-    double V0 = (fa + 4 * fm + fb) * (b - a) / 6;
+    double v0 = (fa + 4 * fm + fb) * (b - a) / 6;
 
-    return adsimp(f, a, b, fa, fm, fb, V0, tol, maxdepth, 1);
+    return adsimp(f, a, b, fa, fm, fb, v0, tol, maxdepth, 1);
   }
 
   try {

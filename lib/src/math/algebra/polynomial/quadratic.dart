@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// A class that represents a quadratic equation that
 /// implementation of [Polynomial] that represents a second degree

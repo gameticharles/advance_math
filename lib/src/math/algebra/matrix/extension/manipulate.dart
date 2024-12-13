@@ -1,4 +1,4 @@
-part of algebra;
+part of '../../algebra.dart';
 
 extension MatrixManipulationExtension on Matrix {
   /// Concatenates the given list of matrices with the current matrix along the specified axis.

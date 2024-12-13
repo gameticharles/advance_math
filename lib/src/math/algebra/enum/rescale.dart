@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// Enum for specifying the direction of rescaling operation in a matrix.
 ///

@@ -1,5 +1,3 @@
-library morse_code;
-
 import 'dart:collection';
 
 part 'rate_limiter.dart';

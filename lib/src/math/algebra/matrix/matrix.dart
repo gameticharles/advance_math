@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// The `Matrix` class provides a structure for two-dimensional arrays of data,
 /// along with various utility methods for manipulating these arrays.

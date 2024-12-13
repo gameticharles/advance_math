@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_cast
+
 import '../../../../number/util/converters.dart';
 import '../../si/dimensions.dart';
 import '../../si/quantity.dart';

@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// Concrete implementation of [Polynomial] that represents a first degree
 /// polynomial equation in the form _ax + b = 0_.

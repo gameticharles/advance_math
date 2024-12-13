@@ -1,4 +1,4 @@
-part of algebra;
+part of '../algebra.dart';
 
 /// The `Diagonal` class is a subclass of `Matrix` and represents a diagonal matrix.
 /// A diagonal matrix is a square matrix in which all the elements outside the main diagonal are zero.

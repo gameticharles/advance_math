@@ -1,6 +1,6 @@
 // ignore_for_file: non_constant_identifier_names
 
-part of algebra;
+part of '../algebra.dart';
 
 /// The `BaseLeastSquares` class is used to perform a least squares fit to the
 /// given model, specified by matrix `A` and column vector `b`.

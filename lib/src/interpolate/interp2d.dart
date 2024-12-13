@@ -88,8 +88,6 @@ class Interp2D {
         return _cubicInterpolation(xNew, yNew);
       case MethodType.newton:
         return _newtonInterpolation(xNew, yNew);
-      default:
-        throw Exception('Invalid interpolation method');
     }
   }
 
