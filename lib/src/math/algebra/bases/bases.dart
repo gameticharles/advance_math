@@ -1,11 +1,10 @@
 library bases;
 
-
 part 'ext.dart';
 
 /// Supports bases up to 36.
-const _chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/';
-
+const _chars =
+    '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/';
 
 /// A utility class for converting numbers between various bases.
 ///
