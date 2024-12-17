@@ -1,5 +1,6 @@
 ## 4.0.0
 
+* **[BROKEN]** DataFrame is no longer maintained in `advance_math`. Now has a separate package for DataFrame called `dartframe`.
 * **[FEATURE]** Added `PI` class for calculating pi to any precision.
 * **[FEATURE]** Added `Decimal` and `Rational` classes to support arbitrary precision calculations.
 * **[BROKEN]** Old `Decimal` class based on `Number` has been changed to `Precision` class. See `Precision` class for more information.

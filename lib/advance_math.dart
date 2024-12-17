@@ -5,6 +5,7 @@ library;
 
 import 'src/math/basic/math.dart' as math;
 
+export 'package:dartframe/dartframe.dart' hide fileIO;
 export 'src/math/basic/math.dart';
 export 'src/math/geometry/geometry.dart';
 export 'src/math/algebra/algebra.dart';
@@ -12,7 +13,6 @@ export 'src/quantity/quantity.dart';
 export 'src/interpolate/interpolate.dart';
 export 'src/code_translator/num_words/num_words.dart';
 export 'src/code_translator/morse_code.dart';
-export 'src/models/data_frame/data_frame.dart';
 
 part 'src/utils/ext.dart';
 part 'src/utils/num_ext.dart';
