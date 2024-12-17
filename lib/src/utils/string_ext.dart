@@ -403,10 +403,11 @@ extension ExtString on String {
   /// - `unicode`: Whether to enable Unicode support in the regular expression. Defaults to `true`.
   ///
   /// Example:
-  ///
+  /// ```
   /// String text = 'This is a sample text with some numbers: 123, 456, 789.';
   /// List<String> numbers = text.extractCustomPattern(r'\d+');
   /// // ['123', '456', '789']
+  /// ```
   ///
   List<String> extractCustomPattern(String pattern, {bool unicode = true}) {
     return RegExp(pattern, unicode: unicode)

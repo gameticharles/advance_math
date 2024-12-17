@@ -63,7 +63,7 @@ class GeoUtils {
 
   // Finds the closest pair of points in a list of points
   static List<Point> closestPair(List<Point> points) {
-    if (points == null || points.length < 2) return [];
+    if (points.length < 2) return [];
 
     final int n = points.length;
     int xQueueFront = 0, xQueueBack = 0;
