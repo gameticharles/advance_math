@@ -83,9 +83,13 @@ class QuantityRange<Q extends Quantity> {
         }
       } else {
         if (q1.mks - epsilon <= quantity.mks &&
-            q2.mks + epsilon >= quantity.mks) return true;
+            q2.mks + epsilon >= quantity.mks) {
+          return true;
+        }
         if (q1.mks + epsilon >= quantity.mks &&
-            q2.mks - epsilon <= quantity.mks) return true;
+            q2.mks - epsilon <= quantity.mks) {
+          return true;
+        }
       }
     }
     return false;
@@ -95,7 +99,7 @@ class QuantityRange<Q extends Quantity> {
   bool encompasses(QuantityRange<Q> range2) =>
       (minValue <= range2.minValue) && (maxValue >= range2.maxValue);
 
-  /// Returns a String representation of this range in the form '<Q1> to <Q2>'.
+  /// Returns a String representation of this range in the form `'<Q1> to <Q2>'`.
   @override
   String toString() => '$q1 to $q2';
 

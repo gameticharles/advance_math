@@ -11,7 +11,7 @@ void main() {
       expect(q.preferredUnits, Currency.dollarsUS);
       expect(q.relativeUncertainty, 0);
 
-      q = Currency(USD: 42, uncert: 0.001);
+      q = Currency(usd: 42, uncert: 0.001);
       expect(q.valueSI.toDouble(), 42);
       expect(q.valueSI is Integer, true);
       expect(q.dimensions, Currency.currencyDimensions);
@@ -20,8 +20,8 @@ void main() {
     });
 
     test('operator +', () {
-      final c1 = Currency(USD: 12.34);
-      final c2 = Currency(USD: 56.78);
+      final c1 = Currency(usd: 12.34);
+      final c2 = Currency(usd: 56.78);
       dynamic sum = c1 + c2;
       expect(sum is Currency, true);
       expect(sum.valueSI.toDouble(), 69.12);
@@ -38,8 +38,8 @@ void main() {
     });
 
     test('operator -', () {
-      final c1 = Currency(USD: 12.34);
-      final c2 = Currency(USD: 56.78);
+      final c1 = Currency(usd: 12.34);
+      final c2 = Currency(usd: 56.78);
       dynamic diff = c2 - c1;
       expect(diff is Currency, true);
       expect(diff.valueSI.toDouble(), 44.44);
@@ -59,7 +59,7 @@ void main() {
     });
 
     test('operator *', () {
-      final c1 = Currency(USD: 12.34);
+      final c1 = Currency(usd: 12.34);
 
       dynamic prod = c1 * 2;
       expect(prod is Currency, true);
@@ -79,7 +79,7 @@ void main() {
     });
 
     test('operator /', () {
-      final c1 = Currency(USD: 12.34);
+      final c1 = Currency(usd: 12.34);
 
       dynamic prod = c1 / 2;
       expect(prod is Currency, true);

@@ -289,7 +289,9 @@ class Decimal implements Comparable<Decimal> {
       if (a == b) {
         // Base case: Compute single term
         Decimal fact = Decimal.one;
-        for (int i = 1; i <= a; i++) fact *= Decimal.fromInt(i);
+        for (int i = 1; i <= a; i++) {
+          fact *= Decimal.fromInt(i);
+        }
         return (x.pow(a) / fact).toDecimal(precision: decimalPrecision + 10);
       }
 

@@ -26,7 +26,7 @@ abstract class PlaneGeometry extends Geometry {
   /// Constructor for the PlaneGeometry class.
   ///
   /// Takes a [name] parameter to identify the shape.
-  PlaneGeometry(String name) : super(name);
+  PlaneGeometry(super.name);
 
   /// Calculates the area of the 2D geometric shape.
   ///

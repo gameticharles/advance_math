@@ -323,9 +323,9 @@ dynamic readCellArray(
     for (var col = 0; col < header['dims'][1]; col++) {
       // Read the matrix header and array
       var result = await readVarHeader(fd, endian);
-      var vHeader = result[0];
-      var nextPos = result[1];
-      var fdVar = result[2];
+      var vHeader = result['0'];
+      var nextPos = result['1'];
+      var fdVar = result['2'];
 
       var vArray = readVarArray(fdVar, endian, vHeader);
       array[row].add(vArray);
@@ -367,9 +367,9 @@ Future<Map<String, dynamic>> readStructArray(
       for (var field in fields) {
         // Read the matrix header and array
         var result = await readVarHeader(fd, endian);
-        var vHeader = result[0];
-        var nextPos = result[1];
-        var fdVar = result[2];
+        var vHeader = result['0'];
+        var nextPos = result['1'];
+        var fdVar = result['2'];
 
         var data = readVarArray(fdVar, endian, vHeader);
         if (!array.containsKey(field)) {
@@ -766,8 +766,8 @@ void writeCharArray(
 
 void writeVarArray(RandomAccessFile file, dynamic array, [String name = '']) {
   var headerAndArray = guessHeader(array, name);
-  var header = headerAndArray[0];
-  array = headerAndArray[1];
+  var header = headerAndArray['0'];
+  array = headerAndArray['1'];
   var mc = header['mclass'];
   if (numericClassETypes.containsKey(mc)) {
     writeNumericArray(file, header, array);

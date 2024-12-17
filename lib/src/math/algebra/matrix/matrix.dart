@@ -8,10 +8,10 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// Private field to hold the actual data of the matrix.
   List<List<dynamic>> _data = const [];
 
-  /// Constructs a Matrix object from a List<List<dynamic>> or a String.
+  /// Constructs a Matrix object from a `List<List<dynamic>>` or a String.
   /// If input is null or not provided, an empty Matrix is created.
   ///
-  /// [input]: List<List<dynamic>> or String representing the matrix data.
+  /// [input]: `List<List<dynamic>>` or String representing the matrix data.
   ///
   /// Example 1:
   /// ```dart
@@ -97,7 +97,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// Returns the number of columns in the matrix.
   int get columnCount => _data.isEmpty ? 0 : _data[0].length;
 
-  /// Returns the dimensions of the matrix as a List<int> in the format [rowCount, columnCount].
+  /// Returns the dimensions of the matrix as a `List<int>` in the format [rowCount, columnCount].
   List<int> get shape => [rowCount, columnCount];
 
   /// Assigns the value to the specified row index of the matrix.
@@ -145,7 +145,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
 
   /// Creates a square Matrix with the specified diagonal elements.
   ///
-  /// [diagonal]: List<dynamic> containing the diagonal elements.
+  /// [diagonal]: `List<dynamic>` containing the diagonal elements.
   ///
   /// Example:
   /// ```dart
@@ -1172,8 +1172,8 @@ class Matrix extends IterableMixin<List<dynamic>> {
   }
 
   /// Returns the indices of occurrences of the specified element in the matrix.
-  /// If [findAll] is set to true, returns a List<List<int>> of all indices where the element was found.
-  /// If [findAll] is false or not provided, returns a List<int> of the first occurrence.
+  /// If [findAll] is set to true, returns a `List<List<int>>` of all indices where the element was found.
+  /// If [findAll] is false or not provided, returns a `List<int> `of the first occurrence.
   /// Returns null if the element is not found.
   ///
   /// [element]: The element to search for in the matrix.

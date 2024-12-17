@@ -1,7 +1,7 @@
 part of 'num_words.dart';
 
 final Currency usdCurrency = Currency(
-  USD: 1.0,
+  usd: 1.0,
   mainUnitSingular: 'Dollar',
   mainUnitPlural: 'Dollars',
   fractionalUnitSingular: 'Cent',

@@ -136,16 +136,11 @@ class IsoscelesTrapezoid extends Trapezoid {
 
   /// Named constructor to create an Isosceles Trapezoid from various parameters.
   IsoscelesTrapezoid.from({
-    num? base1,
-    num? base2,
+    super.base1,
+    super.base2,
     num? side,
-    num? height,
-  }) : super.from(
-            base1: base1,
-            base2: base2,
-            side1: side,
-            side2: side,
-            height: height);
+    super.height,
+  }) : super.from(side1: side, side2: side);
 }
 
 /// A class representing a Right Trapezoid in 2D space.
@@ -156,14 +151,9 @@ class RightTrapezoid extends Trapezoid {
 
   /// Named constructor to create a Right Trapezoid from various parameters.
   RightTrapezoid.from({
-    num? base1,
-    num? base2,
+    super.base1,
+    super.base2,
     num? side,
-    num? height,
-  }) : super.from(
-            base1: base1,
-            base2: base2,
-            side1: side,
-            side2: height,
-            height: height);
+    super.height,
+  }) : super.from(side1: side, side2: height);
 }

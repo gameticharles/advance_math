@@ -4,7 +4,7 @@ import 'quantity_range.dart';
 /// Represents a specific time span.
 class TimePeriod extends QuantityRange<TimeInstant> {
   /// Constructs a time period.
-  TimePeriod(TimeInstant startTime, TimeInstant endTime) : super(startTime, endTime);
+  TimePeriod(super.startTime, super.endTime);
 }
 
 /// Constructs a [FiscalYear] time period.
@@ -33,7 +33,8 @@ class CalendarYear extends TimePeriod {
   /// Constructs a instance for [year].
   CalendarYear(int year)
       : _year = year,
-        super(TimeInstant.dateTime(DateTime(year, 1)), TimeInstant.dateTime(DateTime(year + 1)));
+        super(TimeInstant.dateTime(DateTime(year, 1)),
+            TimeInstant.dateTime(DateTime(year + 1)));
 
   final int _year;
 

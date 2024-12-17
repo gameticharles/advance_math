@@ -5,7 +5,7 @@ import 'number_format_si.dart';
 /// and raised to a power of 10 (e.g., 1.2345 x 10^3).
 class ScientificFormatSI extends NumberFormatSI {
   /// Constructs a instance.
-  ScientificFormatSI({bool unicode = false}) : super(unicode: unicode);
+  ScientificFormatSI({super.unicode});
 
   /// Move the decimal point to just after the first integer digit.
   @override

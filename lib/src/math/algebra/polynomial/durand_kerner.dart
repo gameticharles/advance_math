@@ -95,11 +95,11 @@ final class DurandKerner extends Polynomial {
   /// If the coefficients of your polynomial are only real numbers, consider
   /// using the [DurandKerner.realEquation] constructor instead.
   DurandKerner(
-    List<Number> coefficients, {
+    super.coefficients, {
     this.initialGuess = const [],
     this.precision = 1.0e-10,
     this.maxSteps = 2000,
-  }) : super(coefficients);
+  });
 
   /// Creates a new object that finds all the roots of a polynomial equation
   /// using the Durand-Kerner algorithm. The polynomial can only have real

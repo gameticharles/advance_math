@@ -111,8 +111,8 @@ class PowerLevel extends Level {
       : super(Np: 0.5 * math.log((p.mks / refP.mks).toDouble()));
 
   /// Constructs a instance having specified [units].
-  PowerLevel.inUnits(dynamic value, LevelUnits? units, [double uncert = 0.0])
-      : super.inUnits(value, units, uncert);
+  PowerLevel.inUnits(super.value, super.units, [super.uncert])
+      : super.inUnits();
 
   /// Returns the ratio represented by this power level.
   double get ratio => math.exp(2.0 * valueSI.toDouble());
@@ -149,8 +149,8 @@ class FieldLevel extends Level {
       : super(Np: 0.5 * math.log((q1.mks / refQ.mks).toDouble()));
 
   /// Constructs a instance in the specified [units].
-  FieldLevel.inUnits(dynamic value, LevelUnits? units, [double uncert = 0.0])
-      : super.inUnits(value, units, uncert);
+  FieldLevel.inUnits(super.value, super.units, [super.uncert])
+      : super.inUnits();
 
   /// Returns the ratio that this field level represents..
   double get ratio => math.exp(valueSI.toDouble());

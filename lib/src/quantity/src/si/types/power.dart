@@ -104,7 +104,7 @@ class PowerUnits extends Power with Units {
 /// Radiant flux is another way to express power.
 class RadiantFlux extends Power {
   /// Constructs a constant RadiantFlux.
-  const RadiantFlux.constant(Number valueSI,
-      {PowerUnits? units, double uncert = 0.0})
-      : super.constant(valueSI, units: units, uncert: uncert);
+  const RadiantFlux.constant(super.valueSI,
+      {super.units, super.uncert})
+      : super.constant();
 }

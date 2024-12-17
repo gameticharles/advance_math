@@ -4,5 +4,5 @@ import 'quantity_exception.dart';
 /// operation on a Quantity having unexpected or illegal dimensions.
 class DimensionsException extends QuantityException {
   /// Constructs a DimensionsException with an optional message.
-  DimensionsException([String str = '']) : super(str);
+  DimensionsException([super.str]);
 }

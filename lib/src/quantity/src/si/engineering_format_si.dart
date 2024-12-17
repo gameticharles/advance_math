@@ -5,7 +5,7 @@ import 'number_format_si.dart';
 /// three (e.g., 123.345 x 10^3).
 class EngineeringFormatSI extends NumberFormatSI {
   /// Constructs a instance.
-  EngineeringFormatSI({bool unicode = false}) : super(unicode: unicode);
+  EngineeringFormatSI({super.unicode});
 
   /// Move the decimal point.
   @override

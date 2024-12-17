@@ -25,15 +25,13 @@ class Parallelogram extends PlaneGeometry {
   /// Requires the base length, side length, and optionally the height and angle.
   /// If height is provided, angle is calculated. If angle is provided, height is calculated.
   Parallelogram(this.base, this.side,
-      {num? height1, num? height2, this.angle1, this.angle2})
-      : height2 = height2,
-        height1 = height1,
-        super("Parallelogram") {
+      {this.height1, this.height2, this.angle1, this.angle2})
+      : super("Parallelogram") {
     if (height1 == null && angle1 == null) {
       throw ArgumentError('Either height or angle must be provided.');
     }
     height1 ??= side * sin(angle1!);
-    angle1 ??= asin(height1 / side);
+    angle1 ??= asin(height1! / side);
   }
 
   /// Named constructor to create a Parallelogram from various parameters.

@@ -84,9 +84,9 @@ class LeastSquares extends BaseLeastSquares {
   ///
   /// The `method` parameter is an optional parameter specifying the equation method to be used.
   /// By default, it is set to `EquationMethod.linear`.
-  LeastSquares(Matrix A, ColumnMatrix b, DiagonalMatrix W,
-      {EquationMethod method = EquationMethod.linear})
-      : super(A, b, W: W, method: method);
+  LeastSquares(super.A, super.b, DiagonalMatrix W,
+      {super.method})
+      : super(W: W);
 }
 
 /// Implements Ordinary Least Squares method for linear regression.
@@ -111,9 +111,8 @@ class OrdinaryLeastSquares extends BaseLeastSquares {
   ///
   /// The `method` parameter is an optional parameter specifying the equation method to be used.
   /// By default, it is set to `EquationMethod.linear`.
-  OrdinaryLeastSquares(Matrix A, ColumnMatrix b,
-      {DiagonalMatrix? W, EquationMethod method = EquationMethod.linear})
-      : super(A, b, method: method);
+  OrdinaryLeastSquares(super.A, super.b,
+      {DiagonalMatrix? W, super.method});
 }
 
 /// Implements Weighted Least Squares method for linear regression.
@@ -141,9 +140,9 @@ class WeightedLeastSquares extends BaseLeastSquares {
   ///
   /// The `method` parameter is an optional parameter specifying the equation method to be used.
   /// By default, it is set to `EquationMethod.linear`.
-  WeightedLeastSquares(Matrix A, ColumnMatrix b, DiagonalMatrix W,
-      {EquationMethod method = EquationMethod.linear})
-      : super(A, b, W: W, method: method);
+  WeightedLeastSquares(super.A, super.b, DiagonalMatrix W,
+      {super.method})
+      : super(W: W);
 
   /// Computes the residuals of the regression model, taking into account
   /// the weights associated with each observation.
@@ -183,9 +182,9 @@ class GeneralizedLeastSquares extends BaseLeastSquares {
   ///
   /// The `method` parameter is an optional parameter specifying the equation method to be used.
   /// By default, it is set to `EquationMethod.linear`.
-  GeneralizedLeastSquares(Matrix A, ColumnMatrix b, DiagonalMatrix W,
-      {EquationMethod method = EquationMethod.linear})
-      : super(A, b, W: W, method: method);
+  GeneralizedLeastSquares(super.A, super.b, DiagonalMatrix W,
+      {super.method})
+      : super(W: W);
 
   /// Computes the residuals of the regression model, taking into account
   /// the weights associated with each observation.

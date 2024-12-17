@@ -20,8 +20,8 @@ class MiscQuantity extends Quantity {
   /// This constructor sets the [value], [dim]ensions and relative
   /// uncertainty.
   /// [value] may be a num or Number object.
-  MiscQuantity([dynamic value = 0.0, Dimensions dim = Scalar.scalarDimensions, double uncert = 0.0])
-      : super.misc(value, dim, uncert);
+  MiscQuantity([super.value, Dimensions super.dim = Scalar.scalarDimensions, super.uncert])
+      : super.misc();
 
   /// Constructs a constant MiscQuantity.
   const MiscQuantity.constant(Number valueSI, Dimensions dim, {Units? units, double uncert = 0.0})

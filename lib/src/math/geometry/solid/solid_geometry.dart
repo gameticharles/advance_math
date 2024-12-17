@@ -27,7 +27,7 @@ abstract class SolidGeometry extends Geometry {
   /// Constructor for the SolidGeometry class.
   ///
   /// Takes a [name] parameter to identify the shape.
-  SolidGeometry(String name) : super(name);
+  SolidGeometry(super.name);
 
   /// Calculates the volume of the 3D geometric shape.
   ///

@@ -9,7 +9,7 @@ part of '../geometry.dart';
 ///
 /// Parameters:
 /// -----------
-/// vertices : List<Tuple<int, int>>, optional
+/// vertices : `List<Tuple<int, int>>`, optional
 ///     A list of (x, y) coordinates defining the vertices of the polygon.
 ///     If not provided, the polygon will be assumed to be regular, and
 ///     the number of sides and side length must be given.
@@ -20,9 +20,9 @@ part of '../geometry.dart';
 ///
 /// Attributes:
 /// -----------
-/// vertices : List<Tuple<int, int>>
+/// vertices : `List<Tuple<int, int>>`
 ///     A list containing the (x, y) coordinates of the polygon vertices.
-/// sides : List<double>
+/// sides : `List<double>`
 ///     A list containing the lengths of the polygon sides.
 /// num_sides : int
 ///     The number of sides in the polygon.
@@ -203,13 +203,13 @@ class Polygon {
 
   /// This is a private method used internally by the class to calculate the angle between
   /// two vectors v1 and v2. The method uses the dot product and the norms of the vectors
-  /// to find the cosine of the angle, and then applies arccos to get the angle in radians.
+  /// to find the cosine of the angle, and then applies across to get the angle in radians.
 
   /// Parameters:
   /// -----------
-  /// v1 : List<double>
+  /// v1 : `List<double>`
   ///     The first vector.
-  /// v2 : List<double>
+  /// v2 : `List<double>`
   ///     The second vector.
 
   /// Returns:
@@ -283,13 +283,13 @@ class Polygon {
   ///
   /// Parameters:
   /// -----------
-  /// p1 : List<double>
+  /// p1 : `List<double>`
   ///     The first endpoint of the first line segment.
-  /// p2 : List<double>
+  /// p2 : `List<double>`
   ///     The second endpoint of the first line segment.
-  /// q1 : List<double>
+  /// q1 : `List<double>`
   ///     The first endpoint of the second line segment.
-  /// q2 : List<double>
+  /// q2 : `List<double>`
   ///     The second endpoint of the second line segment.
   ///
   /// Returns:
@@ -355,12 +355,12 @@ class Polygon {
   ///
   /// Parameters:
   /// -----------
-  /// point : List<double>
+  /// point : `List<double>`
   ///     The coordinates of the point.
   ///
   /// Returns:
   /// --------
-  /// List<double>
+  /// `List<double>`
   ///     The coordinates of the nearest point on the polygon to the given point.
   ///
   /// Example:
@@ -408,7 +408,7 @@ class Polygon {
   ///
   /// Returns:
   /// --------
-  /// List<List<double>>
+  /// `List<List<double>>`
   ///     The bounding box of the polygon as a list of four points, each represented by [x, y] coordinates.
   ///
   /// Example:
@@ -518,7 +518,7 @@ class Polygon {
   ///
   /// Parameters:
   /// -----------
-  /// a, b, c : Tuple<double, double> or array-like
+  /// a, b, c : `Tuple<double, double> `or array-like
   ///     The coordinates (x, y) of the triangle's vertices.
   ///
   /// Returns:
@@ -672,7 +672,7 @@ class Polygon {
   /// b : double
   ///     The upper limit of integration.
   /// n : int
-  ///     The number of subintervals to divide the integration range. Must be an even number.
+  ///     The number of sub-intervals to divide the integration range. Must be an even number.
   ///     A higher value of n increases the accuracy of the approximation but also increases the computation time.
   ///
   /// Returns:
@@ -737,7 +737,7 @@ class Polygon {
   /// b : double
   ///     The upper limit of integration.
   /// n : int
-  ///     The number of subintervals to divide the integration range. A higher value of n
+  ///     The number of sub-intervals to divide the integration range. A higher value of n
   ///     increases the accuracy of the approximation but also increases the computation time.
   ///
   /// Returns:
@@ -850,7 +850,7 @@ class Polygon {
   ///
   /// Returns:
   /// --------
-  /// Tuple<double, double>
+  /// `Tuple<double, double>`
   ///     The centroid of the polygon as a tuple of [x, y] coordinates.
   ///
   /// Example:
@@ -1145,7 +1145,7 @@ class RegularPolygon extends Polygon {
 }
 
 class IrregularPolygon extends Polygon {
-  IrregularPolygon({List<Point>? vertices}) : super(vertices: vertices);
+  IrregularPolygon({super.vertices});
 
   // irregular polygon specific methods go here...
   // the above class does not include any irregular polygon specific methods,

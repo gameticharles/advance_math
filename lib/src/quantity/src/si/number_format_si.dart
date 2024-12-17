@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:intl/intl.dart' show NumberFormat;
 import 'package:intl/number_symbols.dart';
+// ignore: implementation_imports
 import 'package:intl/src/intl/number_parser_base.dart';
 import '../../../number/number/complex.dart';
 import '../../../number/number/double.dart';

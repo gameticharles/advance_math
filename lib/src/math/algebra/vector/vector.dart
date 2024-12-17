@@ -480,7 +480,7 @@ class Vector extends IterableMixin<num> {
 
   /// Generates a new Vector ([Vector2], [Vector3], [Vector4]) based on the mapping provided.
   ///
-  /// The [mapping] should be a List<String> consisting of the characters 'x', 'y', 'z', 'w'
+  /// The [mapping] should be a `List<String> `consisting of the characters 'x', 'y', 'z', 'w'
   /// representing the desired components for the new Vector. The [mapping] and the Vector must
   /// have the same number of components.
   ///

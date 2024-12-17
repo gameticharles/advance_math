@@ -22,8 +22,8 @@ part of '/advance_math.dart';
 /// }
 /// ```
 class CompressedPrimeSieve {
-  static const int NUM_BITS = 128;
-  static const int NUM_BITS_SHIFT = 7; // 2^7 = 128
+  static const int numBits = 128;
+  static const int numBitsShift = 7; // 2^7 = 128
 
   /// Sets the bit representing [n] to 1 indicating this number is not prime.
   ///
@@ -31,7 +31,7 @@ class CompressedPrimeSieve {
   /// [n] is the number to mark as not prime.
   static void setBit(List<int> arr, int n) {
     if ((n & 1) == 0) return; // n is even
-    arr[n >> NUM_BITS_SHIFT] |= 1 << ((n - 1) >> 1);
+    arr[n >> numBitsShift] |= 1 << ((n - 1) >> 1);
   }
 
   /// Returns true if the bit for [n] is off (meaning [n] is a prime).
@@ -43,7 +43,7 @@ class CompressedPrimeSieve {
     if (n < 2) return false; // n is not prime
     if (n == 2) return true; // two is prime
     if ((n & 1) == 0) return false; // n is even
-    int chunk = arr[n >> NUM_BITS_SHIFT];
+    int chunk = arr[n >> numBitsShift];
     int mask = 1 << ((n - 1) >> 1);
     return (chunk & mask) != mask;
   }
@@ -61,7 +61,7 @@ class CompressedPrimeSieve {
   /// [limit] is the upper bound of the range for which the prime sieve is generated.
   /// Use the [isNotSet] and [setBit] methods to toggle the bits for each number.
   static List<int> primeSieve(int limit) {
-    final int numChunks = (limit / NUM_BITS).ceil();
+    final int numChunks = (limit / numBits).ceil();
     final int sqrtLimit = math.sqrt(limit).toInt();
     List<int> chunks = List<int>.filled(numChunks, 0);
     chunks[0] = 1; // 1 is not prime

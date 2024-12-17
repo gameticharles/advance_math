@@ -12,17 +12,17 @@ class Currency extends Quantity {
   final String? fractionalUnitSingular;
   final String? fractionalUnitPlural;
 
-  /// Constructs a Currency with US dollars ([USD]).
+  /// Constructs a Currency with US dollars ([usd]).
   /// Optionally specify a relative standard uncertainty.
   // ignore:non_constant_identifier_names
   Currency({
-    dynamic USD,
+    dynamic usd,
     double uncert = 0.0,
     this.mainUnitSingular,
     this.mainUnitPlural,
     this.fractionalUnitSingular,
     this.fractionalUnitPlural,
-  }) : super(USD ?? 0.0, Currency.dollarsUS, uncert);
+  }) : super(usd ?? 0.0, Currency.dollarsUS, uncert);
 
   /// Constructs a instance without preferred units.
   Currency.misc(dynamic conv, this.mainUnitSingular, this.mainUnitPlural,

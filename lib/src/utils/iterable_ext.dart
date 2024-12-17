@@ -6,7 +6,7 @@ extension GroupingExtension<T> on Iterable<T> {
   /// [keyExtractor] is a function that takes an element of type T and returns the key of type K.
   /// Returns a Map where each key is of type K and the corresponding value is a List of elements of type T.
   ///
-  /// This method can be used on any Iterable, including List<T> and List<Map<String, dynamic>>.
+  /// This method can be used on any Iterable, including `List<T>` and `List<Map<String, dynamic>>`.
   ///
   /// Example usage with a list of custom objects:
   /// ```dart
@@ -79,7 +79,7 @@ extension MapListGroupingExtension on List<Map<String, dynamic>> {
   /// Returns a Map where each key is the value of the specified key in the maps,
   /// and the corresponding value is a List of maps that have that value for the key.
   ///
-  /// This method is a convenient shorthand for grouping a List<Map<String, dynamic>>
+  /// This method is a convenient shorthand for grouping a `List<Map<String, dynamic>>`
   /// by a specific key without needing to write a custom keyExtractor function.
   ///
   /// Example usage:

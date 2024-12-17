@@ -7,7 +7,7 @@ import 'quantity_range.dart';
 /// implicit direction.
 class AngleRange extends QuantityRange<Angle> {
   /// Constructs an angle range.
-  AngleRange(Angle startAngle, Angle endAngle) : super(startAngle, endAngle);
+  AngleRange(super.startAngle, super.endAngle);
 
   /// Constructs an angle range in radians.
   AngleRange.radians(double startAngleRad, double endAngleRad)
@@ -70,7 +70,9 @@ class AngleRange extends QuantityRange<Angle> {
     var max360 = maxValue.angle360;
     if (max360 < min360) {
       max360 = max360 + Angle(rad: twoPi) as Angle;
-      list1..add(AngleRange(min360, Angle(rad: twoPi)))..add(AngleRange(Angle(rad: 0), max360));
+      list1
+        ..add(AngleRange(min360, Angle(rad: twoPi)))
+        ..add(AngleRange(Angle(rad: 0), max360));
     } else {
       list1.add(AngleRange(min360, max360));
     }
@@ -80,7 +82,9 @@ class AngleRange extends QuantityRange<Angle> {
     var max360two = range2.maxValue.angle360;
     if (max360two < min360two) {
       max360two = max360two + Angle(rad: twoPi) as Angle;
-      list2..add(AngleRange(min360two, Angle(rad: twoPi)))..add(AngleRange(Angle(rad: 0), max360two));
+      list2
+        ..add(AngleRange(min360two, Angle(rad: twoPi)))
+        ..add(AngleRange(Angle(rad: 0), max360two));
     } else {
       list2.add(AngleRange(min360two, max360two));
     }
@@ -130,7 +134,9 @@ class AngleRange extends QuantityRange<Angle> {
   /// depending on whether or not the projection of this range crosses
   /// 0 degrees.
   List<AngleRange> get ranges360 {
-    if (revolutions.abs() > 0) return <AngleRange>[AngleRange(angle0, angle360)];
+    if (revolutions.abs() > 0) {
+      return <AngleRange>[AngleRange(angle0, angle360)];
+    }
 
     final rangeList = <AngleRange>[];
 
@@ -140,7 +146,9 @@ class AngleRange extends QuantityRange<Angle> {
       final delta = start360 - startAngle as Angle;
       final endPlusDelta = endAngle + delta as Angle;
       if (endPlusDelta.valueSI > twoPi) {
-        rangeList..add(AngleRange(angle0, endPlusDelta.angle360))..add(AngleRange(start360, angle360));
+        rangeList
+          ..add(AngleRange(angle0, endPlusDelta.angle360))
+          ..add(AngleRange(start360, angle360));
       } else {
         rangeList.add(AngleRange(start360, endPlusDelta));
       }
@@ -150,7 +158,9 @@ class AngleRange extends QuantityRange<Angle> {
       final delta = end360 - endAngle as Angle;
       final startPlusDelta = startAngle + delta as Angle;
       if (startPlusDelta.valueSI > twoPi) {
-        rangeList..add(AngleRange(angle360, end360))..add(AngleRange(startPlusDelta - angle360 as Angle, angle0));
+        rangeList
+          ..add(AngleRange(angle360, end360))
+          ..add(AngleRange(startPlusDelta - angle360 as Angle, angle0));
       } else {
         rangeList.add(AngleRange(end360, startPlusDelta));
       }
@@ -168,8 +178,11 @@ class AngleRange extends QuantityRange<Angle> {
   /// This is a more lenient test than [contains()] in superclass
   /// [QuantityRange].
   ///
-  bool contains360(Angle angle, [bool inclusive = true, double epsilon = 1.0e-10]) {
-    if (contains(angle, inclusive, epsilon) || revolutions.abs() > 0) return true;
+  bool contains360(Angle angle,
+      [bool inclusive = true, double epsilon = 1.0e-10]) {
+    if (contains(angle, inclusive, epsilon) || revolutions.abs() > 0) {
+      return true;
+    }
     final ang360 = angle.angle360;
     for (final range in ranges360) {
       if (range.contains(ang360, inclusive, epsilon)) return true;
@@ -202,11 +215,15 @@ class AngleRange extends QuantityRange<Angle> {
       num deltaEndRad;
       num deltaEndRadRev;
       for (final range in ranges) {
-        deltaStartRad = (range.startAngle.mks.toDouble() - angRev0.mks.toDouble()).abs();
-        deltaStartRadRev = tau + range.startAngle.mks.toDouble() - angRev0.mks.toDouble();
+        deltaStartRad =
+            (range.startAngle.mks.toDouble() - angRev0.mks.toDouble()).abs();
+        deltaStartRadRev =
+            tau + range.startAngle.mks.toDouble() - angRev0.mks.toDouble();
         deltaStartRad = min(deltaStartRad, deltaStartRadRev);
-        deltaEndRad = (range.endAngle.mks.toDouble() - angRev0.mks.toDouble()).abs();
-        deltaEndRadRev = tau + range.endAngle.mks.toDouble() - angRev0.mks.toDouble();
+        deltaEndRad =
+            (range.endAngle.mks.toDouble() - angRev0.mks.toDouble()).abs();
+        deltaEndRadRev =
+            tau + range.endAngle.mks.toDouble() - angRev0.mks.toDouble();
         deltaEndRad = min(deltaEndRad, deltaEndRadRev);
         if (deltaStartRad < minDeltaRad) {
           closest = range.startAngle;
@@ -219,9 +236,13 @@ class AngleRange extends QuantityRange<Angle> {
       }
       return closest;
     } else {
-      final num deltaStartRad = (startAngle.mks.toDouble() - angle.mks.toDouble()).abs();
-      final num deltaEndRad = (endAngle.mks.toDouble() - angle.mks.toDouble()).abs();
-      return (deltaStartRad <= deltaEndRad) ? Angle(rad: deltaStartRad) : Angle(rad: deltaEndRad);
+      final num deltaStartRad =
+          (startAngle.mks.toDouble() - angle.mks.toDouble()).abs();
+      final num deltaEndRad =
+          (endAngle.mks.toDouble() - angle.mks.toDouble()).abs();
+      return (deltaStartRad <= deltaEndRad)
+          ? Angle(rad: deltaStartRad)
+          : Angle(rad: deltaEndRad);
     }
   }
 }
