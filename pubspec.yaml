@@ -22,18 +22,8 @@ dev_dependencies:
   test: ^1.25.12
 
 topics:
-  - matrix
-  - vectors
-  - dataFrame
-  - angles
-  - zcores
-  - logarithm
-  - num-or-words
-  - morse-code
-  - complex-numbers
+  - translators
   - algebra
   - statistics
   - geometry
-  - numerical-analysis
-  - roman-numerals
-  - polynomials
+  - expressions
