@@ -518,7 +518,7 @@ abstract class Quantity implements Comparable<dynamic> {
   /// of standard units, their use is now discouraged in favor of the adopted
   /// standard MKS (or meter-kilogram-second) units.
   ///
-  /// See [get mks].
+  /// See `[get mks]`.
   Number get cgs {
     var value = valueSI;
 

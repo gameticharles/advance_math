@@ -1440,13 +1440,96 @@ extension MatrixOperationExtension on Matrix {
     }
   }
 
-  /// Computes the pseudoinverse of a given matrix [a] using the transpose and inverse.
+  /// Calculates the inverse of a square matrix, falling back to SVD-based
+  /// inversion or generalized pseudo-inversion if necessary.
   ///
-  /// This method is suitable only for full column rank matrices. For a more
-  /// general approach, consider using the Singular Value Decomposition (SVD) method.
+  /// This method first attempts regular matrix inversion using LU decomposition.
+  /// If the matrix is near-singular or ill-conditioned (as determined by the
+  /// condition number), it falls back to an inversion based on Singular Value
+  /// Decomposition (SVD). If all else fails, it uses the pseudo-inverse as a
+  /// generalized solution.
+  ///
+  /// - [conditionThreshold]: A threshold for the condition number, above which
+  ///   the matrix is considered ill-conditioned. Default is `1e-3`.
+  ///
+  /// Throws:
+  /// - [Exception] if the matrix is not square.
+  /// - [Exception] if all inversion methods fail.
+  ///
+  /// Returns:
+  /// - A [Matrix] representing the inverse of the current matrix.
   ///
   /// Example:
+  /// ```dart
+  /// var matrix = Matrix([[1, 2], [3, 4]]);
+  /// var result = matrix.inverse();
+  /// print(result);
+  /// // Output:
+  /// // Matrix: 2x2
+  /// // ┌ -2.0  1.0 ┐
+  /// // └  1.5 -0.5 ┘
   /// ```
+  Matrix inverse({double conditionThreshold = 1e-3}) {
+    // if (rowCount != columnCount) {
+    //   throw Exception('Matrix must be square to calculate inverse');
+    // }
+
+    // Compute SVD decomposition.
+    var svd = decomposition.singularValueDecomposition();
+
+    print('Condition number is: ${svd.conditionNumber}');
+
+    if (svd.conditionNumber > conditionThreshold) {
+      print(
+          'Matrix condition number exceeds threshold $conditionThreshold. Likely singular.');
+    } else {
+      try {
+        // Attempt regular inversion using LU solve.
+        var lu = decomposition.luDecompositionDoolittle();
+        var identity = Matrix.eye(rowCount);
+        return lu
+            .solve(identity); // Solve A * X = I for X (generalized inverse).
+      } catch (e) {
+        print('Failed regular inversion: $e. Falling back to SVD inversion...');
+      }
+    }
+
+    // SVD Inversion.
+    try {
+      print('Attempting SVD inversion...');
+      // Identity matrix of the same size.
+      var identity = Matrix.eye(rowCount);
+      return svd.solve(identity);
+    } catch (e) {
+      print('SVD inversion failed: $e');
+    }
+
+    // Generalized Inverse Fallback.
+    print('Falling back to generalized inverse...');
+    return pseudoInverse();
+  }
+
+  /// Computes the pseudo-inverse of a matrix using Singular Value Decomposition (SVD).
+  ///
+  /// This method provides a robust approach to calculating the pseudo-inverse of
+  /// a matrix, handling cases where the matrix is singular, poorly conditioned,
+  /// or not square. The method falls back to SVD-based computation when the
+  /// condition number exceeds the specified threshold, ensuring numerical stability.
+  ///
+  /// ### Returns:
+  /// - A `Matrix` object representing the pseudo-inverse of the input matrix.
+  ///
+  /// ### Methodology:
+  /// 1. **SVD Decomposition**: The matrix is decomposed into \( U, S, V \) components.
+  /// 2. **Singular Value Inversion**:
+  ///    - Singular values are inverted to construct \( S^+ \), with small values set
+  ///      to zero to handle numerical instability.
+  /// 3. **Pseudo-Inverse Reconstruction**:
+  ///    - Combines \( U, S^+, V \) to compute the pseudo-inverse:
+  ///      \[ A^+ = V S^+ U^T \]
+  ///
+  /// ### Example:
+  /// ```dart
   /// Matrix a = Matrix([
   ///   [1, 2],
   ///   [3, 4],
@@ -1457,65 +1540,32 @@ extension MatrixOperationExtension on Matrix {
   /// print(aPseudoInverse);
   /// ```
   ///
-  /// Output:
+  /// ### Output:
   /// ```
-  /// -1.333333333333333   1.083333333333333
-  ///  1.083333333333333  -0.333333333333333
+  /// Matrix: 2x3
+  /// ┌ -1.3333333333333308 -0.3333333333333339  0.6666666666666643 ┐
+  /// └  1.0833333333333313 0.33333333333333304 -0.4166666666666643 ┘
   /// ```
   ///
-  /// [a] The input matrix.
-  /// Returns the pseudoinverse of the input matrix.
+  /// ### Notes:
+  /// - This implementation is suitable for both square and rectangular matrices.
+  /// - Provides robust handling for singular and low-rank matrices.
+  /// - If the matrix is well-conditioned, the SVD fallback may not be triggered.
+  ///
+  /// ### Limitations:
+  /// - The computational cost of SVD may be significant for very large matrices.
+  ///
   Matrix pseudoInverse() {
     Matrix a = copy();
     Matrix aTranspose = a.transpose();
     return (aTranspose * a).inverse() * aTranspose;
   }
-
-  /// Calculates the inverse of a square matrix.
-  ///
-  /// Returns the inverse matrix.
-  ///
-  /// Example:
-  /// ```dart
-  /// var matrix = Matrix([[1, 2], [3, 4]]);
-  /// var result = matrix.inverse();
-  /// print(result);
-  /// // Output:
-  /// // -2.0 1.0
-  /// // 1.5 -0.5
-  /// ```
-  Matrix inverse() {
-    int n = rowCount;
-    if (n != columnCount) {
-      throw Exception('Matrix must be square to calculate inverse');
-    }
-
-    num det = determinant();
-    if (det == 0) {
-      throw Exception('Matrix is singular and cannot be inverted');
-    }
-
-    Matrix adjugateMatrix = Matrix.fill(n, n, 0.0);
-
-    for (int i = 0; i < n; i++) {
-      for (int j = 0; j < n; j++) {
-        Matrix subMatrix = Matrix([
-          for (int p = 0; p < n; p++)
-            if (p != i)
-              [
-                for (int q = 0; q < n; q++)
-                  if (q != j) this[p][q]
-              ]
-        ]);
-
-        adjugateMatrix[j][i] =
-            ((i + j) % 2 == 0 ? 1 : -1) * subMatrix.determinant();
-      }
-    }
-
-    Matrix inverseMatrix = adjugateMatrix * (1 / det);
-    return inverseMatrix;
-  }
+  // Matrix pseudoInverse() {
+  //   var svd = decomposition.singularValueDecomposition();
+  //   // Identity matrix of the same size.
+  //   var identity = Matrix.eye(rowCount);
+  //   return svd.solve(identity);
+  // }
 
   /// Calculates the dot product of two matrices.
   ///

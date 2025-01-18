@@ -10,6 +10,28 @@ num mean(List<num> list) {
   return list.reduce((a, b) => a + b) / list.length;
 }
 
+/// Alias for mean.
+num average(List<num> list) {
+  return mean(list);
+}
+
+/// Returns the average of two or more numbers.
+/// If more than two numbers are provided, the average is calculated using the mean function.
+///
+/// Example:
+/// ```dart
+/// print(avg(1, 2, 3)); // prints: 2.0
+/// print(avg(1, 2, 3, 4, 5)); // prints: 3.0
+/// print(avg([1, 2, 3, 4, 5])); // prints: 3.0
+/// ```
+dynamic avg = VarArgsFunction((args, kwargs) {
+  // Check if the first argument is a List, and use it directly.
+  if (args.length == 1 && args.first is List) {
+    args = args.first;
+  }
+  return mean(args.map((e) => e as num).toList());
+});
+
 /// Returns the median of a list of numbers.
 ///
 /// Example:

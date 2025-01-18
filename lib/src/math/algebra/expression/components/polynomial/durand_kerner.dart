@@ -1,4 +1,4 @@
-part of '../algebra.dart';
+part of '../../expression.dart';
 
 /// The Durand–Kerner method, also known as Weierstrass method, is a root
 /// finding algorithm for solving polynomial equations. With this class, you
@@ -182,17 +182,18 @@ final class DurandKerner extends Polynomial {
 
   @override
   Number discriminant() {
-    // Say that P(x) is the polynomial represented by this instance and
-    // P'(x) is the derivative of P. In order to calculate the discriminant of
-    // a polynomial, we need to first compute the resultant Res(A, A') which
-    // is equivalent to the determinant of the Sylvester matrix.
-    final sylvester = SylvesterMatrix(
-      polynomial: this,
-    );
+    // // Say that P(x) is the polynomial represented by this instance and
+    // // P'(x) is the derivative of P. In order to calculate the discriminant of
+    // // a polynomial, we need to first compute the resultant Res(A, A') which
+    // // is equivalent to the determinant of the Sylvester matrix.
+    // final sylvester = SylvesterMatrix(
+    //   polynomial: this,
+    // );
 
-    // Computes Res(A, A') and then determines the sign according with the
-    // degree of the polynomial.
-    return sylvester.polynomialDiscriminant();
+    // // Computes Res(A, A') and then determines the sign according with the
+    // // degree of the polynomial.
+    // return sylvester.polynomialDiscriminant();
+    return Integer(0); // Remove and uncomment the above
   }
 
   @override
@@ -276,11 +277,11 @@ final class DurandKerner extends Polynomial {
         imaginaryBuffer: imaginaryBuffer,
       );
       final factor = bound * 0.65;
-      final multiplier = math.cos(0.25 * 2 * math.pi);
+      final multiplier = cos(0.25 * 2 * pi);
 
       for (var i = 0; i < coefficientsLength - 1; ++i) {
         real[i] = factor * multiplier;
-        complex[i] = factor * math.sqrt(1.0 - multiplier * multiplier);
+        complex[i] = factor * sqrt(1.0 - multiplier * multiplier);
       }
 
       return _solve(
@@ -326,10 +327,10 @@ final class DurandKerner extends Polynomial {
       final realSquare = realBuffer[i] * realBuffer[i];
       final imagSquare = imaginaryBuffer[i] * imaginaryBuffer[i];
 
-      bound = math.max(bound, realSquare + imagSquare);
+      bound = max(bound, realSquare + imagSquare);
     }
 
-    return 1.0 + math.sqrt(bound);
+    return 1.0 + sqrt(bound);
   }
 
   /// The Durand-Kerner algorithm that finds the roots of the polynomial.
@@ -421,7 +422,7 @@ final class DurandKerner extends Polynomial {
         realValues[j] = pa - qa;
         imaginaryValues[j] = pb - qb;
 
-        d = math.max(d, math.max(qa.abs(), qb.abs()));
+        d = max(d, max(qa.abs(), qb.abs()));
       }
 
       // Exiting early if convergence is reached.
@@ -480,5 +481,10 @@ final class DurandKerner extends Polynomial {
       (index) => Complex(realValues[index], imaginaryValues[index]),
       growable: false,
     );
+  }
+
+  @override
+  Expression expand() {
+    return this;
   }
 }

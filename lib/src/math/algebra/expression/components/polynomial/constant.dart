@@ -1,4 +1,4 @@
-part of '../algebra.dart';
+part of '../../expression.dart';
 
 /// Concrete implementation of [Algebraic] that represents a constant value
 /// `a`. It can be either real or complex.
@@ -33,4 +33,9 @@ final class Constant extends Polynomial {
   Number get a => coefficients.first;
 
   Constant copyWith({Complex? a}) => Constant(a: a ?? this.a);
+
+  @override
+  Expression expand() {
+    return this;
+  }
 }

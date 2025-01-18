@@ -1,4 +1,4 @@
-part of '../algebra.dart';
+part of '../../expression.dart';
 
 /// Concrete implementation of [Polynomial] that represents a first degree
 /// polynomial equation in the form _ax + b = 0_.
@@ -41,4 +41,9 @@ class Linear extends Polynomial {
         a: a ?? this.a,
         b: b ?? this.b,
       );
+
+  @override
+  Expression expand() {
+    return this;
+  }
 }

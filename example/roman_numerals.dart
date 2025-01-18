@@ -5,8 +5,13 @@ void main(List<String> args) {
   print(romanFive); // V
   print(RomanNumerals(69)); // LXIX
   print(RomanNumerals(8785, useOverline: false)); // (VIII)DCCLXXXV
+  print('V̅MMMDCCLXXXV'.toRomanNumeralValue());
+  print(RomanNumerals.fromRoman('V̅MMMDCCLXXXV').value);
+
   print(RomanNumerals(3999999, useOverline: true));
   print(RomanNumerals(3999999, useOverline: false));
+  print(RomanNumerals(1989, useOverline: false));
+  print('MCMLXXXIX'.toRomanNumeralValue());
 
   print(RomanNumerals.romanToDate('VIII・XXII・MCMLXXXIX',
       sep: '・', format: 'MMMM d, yyyy')); // Outputs: August 22, 1989
@@ -14,7 +19,6 @@ void main(List<String> args) {
 
   print(RomanNumerals(3449671, useOverline: false));
   print(RomanNumerals(3449671, zeroChar: 'N', useOverline: false));
-  // print(RomanNumerals.fromRoman('V̅MMMDCCLXXXV').value);
 
   /// 1) Nice and easy, default config is the "common" config.
 

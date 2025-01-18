@@ -2,11 +2,8 @@ import 'package:advance_math/advance_math.dart';
 
 void main() {
   int number = 35;
-  List<int> allPrimeFactors = primeFactors(number);
-  print('Prime factors of $num are: $allPrimeFactors');
-
-  List<int> getFactors = factors(number);
-  print('Factors of $num are: $getFactors');
+  print('Prime factors of $num are: ${primeFactors(number)}');
+  print('Factors of $num are: ${factors(number)}');
 
   double functionToEvaluate(double x) {
     return x * x; // Example function: f(x) = x^2
@@ -52,6 +49,22 @@ void main() {
 
   var gaussianValue = random.nextGaussian(mean: 10.0, stddev: 2.0);
   print('Random value from Gaussian distribution: $gaussianValue');
+
+  AbstractRandomProvider provider = CryptographicRandomProvider();
+
+  print('Random Numeric: ${randomNumeric(10, provider: provider)}');
+  print('Random Alpha: ${randomAlpha(10, provider: provider)}');
+  print('Random AlphaNumeric: ${randomAlphaNumeric(10, provider: provider)}');
+
+  provider = Random.secure();
+
+  print('Random Numeric: ${randomNumeric(10, provider: provider)}');
+  print('Random Alpha: ${randomAlpha(10, provider: provider)}');
+  print('Random AlphaNumeric: ${randomAlphaNumeric(10, provider: provider)}');
+
+  // Using Random-specific features
+  Random rand = Random.secure();
+  print('Random UUID: ${rand.nextUUID()}');
 
   printLine("Rec and Pol");
 
@@ -114,6 +127,8 @@ void main() {
 
   printLine("Prime Numbers");
 
+  print('567887653'[3]);
+
   print(isPrime(5)); // Output: true (int)
   print(isPrime(6)); // Output: false (int)
   print(isPrime(BigInt.from(1433))); // Output: true (BigInt)
@@ -165,6 +180,70 @@ void main() {
   var productPermutations =
       permutations(3, 2, func: (perm) => perm.reduce((a, b) => a * b));
   print(productPermutations); // Output: [2, 3, 2, 6, 3, 6]
+
+  printLine("Expressions");
+  Variable x = Variable('x'), y = Variable('y');
+  Pow xSquare = Pow(x, Literal(2));
+  var yCos = Trigonometric('cos', y);
+  Literal three = Literal(3);
+  Expression exp = (xSquare + yCos) / three;
+  print(exp);
+
+  print(Ln(Add(xSquare, Literal(1))).differentiate());
+
+  print((Cos(x) + Sin(x)).integrate());
+
+  print(Csc(x).integrate()); // csc(x)  = ln|tan(x/2 )|+ C
+  print(Pow(Csc(x), Literal(2)).integrate()); // csc(x)  = ln|tan(x/2 )|+ C
+  print(
+    Csc(Multiply(Literal(2), x)).integrate(),
+  ); // csc(2x)  = 1/2 ln|tan(x)|+ C
+
+  print(
+    Csc(Multiply(Literal(3), x)).integrate(),
+  ); // csc(3x)  = 1/3 ln|tan(3x/2)|+ C
+
+  print(
+    Csc(Add(Multiply(Literal(4), x), Literal(1))).integrate(),
+  ); // csc(4x + 1) =  1/4 ln|tan((4x + 1)/2)|+ C
+
+  print(Csc(x, n: 2).differentiate());
+
+  print(
+    Add(Multiply(Literal(2), x),
+            Add(Add(Literal(5), x), Multiply(Literal(2), x)))
+        .simplify(),
+  );
+
+  print(
+    Add(Multiply(Literal(8), y), Multiply(Literal(2), x))
+        .simplify()
+        .evaluate({'x': 1}),
+  );
+
+  print(
+    Add(
+      Multiply(Literal(8), y),
+      Multiply(Literal(2), x),
+    ).simplify().evaluate({'x': 1, 'y': 2}),
+  );
+
+  exp = Add(
+    Add(Multiply(Literal(2), xSquare), Multiply(Literal(3), xSquare)),
+    Add(Literal(4) * Multiply(x, y), Literal(2) * Multiply(x, y)),
+  ).simplify();
+  print(exp.getVariables());
+  print(exp.getVariableTerms());
+
+  exp = Subtract(Multiply(Literal(1), x), Literal(-5));
+  print(exp); // ((x * 1.0) - (-5.0))
+  print(exp.simplify()); // (x + 5.0)
+  print(Pow(Add(x, y), Literal(2)));
+  print(Pow(Pow(Literal(3), Literal(3)), Literal(2)).evaluate()); // 729
+  print(Pow(Literal(3), Pow(Literal(3), Literal(2))).evaluate()); // 19683
+  print(Expression.parse(r'3^(3^(2))').evaluate());
+  print(Expression.parse('10^2').evaluate());
+  print(Pow(Literal(10), Literal(2)).evaluate());
 
   printLine("String Interpolation");
   String testString =

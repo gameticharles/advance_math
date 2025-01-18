@@ -55,21 +55,21 @@ class SVD {
       _n = mat.columnCount;
 
       A = Matrix.fill(_m, _n, 0.0);
-      A.copyFrom(mat);
+      A.copyFrom(mat, retainSize: true);
     } else if (_m > _n) {
       specialCaseMoreRows = true;
       _m = mat.rowCount;
       _n = mat.rowCount;
 
       A = Matrix.fill(_m, _n, 0.0);
-      A.copyFrom(mat);
+      A.copyFrom(mat, retainSize: true);
     } else {
       A = mat.copy();
     }
 
     A = _Utils.toNumMatrix(A);
 
-    var nu = math.min(_m, _n).toInt();
+    var nu = math.max(_m, _n).toInt();
     _s = Matrix.fill(1, math.min(_m + 1, _n), 0.0);
     _u = Matrix.fill(_m, nu, 0.0);
     _v = Matrix.fill(_n, _n, 0.0);
@@ -553,3 +553,5 @@ class SVD {
 
 //#endregion
 }
+
+

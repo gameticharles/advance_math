@@ -1,4 +1,21 @@
-## 4.0.0
+# 5.0.0
+
+* **[IMPROVEMENT]** `pseudoInverse` function has been improved to work with singular and poorly conditioned matrices. Added condition number check and SVD fallback for improved robustness with singular and poorly conditioned matrices.
+* **[BUG_FIX]** `isPrime` function now works correctly.
+* **[FEATURE]** Added extensions to `Bases` class for converting between bases and `Strings`.
+* **[IMPROVEMENT]** Improve the computation of `fib` function.
+* **[FEATURE]** Added `Expression` class for parsing and evaluating mathematical expressions. See `Expression` class for more information.
+
+# 4.0.2
+
+* **[BUG_FIX]** Changed the characters dependency to 1.3.0
+
+# 4.0.1
+
+* **[IMPROVEMENT]** Fixed change log
+* **[IMPROVEMENT]** Updated SDK to 3.6.0
+
+# 4.0.0
 
 * **[BROKEN]** DataFrame is no longer maintained in `advance_math`. Now has a separate package for DataFrame called `dartframe`.
 * **[FEATURE]** Added `PI` class for calculating pi to any precision.
@@ -56,7 +73,7 @@
 * **[IMPROVEMENT]** Cleaned code base and examples files
 * **[IMPROVEMENT]** Fixed README
 
-## 3.3.8
+# 3.3.8
 
 * **[BUG_FIX]** CoordinateType not set to UTM
 * **[BUG_FIX]** Change the data types of mean and correlation to num
@@ -74,47 +91,47 @@
 * **[IMPROVEMENT]** Added documentation of Morse code in the ReadMe file
 * **[IMPROVEMENT]** Fixed README
 
-## 3.3.7
+# 3.3.7
 
 * Fixed README
 * Added functions
 
-## 3.3.6
+# 3.3.6
 
 * Fixed bugs
 * Renamed Row, Column, and Diagonal matrices to RowMatrix, ColumnMatrix and DiagonalMatrix repectively
 
-## 3.3.5
+# 3.3.5
 
 * Added morse code
 * Added more math functions
 * Improved documentation and performance
 * Fixed bugs and aligned code
 
-## 3.3.4
+# 3.3.4
 
 * Added support for converting number to words
 * Added test for roman numerals.
 * Fixed bugs in Roman numerals
 * Added some string extension (e.g. capitalization, removeSpecialCharacters etc)
 
-## 3.3.3
+# 3.3.3
 
 * Setting support for expressions
 * Fixed errors in pow for both real and Complex numbers
 
-## 3.3.2
+# 3.3.2
 
 * Added some math constants
 * Fixed error in angles
 * Fixed error in parsing linear and constant polynomial strings
 * Increased the SDK
 
-## 3.3.1
+# 3.3.1
 
 * Added Interpolation
 
-## 3.3.0
+# 3.3.0
 
 * Added ZScore computation
 * Added more functions matrix statistics
@@ -122,26 +139,26 @@
 * Fixed bugs in Roman numerals
 * Fixed documentation inconsistencies
 
-## 3.2.4
+# 3.2.4
 
 * Fixed error in angles
 
-## 3.2.3
+# 3.2.3
 
 * Fixed error in angles conversion
 
-## 3.2.2
+# 3.2.2
 
 * Improved the checks on roman numerals
 * Added conversion between roman numerals and dates
 * Improved the flexibility in arithmetic with integer, roman strings and roman numbers
 * Fixed README file
 
-## 3.2.1
+# 3.2.1
 
 * Improved the checks on roman numerals
 
-## 3.2.0
+# 3.2.0
 
 * Added roman numerals
 * Added trigonometry functions supports to work with complex numbers
@@ -149,7 +166,7 @@
 * Added factors
 * Fixed README file
 
-## 3.1.0
+# 3.1.0
 
 * Simplified Example file
 * Improved exponents of Complex numbers
@@ -157,7 +174,7 @@
 * Fixed return type of normalize from Angle
 * Fixed README file
 
-## 3.0.0
+# 3.0.0
 
 * Added Geometry (Point, line, Circle, Triangle, Polygon, etc.)
 * Added Polynomial (Linear, Quadratic, Cubic, Quartic, Durand-Kerner)
@@ -165,32 +182,32 @@
 * Added NumPy's roll
 * Fixed README file
 
-## 2.1.2
+# 2.1.2
 
 * Fixed complex number outputing wrong string
 
-## 2.1.1
+# 2.1.1
 
 * Fixed bugs
 
-## 2.1.0
+# 2.1.0
 
 * Added arguments for diagonal
 * Improved min, max and sum functions with axes
 * Fixed bug with magic matrix not working for singly even numbers (6, 10, 14, 18, 22 etc).
 * Fixed bugs
 
-## 2.0.2
+# 2.0.2
 
 * Changed the reverse function to flip in matrices
 * Added magic() to the Maatrix constructors
 * Fixed bug in FileIO
 
-## 2.0.1
+# 2.0.1
 
 * Fixed bug
 
-## 2.0.0
+# 2.0.0
 
 * Fixed the usage of quantities in the respective computations
 * Implemented support for quantity
@@ -198,28 +215,28 @@
 * Fixed range
 * Fixed README
 
-## 1.0.3
+# 1.0.3
 
 * Fixed bugs
 * Fixed README
 
-## 1.0.2
+# 1.0.2
 
 * Conversion of angles(radians, degrees, gradients, DMS, and DM)
 * Organized code
 * Fixed bugs
 * Fixed README
 
-## 1.0.0
+# 1.0.0
 
 * Moved codes and reorganized functions
 * Fixed bugs
 
-## 0.1.8
+# 0.1.8
 
 * Fixed bugs (in null space)
 
-## 0.1.7
+# 0.1.7
 
 * Added rescale for both vectors and matrix
 * Improved vector compatibility with lists
@@ -228,13 +245,13 @@
 * Fixed Norm with options
 * Fixed bugs
 
-## 0.1.5
+# 0.1.5
 
 * Added support for distance calculation for vectors and matrices
 * Improved consistency in linear algebra
 * Added scale for vector types
 
-## 0.1.4
+# 0.1.4
 
 * Spercial matrices and vectors their functionalities
 * Fixed spellings in matrix structure properties
@@ -242,23 +259,23 @@
 * Improved subMatrix() function
 * Fixed README
 
-## 0.1.2
+# 0.1.2
 
 * Fixed spellings in matrix structure properties
 * Added Vectors, Complex Numbers, and Complex Vectors to README
 * Fixed README
 
-## 0.1.1
+# 0.1.1
 
 * Fixed README
 
-## 0.1.0
+# 0.1.0
 
 * Improved indexOf() and random functionalities
 * Fixed README
 * Fixed bugs
 
-## 0.0.9
+# 0.0.9
 
 * Started benchmarking
 * Implemented matrix form rows and columns
@@ -269,27 +286,27 @@
 * Corrected anonotations
 * Fixed bugs
 
-## 0.0.8
+# 0.0.8
 
 * Added Exponential, logarithmic, and Matrix power (generalized, not just integer powers)
 * Added support to create from flattened arrays
 * Clean codes
 * Fixed bugs
 
-## 0.0.7
+# 0.0.7
 
 * Fixed matrix round
 * Fixed corrected README
 * Fixed bugs
 
-## 0.0.6
+# 0.0.6
 
 * Added matrix broadcast and replicate matrix
 * Added pseudoInverse of a matrix
 * Fixed corrected README
 * Fixed bugs
 
-## 0.0.5
+# 0.0.5
 
 * Added linear equation solver (cramersRule, ridgeRegression, bareissAlgorithm, inverseMatrix, gaussElimination, gaussJordanElimination, leastSquares, etc.)
 * Added function to compute matrix condition number with both SVD and norm2 approaches.
@@ -321,7 +338,7 @@
 * Provide methods to import and export matrices to and from other formats (e.g., CSV, JSON, binary)
 * Fixed bugs
 
-## 0.0.3
+# 0.0.3
 
 * Improved the arithmetic (+, -, *) functions to work for both scalars and matrices
 * Updated range to create row and column matrices
@@ -332,13 +349,13 @@
 * Fixed bugs
 * Fix README file
 
-## 0.0.2
+# 0.0.2
 
 * Added info on the README file.
 * Added more functionalities
 * Fixed bugs
 * Tests now works with most of the functions
 
-## 0.0.1
+# 0.0.1
 
 * initial release.

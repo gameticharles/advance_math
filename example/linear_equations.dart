@@ -1,6 +1,5 @@
 import 'package:advance_math/advance_math.dart';
 
-
 void main() {
   var mat = Matrix([
     [4.0, 2.0, 1.0],
@@ -32,5 +31,54 @@ void main() {
   print(eig.S);
   print(eig.U);
   print(eig.V);
-  print(eig.checkMatrix);
+  print(eig.checkMatrix.round(1));
+
+  printLine();
+  var matrix = Matrix([
+    [1, 2],
+    [3, 4]
+  ]);
+
+  var result = matrix.inverse();
+  print(matrix.isSingularMatrix());
+  print(result.round(1));
+
+  printLine();
+
+  Matrix a = Matrix([
+    [1, 2],
+    [3, 4],
+    [5, 6]
+  ]);
+
+  var svd = a.decomposition.singularValueDecomposition();
+  var S = svd.S;
+  var U = svd.U;
+  var V = svd.V;
+  print('S = $S');
+  print('U = $U');
+  print('V = $V');
+
+  // var identity = Matrix.eye(a.rowCount);
+  // var svdInverse = svd.solve(identity);
+  // print(svdInverse);
+
+  printLine("Try inverse");
+
+  print(a.inverse());
+
+  printLine("Try pseudo inverse");
+
+  Matrix aPseudoInverse = a.pseudoInverse();
+  print(aPseudoInverse);
+
+  // // Compute x = V * S^+ * U^T * b
+  // Matrix x = V * sPseudoInverse * U.transpose();
+  // print(x);
+  // print(svd.solve(identity));
+
+  /// ### Output:
+  /// ```
+  /// -1.333333333333333   1.083333333333333
+  ///  1.083333333333333  -0.333333333333333
 }

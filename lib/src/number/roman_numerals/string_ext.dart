@@ -1,62 +1,5 @@
 part of 'roman_numerals.dart';
 
-final _sharedRomanLettersToNumbers = {
-  'I': 1,
-  'V': 5,
-  'X': 10,
-  'L': 50,
-  'C': 100,
-};
-
-final _commonRomanLettersToNumbers = {'M': 1000, 'D': 500};
-
-final _vinculumRomanLettersToNumbers = {
-  'MV\u{0305}': 4000,
-  'V\u{0305}': 5000,
-  'MX\u{0305}': 9000,
-  'X\u{0305}': 10000,
-  'X\u{0305}L\u{0305}': 40000,
-  'L\u{0305}': 50000,
-  'X\u{0305}C\u{0305}': 90000,
-  'C\u{0305}': 100000,
-  'C\u{0305}D\u{0305}': 400000,
-  'D\u{0305}': 500000,
-  'C\u{0305}M\u{0305}': 900000,
-  'M\u{0305}': 1000000
-};
-
-final _apostrophusRomanLettersToNumbers = {
-  'IↃ': 500,
-  'CCIↃ': 900,
-  'CIↃ': 1000,
-  'CIↃIↃↃ': 4000,
-  'IↃↃ': 5000,
-  'CIↃCCIↃↃ': 9000,
-  'CCIↃↃ': 10000,
-  'CCIↃↃIↃↃↃ': 40000,
-  'IↃↃↃ': 50000,
-  'CCIↃↃCCCIↃↃↃ': 90000,
-  'CCCIↃↃↃ': 100000,
-  'CCCIↃↃↃIↃↃↃↃ': 400000,
-  'IↃↃↃↃ': 500000,
-  'CCCIↃↃↃCCCCIↃↃↃↃ': 900000,
-  'CCCCIↃↃↃↃ': 1000000
-};
-
-final _compactApostrophusRomanLettersToNumbers = {
-  'D': 500,
-  'Cↀ': 900,
-  'ↀ': 1000,
-  'ↀↁ': 4000,
-  'ↁ': 5000,
-  'ↀↂ': 9000,
-  'ↂ': 10000,
-  'ↂↇ': 40000,
-  'ↇ': 50000,
-  'ↂↈ': 90000,
-  'ↈ': 100000
-};
-
 class _ApostrophusData {
   var count = 0;
   var tally = false;
@@ -78,18 +21,150 @@ class _ApostrophusData {
 }
 
 extension RomanNumeralsString on String {
+  /// A map of common Roman numeral letters to their corresponding numeric values.
+  /// This map includes the basic Roman numeral symbols: I, V, X, L, and C.
+  /// These are the most commonly used Roman numeral symbols.
+  static final _sharedRomanLettersToNumbers = {
+    'I': 1,
+    'V': 5,
+    'X': 10,
+    'L': 50,
+    'C': 100,
+  };
+
+  /// A map of common Roman numeral letters to their corresponding numeric values.
+  /// This map includes the basic Roman numeral symbols: M and D.
+  /// These are commonly used Roman numeral symbols.
+  static final _commonRomanLettersToNumbers = {'M': 1000, 'D': 500};
+
+  /// A map of Roman numeral letters with a vinculum (overbar) to their corresponding numeric values.
+  /// The vinculum is a diacritic mark used in Roman numerals to indicate a multiplication by 1000.
+  /// This map includes the less common Roman numeral symbols with a vinculum, such as M̅, V̅, X̅, L̅, and C̅.
+  static final _vinculumRomanLettersToNumbers = {
+    'MV\u{0305}': 4000,
+    'V\u{0305}': 5000,
+    'MX\u{0305}': 9000,
+    'X\u{0305}': 10000,
+    'X\u{0305}L\u{0305}': 40000,
+    'L\u{0305}': 50000,
+    'X\u{0305}C\u{0305}': 90000,
+    'C\u{0305}': 100000,
+    'C\u{0305}D\u{0305}': 400000,
+    'D\u{0305}': 500000,
+    'C\u{0305}M\u{0305}': 900000,
+    'M\u{0305}': 1000000
+  };
+
+  /// A map of compact apostrophus Roman numeral letters to their corresponding numeric values.
+  /// This map includes less common Roman numeral symbols with an apostrophus, such as IↃ, CCIↄ, CIↃ, and others.
+  /// The apostrophus is a diacritic mark used in some variants of Roman numerals to indicate a multiplication by 1000.
+  static final _apostrophusRomanLettersToNumbers = {
+    'IↃ': 500,
+    'CCIↃ': 900,
+    'CIↃ': 1000,
+    'CIↃIↃↃ': 4000,
+    'IↃↃ': 5000,
+    'CIↃCCIↃↃ': 9000,
+    'CCIↃↃ': 10000,
+    'CCIↃↃIↃↃↃ': 40000,
+    'IↃↃↃ': 50000,
+    'CCIↃↃCCCIↃↃↃ': 90000,
+    'CCCIↃↃↃ': 100000,
+    'CCCIↃↃↃIↃↃↃↃ': 400000,
+    'IↃↃↃↃ': 500000,
+    'CCCIↃↃↃCCCCIↃↃↃↃ': 900000,
+    'CCCCIↃↃↃↃ': 1000000
+  };
+
+  /// A map of compact apostrophus Roman numeral letters to their corresponding numeric values.
+  /// This map includes less common Roman numeral symbols with an apostrophus, such as IↃ, CCIↄ, CIↃ, and others.
+  /// The apostrophus is a diacritic mark used in some variants of Roman numerals to indicate a multiplication by 1000.
+  static final _compactApostrophusRomanLettersToNumbers = {
+    'D': 500,
+    'Cↀ': 900,
+    'ↀ': 1000,
+    'ↀↁ': 4000,
+    'ↁ': 5000,
+    'ↀↂ': 9000,
+    'ↂ': 10000,
+    'ↂↇ': 40000,
+    'ↇ': 50000,
+    'ↂↈ': 90000,
+    'ↈ': 100000
+  };
+
   /// Confirms or not confirms a valid Roman numeral value. This
   /// may change for the same [String] depending on the [RomanNumeralsConfig].
   bool isValidRomanNumeralValue({RomanNumeralsConfig? config}) {
     config ??= romanNumeralConfig;
 
     // Is it literally just a nulla token?
-    final nulla = config.nulla;
-    if (nulla != null) {
-      if (this == nulla) {
-        return true;
+    if (this == config.nulla) {
+      return true;
+    }
+
+    final numerals = {
+      ..._sharedRomanLettersToNumbers,
+      ..._commonRomanLettersToNumbers,
+      ..._vinculumRomanLettersToNumbers,
+    };
+
+    // 1. Invalid Characters
+    final invalidCharacters = r"([^MDCLXVI\(\)\u0305])";
+
+    // 2. Invalid Repetitions
+    final invalidRepeats =
+        r"(D{2,}|\u0305D{2,}|L{2,}|\u0305L{2,}|V{2,}|\u0305V{2,})";
+    // 3. Check for more than three consecutive I, X, or C characters
+    final invalidConsecutive =
+        r"(I{4,}|\u0305I{4,}|X{4,}|\u0305X{4,}|C{4,}|\u0305C{4,})";
+    // 4. Invalid subtractive combinations
+    final invalidSubtractives =
+        r"(IL|IC|ID|IM|XD|XM|VX|VL|VC|VD|VM|LC|LD|LM|DM|\u0305IL|\u0305IC|\u0305ID|\u0305IM|\u0305XD|\u0305XM|\u0305VX|\u0305VL|\u0305VC|\u0305VD|\u0305VM|\u0305LC|\u0305LD|\u0305LM|\u0305DM)";
+
+    if (RegExp(
+            "$invalidCharacters|$invalidRepeats|$invalidConsecutive|$invalidSubtractives")
+        .hasMatch(this)) {
+      return false;
+    }
+
+    // 5. Bracket Check
+    int openBrackets = split('(').length - 1;
+    int closeBrackets = split(')').length - 1;
+    if (openBrackets != closeBrackets) {
+      return false;
+    }
+
+    // 6. Subtractive Notation Inside Brackets
+    RegExp bracketPattern = RegExp(r"\(([^)]+)\)");
+    Iterable<Match> matches = bracketPattern.allMatches(this);
+    for (Match match in matches) {
+      if (RegExp(r"[^M]").hasMatch(match.group(1)!)) {
+        return false;
       }
     }
+
+    // 7. Non-Decreasing Inside Brackets
+    for (Match match in matches) {
+      String bracketContent = match.group(1)!;
+      for (int i = 1; i < bracketContent.length; i++) {
+        if (numerals[bracketContent[i]]! > numerals[bracketContent[i - 1]]!) {
+          return false;
+        }
+      }
+    }
+
+    // // Additional: Invalid Order (outside of subtractive notations)
+    // // E.g., MC (1100) is valid, CM (900) is valid
+    // List<String> romanChars = split('');
+    // for (int i = 1; i < romanChars.length; i++) {
+    //   if (numerals.containsKey(romanChars[i - 1] + romanChars[i])) {
+    //     continue; // Skip valid subtractive pairs
+    //   }
+    //   if (numerals[romanChars[i]]! > numerals[romanChars[i - 1]]!) {
+    //     return false;
+    //   }
+    // }
 
     /*
        Match expression reads as:
@@ -164,7 +239,7 @@ extension RomanNumeralsString on String {
     expString = r'^' + expString + r'$';
     final exp = RegExp(expString, caseSensitive: false, unicode: true);
 
-    final matches = exp.allMatches(this);
+    matches = exp.allMatches(this);
     return matches.length == 1;
   }
 
@@ -172,6 +247,12 @@ extension RomanNumeralsString on String {
   /// the optional [config].
   int? toRomanNumeralValue({RomanNumeralsConfig? config}) {
     config ??= romanNumeralConfig;
+
+    // Process as negative number
+    if (startsWith('-')) {
+      final positiveValue = substring(1).toRomanNumeralValue(config: config);
+      return positiveValue != null ? -positiveValue : null;
+    }
 
     // Guard against malformed string sequences, and return early if the string itself is invalid
     if (!isValidRomanNumeralValue(config: config)) {
@@ -212,9 +293,7 @@ extension RomanNumeralsString on String {
     }
 
     final nulla = config.nulla;
-    if (nulla != null) {
-      useMap[nulla] = 0;
-    }
+    useMap[nulla] = 0;
 
     var accum = 0;
     var curMax = 0;

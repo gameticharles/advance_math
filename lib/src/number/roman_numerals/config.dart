@@ -11,10 +11,10 @@ enum RomanNumeralsType { apostrophus, common, vinculum }
 /// all of the descendent classes and should not be used directly.
 class RomanNumeralsConfig {
   final RomanNumeralsType configType;
-  final String? nulla;
+  final String nulla;
 
   const RomanNumeralsConfig(
-      {this.configType = RomanNumeralsType.common, this.nulla});
+      {this.configType = RomanNumeralsType.common, this.nulla = 'N'});
 }
 
 /// Use [ApostrophusRomanNumeralsConfig] to use special symbols from

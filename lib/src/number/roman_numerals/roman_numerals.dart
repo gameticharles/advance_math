@@ -10,7 +10,7 @@ part 'string_ext.dart';
 /// Sets the [RomanNumeralsConfig] to be used globally for all [RomanNumerals] instances.
 /// This allows customizing the behavior of the [RomanNumerals] class, such as the
 /// representation of zero or the use of overline.
-RomanNumeralsConfig romanNumeralConfig = CommonRomanNumeralsConfig();
+RomanNumeralsConfig romanNumeralConfig = VinculumRomanNumeralsConfig();
 
 /// A class to convert between Roman and decimal numerals.
 ///
@@ -29,7 +29,7 @@ RomanNumeralsConfig romanNumeralConfig = CommonRomanNumeralsConfig();
 /// ```
 class RomanNumerals {
   /// The [RomanNumeralsConfig] used to create this [RomanNumerals] instance.
-  final RomanNumeralsConfig _config;
+  late final RomanNumeralsConfig _config;
 
   /// Sets the [RomanNumeralsConfig] to be used globally for all [RomanNumerals] instances.
   /// This allows customizing the behavior of the [RomanNumerals] class, such as the
@@ -38,31 +38,8 @@ class RomanNumerals {
     romanNumeralConfig = config;
   }
 
-  /// A private constant map that represents the standard numerals.
-  static const Map<String, int> _numerals = {
-    'M\u0305': 1000000,
-    'D\u0305': 500000,
-    'C\u0305': 100000,
-    'L\u0305': 50000,
-    'X\u0305': 10000,
-    'V\u0305': 5000,
-    'M': 1000,
-    'CM': 900,
-    'D': 500,
-    'CD': 400,
-    'C': 100,
-    'XC': 90,
-    'L': 50,
-    'XL': 40,
-    'X': 10,
-    'IX': 9,
-    'V': 5,
-    'IV': 4,
-    'I': 1
-  };
-
   /// The integer value represented by this instance.
-  final int value;
+  late int value;
 
   /// Determines if the numeral is represented as a negative.
   final bool _isNegative;
@@ -72,10 +49,6 @@ class RomanNumerals {
 
   /// Determines if the numeral should use overline.
   final bool useOverline;
-
-  /// Private cache to improve performance for the conversion methods.
-  static final Map<int, String> _numToRomanCache = {};
-  static final Map<String, int> _romanToNumCache = {};
 
   /// Constructs a [RomanNumerals] object from a given integer [value].
   ///
@@ -99,253 +72,36 @@ class RomanNumerals {
   /// ```dart
   /// var numeral = RomanNumerals.fromRoman('XIV'); // 14
   /// ```
-  RomanNumerals.fromRoman(String roman,
-      {RomanNumeralsConfig? config,
-      this.zeroChar = 'N',
-      this.useOverline = false})
-      : _isNegative = roman.startsWith('-'),
-        _config = config ?? romanNumeralConfig,
-        value = _fromRoman(roman.startsWith('-') ? roman.substring(1) : roman,
-                zeroChar: zeroChar) *
-            (roman.startsWith('-') ? -1 : 1);
-
-  /// A private method to convert a Roman numeral string to an integer.
-  static int _fromRoman(String roman,
-      {String zeroChar = 'N', bool useOverline = false}) {
-    roman = roman.toUpperCase();
-
-    // Handle the special case for zero
-    if (roman == zeroChar) return 0;
-
-    // Validate the provided Roman numeral
-    if (!_validateRoman(roman)) {
-      throw InvalidRomanNumeralException('Invalid Roman numeral: $roman');
+  RomanNumerals.fromRoman(
+    String roman, {
+    RomanNumeralsConfig? config,
+    this.zeroChar = 'N',
+    this.useOverline = false,
+  })  : _isNegative = roman.startsWith('-'),
+        _config = config ?? romanNumeralConfig {
+    // Adjust configuration if `zeroChar` differs from `config.nulla`
+    if (zeroChar != 'N' && zeroChar != _config.nulla) {
+      switch (_config.configType) {
+        case RomanNumeralsType.common:
+          _config = CommonRomanNumeralsConfig(nulla: zeroChar);
+          break;
+        case RomanNumeralsType.apostrophus:
+          _config = ApostrophusRomanNumeralsConfig(nulla: zeroChar);
+          break;
+        case RomanNumeralsType.vinculum:
+          _config = VinculumRomanNumeralsConfig(nulla: zeroChar);
+          break;
+      }
     }
 
-    // Using cache's putIfAbsent to streamline caching
-    return _romanToNumCache.putIfAbsent(roman, () => _decodeRoman(roman));
+    // Calculate the value of the numeral
+    var res = roman.toRomanNumeralValue(config: _config);
+    value = res ??
+        (throw InvalidRomanNumeralException('Invalid Roman numeral: $roman'));
   }
 
-  /// Helper method to convert a Roman numeral string to an integer
-  static int _decodeRoman(String roman) {
-    int result = 0;
-    int prevValue = 0;
-    int i = roman.length - 1;
-
-    while (i >= 0) {
-      // Check if the current character is a parenthesis
-      if (roman[i] == ')') {
-        // Find the matching opening parenthesis
-        int j = roman.lastIndexOf('(', i);
-        if (j == -1) {
-          throw InvalidRomanNumeralException('Invalid Roman numeral: $roman');
-        }
-        // Convert the part of the string inside the parentheses
-        String innerRoman = roman.substring(j + 1, i);
-        int innerValue = _fromRomanWithoutParentheses(innerRoman);
-        result += innerValue * 1000;
-
-        i = j - 1;
-      } else if (i > 0 &&
-          _numerals.containsKey(roman.substring(i - 1, i + 1))) {
-        String currentSymbol = roman.substring(i - 1, i + 1);
-        int currentValue = _numerals[currentSymbol]!;
-        if (currentValue < prevValue) {
-          result -= currentValue;
-        } else {
-          result += currentValue;
-        }
-        prevValue = currentValue;
-        i -= 2;
-      } else {
-        String currentSymbol = roman[i];
-        int currentValue = _numerals[currentSymbol]!;
-        if (currentValue < prevValue) {
-          result -= currentValue;
-        } else {
-          result += currentValue;
-        }
-        prevValue = currentValue;
-        i--;
-      }
-    }
-
-    // Cache the converse for improved performance
-    _numToRomanCache[result] = roman;
-
-    return result;
-  }
-
-  /// A helper private method to convert a Roman numeral string
-  /// (without parentheses) to an integer.
-  static int _fromRomanWithoutParentheses(String roman) {
-    int result = 0;
-    int prevValue = 0;
-    int i = roman.length - 1;
-
-    while (i >= 0) {
-      String currentSymbol = roman[i];
-
-      int? currentValue = _numerals[currentSymbol];
-      if (currentValue == null) {
-        throw InvalidRomanNumeralException('Invalid Roman numeral: $roman');
-      }
-
-      if (currentValue < prevValue) {
-        result -= currentValue;
-      } else {
-        result += currentValue;
-      }
-      prevValue = currentValue;
-
-      i--;
-    }
-
-    return result;
-  }
-
-  /// Converts the integer value of this instance to a Roman numeral string.
-  ///
-  /// Example:
-  /// ```dart
-  /// var numeral = RomanNumerals(14);
-  /// print(numeral.toRoman());  // Outputs: XIV
-  /// ```
-  String toRoman({bool useOverline = false}) {
-    if (value == 0) return zeroChar;
-
-    // Using cache's putIfAbsent to streamline caching
-    return _numToRomanCache.putIfAbsent(value, () {
-      int number = value.abs();
-      StringBuffer result = StringBuffer();
-
-      // If the value is more than 3999, use brackets for the thousands part
-      if (number >= 10000) {
-        //if (value > 3999) {
-        int thousands = value ~/ 1000;
-        number %= 1000;
-        if (useOverline) {
-          result.write(_addOverline(_toRomanWithoutParentheses(thousands)));
-        } else {
-          result.write('(${_toRomanWithoutParentheses(thousands)})');
-        }
-      }
-
-      // Then handle the rest of the number
-      result.write(_toRomanWithoutParentheses(number));
-
-      // Cache the converse for improved performance
-      _romanToNumCache[result.toString()] = value;
-
-      return _isNegative ? '-${result.toString()}' : result.toString();
-    });
-  }
-
-  /// A helper private method to convert an integer to a Roman numeral string
-  /// without using parentheses.
-  String _toRomanWithoutParentheses(int value) {
-    int number = value;
-    StringBuffer result = StringBuffer();
-
-    // Loop through the numerals, from largest to smallest
-    for (var entry in _numerals.entries) {
-      while (number >= entry.value) {
-        number -= entry.value;
-        result.write(entry.key);
-      }
-    }
-
-    return result.toString();
-  }
-
-  static String _addOverline(String numeral) {
-    const overline = '\u0305';
-    return numeral.split('').map((char) => char + overline).join('');
-  }
-
-  /// Helper private method to check the roman numeral string
-  static bool _validateRoman(String roman) {
-    // 1. Invalid Characters
-    if (RegExp(r"[^MDCLXVI\(\)\u0305]").hasMatch(roman)) {
-      return false;
-    }
-
-    // 2. Invalid Repetitions
-    if (RegExp(r"D{2,}|\u0305D{2,}|L{2,}|\u0305L{2,}|V{2,}|\u0305V{2,}")
-        .hasMatch(roman)) {
-      return false;
-    }
-
-    // 3. Check for more than three consecutive I, X, or C characters
-    if (RegExp(r"I{4,}|\u0305I{4,}|X{4,}|\u0305X{4,}|C{4,}|\u0305C{4,}")
-        .hasMatch(roman)) {
-      return false;
-    }
-
-    // 4. Invalid subtractive combinations
-    if (RegExp(
-            r"IL|IC|ID|IM|XD|XM|VX|VL|VC|VD|VM|LC|LD|LM|DM|\u0305IL|\u0305IC|\u0305ID|\u0305IM|\u0305XD|\u0305XM|\u0305VX|\u0305VL|\u0305VC|\u0305VD|\u0305VM|\u0305LC|\u0305LD|\u0305LM|\u0305DM")
-        .hasMatch(roman)) {
-      return false;
-    }
-
-    // 5. Bracket Check
-    int openBrackets = roman.split('(').length - 1;
-    int closeBrackets = roman.split(')').length - 1;
-    if (openBrackets != closeBrackets) {
-      return false;
-    }
-
-    // 6. Subtractive Notation Inside Brackets
-    RegExp bracketPattern = RegExp(r"\(([^)]+)\)");
-    Iterable<Match> matches = bracketPattern.allMatches(roman);
-    for (Match match in matches) {
-      if (RegExp(r"[^M]").hasMatch(match.group(1)!)) {
-        return false;
-      }
-    }
-
-    // 7. Non-Decreasing Inside Brackets
-    for (Match match in matches) {
-      String bracketContent = match.group(1)!;
-      for (int i = 1; i < bracketContent.length; i++) {
-        if (_numerals[bracketContent[i]]! > _numerals[bracketContent[i - 1]]!) {
-          return false;
-        }
-      }
-    }
-
-    // Additional: Invalid Order (outside of subtractive notations)
-    // E.g., MC (1100) is valid, CM (900) is valid
-    List<String> romanChars = roman.split('');
-    for (int i = 1; i < romanChars.length; i++) {
-      if (_numerals.containsKey(romanChars[i - 1] + romanChars[i])) {
-        continue; // Skip valid subtractive pairs
-      }
-      if (_numerals[romanChars[i]]! > _numerals[romanChars[i - 1]]!) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  /// Validates if a given string [roman] is a valid Roman numeral.
-  ///
-  /// Returns `true` if [roman] is a valid Roman numeral, `false` otherwise.
-  ///
-  /// Example:
-  /// ```dart
-  /// print(RomanNumerals.isValidRoman('XIV'));  // Outputs: true
-  /// print(RomanNumerals.isValidRoman('XIVV')); // Outputs: false
-  /// ```
-  static bool isValidRoman(String roman, {String zeroChar = 'N'}) {
-    try {
-      _fromRoman(roman, zeroChar: zeroChar);
-      return true;
-    } catch (_) {
-      return false;
-    }
+  String toRoman() {
+    return value.toRomanNumeralString(config: _config)!;
   }
 
   /// Converts a date represented as a string to its Roman numeral representation.
@@ -423,7 +179,8 @@ class RomanNumerals {
     int newValue = 0;
     if (other is num) {
       newValue = value + other.toInt();
-    } else if (other is String && _validateRoman(other)) {
+    } else if (other is String &&
+        (other.isValidRomanNumeralValue(config: _config))) {
       newValue = value + RomanNumerals.fromRoman(other).value;
     } else if (other is RomanNumerals) {
       newValue = value + other.value;
@@ -438,7 +195,8 @@ class RomanNumerals {
     int newValue = 0;
     if (other is num) {
       newValue = value - other.toInt();
-    } else if (other is String && _validateRoman(other)) {
+    } else if (other is String &&
+        (other.isValidRomanNumeralValue(config: _config))) {
       newValue = value - RomanNumerals.fromRoman(other).value;
     } else if (other is RomanNumerals) {
       newValue = value - other.value;
@@ -454,7 +212,8 @@ class RomanNumerals {
     int newValue = 0;
     if (other is num) {
       newValue = value * other.toInt();
-    } else if (other is String && _validateRoman(other)) {
+    } else if (other is String &&
+        (other.isValidRomanNumeralValue(config: _config))) {
       newValue = value * RomanNumerals.fromRoman(other).value;
     } else if (other is RomanNumerals) {
       newValue = value * other.value;
@@ -475,7 +234,8 @@ class RomanNumerals {
     int newValue = 0;
     if (other is num) {
       newValue = (value / other).round();
-    } else if (other is String && _validateRoman(other)) {
+    } else if (other is String &&
+        (other.isValidRomanNumeralValue(config: _config))) {
       newValue = (value / RomanNumerals.fromRoman(other).value).round();
     } else if (other is RomanNumerals) {
       newValue = (value / other.value).round();
@@ -490,7 +250,8 @@ class RomanNumerals {
     int newValue = 0;
     if (other is num) {
       newValue = value & other.toInt();
-    } else if (other is String && _validateRoman(other)) {
+    } else if (other is String &&
+        (other.isValidRomanNumeralValue(config: _config))) {
       newValue = value & RomanNumerals.fromRoman(other).value;
     } else if (other is RomanNumerals) {
       newValue = value & other.value;
@@ -505,7 +266,8 @@ class RomanNumerals {
     int newValue = 0;
     if (other is num) {
       newValue = value | other.toInt();
-    } else if (other is String && _validateRoman(other)) {
+    } else if (other is String &&
+        (other.isValidRomanNumeralValue(config: _config))) {
       newValue = value | RomanNumerals.fromRoman(other).value;
     } else if (other is RomanNumerals) {
       newValue = value | other.value;
@@ -520,7 +282,8 @@ class RomanNumerals {
     int newValue = 0;
     if (other is num) {
       newValue = value ^ other.toInt();
-    } else if (other is String && _validateRoman(other)) {
+    } else if (other is String &&
+        (other.isValidRomanNumeralValue(config: _config))) {
       newValue = value ^ RomanNumerals.fromRoman(other).value;
     } else if (other is RomanNumerals) {
       newValue = value ^ other.value;
@@ -535,7 +298,8 @@ class RomanNumerals {
     int newValue = 0;
     if (other is num) {
       newValue = value % other.toInt();
-    } else if (other is String && _validateRoman(other)) {
+    } else if (other is String &&
+        (other.isValidRomanNumeralValue(config: _config))) {
       newValue = value % RomanNumerals.fromRoman(other).value;
     } else if (other is RomanNumerals) {
       newValue = value % other.value;
@@ -559,7 +323,8 @@ class RomanNumerals {
   bool operator <(dynamic other) {
     if (other is num) {
       return value < other.toInt();
-    } else if (other is String && _validateRoman(other)) {
+    } else if (other is String &&
+        (other.isValidRomanNumeralValue(config: _config))) {
       return value < RomanNumerals.fromRoman(other).value;
     } else if (other is RomanNumerals) {
       return value < other.value;
@@ -572,7 +337,8 @@ class RomanNumerals {
   bool operator <=(dynamic other) {
     if (other is num) {
       return value <= other.toInt();
-    } else if (other is String && _validateRoman(other)) {
+    } else if (other is String &&
+        (other.isValidRomanNumeralValue(config: _config))) {
       return value <= RomanNumerals.fromRoman(other).value;
     } else if (other is RomanNumerals) {
       return value <= other.value;
@@ -585,7 +351,8 @@ class RomanNumerals {
   bool operator >(dynamic other) {
     if (other is num) {
       return value > other.toInt();
-    } else if (other is String && _validateRoman(other)) {
+    } else if (other is String &&
+        (other.isValidRomanNumeralValue(config: _config))) {
       return value > RomanNumerals.fromRoman(other).value;
     } else if (other is RomanNumerals) {
       return value > other.value;
@@ -598,7 +365,8 @@ class RomanNumerals {
   bool operator >=(dynamic other) {
     if (other is num) {
       return value >= other.toInt();
-    } else if (other is String && _validateRoman(other)) {
+    } else if (other is String &&
+        (other.isValidRomanNumeralValue(config: _config))) {
       return value >= RomanNumerals.fromRoman(other).value;
     } else if (other is RomanNumerals) {
       return value >= other.value;
@@ -621,6 +389,6 @@ class RomanNumerals {
   /// Returns the Roman numeral string representation of this instance.
   @override
   String toString() {
-    return toRoman(useOverline: useOverline);
+    return value.toRomanNumeralString(config: _config)!;
   }
 }

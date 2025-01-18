@@ -3,7 +3,7 @@ library maths;
 import 'dart:math' as math;
 import 'dart:typed_data';
 
-import '../../quantity/quantity.dart';
+import '../../../advance_math.dart';
 
 part 'basic.dart';
 part 'statistics.dart';
@@ -43,7 +43,7 @@ part 'extension.dart';
 /// ```dart
 /// var boolValue = Random().nextBool(); // true or false, with equal chance.
 /// ```
-class Random implements math.Random {
+class Random implements math.Random, AbstractRandomProvider {
   final math.Random _random;
 
   Random([int? seed]) : _random = math.Random(seed);
@@ -335,5 +335,172 @@ class Random implements math.Random {
 
     return list;
   }
+}
 
+/// ASCII character range constants
+const asciiStart = 33; // '!'
+const asciiEnd = 126; // '~'
+
+/// Enum to specify the type of characters for random string generation.
+enum CharacterType { numeric, lowerAlpha, upperAlpha, ascii }
+
+/// Character ranges mapped to enums.
+const Map<CharacterType, List<int>> characterRanges = {
+  CharacterType.numeric: [48, 57], // '0'-'9'
+  CharacterType.lowerAlpha: [97, 122], // 'a'-'z'
+  CharacterType.upperAlpha: [65, 90], // 'A'-'Z'
+  CharacterType.ascii: [asciiStart, asciiEnd], // All printable ASCII
+};
+
+/// Default random instance.
+final _internal = Random();
+
+/// Abstract provider for custom random number generators.
+///
+/// Implementations must provide methods to generate random doubles and integers.
+abstract class AbstractRandomProvider {
+  /// Returns a random double in the range [0.0, 1.0).
+  double nextDouble();
+
+  /// Returns a random integer in the range [0, max).
+  int nextInt(int max);
+}
+
+/// Default provider using the `dart:math` Random.
+///
+/// Example:
+/// ```dart
+/// final provider = DefaultRandomProvider();
+/// print(provider.nextDouble()); // Random double in range [0.0, 1.0)
+/// ```
+class DefaultRandomProvider implements AbstractRandomProvider {
+  const DefaultRandomProvider();
+
+  @override
+  double nextDouble() => _internal.nextDouble();
+
+  @override
+  int nextInt(int max) => _internal.nextInt(max);
+}
+
+/// Provider using a seeded random number generator for deterministic behavior.
+///
+/// Example:
+/// ```dart
+/// final provider = SeededRandomProvider(12345);
+/// print(provider.nextDouble()); // Deterministic output
+/// ```
+class SeededRandomProvider implements AbstractRandomProvider {
+  final Random _random;
+
+  SeededRandomProvider(int seed) : _random = Random(seed);
+
+  @override
+  double nextDouble() => _random.nextDouble();
+
+  @override
+  int nextInt(int max) => _random.nextInt(max);
+}
+
+/// Provider for cryptographic secure random numbers.
+///
+/// Example:
+/// ```dart
+/// final provider = CryptographicRandomProvider();
+/// print(provider.nextDouble()); // Secure random double in range [0.0, 1.0)
+/// ```
+class CryptographicRandomProvider implements AbstractRandomProvider {
+  final Random _secureRandom = Random.secure();
+
+  @override
+  double nextDouble() => _secureRandom.nextDouble();
+
+  @override
+  int nextInt(int max) => _secureRandom.nextInt(max);
+}
+
+/// Generates a random integer between [from] and [to], inclusive.
+///
+/// Throws [ArgumentError] if `from > to`.
+///
+/// Example:
+/// ```dart
+/// print(randomBetween(1, 10)); // Random integer between 1 and 10
+/// ```
+int randomBetween(int from, int to, {AbstractRandomProvider? provider}) {
+  if (from > to) {
+    throw ArgumentError('$from cannot be greater than $to');
+  }
+
+  final rand = provider ?? const DefaultRandomProvider();
+  return (rand.nextDouble() * (to - from + 1)).toInt() + from;
+}
+
+/// Generates a random string of the specified [length] using characters
+/// from the given [type].
+///
+/// Example:
+/// ```dart
+/// print(randomString(5, CharacterType.lowerAlpha)); // Random lowercase string
+/// ```
+String randomString(int length, CharacterType type,
+    {AbstractRandomProvider? provider}) {
+  final range = characterRanges[type]!;
+  return String.fromCharCodes(List.generate(
+      length, (_) => randomBetween(range[0], range[1], provider: provider)));
+}
+
+/// Generates a random numeric string of the specified [length].
+///
+/// Example:
+/// ```dart
+/// print(randomNumeric(5)); // Random numeric string of length 5
+/// ```
+String randomNumeric(int length, {AbstractRandomProvider? provider}) =>
+    randomString(length, CharacterType.numeric, provider: provider);
+
+/// Generates a random alphabetic string of the specified [length].
+///
+/// Example:
+/// ```dart
+/// print(randomAlpha(10)); // Random alphabetic string of length 10
+/// ```
+String randomAlpha(int length, {AbstractRandomProvider? provider}) {
+  final lowerAlphaLength = randomBetween(0, length, provider: provider);
+  final upperAlphaLength = length - lowerAlphaLength;
+
+  final lowerAlpha = randomString(lowerAlphaLength, CharacterType.lowerAlpha,
+      provider: provider);
+  final upperAlpha = randomString(upperAlphaLength, CharacterType.upperAlpha,
+      provider: provider);
+
+  return randomMerge(lowerAlpha, upperAlpha);
+}
+
+/// Generates a random alphanumeric string of the specified [length].
+///
+/// Example:
+/// ```dart
+/// print(randomAlphaNumeric(8)); // Random alphanumeric string of length 8
+/// ```
+String randomAlphaNumeric(int length, {AbstractRandomProvider? provider}) {
+  final alphaLength = randomBetween(0, length, provider: provider);
+  final numericLength = length - alphaLength;
+
+  final alpha = randomAlpha(alphaLength, provider: provider);
+  final numeric = randomNumeric(numericLength, provider: provider);
+
+  return randomMerge(alpha, numeric);
+}
+
+/// Merges two strings [a] and [b], shuffles their characters, and returns the result.
+///
+/// Example:
+/// ```dart
+/// print(randomMerge("abc", "123")); // Random shuffle of "abc123"
+/// ```
+String randomMerge(String a, String b) {
+  final chars = [...a.codeUnits, ...b.codeUnits];
+  chars.shuffle(_internal);
+  return String.fromCharCodes(chars);
 }

@@ -1,57 +1,51 @@
-part of '../algebra.dart';
+library expression;
 
-/// An abstract representation of a mathematical expression.
-///
-/// The `Expression` class provides a framework for representing,
-/// evaluating, differentiating, and integrating mathematical expressions.
-/// Each specific type of expression (e.g., polynomial, symbolic, function)
-/// should extend this class and provide concrete implementations of the
-/// required methods.
-abstract class Expression {
-  /// Evaluates the expression for a given value of [x].
-  ///
-  /// This method returns the value of the expression when evaluated at [x].
-  /// If [x] is not provided, the method should return the general form of the
-  /// expression or a representative value.
-  ///
-  /// Returns:
-  ///   - A `dynamic` representing the evaluated value of the expression.
-  dynamic evaluate([dynamic x]);
+import 'package:advance_math/advance_math.dart';
+import 'package:petitparser/petitparser.dart';
 
-  /// Differentiates the expression with respect to a variable.
-  ///
-  /// This method returns the derivative of the expression. For expressions
-  /// involving multiple variables, the differentiation is typically done
-  /// with respect to the main variable of the expression.
-  ///
-  /// Returns:
-  ///   - An `Expression` representing the derivative of the expression.
-  dynamic differentiate([dynamic x]);
+part 'parser.dart';
+part 'utils.dart';
 
-  /// Integrates the expression with respect to a variable.
-  ///
-  /// This method returns the integral of the expression. For expressions
-  /// involving multiple variables, the integration is typically done
-  /// with respect to the main variable of the expression.
-  ///
-  /// Returns:
-  ///   - An `Expression` representing the integral of the expression.
-  dynamic integrate([dynamic start, dynamic end]);
+part 'components/binary_unary_operation/binary_expression.dart';
+part 'components/binary_unary_operation/binary_operations_expression.dart';
+part 'components/binary_unary_operation/subtract.dart';
+part 'components/binary_unary_operation/division.dart';
+part 'components/binary_unary_operation/multiply.dart';
+part 'components/binary_unary_operation/power.dart';
+part 'components/binary_unary_operation/add.dart';
 
-  // Future methods for determining specific properties of the expression.
-  bool isIndeterminate(num x);
-  bool isInfinity(num x);
+part 'components/simple/variable.dart';
+part 'components/simple/identifier.dart';
+part 'components/simple/literal.dart';
+part 'components/simple/expression.dart';
+part 'components/simple/conditional.dart';
 
-  /// Returns the simple form of the expression
-  Expression simplify();
+part 'components/functions/function.dart';
+part 'components/functions/predefined.dart';
+part 'components/functions/trigonometric.dart';
+part 'components/functions/trig/sin.dart';
+part 'components/functions/trig/cos.dart';
+part 'components/functions/trig/tan.dart';
+part 'components/functions/trig/sec.dart';
+part 'components/functions/trig/csc.dart';
+part 'components/functions/trig/cot.dart';
+part 'components/functions/trig/trig_expression.dart';
+part 'components/functions/rational.dart';
+part 'components/functions/abs.dart';
+part 'components/functions/ln.dart';
 
-  /// Returns the string representation of the expression.
-  ///
-  /// This method should provide a human-readable format of the expression,
-  /// suitable for display or printing.
-  ///
-  /// Returns:
-  ///   - A `String` representing the expression.
-  @override
-  String toString();
-}
+part 'components/polynomial/constant.dart';
+part 'components/polynomial/cubic.dart';
+part 'components/polynomial/linear.dart';
+part 'components/polynomial/quadratic.dart';
+part 'components/polynomial/quartic.dart';
+part 'components/polynomial/durand_kerner.dart';
+part 'components/polynomial/polynomial.dart';
+part 'components/polynomial/multi_polynomial/multi_variable_poly.dart';
+part 'components/polynomial/multi_polynomial/term.dart';
+
+part 'components/structured/call_expression.dart';
+part 'components/structured/indexing_expression.dart';
+part 'components/structured/member_expression.dart';
+part 'components/structured/negation_expression.dart';
+part 'components/structured/unary_operator_expression.dart';

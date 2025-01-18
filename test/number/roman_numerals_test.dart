@@ -1,7 +1,7 @@
 import 'package:advance_math/src/number/number.dart';
 import 'package:test/test.dart';
 
-void main2() {
+void main() {
   group('RomanNumerals', () {
     test('Conversion from integer to Roman numeral', () {
       expect(RomanNumerals(5).toRoman(), 'V');

@@ -695,7 +695,7 @@ class MatrixDecomposition {
 
     var svd = SVD(_matrix);
 
-    return SingularValueDecomposition(svd.U(), svd.S(), svd.V());
+    return SingularValueDecomposition(svd);
   }
 
   /// Performs Eigenvalue decomposition of a square matrix.

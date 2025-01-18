@@ -10,6 +10,9 @@ import '../geometry/geometry.dart';
 import '/src/math/basic/math.dart' as math;
 import 'interoperability/file_helper/file_io.dart';
 
+import 'expression/expression.dart';
+export 'expression/expression.dart';
+
 part 'utils/utils.dart';
 part 'matrix/matrix.dart';
 
@@ -66,18 +69,10 @@ part 'least_squares/base_least_square.dart';
 part 'least_squares/special_least_square.dart';
 part 'least_squares/z_score.dart';
 
-part 'polynomial/constant.dart';
-part 'polynomial/linear.dart';
-part 'polynomial/quadratic.dart';
-part 'polynomial/cubic.dart';
-part 'polynomial/quartic.dart';
-part 'polynomial/durand_kerner.dart';
-part 'polynomial/polynomial.dart';
-
-part 'expression/expression.dart';
-part 'expression/rational_function.dart';
-
 part 'limit/limit.dart';
 
 // This function should return an instance of FileIODesktop or FileIOWeb depending on the platform.
 FileIO fileIO = FileIO();
+
+
+//Learn more about the library at https://commons.apache.org/

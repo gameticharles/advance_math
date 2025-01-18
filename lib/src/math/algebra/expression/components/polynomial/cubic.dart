@@ -1,4 +1,4 @@
-part of '../algebra.dart';
+part of '../../expression.dart';
 
 /// Concrete implementation of [Polynomial] that represents a third degree
 /// polynomial equation in the form `ax^3 + bx^2 + cx + d = 0`.
@@ -43,10 +43,10 @@ class Cubic extends Polynomial {
   List<Number> roots() {
     var two = Complex.fromReal(2);
     var three = Complex.fromReal(3);
-    final sigma = Complex(-1 / 2, 1 / 2 * math.sqrt(3));
+    final sigma = Complex(-1 / 2, 1 / 2 * sqrt(3));
 
     final d0 = b * b - a * c * three;
-    final d1 = (two * math.pow(b.toDouble(), 3)) -
+    final d1 = (two * pow(b.toDouble(), 3)) -
         (a * b * c * Complex.fromReal(9)) +
         (a * a * d * Complex.fromReal(27));
     final sqrtD = (discriminant() * a * a * Complex.fromReal(-27)).sqrt();
@@ -89,4 +89,9 @@ class Cubic extends Polynomial {
         c: c ?? this.c,
         d: d ?? this.d,
       );
+
+  @override
+  Expression expand() {
+    return this;
+  }
 }

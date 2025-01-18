@@ -604,11 +604,6 @@ bool isPrime(dynamic number, [int certainty = 12]) {
         'Invalid number format. String input must be a valid integer.');
   }
 
-  // handle if the last digit is even
-  if (int.parse(number.toString()[-1]) % 2 == 0) {
-    return false;
-  }
-
   // Handle base cases (less than 2 or even numbers)
   if (n < BigInt.from(2)) {
     return false;
@@ -623,6 +618,11 @@ bool isPrime(dynamic number, [int certainty = 12]) {
     return true;
   }
   if (n % BigInt.from(2) == BigInt.zero || n % BigInt.from(3) == BigInt.zero) {
+    return false;
+  }
+
+  // handle if the last digit is even
+  if (int.parse(number.toString()[number.toString().length - 1]) % 2 == 0) {
     return false;
   }
 
@@ -1276,26 +1276,40 @@ List<num> sieve(int n) {
 /// If [n] is negative and even, the result will also be negative.
 /// If [n] is negative and odd, the result will be positive.
 ///
+/// Returns an `int` if the result fits in 64 bits, otherwise a `BigInt`.
+///
 /// Example:
 /// ```dart
 /// print(fib(7));  // Output: 13
 /// print(fib(-7)); // Output: 13
 /// print(fib(-8)); // Output: -21
+/// print(fib(50)); // Output: 12586269025
 /// ```
-int fib(int n) {
-  int sign = n.isNegative ? -1 : 1;
-  n = n.abs();
+dynamic fib(int n) {
+  if (n == 0) return 0; // Special case for n = 0
+  if (n == 1 || n == -1) return 1; // Special cases for n = ±1
 
   // Determine the sign based on evenness of n
-  sign = n.isEven ? sign : sign.abs();
+  int sign = (n.isNegative && n.isEven) ? -1 : 1;
+  n = n.abs();
 
-  int a = 0, b = 1, f = 1;
+  // Use BigInt for calculation
+  BigInt a = BigInt.zero, b = BigInt.one, f = BigInt.one;
   for (int i = 2; i <= n; i++) {
     f = a + b;
     a = b;
     b = f;
   }
-  return f * sign;
+
+  // Adjust sign
+  f *= BigInt.from(sign);
+
+  // Return as int if it fits, otherwise as BigInt
+  if (f.bitLength <= 63) {
+    return f.toInt();
+  } else {
+    return f;
+  }
 }
 
 /// Returns a list of Fibonacci numbers from the start to the end.

@@ -33,6 +33,11 @@ class QRDecomposition extends Decomposition {
 
     return x;
   }
+
+  @override
+  String toString() {
+    return 'QRDecomposition \nQ: $Q \nR: $R';
+  }
 }
 
 class LQDecomposition extends Decomposition {
@@ -67,6 +72,11 @@ class LQDecomposition extends Decomposition {
     Matrix x = Q.transpose() * y;
 
     return x;
+  }
+
+  @override
+  String toString() {
+    return 'LQDecomposition(Q: $Q, L: $L)';
   }
 }
 
@@ -115,6 +125,11 @@ class EigenvalueDecomposition extends Decomposition {
 
     return x;
   }
+
+  @override
+  String toString() {
+    return 'Eigenvalue Decomposition \nD: $D \nV: $V';
+  }
 }
 
 class EigenvalueDecompositions {
@@ -141,6 +156,11 @@ class EigenvalueDecompositions {
     // Extract eigenvalues from the diagonal of the upper-triangular matrix T
 
     return EigenvalueDecomposition(lambda, q);
+  }
+
+  @override
+  String toString() {
+    return 'Eigenvalue Decompositions \nEigenvalues: $eigenvalues \nEigenvectors: $eigenvectors';
   }
 }
 
@@ -186,6 +206,11 @@ class CholeskyDecomposition extends Decomposition {
     Matrix x = _Utils.backwardSubstitution(L.transpose(), y);
 
     return x;
+  }
+
+  @override
+  String toString() {
+    return 'Cholesky Decomposition \nL: $L \nOriginal Matrix: $_originalMatrix';
   }
 }
 
@@ -257,6 +282,11 @@ class SchurDecomposition extends Decomposition {
 
     return xOriginal;
   }
+
+  @override
+  String toString() {
+    return 'Schur Decomposition \nQ: $Q \nT: $T';
+  }
 }
 
 class LUDecomposition extends Decomposition {
@@ -302,16 +332,31 @@ class LUDecomposition extends Decomposition {
 
     return x;
   }
+
+  @override
+  String toString() {
+    return 'LU Decomposition \nL: $L \nU: $U \nP: $P \nQ: $Q';
+  }
 }
 
 class SingularValueDecomposition extends Decomposition {
-  final Matrix U;
-  final Matrix S;
-  final Matrix V;
+  final SVD _svd;
 
-  SingularValueDecomposition(this.U, this.S, this.V);
+  SingularValueDecomposition(SVD svd) : _svd = svd;
 
-  /// Checks if U is an orthogonal matrix.
+  /// Returns the left singular vectors
+  Matrix get U => _svd.U();
+
+  /// Returns the right singular vectors
+  Matrix get S => _svd.S();
+
+  /// Returns the diagonal matrix of singular values
+  Matrix get V => _svd.V();
+
+  /// Two norm condition number
+  double get conditionNumber => _svd.cond();
+
+  /// ,. bhng,hh,.h .hh.t./u,t...t.xzh.....     fChecks if U is an orthogonal matrix.
   bool get isOrthogonalU => U.isOrthogonalMatrix();
 
   /// Checks if V is an orthogonal matrix.
@@ -326,19 +371,20 @@ class SingularValueDecomposition extends Decomposition {
   @override
   Matrix solve(Matrix b) {
     // Compute the pseudo-inverse of S
-    Matrix sPseudoInverse = S.copy();
-    for (int i = 0; i < sPseudoInverse.rowCount; i++) {
-      for (int j = 0; j < sPseudoInverse.columnCount; j++) {
-        if (sPseudoInverse[i][j] != 0) {
-          sPseudoInverse[i][j] = 1 / sPseudoInverse[i][j];
-        }
-      }
+    var sPseudoInverse = Matrix.fill(S.rowCount, S.columnCount, 0.0);
+    for (int i = 0; i < S.rowCount; i++) {
+      sPseudoInverse[i][i] = S[i][i] != 0 ? 1 / S[i][i] : 0;
     }
 
     // Compute x = V * S^+ * U^T * b
     Matrix x = V * sPseudoInverse * U.transpose() * b;
 
     return x;
+  }
+
+  @override
+  String toString() {
+    return 'Singular Value Decomposition \nU: $U \nS: $S \nV: $V';
   }
 }
 

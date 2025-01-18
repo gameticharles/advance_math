@@ -1,4 +1,4 @@
-part of '../algebra.dart';
+part of '../../expression.dart';
 
 /// A class that represents a quadratic equation that
 /// implementation of [Polynomial] that represents a second degree
@@ -131,5 +131,10 @@ class Quadratic extends Polynomial {
       return "Downwards";
     }
     return "Not a parabola";
+  }
+
+  @override
+  Expression expand() {
+    return this;
   }
 }

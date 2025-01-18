@@ -1,4 +1,4 @@
-part of '../algebra.dart';
+part of '../../expression.dart';
 
 /// Concrete implementation of [Polynomial] that represents a fourth degree
 /// polynomial equation in the form _ax^4 + bx^3 + cx^2 + dx + e = 0_.
@@ -176,4 +176,9 @@ class Quartic extends Polynomial {
         d: d ?? this.d,
         e: e ?? this.e,
       );
+
+  @override
+  Expression expand() {
+    return this;
+  }
 }
