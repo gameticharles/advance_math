@@ -93,12 +93,12 @@ class FunctionExpression extends Expression {
     var paramString = parameters.map((p) => p.toString()).join(', ');
     return "$name($paramString) = ${body.toString()}";
   }
-  
+
   @override
   bool isIndeterminate(num x) {
     throw UnimplementedError();
   }
-  
+
   @override
   bool isInfinity(num x) {
     throw UnimplementedError();

@@ -32,20 +32,20 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
 - Polynomial functions: Solve and find roots of a function to any degree (including Linear, Quadratic, Cubic, Quartic etc).
 - Roman numerals: Convert roman numerals to integers and vice versa. It also supports basic arithmetic operations and comparisons.
 - Matrix creation, filling and generation: Methods for filling the matrix with specific values or generating matrices with certain properties, such as zero, ones, identity, diagonal, list, or random matrices.
-    - Import and export matrices to and from other formats (e.g., CSV, JSON, binary)
-    - Matrix operations: Implement common matrix operations such as addition, subtraction, multiplication (element-wise and matrix-matrix), and division (element-wise) etc.
-    - Matrix transformation methods: Add methods for matrix transformations, such as transpose, inverse, pseudoInverse, and rank etc.
-    - Matrix manipulation (concatenate, sort, removeRow, removeRows, removeCol, removeCols, reshape, swapping rows and columns etc.)
-    - Statistical methods: Methods for calculating statistical properties of the matrix, such as min, max, sum, mean, median, mode, skewness, standard deviation, and variance.
-    - Element-wise operations: Methods for performing element-wise operations on the matrix, such as applying a function to each element or filtering elements based on a condition.
-    - Solving linear systems of equations (Using Inverse Matrix, LU Decomposition,Gauss-Jordan Elimination, Ridge Regression, Gauss Elimination, Least Squares, Jacobi, Successive Over-Relaxation (SOR), Gauss-Seidel method, Gram Schmidt, Conjugate Gradient, Montante's Method (Bareiss algorithm) and Cramers Rule)
-    - Solve matrix decompositions like LU decomposition, QR decomposition, LQ decomposition, Cholesky, Singular Value Decomposition (SVD)  with different algorithms Crout's, Doolittle, Gauss Elimination Method, Gram Schmidt, Householder, Partial and Complete Pivoting, etc.
-    - Matrix slicing and partitioning: Methods for extracting sub-Matrices or slices from the matrix.
-    - Matrix concatenation and stacking: Methods for concatenating or stacking matrices horizontally or vertically.
-    - Matrix norms: Methods for calculating matrix norms, such as L1 (Marathan), L2 (Euclidean), and infinity norms.
-    - Determine the properties of a matrix.
-    - From the matrix, row and columns of the matrix are iterables and also iterate on every element.
-    - Eigen values and vectors.
+  - Import and export matrices to and from other formats (e.g., CSV, JSON, binary)
+  - Matrix operations: Implement common matrix operations such as addition, subtraction, multiplication (element-wise and matrix-matrix), and division (element-wise) etc.
+  - Matrix transformation methods: Add methods for matrix transformations, such as transpose, inverse, pseudoInverse, and rank etc.
+  - Matrix manipulation (concatenate, sort, removeRow, removeRows, removeCol, removeCols, reshape, swapping rows and columns etc.)
+  - Statistical methods: Methods for calculating statistical properties of the matrix, such as min, max, sum, mean, median, mode, skewness, standard deviation, and variance.
+  - Element-wise operations: Methods for performing element-wise operations on the matrix, such as applying a function to each element or filtering elements based on a condition.
+  - Solving linear systems of equations (Using Inverse Matrix, LU Decomposition,Gauss-Jordan Elimination, Ridge Regression, Gauss Elimination, Least Squares, Jacobi, Successive Over-Relaxation (SOR), Gauss-Seidel method, Gram Schmidt, Conjugate Gradient, Montante's Method (Bareiss algorithm) and Cramers Rule)
+  - Solve matrix decompositions like LU decomposition, QR decomposition, LQ decomposition, Cholesky, Singular Value Decomposition (SVD)  with different algorithms Crout's, Doolittle, Gauss Elimination Method, Gram Schmidt, Householder, Partial and Complete Pivoting, etc.
+  - Matrix slicing and partitioning: Methods for extracting sub-Matrices or slices from the matrix.
+  - Matrix concatenation and stacking: Methods for concatenating or stacking matrices horizontally or vertically.
+  - Matrix norms: Methods for calculating matrix norms, such as L1 (Marathan), L2 (Euclidean), and infinity norms.
+  - Determine the properties of a matrix.
+  - From the matrix, row and columns of the matrix are iterables and also iterate on every element.
+  - Eigen values and vectors.
 - Supports vectors, complex numbers and complex vectors with most of the basic functionalities and operations.
 
 ## Todo
@@ -158,7 +158,6 @@ void main() {
 // Decoded directly
 // Decoded: HI THERE HOW ARE YOU?
 ```
-
 
 # NumOrWords
 
@@ -549,7 +548,6 @@ To support multiple languages, simply extend the `LanguageConfig` for each langu
 NumOrWords offers a comprehensive solution for converting numbers into words, supporting a wide range of use-cases and customization. Whether you need simple word representation or complex multi-language support with currency, NumOrWords has got you covered.
 
 </details>
-
 
 <details>
 <summary>ZScore</summary>

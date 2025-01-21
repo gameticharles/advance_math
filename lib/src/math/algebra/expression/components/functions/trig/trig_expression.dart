@@ -10,11 +10,11 @@ abstract class TrigonometricExpression extends Expression {
     return {...operand.getVariableTerms()};
   }
 
-   @override
+  @override
   bool isIndeterminate(num x) {
     throw UnimplementedError();
   }
-  
+
   @override
   bool isInfinity(num x) {
     throw UnimplementedError();

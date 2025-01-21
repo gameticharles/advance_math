@@ -4,7 +4,7 @@ class Divide extends BinaryOperationsExpression {
   Divide(super.left, super.right);
 
   @override
-  dynamic evaluate([dynamic x]) {
+  dynamic evaluate([dynamic arg]) {
     // Helper method to convert num to Literal if the other operand is an Expression
     dynamic convertToLiteralIfNeeded(dynamic val, dynamic other) {
       if (val is num && other is Expression) {
@@ -13,8 +13,8 @@ class Divide extends BinaryOperationsExpression {
       return val;
     }
 
-    dynamic leftEval = left.evaluate(x);
-    dynamic rightEval = right.evaluate(x);
+    dynamic leftEval = left.evaluate(arg);
+    dynamic rightEval = right.evaluate(arg);
 
     if (leftEval == 0) {
       throw Exception('Division by zero!');
@@ -30,7 +30,7 @@ class Divide extends BinaryOperationsExpression {
     }
 
     // If x is null and either operand contains a Variable, return the simplified version of the expression
-    if (x == null && (_containsVariable(left) || _containsVariable(right))) {
+    if (arg == null && (_containsVariable(left) || _containsVariable(right))) {
       return simplify();
     }
 

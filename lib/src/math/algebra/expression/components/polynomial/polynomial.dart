@@ -188,7 +188,7 @@ class Polynomial extends Expression {
 
   // Addition of Polynomials
   @override
-  Expression operator +(Expression other) {
+  Expression operator +(dynamic other) {
     if (other is Polynomial) {
       int maxDegree = max(coefficients.length, other.coefficients.length);
       List<Number> result =
@@ -207,7 +207,7 @@ class Polynomial extends Expression {
 
   // Subtraction of Polynomials
   @override
-  Expression operator -(Expression other) {
+  Expression operator -(dynamic other) {
     if (other is Polynomial) {
       int maxDegree = max(coefficients.length, other.coefficients.length);
       List<Number> result =
@@ -226,7 +226,7 @@ class Polynomial extends Expression {
 
   // Multiplication of Polynomials
   @override
-  Expression operator *(Expression other) {
+  Expression operator *(dynamic other) {
     if (other is Polynomial) {
       int resultDegree = coefficients.length + other.coefficients.length - 2;
       List<Number> result =
@@ -277,7 +277,7 @@ class Polynomial extends Expression {
   int get hashCode => Object.hashAll(coefficients);
 
   @override
-  Expression operator /(Expression other) {
+  Expression operator /(dynamic other) {
     if (other is Polynomial) {
       if (other.coefficients.first == Integer.zero) {
         throw Exception('Division by zero polynomial.');

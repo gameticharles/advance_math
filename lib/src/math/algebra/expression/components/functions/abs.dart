@@ -53,11 +53,11 @@ class Abs extends Expression {
     return Abs(operand.substitute(oldExpr, newExpr));
   }
 
-   @override
+  @override
   bool isIndeterminate(num x) {
     throw UnimplementedError();
   }
-  
+
   @override
   bool isInfinity(num x) {
     throw UnimplementedError();

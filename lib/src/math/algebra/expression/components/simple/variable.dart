@@ -1,6 +1,6 @@
 part of '../../expression.dart';
 
-/// A class representing a variable in an expression.
+/// A class representing a variable/symbol in an expression.
 ///
 /// Variables can be differentiated and integrated with respect to themselves,
 /// and they can also be evaluated given a specific value or map of values.

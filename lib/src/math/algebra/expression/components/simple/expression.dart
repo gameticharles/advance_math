@@ -22,25 +22,36 @@ abstract class Expression {
       _parser.expression.trim().end().parse(formattedString).value;
 
   // Basic operations.
-  /// Add operator. Creates a [Add] expression.
-  Expression operator +(Expression other) => Add(this, other);
+  /// Converts a `num` to a `Literal` if necessary.
+  static Expression _toExpression(dynamic value) {
+    if (value is Expression) {
+      return value;
+    } else if (value is num) {
+      return Literal(value);
+    } else {
+      throw ArgumentError('Unsupported type for Expression operations: $value');
+    }
+  }
+
+  /// Add operator. Creates an [Add] expression.
+  Expression operator +(dynamic other) => Add(this, _toExpression(other));
 
   /// Subtract operator. Creates a [Subtract] expression.
-  Expression operator -(Expression other) => Subtract(this, other);
+  Expression operator -(dynamic other) => Subtract(this, _toExpression(other));
 
   /// Multiply operator. Creates a [Multiply] expression.
-  Expression operator *(Expression other) => Multiply(this, other);
+  Expression operator *(dynamic other) => Multiply(this, _toExpression(other));
 
   /// Divide operator. Creates a [Divide] expression.
-  Expression operator /(Expression other) => Divide(this, other);
+  Expression operator /(dynamic other) => Divide(this, _toExpression(other));
 
   /// Modulo operator. Creates a [Modulo] expression.
-  // Expression operator %(Expression exp) => Modulo(this, exp);
+  // Expression operator %(dynamic other) => Modulo(this, _toExpression(other));
 
-  /// Power operator. Creates a [Power] expression.
-  Expression operator ^(Expression other) => Pow(this, other);
+  /// Power operator. Creates a [Pow] expression.
+  Expression operator ^(dynamic other) => Pow(this, _toExpression(other));
 
-  /// Unary minus operator. Creates a [UnaryMinus] expression.
+  /// Unary minus operator. Creates a [Negate] expression.
   Expression operator -() => Negate(this);
 
   /// Evaluates the expression for a given value of [x].
@@ -145,7 +156,7 @@ abstract class Expression {
   /// Compute the size of the expression based on the number of nodes in its tree.
   int size();
 
-    // Future methods for determining specific properties of the expression.
+  // Future methods for determining specific properties of the expression.
   bool isIndeterminate(num x);
   bool isInfinity(num x);
 
@@ -160,9 +171,7 @@ abstract class Expression {
   String toString();
 }
 
-extension ExpressionExtension on Expression {
-   
-}
+extension ExpressionExtension on Expression {}
 
 abstract class SimpleExpression extends Expression {
   @override

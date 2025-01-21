@@ -117,7 +117,7 @@ class MultiVariablePolynomial extends Expression {
   }
 
   @override
-  Expression operator +(Expression other) {
+  Expression operator +(dynamic other) {
     if (other is MultiVariablePolynomial) {
       var resultTerms = [...terms];
 
@@ -146,7 +146,7 @@ class MultiVariablePolynomial extends Expression {
   }
 
   @override
-  Expression operator -(Expression other) {
+  Expression operator -(dynamic other) {
     if (other is MultiVariablePolynomial) {
       var resultTerms = [...terms];
 
@@ -174,7 +174,7 @@ class MultiVariablePolynomial extends Expression {
   }
 
   @override
-  Expression operator *(Expression other) {
+  Expression operator *(dynamic other) {
     if (other is MultiVariablePolynomial) {
       List<Term> resultTerms = [];
 
@@ -309,11 +309,11 @@ class MultiVariablePolynomial extends Expression {
     throw UnimplementedError();
   }
 
-   @override
+  @override
   bool isIndeterminate(num x) {
     throw UnimplementedError();
   }
-  
+
   @override
   bool isInfinity(num x) {
     throw UnimplementedError();

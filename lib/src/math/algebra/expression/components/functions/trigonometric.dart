@@ -99,11 +99,11 @@ class Trigonometric extends Expression {
     );
   }
 
-   @override
+  @override
   bool isIndeterminate(num x) {
     throw UnimplementedError();
   }
-  
+
   @override
   bool isInfinity(num x) {
     throw UnimplementedError();

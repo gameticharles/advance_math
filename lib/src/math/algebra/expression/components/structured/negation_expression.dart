@@ -51,11 +51,11 @@ class Negate extends Expression {
     return Negate(operand.substitute(oldExpr, newExpr));
   }
 
-   @override
+  @override
   bool isIndeterminate(num x) {
     throw UnimplementedError();
   }
-  
+
   @override
   bool isInfinity(num x) {
     throw UnimplementedError();

@@ -249,7 +249,8 @@ void expressionMath() {
 
   print(Add(Multiply(Literal(6), Variable('x')), Literal(4)).integrate());
   print(Expression.parse('6 * x + 4').integrate());
-  print(Expression.parse('6 * x + 4').evaluate(2)); // 16
+
+  print(Expression.parse('6 * x + 4').evaluate({'x': 2})); // 16
 
   Pow xSquare = Pow(x, Literal(2));
   var yCos = Trigonometric('cos', y);
@@ -312,4 +313,48 @@ void expressionMath() {
   print(Expression.parse(r'3^(3^(2))').evaluate());
   print(Expression.parse('10^2').evaluate());
   print(Pow(Literal(10), Literal(2)).evaluate());
+
+  // Example expression: 2x^2 + 3y + sin(x)
+  x = Variable('x');
+  final expr1 = E(2) + x; // num + Expression
+  final expr2 = x + 2; // Expression + num
+
+  print('Expression 1: $expr1');
+  print('Expression 2: $expr2');
+
+  final expr3 = E(3) * (x ^ 2) - E(4) / x;
+  print('Expression 3: $expr3');
+}
+
+extension NumToExpression on num {
+  Expression get expr => Literal(this);
+}
+
+/// Extension methods for num to allow for operator overloading
+/// with Expressions and other nums to create expressions.
+///
+/// Example usage:
+/// ```dart
+/// final x = Variable('x');
+/// final expr1 = E(2) + x; // num + Expression
+/// final expr2 = x + 2; // Expression + num
+///
+/// print('Expression 1: $expr1');
+/// print('Expression 2: $expr2');
+///
+/// final expr3 = E(3) * (x ^ 2) - E(4) / x;
+/// print('Expression 3: $expr3');
+/// ```
+extension E on num {
+  Expression operator +(Expression other) => Literal(this) + other;
+
+  Expression operator -(Expression other) => Literal(this) - other;
+
+  Expression operator *(Expression other) => Literal(this) * other;
+
+  Expression operator /(Expression other) => Literal(this) / other;
+
+  Expression operator ^(Expression other) => Literal(this) ^ other;
+
+  Expression operator -() => -Literal(this);
 }
