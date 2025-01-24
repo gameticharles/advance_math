@@ -16,3 +16,34 @@ extension NumExtension on num {
     }
   }
 }
+
+/// Extension to calculate the integer square root of a BigInt.
+extension BigIntSqrt on BigInt {
+  /// Returns the integer square root of a BigInt.
+  BigInt sqrt() {
+    BigInt low = BigInt.zero;
+    BigInt high = this;
+    BigInt mid;
+
+    while (low <= high) {
+      mid = (low + high) >> 1;
+      BigInt square = mid * mid;
+
+      if (square == this) {
+        return mid;
+      } else if (square < this) {
+        low = mid + BigInt.one;
+      } else {
+        high = mid - BigInt.one;
+      }
+    }
+
+    return high;
+  }
+
+  /// Checks if the BigInt is a power of two.
+  bool get isPowerOfTwo {
+    if (this <= BigInt.zero) return false;
+    return (this & (this - BigInt.one)) == BigInt.zero;
+  }
+}

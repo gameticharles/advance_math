@@ -714,73 +714,269 @@ extension MatrixOperationExtension on Matrix {
     }
   }
 
-  /// Returns the cumulative sum of the elements in the matrix along the specified axis.
+  /// Performs cumulative sum operations similar to numpy's cumsum but with more flexibility.
   ///
-  /// - If [axis] is null, the cumulative sum of all elements is returned.
-  /// - If [axis] is 0, a Matrix of cumulative sums of each column is returned.
-  /// - If [axis] is 1, a Matrix of cumulative sums of each row is returned.
-  /// - If [axis] is 2, the cumulative sum of the diagonal elements is returned.
-  /// - If [axis] is 3, a Matrix of cumulative sums of each main diagonal is returned.
-  /// - If [axis] is 4, a Matrix of cumulative sums of each anti-diagonal is returned.
+  /// Parameters:
+  /// - [continuous]: When true, continues accumulation across axis boundaries (default: false)
+  /// - [axis]: The summation axis (null returns flattened list, 0-4 for matrix operations):
+  ///   - null: Flattened list
+  ///   - 0: Column-wise accumulation
+  ///   - 1: Row-wise accumulation
+  ///   - 2: Diagonal (top-left to bottom-right)
+  ///   - 3: Diagonal (bottom-left to top-right)
+  ///   - 4: Diagonal (top-right to bottom-left)
   ///
-  /// [absolute] (optional): If set to `true`, the absolute values of the elements are considered.
+  /// Returns:
+  /// - [List<num>] when axis is null
+  /// - [Matrix] when axis is specified
   ///
-  /// Returns zero(0) if the matrix is empty.
-  /// Throws [ArgumentError] if [axis] is not null, 0, 1, 2, 3 or 4.
-  Matrix cumsum({bool absolute = false, int? axis, bool continuous = false}) {
-    if (isEmpty) {
-      return Matrix();
-    }
+  /// Examples:
+  /// ```
+  /// var arr = Matrix([
+  ///   [1, 5, 6],
+  ///   [4, 7, 2],
+  ///   [3, 1, 9]
+  /// ]);
+  ///
+  /// print(arr.cumsum());
+  /// // [1, 6, 12, 4, 11, 13, 3, 4, 13]
+  ///
+  /// print(arr.cumsum(continuous: true));
+  /// // [1, 6, 12, 16, 23, 25, 28, 29, 38]
+  ///
+  /// print(arr.cumsum(axis: 0));
+  /// // ┌ 1  5  6 ┐
+  /// // │ 5 12  8 │
+  /// // └ 8 13 17 ┘
+  ///
+  /// print(arr.cumsum(continuous: true, axis: 0));
+  /// // ┌ 1 13 27 ┐
+  /// // │ 5 20 29 │
+  /// // └ 8 21 38 ┘
+  ///
+  /// print(arr.cumsum(axis: 1));
+  /// // ┌ 1  6 12 ┐
+  /// // │ 4 11 13 │
+  /// // └ 3  4 13 ┘
+  ///
+  /// print(arr.cumsum(continuous: true, axis: 1));
+  /// // ┌  1  6 12 ┐
+  /// // │ 16 23 25 │
+  /// // └ 28 29 38 ┘
+  ///
+  /// print(arr.cumsum(axis: 2));
+  /// // ┌ 1 5  6 ┐
+  /// // │ 4 8  7 │
+  /// // └ 3 5 17 ┘
+  ///
+  /// print(arr.cumsum(continuous: true, axis: 2));
+  /// // ┌ 9 30 38 ┐
+  /// // │ 7 16 32 │
+  /// // └ 3 8 25 ┘
+  ///
+  /// print(arr.cumsum(axis: 3));
+  /// // ┌ 1 9  16 ┐
+  /// // │ 4 10 3  │
+  /// // └ 3 1  9  ┘
+  ///
+  /// print(arr.cumsum(continuous: true, axis: 3));
+  /// // ┌ 38 37 28 ┐
+  /// // │ 32 22 12 │
+  /// // └ 15 10 9 ┘
+  ///
+  /// print(arr.cumsum(axis: 4));
+  /// // ┌ 1  5  6 ┐
+  /// // │ 9  13 2 │
+  /// // └ 16 3  9 ┘
+  ///
+  /// print(arr.cumsum(continuous: true, axis: 4));
+  /// // ┌ 38 33 18 ┐
+  /// // │ 37 25 11 │
+  /// // └ 28 12 9 ┘
+  /// ```
+  dynamic cumsum({bool continuous = false, int? axis}) {
+    int rows = _data.length;
+    int cols = _data[0].length;
 
-    if (axis != null && (axis < 0 || axis > 4)) {
-      throw ArgumentError.value(
-          axis, 'axis', 'Axis must be null or between 0 and 4.');
-    }
+    List<List<num>> result = List.generate(rows, (i) => List.filled(cols, 0));
 
-    int rows = rowCount;
-    int cols = columnCount;
-
-    Matrix result = Matrix.fill(rows, cols, 0.0);
-
-    for (int i = 0; i < rows; i++) {
-      for (int j = 0; j < cols; j++) {
-        num value = absolute ? this[i][j].abs() : this[i][j];
-
+    switch (axis) {
+      case null:
         if (continuous) {
-          if (axis == null || axis == 1) {
-            // Cumulative sum in row-major order
-            result[i][j] = value +
-                (j > 0
-                    ? result[i][j - 1]
-                    : (i > 0 ? result[i - 1][cols - 1] : 0.0));
-          } else if (axis == 0) {
-            // Cumulative sum in column-major order
-            result[i][j] = value +
-                (i > 0
-                    ? result[i - 1][j]
-                    : (j > 0 ? result[rows - 1][j - 1] : 0.0));
-          } else {
-            // Cumulative sum along the diagonal
-            result[i][j] =
-                value + (i > 0 && j > 0 ? result[i - 1][j - 1] : 0.0);
+          // Continuous accumulation across entire matrix
+          List<num> flat = [];
+          num cumulative = 0;
+          for (var row in _data) {
+            for (var val in row) {
+              cumulative += val;
+              flat.add(cumulative);
+            }
           }
+          return flat;
         } else {
-          if (axis == null || axis == 1) {
-            // Cumulative sum in each row
-            result[i][j] = value + (j > 0 ? result[i][j - 1] : 0.0);
-          } else if (axis == 0) {
-            // Cumulative sum in each column
-            result[i][j] = value + (i > 0 ? result[i - 1][j] : 0.0);
-          } else {
-            // Cumulative sum along the diagonal
-            result[i][j] =
-                value + (i > 0 && j > 0 ? result[i - 1][j - 1] : 0.0);
+          // Row-wise accumulation without continuity
+          List<num> flat = [];
+          for (var row in _data) {
+            num rowSum = 0;
+            for (var val in row) {
+              rowSum += val;
+              flat.add(rowSum);
+            }
+          }
+          return flat;
+        }
+      case 0: // Column-wise
+        for (int j = 0; j < cols; j++) {
+          for (int i = 0; i < rows; i++) {
+            result[i][j] = _data[i][j];
+            if (continuous) {
+              if (j > 0 && i == 0) {
+                result[i][j] += result[rows - 1][j - 1];
+              }
+              if (i > 0) {
+                result[i][j] += result[i - 1][j];
+              }
+            } else {
+              if (i > 0) {
+                result[i][j] += result[i - 1][j];
+              }
+            }
           }
         }
-      }
+        break;
+
+      case 1: // Row-wise
+        for (int i = 0; i < rows; i++) {
+          for (int j = 0; j < cols; j++) {
+            result[i][j] = _data[i][j];
+            if (continuous) {
+              if (i > 0 && j == 0) {
+                result[i][j] += result[i - 1][cols - 1];
+              }
+              if (j > 0) {
+                result[i][j] += result[i][j - 1];
+              }
+            } else {
+              if (j > 0) {
+                result[i][j] += result[i][j - 1];
+              }
+            }
+          }
+        }
+        break;
+
+      case 2: // Diagonal top-left to bottom-right
+        if (continuous) {
+          List<List<int>> coords = [];
+          for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+              coords.add([i, j]);
+            }
+          }
+          coords.sort((a, b) {
+            int diffA = a[0] - a[1];
+            int diffB = b[0] - b[1];
+            if (diffA != diffB) {
+              return diffB.compareTo(diffA);
+            } else {
+              return a[0].compareTo(b[0]);
+            }
+          });
+          num cumulative = 0;
+          for (var coord in coords) {
+            int i = coord[0];
+            int j = coord[1];
+            cumulative += _data[i][j];
+            result[i][j] = cumulative;
+          }
+        } else {
+          for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+              result[i][j] = _data[i][j];
+              if (i > 0 && j > 0) {
+                result[i][j] += result[i - 1][j - 1];
+              }
+            }
+          }
+        }
+
+      case 3: // Diagonal bottom-left to top-right
+        if (continuous) {
+          List<List<int>> coords = [];
+          for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+              coords.add([i, j]);
+            }
+          }
+          coords.sort((a, b) {
+            int sumA = a[0] + a[1];
+            int sumB = b[0] + b[1];
+            if (sumA != sumB) {
+              return sumB.compareTo(sumA);
+            } else {
+              return b[0].compareTo(a[0]);
+            }
+          });
+          num cumulative = 0;
+          for (var coord in coords) {
+            int i = coord[0];
+            int j = coord[1];
+            cumulative += _data[i][j];
+            result[i][j] = cumulative;
+          }
+        } else {
+          for (int j = 0; j < cols; j++) {
+            for (int i = rows - 1; i >= 0; i--) {
+              result[i][j] = _data[i][j];
+              if (i < rows - 1 && j > 0) {
+                result[i][j] += result[i + 1][j - 1];
+              }
+            }
+          }
+        }
+        break;
+
+      case 4: // Diagonal top-right to bottom-left
+        if (continuous) {
+          List<List<int>> coords = [];
+          for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+              coords.add([i, j]);
+            }
+          }
+          coords.sort((a, b) {
+            int sumA = a[0] + a[1];
+            int sumB = b[0] + b[1];
+            if (sumA != sumB) {
+              return sumB.compareTo(sumA);
+            } else {
+              return b[1].compareTo(a[1]);
+            }
+          });
+          num cumulative = 0;
+          for (var coord in coords) {
+            int i = coord[0];
+            int j = coord[1];
+            cumulative += _data[i][j];
+            result[i][j] = cumulative;
+          }
+        } else {
+          for (int j = cols - 1; j >= 0; j--) {
+            for (int i = 0; i < rows; i++) {
+              result[i][j] = _data[i][j];
+              if (i > 0 && j < cols - 1) {
+                result[i][j] += result[i - 1][j + 1];
+              }
+            }
+          }
+        }
+        break;
+
+      default:
+        throw ArgumentError('Invalid axis value');
     }
 
-    return result;
+    return Matrix(result);
   }
 
   /// Returns the product of all elements in the matrix.

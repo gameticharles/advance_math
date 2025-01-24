@@ -1828,6 +1828,82 @@ var trace = matrix.trace();
 print(trace); // Output: 5
 ```
 
+You can also perform matrix `cumsum` similar to numpy's function but with more flexibilities.
+
+```dart
+var arr = Matrix([
+    [1, 5, 6],
+    [4, 7, 2],
+    [3, 1, 9]
+  ]);
+
+  print(arr.cumsum(continuous: true));
+  // [ 1  6 12 16 23 25 28 29 38 ]
+
+  print(arr.cumsum(continuous: false));
+  // [ 1  6 12 4 11 13 3  4 13 ]
+
+  print(arr.cumsum(continuous: false, axis: 0));
+  // Matrix: 3x3
+  // ┌ 1  5  6 ┐
+  // │ 5 12  8 │
+  // └ 8 13 17 ┘
+
+  print(arr.cumsum(continuous: true, axis: 0));
+  // Matrix: 3x3
+  // ┌ 1 13 27 ┐
+  // │ 5 20 29 │
+  // └ 8 21 38 ┘
+
+  print(arr.cumsum(continuous: false, axis: 1));
+  // Matrix: 3x3
+  // ┌ 1  6 12 ┐
+  // │ 4 11 13 │
+  // └ 3  4 13 ┘
+
+  print(arr.cumsum(continuous: true, axis: 1));
+  // Matrix: 3x3
+  // ┌  1  6 12 ┐
+  // │ 16 23 25 │
+  // └ 28 29 38 ┘
+
+  print(arr.cumsum(continuous: false, axis: 2));
+  // Matrix: 3x3
+  // ┌ 1 5  6 ┐
+  // │ 4 8  7 │
+  // └ 3 5 17 ┘
+
+  print(arr.cumsum(continuous: true, axis: 2));
+  // Matrix: 3x3
+  // ┌ 9 30 38 ┐
+  // │ 7 16 32 │
+  // └ 3 8  25 ┘
+
+  print(arr.cumsum(continuous: false, axis: 3));
+  // Matrix: 3x3
+  // ┌ 1 9  16 ┐
+  // │ 4 10 3  │
+  // └ 3 1  9  ┘
+
+  print(arr.cumsum(continuous: true, axis: 3));
+  // Matrix: 3x3
+  // ┌ 38 37 28 ┐
+  // │ 32 22 12 │
+  // └ 15 10  9 ┘
+
+  print(arr.cumsum(continuous: false, axis: 4));
+  // Matrix: 3x3
+  // ┌ 1  5  6 ┐
+  // │ 9  13 2 │
+  // └ 16 3  9 ┘
+
+  print(arr.cumsum(continuous: true, axis: 4));
+  // Matrix: 3x3
+  // ┌ 38 33 18 ┐
+  // │ 37 25 11 │
+  // └ 28 12  9 ┘
+```
+
 ## Assessing the elements of a matrix
 
 Matrix can be accessed as components

@@ -3,6 +3,10 @@
 * **[IMPROVEMENT]** `pseudoInverse` function has been improved to work with singular and poorly conditioned matrices. Added condition number check and SVD fallback for improved robustness with singular and poorly conditioned matrices.
 * **[BUG_FIX]** `isPrime` function now works correctly.
 * **[FEATURE]** Added extensions to `Bases` class for converting between bases and `Strings`.
+* **[FEATURE]** Added a class for `PerfectNumbers` and functions for calculating perfect numbers including `isMersennePrime`.
+* **[IMPROVEMENT]** Improved `isPerfectNumber` function for performance and to work with large numbers with `BigInt`, large `String` number, and int support.
+* **[FEATURE]** Added `sqrt` to the `BigInt` class to aid computations.
+* **[IMPROVEMENT]** Fixed the error with `cumsum` and improved it with functionalities
 * **[IMPROVEMENT]** Improve the computation of `fib` function.
 * **[FEATURE]** Added `Expression` class for parsing and evaluating mathematical expressions. See `Expression` class for more information.
 

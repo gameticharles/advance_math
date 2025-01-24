@@ -23,3 +23,4 @@ export 'util/romans_exception.dart';
 
 export 'decimal/decimal.dart';
 export 'decimal/rational.dart';
+export 'number/perfect_number.dart';
