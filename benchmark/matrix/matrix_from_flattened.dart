@@ -8,7 +8,7 @@ class MatrixFromFlattenedBenchmark extends BenchmarkBase {
   MatrixFromFlattenedBenchmark()
       : super('Matrix initialization (fromFlattenedList)');
 
-  late List<num> _source;
+  late List _source;
 
   static void main() {
     MatrixFromFlattenedBenchmark().report();

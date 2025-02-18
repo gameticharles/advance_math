@@ -8,13 +8,13 @@ Performance Optimizations:
 */
 
 class _Utils {
-  static List<List<dynamic>> parseMatrixString(String input) {
+  static List<List<Number>> parseMatrixString(String input) {
     return input
         .split(';')
         .map((rowString) => rowString
             .trim()
             .split(RegExp(r'\s+'))
-            .map((elem) => num.parse(elem))
+            .map((elem) => Complex.parse(elem))
             .toList())
         .toList();
   }
@@ -32,9 +32,12 @@ class _Utils {
   }
 
   ///Convert the dynamic matrix to num type
-  static List<List<num>> toNumList(List<List<dynamic>> input) {
+  static List<List<Number>> toNumList(List<List<dynamic>> input) {
     return input
-        .map((row) => row.map((value) => (value as num)).toList())
+        .map((row) => row
+            .map((value) =>
+                value is Number ? value : Complex.parse(value.toString()))
+            .toList())
         .toList();
   }
 
@@ -44,10 +47,10 @@ class _Utils {
   }
 
   ///Convert a dynamic list to double list
-  static List<double> toSDList(List<dynamic> list) {
+  static List<Number> toSDList(List<dynamic> list) {
     return list.map((e) {
-      if (e is num) {
-        return e.toDouble();
+      if (e is num || e is Number) {
+        return e is Number ? e : Complex.parse(e.toString());
       } else {
         throw ArgumentError('List element is not of type num');
       }
@@ -125,7 +128,7 @@ class _Utils {
 
     for (int k = 0; k < rowCount - 1; k++) {
       for (int i = k + 1; i < rowCount; i++) {
-        double factor = a[i][k] / a[k][k];
+        dynamic factor = a[i][k] / a[k][k];
         if (forLUDecomposition) {
           a[i][k] = factor;
         }
@@ -142,8 +145,8 @@ class _Utils {
   }
 
   // Helper function to get the sum
-  static double sumLUk(Matrix L, Matrix U, int k, int row, int col) {
-    double sum = 0;
+  static dynamic sumLUk(Matrix L, Matrix U, int k, int row, int col) {
+    Number sum = Complex.zero();
     for (int p = 0; p < k; p++) {
       sum += L[row][p] * U[p][col];
     }
@@ -163,18 +166,18 @@ class _Utils {
   static Matrix householderReflection(Matrix columnVector) {
     int n = columnVector.rowCount;
     Matrix e1 = Matrix.zeros(n, 1);
-    e1[0][0] = 1;
+    e1[0][0] = Complex.one();
 
     // Check if the matrix is filled with zeros and return the identity matrix if true
-    if (columnVector.norm(Norm.chebyshev) == 0.0) {
+    if (columnVector.norm() == Complex.zero()) {
       return Matrix.eye(n);
     }
 
     Matrix u =
         (columnVector + e1) * columnVector.norm() * columnVector[0][0].sign;
 
-    Matrix P =
-        Matrix.eye(n) - ((u * u.transpose()) * (2 / math.pow(u.norm(), 2)));
+    Matrix P = Matrix.eye(n) -
+        ((u * u.transpose()) * (Complex(2) / math.pow(u.norm(), Complex(2))));
 
     return P;
   }

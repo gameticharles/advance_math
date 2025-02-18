@@ -37,7 +37,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
           throw Exception('Rows have different lengths');
         }
       }
-      _data = input;
+      _data = _Utils.toNumList(input);
     } else {
       throw Exception('Invalid input type');
     }
@@ -816,7 +816,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// ```
   ///
   /// Returns the computed distance between `m1` and `m2` according to `distanceType`.
-  static num distance(Matrix m1, Matrix m2,
+  static dynamic distance(Matrix m1, Matrix m2,
       {DistanceType distance = DistanceType.frobenius}) {
     switch (distance) {
       case DistanceType.frobenius:
@@ -900,11 +900,11 @@ class Matrix extends IterableMixin<List<dynamic>> {
       int numCols = byteData.getInt32(4, Endian.little);
       int offset = 8;
 
-      List<List<double>> rows =
-          List.generate(numRows, (_) => List.filled(numCols, 0.0));
+      List<List<dynamic>> rows =
+          List.generate(numRows, (_) => List.filled(numCols, Complex.zero()));
       for (int i = 0; i < numRows; i++) {
         for (int j = 0; j < numCols; j++) {
-          rows[i][j] = byteData.getFloat64(offset, Endian.little);
+          rows[i][j] = Complex(byteData.getFloat64(offset, Endian.little));
           offset += 8;
         }
       }
@@ -962,7 +962,6 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// myMatrix will be constructed from the data in the specified JSON file.
   static Matrix fromJSON({String? jsonString, String? inputFilePath}) {
     if (jsonString == null && inputFilePath != null) {
-
       // Read file
       fileIO.readFromFile(inputFilePath).then((data) {
         jsonString = data;

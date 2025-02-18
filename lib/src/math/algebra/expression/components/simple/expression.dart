@@ -289,4 +289,3 @@ class _MemberAccessor<T> implements MemberAccessor<T> {
     return accessors[member]!(object);
   }
 }
-

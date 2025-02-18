@@ -67,6 +67,8 @@ void main() {
   });
 
   printLine();
+  precision = 10; // Desired precision (number of decimal places)
+  Decimal.setPrecision(precision);
 
   var r = Decimal(5);
   // Using the compute method

@@ -3,9 +3,9 @@
 part of '../algebra.dart';
 
 //extends ListBase<num>
-class Vector extends IterableMixin<num> {
+class Vector extends IterableMixin<dynamic> {
   /// Internal data of the vector.
-  List<num> _data = const [];
+  List<dynamic> _data = const [];
 
   /// Getter to retrieve an iterable over all elements in the matrix,
   /// regardless of their row or column.
@@ -20,7 +20,7 @@ class Vector extends IterableMixin<num> {
   /// Overrides the iterator getter to provide a VectorIterator.
   /// This iterator iterates over the elements of the vector.
   @override
-  Iterator<num> get iterator => VectorIterator(this);
+  Iterator<dynamic> get iterator => VectorIterator(this);
 
   /// Constructs a [Vector] of given length with all elements initialized to 0.
   ///
@@ -28,16 +28,17 @@ class Vector extends IterableMixin<num> {
   /// otherwise they are initialized with 0.
   Vector(dynamic input, {bool isDouble = true}) {
     if (input is int) {
-      _data = List<num>.filled(input, isDouble ? 0.0 : 0);
-    } else if (input is List<num>) {
-      _data = input.cast<num>();
+      _data = List.filled(input, isDouble ? Complex(0.0, 0.0) : Complex.zero());
+    } else if (input is List) {
+      _data =
+          input.map((e) => isDouble ? Complex(e, 0.0) : Complex(e, 0)).toList();
     } else {
       throw Exception('Invalid input type');
     }
   }
 
   /// Constructs a [Vector] from a list of numerical values.
-  Vector.fromList(List<num> data) : _data = data;
+  Vector.fromList(List data) : _data = data;
 
   /// Constructs a new vector of the given [length] with randomly generated values.
   ///
@@ -93,11 +94,11 @@ class Vector extends IterableMixin<num> {
       random = math.Random(seed);
     }
     random ??= math.Random();
-    List<num> data = List.generate(
+    List data = List.generate(
       length,
       (_) => (isDouble
-          ? random!.nextDouble() * (max - min) + min
-          : random!.nextInt(max.toInt() - min.toInt()) + min.toInt()),
+          ? Complex(random!.nextDouble() * (max - min) + min)
+          : Complex(random!.nextInt(max.toInt() - min.toInt()) + min.toInt())),
     );
 
     return Vector.fromList(data);
@@ -126,8 +127,8 @@ class Vector extends IterableMixin<num> {
       throw Exception('Number must be a positive integer');
     }
 
-    double step = (end - start) / (number - 1);
-    List<num> data = [];
+    dynamic step = Complex((end - start) / (number - 1));
+    List data = [];
     for (int i = 0; i < number; i++) {
       data.add(start + i * step);
     }
@@ -157,9 +158,9 @@ class Vector extends IterableMixin<num> {
       throw Exception('Step must be a positive integer');
     }
 
-    List<num> range = [];
+    List range = [];
     for (int i = start; i < end; i += step) {
-      range.add(i);
+      range.add(Complex(i));
     }
 
     return Vector.fromList(range);
@@ -171,10 +172,10 @@ class Vector extends IterableMixin<num> {
   }
 
   /// Fetches the value at the given index of the vector.
-  num operator [](int index) => _data[index];
+  dynamic operator [](int index) => _data[index];
 
   /// Sets the value at the given index of the vector.
-  void operator []=(int index, num value) {
+  void operator []=(int index, dynamic value) {
     _data[index] = value;
   }
 
@@ -232,9 +233,9 @@ class Vector extends IterableMixin<num> {
   /// true
   /// ```
   bool isUnit() {
-    const double tolerance =
-        1e-10; // Define a suitable tolerance as per your needs
-    return (norm() - 1).abs() < tolerance;
+    final tolerance =
+        Complex(1e-10); // Define a suitable tolerance as per your needs
+    return (norm() - Complex.one()).abs() < tolerance;
   }
 
   /// Sets all elements of this vector to [value].
@@ -274,19 +275,20 @@ class Vector extends IterableMixin<num> {
   /// ```
   /// 5.196152422706632
   /// ```
-  num distance(Vector other, {DistanceType distance = DistanceType.frobenius}) {
+  dynamic distance(Vector other,
+      {DistanceType distance = DistanceType.frobenius}) {
     if (length != other.length) {
       throw ArgumentError(
           "Vectors must have the same length for distance calculation.");
     }
 
-    double sumSquare = 0;
-    double sumAbs = 0;
-    num maxAbs = 0;
-    double dotProduct = 0;
-    double sumSquare1 = 0;
-    double sumSquare2 = 0;
-    int hammingDistance = 0;
+    dynamic sumSquare = Complex.zero();
+    dynamic sumAbs = Complex.zero();
+    dynamic maxAbs = Complex.zero();
+    dynamic dotProduct = Complex.zero();
+    dynamic sumSquare1 = Complex.zero();
+    dynamic sumSquare2 = Complex.zero();
+    dynamic hammingDistance = Complex.zero();
 
     for (int i = 0; i < _data.length; i++) {
       final diff = _data[i] - other[i];
@@ -298,7 +300,7 @@ class Vector extends IterableMixin<num> {
       dotProduct += _data[i] * other[i];
       sumSquare1 += _data[i] * _data[i];
       sumSquare2 += other[i] * other[i];
-      hammingDistance += _data[i] != other[i] ? 1 : 0;
+      hammingDistance += _data[i] != other[i] ? Complex.one() : Complex.zero();
     }
 
     switch (distance) {
@@ -314,7 +316,7 @@ class Vector extends IterableMixin<num> {
       case DistanceType.cosine:
         final magnitude1 = math.sqrt(sumSquare1);
         final magnitude2 = math.sqrt(sumSquare2);
-        return 1 - (dotProduct / (magnitude1 * magnitude2));
+        return Complex.one() - (dotProduct / (magnitude1 * magnitude2));
       case DistanceType.hamming:
         return hammingDistance;
       case DistanceType.spectral:
@@ -349,7 +351,7 @@ class Vector extends IterableMixin<num> {
     if (length != other.length) {
       throw ArgumentError("Vectors must have the same length for projection.");
     }
-    double scalar = dot(other) / other.dot(other);
+    dynamic scalar = dot(other) / other.dot(other);
     return other * scalar;
   }
 
@@ -370,7 +372,7 @@ class Vector extends IterableMixin<num> {
   /// ```
   /// 1.5707963267948966
   /// ```
-  double angle(Vector other) {
+  dynamic angle(Vector other) {
     if (length != other.length) {
       throw ArgumentError(
           "Vectors must have the same length for angle calculation.");
@@ -391,17 +393,17 @@ class Vector extends IterableMixin<num> {
   /// print(v.toSpherical());
   /// // Output: [1.7320508075688772, 0.9553166181245093, 0.7853981633974483]
   /// ```
-  List<double> toSpherical() {
+  List toSpherical() {
     if (length != 3) {
       throw Exception(
           "Vector must be 3D for conversion to Spherical coordinates");
     }
-    double x = _data[0].toDouble();
-    double y = _data[1].toDouble();
-    double z = _data[2].toDouble();
-    double r = math.sqrt(x * x + y * y + z * z);
-    double theta = math.acos(z / r);
-    double phi = math.atan2(y, x);
+    dynamic x = _data[0];
+    dynamic y = _data[1];
+    dynamic z = _data[2];
+    dynamic r = math.sqrt(x * x + y * y + z * z);
+    dynamic theta = math.acos(z / r);
+    dynamic phi = math.atan2(y, x);
     return [r, theta, phi];
   }
 
@@ -418,16 +420,16 @@ class Vector extends IterableMixin<num> {
   /// print(v.toCylindrical());
   /// // Output: [1.4142135623730951, 0.7853981633974483, 1]
   /// ```
-  List<double> toCylindrical() {
+  List toCylindrical() {
     if (length != 3) {
       throw Exception(
           "Vector must be 3D for conversion to Cylindrical coordinates");
     }
-    double x = _data[0].toDouble();
-    double y = _data[1].toDouble();
-    double z = _data[2].toDouble();
-    double rho = math.sqrt(x * x + y * y);
-    double phi = math.atan2(y, x);
+    dynamic x = _data[0];
+    dynamic y = _data[1];
+    dynamic z = _data[2];
+    dynamic rho = math.sqrt(x * x + y * y);
+    dynamic phi = math.atan2(y, x);
     return [rho, phi, z];
   }
 
@@ -446,14 +448,14 @@ class Vector extends IterableMixin<num> {
   /// print(v.toPolar());
   /// // Output: [1.4142135623730951, 0.7853981633974483]
   /// ```
-  List<double> toPolar() {
+  List toPolar() {
     if (length != 2) {
       throw Exception("Vector must be 2D for conversion to Polar coordinates");
     }
-    double x = _data[0].toDouble();
-    double y = _data[1].toDouble();
-    double r = math.sqrt(x * x + y * y);
-    double theta = math.atan2(y, x);
+    dynamic x = _data[0];
+    dynamic y = _data[1];
+    dynamic r = math.sqrt(x * x + y * y);
+    dynamic theta = math.atan2(y, x);
     return [r, theta];
   }
 
@@ -519,7 +521,8 @@ class Vector extends IterableMixin<num> {
       maxAllowedIndex['z'] = -1;
     }
 
-    List<num> mappedComponents = List.filled(mapping.length, 0.0);
+    List<dynamic> mappedComponents =
+        List.filled(mapping.length, Complex.zero());
 
     for (int i = 0; i < mapping.length; i++) {
       String component = mapping[i];
@@ -591,7 +594,7 @@ class Vector extends IterableMixin<num> {
       throw Exception('Indices are out of range');
     }
 
-    List<num> newValues = indices_.map((i) => _data[i]).toList();
+    List newValues = indices_.map((i) => _data[i]).toList();
 
     switch (newValues.length) {
       case 2:
@@ -613,17 +616,17 @@ class Vector extends IterableMixin<num> {
 
   /// Adds a new value at the end of the row.
   void push(num value) {
-    _data.add(value);
+    _data.add(Complex(value));
   }
 
   /// Removes the last value in the row.
-  num pop() {
+  dynamic pop() {
     return _data.removeLast();
   }
 
   /// Adds a new value at the beginning of the row.
   void unShift(num value) {
-    _data.insert(0, value);
+    _data.insert(0, Complex(value));
   }
 
   /// Removes the first value in the row.
@@ -655,7 +658,7 @@ class Vector extends IterableMixin<num> {
   }
 
   /// Private helper function to flatten the array
-  List<num> _rollFlat(List<dynamic> array, int shift) {
+  List _rollFlat(List<dynamic> array, int shift) {
     int n = array.length;
     shift = ((shift % n) + n) % n; // Handle negative shifts
     return [...array.sublist(n - shift), ...array.sublist(0, n - shift)];
@@ -722,7 +725,7 @@ class Vector extends IterableMixin<num> {
     return Matrix.fromFlattenedList(_data, rows, cols);
   }
 
-  Point toPoint() => Point.fromList(_data);
+  Point toPoint() => Point.fromList(_data.map((e) => numberToNum(e)).toList());
 
   @override
   String toString() {

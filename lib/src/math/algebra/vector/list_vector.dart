@@ -69,7 +69,7 @@ extension ListVector on List<num> {
 
   /// This function creates a new list where the elements are shifted by [shift] positions.
   /// Elements that are shifted off the end of the list wrap around to the beginning.
-  List<num> roll(dynamic shift) => Vector(this).roll(shift).toList();
+  List<dynamic> roll(dynamic shift) => Vector(this).roll(shift).toList();
 
   /// Calculates the dot product of the list with another list or vector.
   double dot(dynamic other) =>

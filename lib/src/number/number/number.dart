@@ -151,8 +151,8 @@ abstract class Number implements Comparable<dynamic> {
       return n;
     }
     if (n is Complex) {
-      final realZero =
-          n.real.value == 0 && (n.real is! Precision || n.real == Precision.zero);
+      final realZero = n.real.value == 0 &&
+          (n.real is! Precision || n.real == Precision.zero);
       final imagZero = n.imag.value.value.toDouble() == 0 &&
           (n.imag.value is! Precision || n.imag.value == Precision.zero);
       if (realZero) {
@@ -240,7 +240,10 @@ abstract class Number implements Comparable<dynamic> {
 
   /// Find the square root of the number
   Number pow(num exponent) {
-    if (this is Integer || this is Precision || this is Double || this is Real) {
+    if (this is Integer ||
+        this is Precision ||
+        this is Double ||
+        this is Real) {
       return numToNumber(math.pow(numberToNum(this), exponent));
     } else if (this is Imaginary) {
       return Complex.num(Integer.zero, this as Imaginary).pow(exponent);
@@ -251,7 +254,10 @@ abstract class Number implements Comparable<dynamic> {
 
   /// Find the square root of the number
   Number sqrt() {
-    if (this is Integer || this is Precision || this is Double || this is Real) {
+    if (this is Integer ||
+        this is Precision ||
+        this is Double ||
+        this is Real) {
       var re = math.sqrt(numberToNum(this));
       return re is num ? numToNumber(re) : re;
     } else if (this is Imaginary) {
@@ -264,7 +270,10 @@ abstract class Number implements Comparable<dynamic> {
   /// Get the nth root of the number
   dynamic nthRoot(double nth, {bool allRoots = false}) {
     Complex complex = Complex.zero();
-    if (this is Integer || this is Precision || this is Double || this is Real) {
+    if (this is Integer ||
+        this is Precision ||
+        this is Double ||
+        this is Real) {
       complex = Complex.fromReal(numberToNum(this));
     }
     if (this is Imaginary) {
@@ -313,12 +322,15 @@ abstract class Number implements Comparable<dynamic> {
 
   /// Returns the natural exponentiation of a number.
   Number exp() {
-    if (this is Integer || this is Precision || this is Double || this is Real) {
+    if (this is Integer ||
+        this is Precision ||
+        this is Double ||
+        this is Real) {
       return math.exp(numberToNum(this));
     } else if (this is Imaginary) {
       return Complex.num(Integer.zero, this as Imaginary).exp();
     } else {
-      return (this as Complex).exp();
+      return Complex(this).exp();
     }
   }
 

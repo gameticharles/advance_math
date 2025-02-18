@@ -3,7 +3,7 @@ part of '../../algebra.dart';
 /// Class to store eigenvalues and eigenvectors of a matrix.
 class Eigen {
   /// List of eigenvalues.
-  final List<double> values;
+  final List<dynamic> values;
 
   /// List of eigenvectors, each represented as a column matrix.
   final List<Matrix> vectors;
@@ -32,14 +32,14 @@ class Eigen {
   /// Verifies the eigenvalues and eigenvectors by checking if A * x = λ * x
   /// for all eigenvalue-eigenvector pairs. Returns true if the verification
   /// is successful within the specified tolerance.
-  bool verify(Matrix A, {double tolerance = 1e-6}) {
+  bool verify(Matrix A, {num tolerance = 1e-6}) {
     for (int i = 0; i < vectors.length; i++) {
       Matrix eigenvector = vectors[i];
       Matrix ax = A * eigenvector;
       Matrix lambdaX = eigenvector * values[i];
       Matrix residual = ax - lambdaX;
 
-      if (residual.norm(Norm.chebyshev) > tolerance) {
+      if (residual.norm(Norm.chebyshev) > Complex(tolerance)) {
         return false;
       }
     }

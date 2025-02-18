@@ -142,10 +142,16 @@ class ExpressionParser {
 
   // This function is responsible for gobbling an individual expression,
   // e.g. `1`, `1+2`, `a+(b*2)-Math.sqrt(2)`
-  Parser<String> get binaryOperation => binaryOperations.keys
-      .map<Parser<String>>((v) => string(v))
-      .reduce((a, b) => (a | b).cast<String>())
-      .trim();
+  Parser<String> get binaryOperation {
+    // Order operators by descending length to avoid partial matches
+    final sortedOps = binaryOperations.keys.toList()
+      ..sort((a, b) => b.length.compareTo(a.length));
+
+    return sortedOps
+        .map<Parser<String>>((v) => string(v))
+        .reduce((a, b) => (a | b).cast<String>())
+        .trim();
+  }
 
   Parser<Expression> get binaryExpression =>
       token.separatedBy(binaryOperation).map((elements) {
@@ -199,33 +205,7 @@ class ExpressionParser {
   // Values are set to `true` (it really doesn't matter)
   static const _unaryOperations = ['-', '!', '~', '+'];
 
-  // Parser<UnaryExpression> get unaryExpression {
-  //   // Prefix unary operators
-  //   final prefixUnary = (_unaryOperations
-  //           .map((op) => string(op).trim())
-  //           .reduce((a, b) => (a.or(b).cast())))
-  //       .seq(token)
-  //       .map((List<dynamic> parts) {
-  //     final op = parts[0] as String;
-  //     final operand = parts[1] as Expression;
-  //     return UnaryExpression(op, operand, prefix: true);
-  //   });
-
-  //   // Suffix unary operators
-  //   final suffixUnary = token
-  //       .seq((_unaryOperations
-  //           .map((op) => string(op).trim())
-  //           .reduce((a, b) => (a.or(b).cast()))))
-  //       .map((List<dynamic> parts) {
-  //     final operand = parts[0] as Expression;
-  //     final op = parts[1] as String;
-  //     return UnaryExpression(op, operand, prefix: false);
-  //   });
-
-  //   // Combine prefix and suffix unary operators
-  //   return (prefixUnary | suffixUnary).cast();
-  // }
-
+  Parser<void> _lookahead(Parser parser) => parser.and();
   Parser<UnaryExpression> get unaryExpression {
     // Operand parser: Matches numbers and booleans
     final operandParser = (string('true').map((_) => Literal(true)) |
@@ -235,7 +215,13 @@ class ExpressionParser {
 
     // Operator parser
     final operatorParser = _unaryOperations
-        .map<Parser<String>>((op) => string(op))
+        .map<Parser<String>>((op) {
+          // Special handling for factorial to avoid conflict with !=
+          if (op == '!') {
+            return string('!').seq(_lookahead(char('=').not())).map((_) => '!');
+          }
+          return string(op);
+        })
         .reduce((a, b) => (a | b).cast())
         .trim();
 

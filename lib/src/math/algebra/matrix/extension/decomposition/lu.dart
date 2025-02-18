@@ -25,7 +25,7 @@ class LU {
   /// - [_m] column dimension.
   /// - [_n] row dimension.
   /// - [_pivsign] pivot sign.
-  int _m = 0, _n = 0, _pivsign = 1;
+  int _m = 0, _n = 0;  Number _pivsign = Complex.one();
 
   /// Internal storage of pivot vector.
   /// - [_piv] pivot vector.
@@ -39,16 +39,16 @@ class LU {
   /// - [A] Rectangular matrix
   LU(Matrix A) {
     // Use a "left-looking", dot-product, Crout/Doolittle algorithm.
-    luMatrix = _Utils.toNumMatrix(A.copy());
+    luMatrix = A.copy();
     _m = A.rowCount;
     _n = A.columnCount;
-    _piv = Matrix.fill(1, _m, 0.0);
+    _piv = Matrix.zeros(1, _m);
     for (var i = 0; i < _m; i++) {
-      _piv[0][i] = i.toDouble();
+      _piv[0][i] = i;
     }
-    _pivsign = 1;
+    _pivsign = Complex.one();
     Matrix luRowI = Matrix();
-    var luColJ = Matrix.fill(_m, 1, 0.0);
+    var luColJ = Matrix.zeros(_m, 1);
 
     // Outer loop.
 
@@ -67,7 +67,7 @@ class LU {
         // Most of the time is spent in the following dot product.
 
         var kmax = math.min(i, j);
-        var s = 0.0;
+        dynamic s = Complex.zero();
         for (var k = 0; k < kmax; k++) {
           s += luRowI[0][k] * luColJ[k][0];
         }
@@ -79,7 +79,7 @@ class LU {
 
       var p = j;
       for (var i = j + 1; i < _m; i++) {
-        if ((luColJ[i][0] as num).abs() > (luColJ[p][0] as num).abs()) {
+        if (luColJ[i][0].abs() > luColJ[p][0].abs()) {
           p = i;
         }
       }
@@ -89,14 +89,14 @@ class LU {
           luMatrix[p][k] = luMatrix[j][k];
           luMatrix[j][k] = t;
         }
-        var k = (_piv[0][p] as num).toDouble();
+        var k = _piv[0][p];
         _piv[0][p] = _piv[0][j];
         _piv[0][j] = k;
         _pivsign = -_pivsign;
       }
 
       // Compute multipliers.
-      if (j < _m && luMatrix[j][j] != 0.0) {
+      if (j < _m && luMatrix[j][j] != Complex.zero()) {
         for (var i = j + 1; i < _m; i++) {
           luMatrix[i][j] /= luMatrix[j][j];
         }
@@ -162,7 +162,7 @@ class LU {
 //#region Public Methods
   /// Is the matrix nonsingular?
   /// return true if U, and hence A, is nonsingular.
-  bool isNonsingular() {
+  bool isNonSingular() {
     for (var j = 0; j < _n; j++) {
       if (luMatrix[j][j] == 0) {
         return false;
@@ -174,15 +174,15 @@ class LU {
   /// Return lower triangular factor
   /// return  L
   Matrix L() {
-    var L = Matrix.fill(_m, _n, 0.0);
+    var L = Matrix.zeros(_m, _n);
     for (var i = 0; i < _m; i++) {
       for (var j = 0; j < _n; j++) {
         if (i > j) {
           L[i][j] = luMatrix[i][j];
         } else if (i == j) {
-          L[i][j] = 1.0;
+          L[i][j] = Complex.one();
         } else {
-          L[i][j] = 0.0;
+          L[i][j] = Complex.zero();
         }
       }
     }
@@ -198,7 +198,7 @@ class LU {
         if (i <= j) {
           U[i][j] = luMatrix[i][j];
         } else {
-          U[i][j] = 0.0;
+          U[i][j] = Complex.zero();
         }
       }
     }
@@ -228,11 +228,11 @@ class LU {
   /// Determinant
   /// return det(A)
   /// exception FormatException Matrix must be square
-  double det() {
+  dynamic det() {
     if (_m != _n) {
       throw FormatException('Matrix must be square.');
     }
-    var d = _pivsign.toDouble();
+    var d = _pivsign;
     for (var j = 0; j < _n; j++) {
       d *= luMatrix[j][j];
     }
@@ -247,14 +247,14 @@ class LU {
     if (B.rowCount != _m) {
       throw FormatException('Matrix row dimensions must agree.');
     }
-    if (!isNonsingular()) {
+    if (!isNonSingular()) {
       throw FormatException('Matrix is singular.');
     }
 
     // Copy right hand side with pivoting
     var nx = B.columnCount;
     var X = B.subMatrix(
-        rowIndices: _piv.flatten().map((e) => (e as num).toInt()).toList(),
+        rowIndices: _piv.flatten().map((e) => (e as Number).toInt()).toList(),
         colStart: 0,
         colEnd: nx - 1);
 

@@ -54,14 +54,14 @@ class SVD {
       _m = mat.columnCount;
       _n = mat.columnCount;
 
-      A = Matrix.fill(_m, _n, 0.0);
+      A = Matrix.zeros(_m, _n);
       A.copyFrom(mat, retainSize: true);
     } else if (_m > _n) {
       specialCaseMoreRows = true;
       _m = mat.rowCount;
       _n = mat.rowCount;
 
-      A = Matrix.fill(_m, _n, 0.0);
+      A = Matrix.zeros(_m, _n);
       A.copyFrom(mat, retainSize: true);
     } else {
       A = mat.copy();
@@ -69,12 +69,12 @@ class SVD {
 
     A = _Utils.toNumMatrix(A);
 
-    var nu = math.max(_m, _n).toInt();
-    _s = Matrix.fill(1, math.min(_m + 1, _n), 0.0);
-    _u = Matrix.fill(_m, nu, 0.0);
-    _v = Matrix.fill(_n, _n, 0.0);
-    var e = Matrix.fill(1, _n, 0.0);
-    var work = Matrix.fill(1, _m, 0.0);
+    var nu = math.max(_m, _n);
+    _s = Matrix.zeros(1, math.min(_m + 1, _n));
+    _u = Matrix.zeros(_m, nu);
+    _v = Matrix.zeros(_n, _n);
+    var e = Matrix.zeros(1, _n);
+    var work = Matrix.zeros(1, _m);
     var wantu = true;
     var wantv = true;
 
@@ -88,26 +88,26 @@ class SVD {
         // Compute the transformation for the k-th column and
         // place the k-th diagonal in s[k].
         // Compute 2-norm of k-th column without under/overflow.
-        _s[0][k] = 0.0;
+        _s[0][k] = Complex.zero();
         for (var i = k; i < _m; i++) {
           _s[0][k] = hypotenuse(_s[0][k], A[i][k]);
         }
-        if (_s[0][k] != 0.0) {
-          if (A[k][k] < 0.0) {
+        if (_s[0][k] != Complex.zero()) {
+          if (A[k][k] < Complex.zero()) {
             _s[0][k] = -_s[0][k];
           }
           for (var i = k; i < _m; i++) {
             A[i][k] /= _s[0][k];
           }
-          A[k][k] += 1.0;
+          A[k][k] += Complex.one();
         }
         _s[0][k] = -_s[0][k];
       }
       for (var j = k + 1; j < _n; j++) {
-        if ((k < nct) && (_s[0][k] != 0.0)) {
+        if ((k < nct) && (_s[0][k] != Complex.zero())) {
           // Apply the transformation.
 
-          var t = 0.0;
+          Number t = Complex.zero();
           for (var i = k; i < _m; i++) {
             t += A[i][k] * A[i][j];
           }
@@ -134,25 +134,25 @@ class SVD {
         // Compute the k-th row transformation and place the
         // k-th super-diagonal in e[0][k].
         // Compute 2-norm without under/overflow.
-        e[0][k] = 0.0;
+        e[0][k] = Complex.zero();
         for (var i = k + 1; i < _n; i++) {
           e[0][k] = hypotenuse(e[0][k], e[0][i]);
         }
-        if (e[0][k] != 0.0) {
-          if (e[0][k + 1] < 0.0) {
+        if (e[0][k] != Complex.zero()) {
+          if (e[0][k + 1] < Complex.zero()) {
             e[0][k] = -e[0][k];
           }
           for (var i = k + 1; i < _n; i++) {
             e[0][i] /= e[0][k];
           }
-          e[0][k + 1] += 1.0;
+          e[0][k + 1] += Complex.one();
         }
         e[0][k] = -e[0][k];
-        if ((k + 1 < _m) && (e[0][k] != 0.0)) {
+        if ((k + 1 < _m) && (e[0][k] != Complex.zero())) {
           // Apply the transformation.
 
           for (var i = k + 1; i < _m; i++) {
-            work[0][i] = 0.0;
+            work[0][i] = Complex.zero();
           }
           for (var j = k + 1; j < _n; j++) {
             for (var i = k + 1; i < _m; i++) {
@@ -184,26 +184,26 @@ class SVD {
       _s[0][nct] = A[nct][nct];
     }
     if (_m < p) {
-      _s[0][p - 1] = 0.0;
+      _s[0][p - 1] = Complex.zero();
     }
     if (nrt + 1 < p) {
       e[0][nrt] = A[nrt][p - 1];
     }
-    e[0][p - 1] = 0.0;
+    e[0][p - 1] = Complex.zero();
 
     // If required, generate U.
 
     if (wantu) {
       for (var j = nct; j < nu; j++) {
         for (var i = 0; i < _m; i++) {
-          _u[i][j] = 0.0;
+          _u[i][j] = Complex.zero();
         }
-        _u[j][j] = 1.0;
+        _u[j][j] = Complex.one();
       }
       for (var k = nct - 1; k >= 0; k--) {
-        if (_s[0][k] != 0.0) {
+        if (_s[0][k] != Complex.zero()) {
           for (var j = k + 1; j < nu; j++) {
-            var t = 0.0;
+            Number t = Complex.zero();
             for (var i = k; i < _m; i++) {
               t += _u[i][k] * _u[i][j];
             }
@@ -215,15 +215,15 @@ class SVD {
           for (var i = k; i < _m; i++) {
             _u[i][k] = -_u[i][k];
           }
-          _u[k][k] = 1.0 + _u[k][k];
+          _u[k][k] = Complex.one() + _u[k][k];
           for (var i = 0; i < k - 1; i++) {
-            _u[i][k] = 0.0;
+            _u[i][k] = Complex.zero();
           }
         } else {
           for (var i = 0; i < _m; i++) {
-            _u[i][k] = 0.0;
+            _u[i][k] = Complex.zero();
           }
-          _u[k][k] = 1.0;
+          _u[k][k] = Complex.one();
         }
       }
     }
@@ -232,9 +232,9 @@ class SVD {
 
     if (wantv) {
       for (var k = _n - 1; k >= 0; k--) {
-        if ((k < nrt) && (e[0][k] != 0.0)) {
+        if ((k < nrt) && (e[0][k] != Complex.zero())) {
           for (var j = k + 1; j < nu; j++) {
-            var t = 0.0;
+            Number t = Complex.zero();
             for (var i = k + 1; i < _n; i++) {
               t += _v[i][k] * _v[i][j];
             }
@@ -245,9 +245,9 @@ class SVD {
           }
         }
         for (var i = 0; i < _n; i++) {
-          _v[i][k] = 0.0;
+          _v[i][k] = Complex.zero();
         }
-        _v[k][k] = 1.0;
+        _v[k][k] = Complex.one();
       }
     }
 
@@ -255,8 +255,8 @@ class SVD {
 
     var pp = p - 1;
     var iter = 0;
-    var eps = math.pow(2.0, -52.0).toDouble();
-    var tiny = math.pow(2.0, -966.0).toDouble();
+    var eps = Complex(math.pow(2.0, -52.0));
+    var tiny = Complex(math.pow(2.0, -966.0));
     while (p > 0) {
       int k, kase;
 
@@ -275,11 +275,9 @@ class SVD {
         if (k == -1) {
           break;
         }
-        if ((e[0][k] as num).abs() <=
-            (tiny +
-                (eps *
-                    ((_s[0][k] as num).abs() + (_s[0][k + 1] as num).abs())))) {
-          e[0][k] = 0.0;
+        if (e[0][k].abs() <=
+            (tiny + (eps * (_s[0][k].abs() + _s[0][k + 1].abs())))) {
+          e[0][k] = Complex.zero();
           break;
         }
       }
@@ -291,10 +289,10 @@ class SVD {
           if (ks == k) {
             break;
           }
-          var t = (ks != p ? (e[0][ks] as num).abs() : 0.0) +
-              (ks != k + 1 ? (e[0][ks - 1] as num).abs() : 0.0);
-          if ((_s[0][ks] as num).abs() <= (tiny + (eps * t))) {
-            _s[0][ks] = 0.0;
+          var t = (ks != p ? e[0][ks].abs() : Complex.zero()) +
+              (ks != k + 1 ? e[0][ks - 1].abs() : Complex.zero());
+          if (_s[0][ks].abs() <= (tiny + (eps * t))) {
+            _s[0][ks] = Complex.zero();
             break;
           }
         }
@@ -317,7 +315,7 @@ class SVD {
         case 1:
           {
             var f = e[0][p - 2];
-            e[0][p - 2] = 0.0;
+            e[0][p - 2] = Complex.zero();
             for (var j = p - 2; j >= k; j--) {
               var t = hypotenuse(_s[0][j], f);
               var cs = _s[0][j] / t;
@@ -343,7 +341,7 @@ class SVD {
         case 2:
           {
             var f = e[0][k - 1];
-            e[0][k - 1] = 0.0;
+            e[0][k - 1] = Complex.zero();
             for (var j = k; j < p; j++) {
               var t = hypotenuse(_s[0][j], f);
               var cs = _s[0][j] / t;
@@ -370,12 +368,10 @@ class SVD {
 
             var scale = math.max(
                 math.max(
-                    math.max(
-                        math.max((_s[0][p - 1] as num).abs(),
-                            (_s[0][p - 2] as num).abs()),
-                        (e[0][p - 2] as num).abs()),
-                    (_s[0][k] as num).abs()),
-                (e[0][k] as num).abs());
+                    math.max(math.max(_s[0][p - 1].abs(), _s[0][p - 2].abs()),
+                        e[0][p - 2].abs()),
+                    _s[0][k].abs()),
+                e[0][k].abs());
             var sp = _s[0][p - 1] / scale;
             var spm1 = _s[0][p - 2] / scale;
             var epm1 = e[0][p - 2] / scale;
@@ -383,10 +379,10 @@ class SVD {
             var ek = e[0][k] / scale;
             var b = ((spm1 + sp) * (spm1 - sp) + (epm1 * epm1)) / 2.0;
             var c = (sp * epm1) * (sp * epm1);
-            var shift = 0.0;
-            if ((b != 0.0) | (c != 0.0)) {
+            Number shift = Complex.zero();
+            if ((b != Complex.zero()) | (c != Complex.zero())) {
               shift = math.sqrt((b * b) + c);
-              if (b < 0.0) {
+              if (b < Complex.zero()) {
                 shift = -shift;
               }
               shift = c / (b + shift);
@@ -440,8 +436,9 @@ class SVD {
           {
             // Make the singular values positive.
 
-            if (_s[0][k] <= 0.0) {
-              _s[0][k] = (_s[0][k] < 0.0 ? -_s[0][k] : 0.0);
+            if (_s[0][k] <= Complex.zero()) {
+              _s[0][k] =
+                  (_s[0][k] < Complex.zero() ? -_s[0][k] : Complex.zero());
               if (wantv) {
                 for (var i = 0; i <= pp; i++) {
                   _v[i][k] = -_v[i][k];
@@ -456,7 +453,7 @@ class SVD {
                 break;
               }
               var t = _s[0][k];
-              _s[0][k] = _s[k + 1];
+              _s[0][k] = _s[0][k + 1];
               _s[0][k + 1] = t;
               if (wantv && (k < _n - 1)) {
                 for (var i = 0; i < _n; i++) {
@@ -514,7 +511,7 @@ class SVD {
   /// Check if a is an Odd number.
   bool isOdd(int a) => a % 2 != 0;
 
-  double hypotenuse(num x, num y) {
+  dynamic hypotenuse(dynamic x, dynamic y) {
     return math.sqrt(math.pow(x, 2) + math.pow(y, 2));
   }
 
@@ -547,11 +544,9 @@ class SVD {
 
   /// Two norm condition number
   /// return max(S)/min(S)
-  double cond() {
+  dynamic cond() {
     return _s[0][0] / _s[0][math.min(_m, _n) - 1];
   }
 
 //#endregion
 }
-
-

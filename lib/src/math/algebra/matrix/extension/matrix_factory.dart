@@ -23,8 +23,8 @@ class MatrixFactory {
   /// Matrix A = Matrix.tridiagonal(n, a, b, c);
   /// ```
   Matrix tridiagonal(int n, double a, double b, double c) {
-    List<List<double>> data =
-        List.generate(n, (_) => List<double>.filled(n, 0));
+    List<List<dynamic>> data =
+        List.generate(n, (_) => List<dynamic>.filled(n, Complex.zero()));
 
     for (int i = 0; i < n; i++) {
       if (i - 1 >= 0) {
@@ -105,8 +105,11 @@ class MatrixFactory {
     }
 
     // Generate matrix with appropriate type of zeros
-    List<List<dynamic>> data = List.generate(rowCount,
-        (_) => List.filled(columnCount, isDouble ? 0.0 : 0, growable: false));
+    List<List<Number>> data = List.generate(
+        rowCount,
+        (_) => List.filled(
+            columnCount, isDouble ? Complex(0.0, 0.0) : Complex(0, 0),
+            growable: false));
 
     switch (type) {
       case MatrixType.square:
@@ -117,8 +120,9 @@ class MatrixFactory {
         for (int i = 0; i < rowCount; i++) {
           for (int j = 0; j < columnCount; j++) {
             data[i][j] = isDouble
-                ? random.nextDouble() * (max - min) + min
-                : random.nextInt(max.toInt() - min.toInt()) + min.toInt();
+                ? Complex(random.nextDouble() * (max - min) + min)
+                : Complex(
+                    random.nextInt(max.toInt() - min.toInt()) + min.toInt());
           }
         }
         break;
@@ -126,15 +130,21 @@ class MatrixFactory {
       case MatrixType.upperTriangular:
         data = List.generate(
             rowCount,
-            (_) => List.generate(columnCount,
-                (j) => j >= _ ? random!.nextDouble() * (max - min) + min : 0));
+            (_) => List.generate(
+                columnCount,
+                (j) => j >= _
+                    ? Complex(random!.nextDouble() * (max - min) + min)
+                    : Complex(0, 0)));
         break;
 
       case MatrixType.lowerTriangular:
         data = List.generate(
             rowCount,
-            (_) => List.generate(columnCount,
-                (j) => j <= _ ? random!.nextDouble() * (max - min) + min : 0));
+            (_) => List.generate(
+                columnCount,
+                (j) => j <= _
+                    ? Complex(random!.nextDouble() * (max - min) + min)
+                    : Complex(0, 0)));
         break;
 
       case MatrixType.symmetric:
@@ -146,8 +156,9 @@ class MatrixFactory {
         for (int i = 0; i < rowCount; i++) {
           for (int j = i; j < columnCount; j++) {
             final value = isDouble
-                ? random.nextDouble() * (max - min) + min
-                : random.nextInt(max.toInt() - min.toInt()) + min.toInt();
+                ? Complex(random.nextDouble() * (max - min) + min)
+                : Complex(
+                    random.nextInt(max.toInt() - min.toInt()) + min.toInt());
             data[i][j] = value;
             data[j][i] = value;
           }
@@ -163,8 +174,9 @@ class MatrixFactory {
           for (int j = 0; j < columnCount; j++) {
             if (i == j || (i - j).abs() == 1) {
               data[i][j] = isDouble
-                  ? random.nextDouble() * (max - min) + min
-                  : random.nextInt(max.toInt() - min.toInt()) + min.toInt();
+                  ? Complex(random.nextDouble() * (max - min) + min)
+                  : Complex(
+                      random.nextInt(max.toInt() - min.toInt()) + min.toInt());
             }
           }
         }
@@ -177,8 +189,9 @@ class MatrixFactory {
 
         List<dynamic> firstRow = List.generate(columnCount, (_) {
           return isDouble
-              ? random!.nextDouble() * (max - min) + min
-              : random!.nextInt(max.toInt() - min.toInt()) + min.toInt();
+              ? Complex(random!.nextDouble() * (max - min) + min)
+              : Complex(
+                  random!.nextInt(max.toInt() - min.toInt()) + min.toInt());
         });
         for (int i = 0; i < rowCount; i++) {
           for (int j = 0; j < columnCount; j++) {
@@ -195,15 +208,18 @@ class MatrixFactory {
 
         List<List<dynamic>> lowerTriangular = List.generate(
             rowCount,
-            (_) => List.generate(columnCount,
-                (j) => j <= _ ? random!.nextDouble() * (max - min) + min : 0));
+            (_) => List.generate(
+                columnCount,
+                (j) => j <= _
+                    ? Complex(random!.nextDouble() * (max - min) + min)
+                    : Complex(0, 0)));
         for (int i = 0; i < rowCount; i++) {
           for (int j = 0; j < columnCount; j++) {
-            double sum = 0;
+            dynamic sum = Complex.zero();
             for (int k = 0; k <= j; k++) {
               sum += lowerTriangular[i][k] * lowerTriangular[j][k];
             }
-            data[i][j] = (i == j ? -1 : 1) * sum;
+            data[i][j] = (i == j ? -Complex(1) : Complex(1)) * sum;
           }
         }
         break;
@@ -219,8 +235,8 @@ class MatrixFactory {
         for (int i = 0; i < rowCount; i++) {
           for (int j = 0; j < columnCount; j++) {
             data[i][j] = i == j
-                ? random.nextDouble() * (max - min) + min
-                : (i == indices[j] ? 1 : 0);
+                ? Complex(random.nextDouble() * (max - min) + min)
+                : Complex(i == indices[j] ? 1 : 0);
           }
         }
         break;
@@ -233,11 +249,14 @@ class MatrixFactory {
 
         List<List<dynamic>> lowerTriangular = List.generate(
             rowCount,
-            (_) => List.generate(columnCount,
-                (j) => j <= _ ? random!.nextDouble() * (max - min) + min : 0));
+            (_) => List.generate(
+                columnCount,
+                (j) => j <= _
+                    ? Complex(random!.nextDouble() * (max - min) + min)
+                    : Complex(0, 0)));
         for (int i = 0; i < rowCount; i++) {
           for (int j = 0; j < columnCount; j++) {
-            double sum = 0;
+            dynamic sum = Complex.zero();
             for (int k = 0; k <= j; k++) {
               sum += lowerTriangular[i][k] * lowerTriangular[j][k];
             }
@@ -256,8 +275,9 @@ class MatrixFactory {
           for (int j = i; j < columnCount; j++) {
             if (i == j) {
               final value = isDouble
-                  ? random.nextDouble() * (max - min) + min
-                  : random.nextInt(max.toInt() - min.toInt()) + min.toInt();
+                  ? numToNumber(random.nextDouble() * (max - min) + min)
+                  : numToNumber(
+                      random.nextInt(max.toInt() - min.toInt()) + min.toInt());
               data[i][j] = value;
             } else {
               final realPart = isDouble
@@ -281,8 +301,9 @@ class MatrixFactory {
           int row = random.nextInt(rowCount);
           int col = random.nextInt(columnCount);
           data[row][col] = isDouble
-              ? random.nextDouble() * (max - min) + min
-              : random.nextInt(max.toInt() - min.toInt()) + min.toInt();
+              ? Complex(random.nextDouble() * (max - min) + min)
+              : Complex(
+                  random.nextInt(max.toInt() - min.toInt()) + min.toInt());
         }
         break;
 
@@ -293,8 +314,9 @@ class MatrixFactory {
         }
         List<dynamic> firstRow = List.generate(columnCount, (_) {
           return isDouble
-              ? random!.nextDouble() * (max - min) + min
-              : random!.nextInt(max.toInt() - min.toInt()) + min.toInt();
+              ? Complex(random!.nextDouble() * (max - min) + min)
+              : Complex(
+                  random!.nextInt(max.toInt() - min.toInt()) + min.toInt());
         });
         data = List.generate(rowCount,
             (i) => List.generate(columnCount, (j) => firstRow[(j - i).abs()]));
@@ -306,17 +328,17 @@ class MatrixFactory {
           throw ArgumentError(
               "Matrix must be square for the idempotent matrix type.");
         }
-        List<List<dynamic>> orthoData = List.generate(
-            rowCount, (_) => List.filled(columnCount, 0, growable: false));
+        List<List<dynamic>> orthoData = List.generate(rowCount,
+            (_) => List.filled(columnCount, Complex.zero(), growable: false));
         for (int i = 0; i < rowCount; i++) {
           for (int j = 0; j < columnCount; j++) {
-            orthoData[i][j] = random.nextDouble() * (max - min) + min;
+            orthoData[i][j] = Complex(random.nextDouble() * (max - min) + min);
           }
         }
         Matrix orthoMatrix = Matrix(orthoData);
         Matrix orthoTransposed = orthoMatrix.transpose();
         Matrix idempotentMatrix = orthoMatrix * orthoTransposed;
-        data = idempotentMatrix._data;
+        data = _Utils.toNumList(idempotentMatrix._data);
         break;
 
       case MatrixType.hankel:
@@ -326,8 +348,9 @@ class MatrixFactory {
         }
         List<dynamic> firstColumn = List.generate(rowCount, (_) {
           return isDouble
-              ? random!.nextDouble() * (max - min) + min
-              : random!.nextInt(max.toInt() - min.toInt()) + min.toInt();
+              ? Complex(random!.nextDouble() * (max - min) + min)
+              : Complex(
+                  random!.nextInt(max.toInt() - min.toInt()) + min.toInt());
         });
         data = List.generate(
             rowCount,
@@ -342,8 +365,9 @@ class MatrixFactory {
         }
         List<dynamic> firstRow = List.generate(columnCount, (_) {
           return isDouble
-              ? random!.nextDouble() * (max - min) + min
-              : random!.nextInt(max.toInt() - min.toInt()) + min.toInt();
+              ? Complex(random!.nextDouble() * (max - min) + min)
+              : Complex(
+                  random!.nextInt(max.toInt() - min.toInt()) + min.toInt());
         });
         data = List.generate(
             rowCount,
@@ -358,8 +382,9 @@ class MatrixFactory {
         }
         List<dynamic> firstRow = List.generate(columnCount, (_) {
           return isDouble
-              ? random!.nextDouble() * (max - min) + min
-              : random!.nextInt(max.toInt() - min.toInt()) + min.toInt();
+              ? Complex(random!.nextDouble() * (max - min) + min)
+              : Complex(
+                  random!.nextInt(max.toInt() - min.toInt()) + min.toInt());
         });
         data = List.generate(rowCount,
             (i) => List.generate(columnCount, (j) => math.pow(firstRow[j], i)));
@@ -373,7 +398,7 @@ class MatrixFactory {
         List<int> indices = List.generate(columnCount, (index) => index);
         indices.shuffle(random);
         for (int i = 0; i < rowCount; i++) {
-          data[i][indices[i]] = 1;
+          data[i][indices[i]] = Complex.one();
         }
         break;
 
@@ -384,8 +409,9 @@ class MatrixFactory {
         }
         for (int i = 0; i < rowCount - 1; i++) {
           data[i][i + 1] = isDouble
-              ? random.nextDouble() * (max - min) + min
-              : random.nextInt(max.toInt() - min.toInt()) + min.toInt();
+              ? Complex(random.nextDouble() * (max - min) + min)
+              : Complex(
+                  random.nextInt(max.toInt() - min.toInt()) + min.toInt());
         }
         break;
 
@@ -396,7 +422,7 @@ class MatrixFactory {
         }
 
         for (int i = 0; i < rowCount; i++) {
-          data[i][i] = isDouble ? 1.0 : 1;
+          data[i][i] = isDouble ? Complex(1.0, 0.0) : Complex(1);
         }
         int half = (columnCount / 2).floor();
         for (int i = 0; i < half; i++) {
@@ -404,19 +430,20 @@ class MatrixFactory {
           num value = isDouble
               ? random.nextDouble() * (max - min) + min
               : random.nextInt(max.toInt() - min.toInt()) + min.toInt();
-          data[i][j] = value;
-          data[j][i] = -value;
+          data[i][j] = Complex(value);
+          data[j][i] = Complex(-value);
         }
         break;
 
       case MatrixType.diagonallyDominant:
         for (int i = 0; i < rowCount; i++) {
-          double rowSum = 0;
+          dynamic rowSum = Complex.zero();
           for (int j = 0; j < columnCount; j++) {
             if (i != j) {
               data[i][j] = isDouble
-                  ? random.nextDouble() * (max - min) + min
-                  : random.nextInt(max.toInt() - min.toInt()) + min.toInt();
+                  ? Complex(random.nextDouble() * (max - min) + min)
+                  : Complex(
+                      random.nextInt(max.toInt() - min.toInt()) + min.toInt());
               rowSum += data[i][j].abs();
             }
           }
@@ -426,12 +453,13 @@ class MatrixFactory {
 
       case MatrixType.strictlyDiagonallyDominant:
         for (int i = 0; i < rowCount; i++) {
-          double rowSum = 0;
+          dynamic rowSum = Complex.zero();
           for (int j = 0; j < columnCount; j++) {
             if (i != j) {
               data[i][j] = isDouble
-                  ? random.nextDouble() * (max - min) + min
-                  : random.nextInt(max.toInt() - min.toInt()) + min.toInt();
+                  ? Complex(random.nextDouble() * (max - min) + min)
+                  : Complex(
+                      random.nextInt(max.toInt() - min.toInt()) + min.toInt());
               rowSum += data[i][j].abs();
             }
           }
@@ -443,8 +471,10 @@ class MatrixFactory {
         break;
 
       case MatrixType.ones:
-        data = List.generate(rowCount,
-            (_) => List.generate(columnCount, (_) => isDouble ? 1.0 : 1));
+        data = List.generate(
+            rowCount,
+            (_) => List.generate(
+                columnCount, (_) => isDouble ? Complex(1.0, 0.0) : Complex(1)));
         break;
 
       case MatrixType.diagonal:
@@ -455,11 +485,12 @@ class MatrixFactory {
         for (int i = 0; i < rowCount; i++) {
           data[i][i] = value != null
               ? (value is num
-                  ? (isDouble ? value.toDouble() : value.toInt())
+                  ? Complex((isDouble ? value.toDouble() : value.toInt()))
                   : value)
               : (isDouble
-                  ? random.nextDouble() * (max - min) + min
-                  : random.nextInt(max.toInt() - min.toInt()) + min.toInt());
+                  ? Complex(random.nextDouble() * (max - min) + min)
+                  : Complex(
+                      random.nextInt(max.toInt() - min.toInt()) + min.toInt()));
         }
         break;
 
@@ -469,7 +500,7 @@ class MatrixFactory {
               "Matrix must be square for the identity matrix type.");
         }
         for (int i = 0; i < rowCount; i++) {
-          data[i][i] = isDouble ? 1.0 : 1;
+          data[i][i] = isDouble ? Complex(1.0) : Complex(1);
         }
 
         break;
@@ -482,11 +513,12 @@ class MatrixFactory {
             columnCount,
             (_) => value != null
                 ? (value is num
-                    ? (isDouble ? value.toDouble() : value.toInt())
+                    ? Complex(isDouble ? value.toDouble() : value.toInt())
                     : value)
                 : (isDouble
-                    ? random!.nextDouble() * (max - min) + min
-                    : random!.nextInt(max.toInt() - min.toInt()) + min.toInt()),
+                    ? Complex(random!.nextDouble() * (max - min) + min)
+                    : Complex(random!.nextInt(max.toInt() - min.toInt()) +
+                        min.toInt())),
           ),
         );
     }

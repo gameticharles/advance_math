@@ -82,7 +82,7 @@ extension MatrixStructure on Matrix {
     safelyAdd('Vandermonde Matrix', isVandermondeMatrix);
     safelyAdd('Permutation Matrix', isPermutationMatrix);
     safelyAdd('Nilpotent Matrix', isNilpotentMatrix);
-    safelyAdd('Involutary Matrix', isInvolutaryMatrix);
+    safelyAdd('Involutary Matrix', isInvolutoryMatrix);
     safelyAdd('Idempotent Matrix', isIdempotentMatrix);
     safelyAdd('Tridiagonal Matrix', isTridiagonal);
     safelyAdd('Hermitian Matrix', isHermitianMatrix);
@@ -119,14 +119,14 @@ extension MatrixStructure on Matrix {
     int n = rows.length;
 
     // Compute sum of first row
-    num sum = 0;
+    dynamic sum = Complex.zero();
     for (int i = 0; i < n; i++) {
       sum += _data[0][i];
     }
 
     // Check rows and columns
     for (int i = 0; i < n; i++) {
-      num rowSum = 0, colSum = 0;
+      dynamic rowSum = Complex.zero(), colSum = Complex.zero();
       for (int j = 0; j < n; j++) {
         rowSum += _data[i][j];
         colSum += _data[j][i];
@@ -138,7 +138,7 @@ extension MatrixStructure on Matrix {
     }
 
     // Check main diagonal
-    num diagSum1 = 0;
+    dynamic diagSum1 = Complex.zero();
     for (int i = 0; i < n; i++) {
       diagSum1 += _data[i][i];
     }
@@ -148,7 +148,7 @@ extension MatrixStructure on Matrix {
     }
 
     // Check other diagonal
-    num diagSum2 = 0;
+    dynamic diagSum2 = Complex.zero();
     for (int i = 0; i < n; i++) {
       diagSum2 += _data[i][n - 1 - i];
     }
@@ -181,14 +181,14 @@ extension MatrixStructure on Matrix {
   /// print(A.isAlmostEqual(B, tolerance: 1e-5)); // Output: true
   /// print(A.isAlmostEqual(B, tolerance: 1e-6)); // Output: false
   ///```
-  bool isAlmostEqual(Matrix other, {double tolerance = 1e-10}) {
+  bool isAlmostEqual(Matrix other, {num tolerance = 1e-10}) {
     if (rowCount != other.rowCount || columnCount != other.columnCount) {
       return false;
     }
 
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
-        if (((this[i][j] as num) - (other[i][j] as num)).abs() > tolerance) {
+        if ((this[i][j] - other[i][j]).abs() > Complex(tolerance)) {
           return false;
         }
       }
@@ -202,7 +202,7 @@ extension MatrixStructure on Matrix {
   /// A square matrix is unitary if its conjugate transpose (also known as adjoint)
   /// is equal to its inverse. In other words, for a matrix A, if A * A.conjugateTranspose()
   /// equals the identity matrix, then A is unitary.
-  bool isUnitaryMatrix({double tolerance = 1e-12}) {
+  bool isUnitaryMatrix({num tolerance = 1e-12}) {
     if (!isSquareMatrix()) {
       return false;
     }
@@ -213,11 +213,11 @@ extension MatrixStructure on Matrix {
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
         if (i == j) {
-          if ((product[i][j] - 1 as num).abs() > tolerance) {
+          if (product[i][j] - 1.abs() > Complex(tolerance)) {
             return false;
           }
         } else {
-          if (product[i][j].abs() > tolerance) {
+          if (product[i][j].abs() > Complex(tolerance)) {
             return false;
           }
         }
@@ -230,7 +230,7 @@ extension MatrixStructure on Matrix {
   ///
   /// A matrix is bidiagonal if all its elements are zero except for the elements
   /// on its main diagonal and the first superdiagonal (the diagonal just above the main diagonal).
-  bool isBidiagonalMatrix({double tolerance = 1e-12}) {
+  bool isBidiagonalMatrix({num tolerance = 1e-12}) {
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
         if (i != j && i != j - 1) {
@@ -252,10 +252,10 @@ extension MatrixStructure on Matrix {
   /// Default value for [tolerance] is 1e-10.
   ///
   /// Returns `true` if the matrix is tridiagonal, `false` otherwise.
-  bool isToeplitzMatrix({double tolerance = 1e-10}) {
+  bool isToeplitzMatrix({num tolerance = 1e-10}) {
     for (int i = 0; i < rowCount - 1; i++) {
       for (int j = 0; j < columnCount - 1; j++) {
-        if ((_data[i][j] - _data[i + 1][j + 1]).abs() > tolerance) {
+        if ((_data[i][j] - _data[i + 1][j + 1]).abs() > Complex(tolerance)) {
           return false;
         }
       }
@@ -272,10 +272,10 @@ extension MatrixStructure on Matrix {
   /// Default value for [tolerance] is 1e-10.
   ///
   /// Returns `true` if the matrix is tridiagonal, `false` otherwise.
-  bool isHankelMatrix({double tolerance = 1e-10}) {
+  bool isHankelMatrix({num tolerance = 1e-10}) {
     for (int i = 0; i < rowCount - 1; i++) {
       for (int j = 0; j < columnCount - 1; j++) {
-        if ((_data[i + 1][j] - _data[i][j + 1]).abs() > tolerance) {
+        if ((_data[i + 1][j] - _data[i][j + 1]).abs() > Complex(tolerance)) {
           return false;
         }
       }
@@ -293,13 +293,13 @@ extension MatrixStructure on Matrix {
   /// Default value for [tolerance] is 1e-10.
   ///
   /// Returns `true` if the matrix is tridiagonal, `false` otherwise.
-  bool isCirculantMatrix({double tolerance = 1e-10}) {
+  bool isCirculantMatrix({num tolerance = 1e-10}) {
     if (!isSquareMatrix()) return false;
 
     for (int i = 0; i < rowCount - 1; i++) {
       for (int j = 0; j < columnCount - 1; j++) {
         if ((_data[i][j] - _data[i + 1][(j + 1) % columnCount]).abs() >
-            tolerance) {
+            Complex(tolerance)) {
           return false;
         }
       }
@@ -316,12 +316,12 @@ extension MatrixStructure on Matrix {
   /// Default value for [tolerance] is 1e-10.
   ///
   /// Returns `true` if the matrix is tridiagonal, `false` otherwise.
-  bool isVandermondeMatrix({double tolerance = 1e-10}) {
+  bool isVandermondeMatrix({num tolerance = 1e-10}) {
     for (int i = 0; i < rowCount - 1; i++) {
-      double ratio = _data[i + 1][0] / _data[i][0];
+      dynamic ratio = _data[i + 1][0] / _data[i][0];
       for (int j = 1; j < columnCount; j++) {
-        double currentRatio = _data[i + 1][j] / _data[i][j];
-        if ((currentRatio - ratio).abs() > tolerance) {
+        dynamic currentRatio = _data[i + 1][j] / _data[i][j];
+        if ((currentRatio - ratio).abs() > Complex(tolerance)) {
           return false;
         }
       }
@@ -339,14 +339,14 @@ extension MatrixStructure on Matrix {
   /// Default value for [tolerance] is 1e-10.
   ///
   /// Returns `true` if the matrix is tridiagonal, `false` otherwise.
-  bool isPermutationMatrix({double tolerance = 1e-10}) {
+  bool isPermutationMatrix({num tolerance = 1e-10}) {
     if (!isSquareMatrix()) return false;
 
     for (int i = 0; i < rowCount; i++) {
       int onesCount = 0;
       for (int j = 0; j < columnCount; j++) {
-        if (_data[i][j].abs() < tolerance) continue;
-        if ((_data[i][j] - 1.0).abs() < tolerance) {
+        if (_data[i][j].abs() < Complex(tolerance)) continue;
+        if ((_data[i][j] - 1.0).abs() < Complex(tolerance)) {
           onesCount++;
         } else {
           return false;
@@ -358,8 +358,8 @@ extension MatrixStructure on Matrix {
     for (int j = 0; j < columnCount; j++) {
       int onesCount = 0;
       for (int i = 0; i < rowCount; i++) {
-        if (_data[i][j].abs() < tolerance) continue;
-        if ((_data[i][j] - 1.0).abs() < tolerance) {
+        if (_data[i][j].abs() < Complex(tolerance)) continue;
+        if ((_data[i][j] - 1.0).abs() < Complex(tolerance)) {
           onesCount++;
         } else {
           return false;
@@ -376,7 +376,7 @@ extension MatrixStructure on Matrix {
   ///
   /// Parameters:
   /// - `tolerance` (optional, default = 1e-10): The tolerance used to check for equality of elements.
-  bool isHermitianMatrix({double tolerance = 1e-10}) {
+  bool isHermitianMatrix({num tolerance = 1e-10}) {
     if (!isSquareMatrix()) {
       return false;
     }
@@ -386,12 +386,12 @@ extension MatrixStructure on Matrix {
       for (int j = i; j < n; j++) {
         Complex conjugateValue;
         if (this[j][i] is Complex) {
-          conjugateValue = (this[j][i] as Complex).conjugate;
+          conjugateValue = this[j][i].conjugate;
         } else {
           conjugateValue = this[j][i];
         }
 
-        if ((this[i][j] - conjugateValue).abs() > tolerance) {
+        if ((this[i][j] - conjugateValue).abs() > Complex(tolerance)) {
           return false;
         }
       }
@@ -405,7 +405,7 @@ extension MatrixStructure on Matrix {
   ///
   /// Parameters:
   /// - `threshold` (optional, default = 0.5): The proportion of non-zero elements required to classify a matrix as sparse.
-  bool isSparseMatrix({double threshold = 0.5}) {
+  bool isSparseMatrix({num threshold = 0.5}) {
     int nonZeroElements = 0;
     int totalElements = rowCount * columnCount;
 
@@ -417,7 +417,7 @@ extension MatrixStructure on Matrix {
       }
     }
 
-    return (nonZeroElements / totalElements) < threshold;
+    return Complex(nonZeroElements / totalElements) < Complex(threshold);
   }
 
   /// Checks if the matrix has a dominant eigenvalue.
@@ -425,17 +425,17 @@ extension MatrixStructure on Matrix {
   ///
   /// Parameters:
   /// - `tolerance` (optional, default = 1e-10): The tolerance used to check for the dominance of the eigenvalue.
-  bool hasDominantEigenvalue({double tolerance = 1e-10}) {
+  bool hasDominantEigenvalue({num tolerance = 1e-10}) {
     var eigen = this.eigen();
-    List<double> eigenvalues = eigen.values;
+    List eigenvalues = eigen.values;
 
-    double maxEigenvalue =
+    dynamic maxEigenvalue =
         eigenvalues.reduce((a, b) => a.abs() > b.abs() ? a : b);
-    double sumEigenvalues =
+    dynamic sumEigenvalues =
         eigenvalues.map((e) => e.abs()).reduce((a, b) => a + b);
 
     return (maxEigenvalue.abs() - (sumEigenvalues - maxEigenvalue.abs())) >
-        tolerance;
+        Complex(tolerance);
   }
 
   /// Checks if the matrix is a Tridiagonal matrix.
@@ -448,11 +448,11 @@ extension MatrixStructure on Matrix {
   /// Default value for [tolerance] is 1e-10.
   ///
   /// Returns `true` if the matrix is tridiagonal, `false` otherwise.
-  bool isTridiagonal({double tolerance = 1e-10}) {
+  bool isTridiagonal({num tolerance = 1e-10}) {
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
         if (i < j - 1 || i > j + 1) {
-          if ((this[i][j]).abs() > tolerance) {
+          if ((this[i][j]).abs() > Complex(tolerance)) {
             return false;
           }
         }
@@ -519,10 +519,10 @@ extension MatrixStructure on Matrix {
   /// [tolerance] is the tolerance for checking if the matrix is upper triangular.
   ///
   /// Returns true if the matrix is upper triangular within the given tolerance, false otherwise.
-  bool isUpperTriangular([double tolerance = 1e-10]) {
+  bool isUpperTriangular([num tolerance = 1e-10]) {
     for (int i = 1; i < rowCount; i++) {
       for (int j = 0; j < i; j++) {
-        if (this[i][j].abs() > tolerance) {
+        if (this[i][j].abs() > Complex(tolerance)) {
           return false;
         }
       }
@@ -535,10 +535,10 @@ extension MatrixStructure on Matrix {
   // [tolerance] is the tolerance for checking if the matrix is lower triangular.
   //
   // Returns true if the matrix is lower triangular within the given tolerance, false otherwise.
-  bool isLowerTriangular([double tolerance = 1e-10]) {
+  bool isLowerTriangular([num tolerance = 1e-10]) {
     for (int i = 0; i < rowCount - 1; i++) {
       for (int j = i + 1; j < columnCount; j++) {
-        if (this[i][j].abs() > tolerance) {
+        if (this[i][j].abs() > Complex(tolerance)) {
           return false;
         }
       }
@@ -627,12 +627,12 @@ extension MatrixStructure on Matrix {
   ///   ]);
   ///   print(A.isDiagonalMatrix()); // Output: true
   /// ```
-  bool isDiagonalMatrix({double tolerance = 1e-10}) {
+  bool isDiagonalMatrix({num tolerance = 1e-10}) {
     if (!isSquareMatrix()) return false;
 
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
-        if (i != j && this[i][j].abs() > tolerance) return false;
+        if (i != j && this[i][j].abs() > Complex(tolerance)) return false;
       }
     }
     return true;
@@ -649,13 +649,15 @@ extension MatrixStructure on Matrix {
   ///   ]);
   ///   print(A.isIdentityMatrix()); // Output: true
   /// ```
-  bool isIdentityMatrix({double tolerance = 1e-10}) {
+  bool isIdentityMatrix({num tolerance = 1e-10}) {
     if (!isSquareMatrix()) return false;
 
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
-        double expectedValue = (i == j) ? 1.0 : 0.0;
-        if ((this[i][j] - expectedValue).abs() > tolerance) return false;
+        dynamic expectedValue = (i == j) ? Complex.one() : Complex.zero();
+        if ((this[i][j] - expectedValue).abs() > Complex(tolerance)) {
+          return false;
+        }
       }
     }
     return true;
@@ -672,12 +674,12 @@ extension MatrixStructure on Matrix {
   ///   ]);
   ///   print(A.isScalarMatrix()); // Output: true
   /// ```
-  bool isScalarMatrix({double tolerance = 1e-10}) {
+  bool isScalarMatrix({num tolerance = 1e-10}) {
     if (!isDiagonalMatrix(tolerance: tolerance)) return false;
 
-    double scalarValue = this[0][0];
+    dynamic scalarValue = this[0][0];
     for (int i = 1; i < rowCount; i++) {
-      if ((this[i][i] - scalarValue).abs() > tolerance) return false;
+      if ((this[i][i] - scalarValue).abs() > Complex(tolerance)) return false;
     }
     return true;
   }
@@ -691,10 +693,10 @@ extension MatrixStructure on Matrix {
   ///   ]);
   ///   print(A.isNullMatrix()); // Output: true
   /// ```
-  bool isNullMatrix({double tolerance = 1e-10}) {
+  bool isNullMatrix({num tolerance = 1e-10}) {
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
-        if (this[i][j].abs() > tolerance) return false;
+        if (this[i][j].abs() > Complex(tolerance)) return false;
       }
     }
     return true;
@@ -710,8 +712,9 @@ extension MatrixStructure on Matrix {
   /// ]);
   /// print(A.isZeroMatrix()); // Output: true
   /// ```
-  bool isZeroMatrix({double tolerance = 1e-10}) {
-    return every((row) => row.every((element) => element.abs() <= tolerance));
+  bool isZeroMatrix({num tolerance = 1e-10}) {
+    return every(
+        (row) => row.every((element) => element.abs() <= Complex(tolerance)));
   }
 
   /// Checks if the matrix is an orthogonal matrix.
@@ -724,7 +727,7 @@ extension MatrixStructure on Matrix {
   /// ]);
   /// print(B.isOrthogonalMatrix()); // Output: true
   /// ```
-  bool isOrthogonalMatrix({double tolerance = 1e-10}) {
+  bool isOrthogonalMatrix({num tolerance = 1e-10}) {
     if (rowCount != columnCount) return false;
     Matrix product = this * transpose();
     return product.isIdentityMatrix(tolerance: tolerance);
@@ -741,7 +744,7 @@ extension MatrixStructure on Matrix {
   /// print(C.isSingularMatrix()); // Output: true
   /// ```
   bool isSingularMatrix() {
-    return determinant() == 0;
+    return determinant() == Complex.zero();
   }
 
   /// Checks if the matrix is a NonSingularMatrix matrix.
@@ -769,11 +772,11 @@ extension MatrixStructure on Matrix {
   /// ]);
   /// print(E.isSymmetricMatrix()); // Output: true
   /// ```
-  bool isSymmetricMatrix({double tolerance = 1e-10}) {
+  bool isSymmetricMatrix({num tolerance = 1e-10}) {
     if (rowCount != columnCount) return false;
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < i; j++) {
-        if ((this[i][j] - this[j][i]).abs() > tolerance) {
+        if ((this[i][j] - this[j][i]).abs() > Complex(tolerance)) {
           return false;
         }
       }
@@ -791,11 +794,11 @@ extension MatrixStructure on Matrix {
   /// ]);
   /// print(F.isSkewSymmetricMatrix()); // Output: true
   /// ```
-  bool isSkewSymmetricMatrix({double tolerance = 1e-10}) {
+  bool isSkewSymmetricMatrix({num tolerance = 1e-10}) {
     if (rowCount != columnCount) return false;
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < i; j++) {
-        if ((this[i][j] + this[j][i]).abs() > tolerance) {
+        if ((this[i][j] + this[j][i]).abs() > Complex(tolerance)) {
           return false;
         }
       }
@@ -833,9 +836,9 @@ extension MatrixStructure on Matrix {
   ///   [0, 1],
   ///   [1, 0]
   /// ]);
-  /// print(H.isInvolutaryMatrix()); // Output: true
+  /// print(H.isInvolutoryMatrix()); // Output: true
   /// ```
-  bool isInvolutaryMatrix({double tolerance = 1e-10}) {
+  bool isInvolutoryMatrix({num tolerance = 1e-10}) {
     Matrix product = this * this;
     return product.isIdentityMatrix(tolerance: tolerance);
   }
@@ -850,7 +853,7 @@ extension MatrixStructure on Matrix {
   /// ]);
   /// print(I.isIdempotentMatrix()); // Output: true
   ///```
-  bool isIdempotentMatrix({double tolerance = 1e-10}) {
+  bool isIdempotentMatrix({num tolerance = 1e-10}) {
     Matrix product = this * this;
     return isAlmostEqual(product, tolerance: tolerance);
   }
@@ -865,7 +868,7 @@ extension MatrixStructure on Matrix {
   /// ]);
   /// print(J.isPeriodicMatrix()); // Output: true
   ///```
-  bool isPeriodicMatrix(int period, {double tolerance = 1e-10}) {
+  bool isPeriodicMatrix(int period, {num tolerance = 1e-10}) {
     Matrix product = copy();
     for (int i = 1; i <= period; i++) {
       product = product * this;
@@ -897,7 +900,7 @@ extension MatrixStructure on Matrix {
   /// print(J.findSmallestPeriod(maxPeriod: 10)); // Output: 4
   /// ```
   ///
-  int findSmallestPeriod({double tolerance = 1e-10, int maxPeriod = 100}) {
+  int findSmallestPeriod({num tolerance = 1e-10, int maxPeriod = 100}) {
     for (int period = 1; period <= maxPeriod; period++) {
       if (isPeriodicMatrix(period, tolerance: tolerance)) {
         return period;
@@ -918,7 +921,7 @@ extension MatrixStructure on Matrix {
   ///```
   bool isPositiveDefiniteMatrix() {
     return isSymmetricMatrix() &&
-        eigenvalues().every((eigenvalue) => eigenvalue > 0);
+        eigenvalues().every((eigenvalue) => eigenvalue > Complex(0));
   }
 
   /// Checks if the matrix is a negative definite matrix.
@@ -933,7 +936,7 @@ extension MatrixStructure on Matrix {
   /// ```
   bool isNegativeDefiniteMatrix() {
     return isSymmetricMatrix() &&
-        eigenvalues().every((eigenvalue) => eigenvalue < 0);
+        eigenvalues().every((eigenvalue) => eigenvalue < Complex(0));
   }
 
   /// Checks if the matrix is a derogatory matrix.
@@ -947,15 +950,17 @@ extension MatrixStructure on Matrix {
   /// print(M.isDerogatoryMatrix()); // Output: false
   /// ```
   bool isDerogatoryMatrix() {
-    List<double> eigenvalues = this.eigenvalues();
-    Map<double, int> eigenvalueCounts = {};
+    List eigenvalues = this.eigenvalues();
+    Map<dynamic, dynamic> eigenvalueCounts = {};
 
-    for (double eigenvalue in eigenvalues) {
-      eigenvalueCounts[eigenvalue] = (eigenvalueCounts[eigenvalue] ?? 0) + 1;
+    for (dynamic eigenvalue in eigenvalues) {
+      eigenvalueCounts[eigenvalue] =
+          ((eigenvalueCounts[eigenvalue] ?? Complex(0)) as Number) +
+              Complex.one();
     }
 
-    for (double eigenvalue in eigenvalueCounts.keys) {
-      if (eigenvalueCounts[eigenvalue]! > 1) {
+    for (dynamic eigenvalue in eigenvalueCounts.keys) {
+      if (eigenvalueCounts[eigenvalue]! > Complex.one()) {
         return true;
       }
     }
@@ -975,7 +980,7 @@ extension MatrixStructure on Matrix {
   /// ```
   bool isDiagonallyDominantMatrix() {
     for (int i = 0; i < rowCount; i++) {
-      double rowSum = 0;
+      dynamic rowSum = Complex(0);
       for (int j = 0; j < columnCount; j++) {
         if (i != j) {
           rowSum += this[i][j].abs();
@@ -1001,7 +1006,7 @@ extension MatrixStructure on Matrix {
   /// ```
   bool isStrictlyDiagonallyDominantMatrix() {
     for (int i = 0; i < rowCount; i++) {
-      double rowSum = 0;
+      dynamic rowSum = Complex(0);
       for (int j = 0; j < columnCount; j++) {
         if (i != j) {
           rowSum += this[i][j].abs();

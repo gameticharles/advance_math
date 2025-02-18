@@ -13,17 +13,17 @@ extension VectorOperations on Vector {
   dynamic operator +(dynamic other) {
     if (other is Matrix) {
       return other + this;
-    } else if (other is num) {
+    } else if (other is num || other is Number) {
       Vector result = Vector(length);
       for (int i = 0; i < length; i++) {
-        result[i] = this[i] + other;
+        result[i] = this[i] + (other is num ? Complex(other) : other);
       }
     }
     if (length != other.length) {
       throw ArgumentError("Vectors must have the same length for addition.");
     }
 
-    if (other is! Vector && other is! List<num>) {
+    if (other is! Vector && other is! List) {
       throw ArgumentError(
           "Invalid right-hand value type (Vector or List<num>).");
     }
@@ -38,17 +38,17 @@ extension VectorOperations on Vector {
   dynamic operator -(dynamic other) {
     if (other is Matrix) {
       return other - this;
-    } else if (other is num) {
+    } else if (other is num || other is Number) {
       Vector result = Vector(length);
       for (int i = 0; i < length; i++) {
-        result[i] = this[i] - other;
+        result[i] = this[i] - (other is num ? Complex(other) : other);
       }
     }
     if (length != other.length) {
       throw ArgumentError("Vectors must have the same length for subtraction.");
     }
 
-    if (other is! Vector && other is! List<num>) {
+    if (other is! Vector && other is! List) {
       throw ArgumentError(
           "Invalid right-hand value type (Vector or List<num>).");
     }
@@ -62,12 +62,12 @@ extension VectorOperations on Vector {
 
   Vector operator *(dynamic other) {
     Vector result = Vector(length);
-    if (other is num) {
+    if (other is num || other is Number) {
       for (int i = 0; i < length; i++) {
-        result[i] = this[i] * other;
+        result[i] = this[i] * (other is num ? Complex(other) : other);
       }
     } else if (other is Matrix) {
-      result = Vector((other * this).flatten().cast<num>());
+      result = Vector((other * this).flatten());
     } else if (other is Vector) {
       if (length != other.length) {
         throw ArgumentError(
@@ -83,9 +83,9 @@ extension VectorOperations on Vector {
 
   Vector operator /(dynamic other) {
     Vector result = Vector(length);
-    if (other is num) {
+    if (other is num || other is Number) {
       for (int i = 0; i < length; i++) {
-        result[i] = this[i] / other;
+        result[i] = this[i] / (other is num ? Complex(other) : other);
       }
     } else if (other is Vector) {
       if (length != other.length) {
@@ -111,7 +111,7 @@ extension VectorOperations on Vector {
   /// // Output:   /// // -1 -2 -3
   /// ```
   Vector operator -() {
-    List<num> newData = List.generate(length, (i) => -_data[i]);
+    List newData = List.generate(length, (i) => -_data[i]);
 
     return Vector(newData);
   }
@@ -120,11 +120,11 @@ extension VectorOperations on Vector {
   ///
   /// The two vectors must have the same length. If they don't, an
   /// ArgumentError is thrown.
-  double dot(Vector other) {
+  dynamic dot(Vector other) {
     if (length != other.length) {
       throw ArgumentError("Vectors must have the same length for dot product.");
     }
-    double result = 0;
+    dynamic result = Complex.zero();
     for (int i = 0; i < length; i++) {
       result += this[i] * other[i];
     }
@@ -167,7 +167,7 @@ extension VectorOperations on Vector {
           'Neither the Vector nor the other Vector can be zero');
     }
 
-    return cross(other).magnitude < 1e-10;
+    return cross(other).magnitude < (1e-10);
   }
 
   /// Checks if this [Vector] is perpendicular to [other].
@@ -191,7 +191,7 @@ extension VectorOperations on Vector {
           'Neither the Vector nor the other Vector can be zero');
     }
 
-    return dot(other).abs() < 1e-10;
+    return dot(other).abs() < Complex(1e-10);
   }
 
   /// Rounds each element in the vector to the specified number of decimal places.
@@ -214,15 +214,16 @@ extension VectorOperations on Vector {
   /// ```
   Vector round([int decimalPlaces = 0]) {
     // Create a new data structure for the rounded matrix
-    List<num> newData = List.filled(length, decimalPlaces == 0 ? 0 : 0.0);
+    List newData = List.filled(
+        length, decimalPlaces == 0 ? Complex.zero() : Complex(0.0, 0.0));
 
     // Iterate over each element in the matrix
     for (int i = 0; i < length; i++) {
       if (decimalPlaces == 0) {
         newData[i] = _data[i].round();
       } else {
-        newData[i] = (_data[i] * math.pow(10, decimalPlaces)).round() /
-            math.pow(10, decimalPlaces);
+        newData[i] = (_data[i] * math.pow(Complex(10), decimalPlaces)).round() /
+            math.pow(Complex(10), decimalPlaces);
       }
     }
 
@@ -251,20 +252,22 @@ extension VectorOperations on Vector {
   ///
   /// @param b The scalar value to multiply the vector by.
   /// @return A new Vector that is the original Vector scaled by `b`.
-  Vector scale(num scalar) {
-    return Vector.fromList(_data.map((e) => e * scalar).toList());
+  Vector scale(dynamic scalar) {
+    return Vector.fromList(_data
+        .map((e) => e * (scalar is num ? Complex(scalar) : scalar))
+        .toList());
   }
 
   /// Returns the magnitude (or norm) of the vector.
   ///
   /// This is equivalent to the Euclidean length of the vector.
-  num get magnitude => norm();
+  dynamic get magnitude => norm();
 
   /// Returns the direction (or angle) of the vector, in radians.
   ///
   /// This is only valid for 2D vectors. For vectors of other dimensions, an
   /// AssertionError is thrown.
-  double get direction {
+  dynamic get direction {
     assert(length == 2, 'Direction can only be calculated for 2D vectors');
     return math.atan2(_data[1], _data[0]);
   }
@@ -286,7 +289,7 @@ extension VectorOperations on Vector {
   /// ```
   /// Explanation:
   /// The vector [3, 4] has a norm of 5 because sqrt(3*3 + 4*4) = sqrt(9 + 16) = sqrt(25) = 5.
-  num norm([Norm normType = Norm.frobenius]) {
+  dynamic norm([Norm normType = Norm.frobenius]) {
     switch (normType) {
       case Norm.frobenius:
         return math
@@ -367,7 +370,7 @@ extension VectorOperations on Vector {
   /// var vector = Vector([1.0, 2.0, 3.0, 4.0, 5.0]);
   /// print(vector.mean());  // Output: 3.0
   /// ```
-  num mean() {
+  dynamic mean() {
     return sum() / length;
   }
 
@@ -379,8 +382,8 @@ extension VectorOperations on Vector {
   /// var vector = Vector([1.0, 2.0, 3.0, 4.0, 5.0]);
   /// print(vector.median());  // Output: 3.0
   /// ```
-  num median() {
-    List<num> sortedData = _data..sort();
+  dynamic median() {
+    List sortedData = _data..sort();
     int midIndex = sortedData.length ~/ 2;
     if (sortedData.length.isEven) {
       return (sortedData[midIndex - 1] + sortedData[midIndex]) / 2;
@@ -396,7 +399,7 @@ extension VectorOperations on Vector {
   /// var vector = Vector([1.0, 2.0, 3.0, 4.0, 5.0]);
   /// print(vector.sum());  // Output: 15.0
   /// ```
-  num sum() {
+  dynamic sum() {
     return _data.fold<num>(0, (a, b) => a + b);
   }
 
@@ -407,7 +410,7 @@ extension VectorOperations on Vector {
   /// var vector = Vector([1.0, 2.0, 3.0]);
   /// print(vector.product());  // Output: 6.0
   /// ```
-  num product() {
+  dynamic product() {
     return _data.fold<num>(1, (a, b) => a * b);
   }
 
@@ -425,13 +428,13 @@ extension VectorOperations on Vector {
   /// double z = x.innerProduct(y);
   /// print(z); // 32
   /// ```
-  num innerProduct(Vector other) {
+  dynamic innerProduct(Vector other) {
     // Check that the vectors have the same length
     if (length != other.length) {
       throw ArgumentError('Vectors must have the same length');
     }
     // Initialize the result to zero
-    num result = 0;
+    dynamic result = Complex.zero();
     // Loop over the elements and add their products
     for (int i = 0; i < length; i++) {
       result += this[i] * other[i];
@@ -475,7 +478,7 @@ extension VectorOperations on Vector {
   /// print(vector.exp());  // Output: [2.718281828459045, 7.3890560989306495]
   /// ```
   Vector exp() {
-    return Vector.fromList(_data.map((n) => math.exp(n) as num).toList());
+    return Vector.fromList(_data.map((n) => math.exp(n)).toList());
   }
 
   /// Returns a new vector with each element being raised to the provided exponent.
@@ -486,8 +489,7 @@ extension VectorOperations on Vector {
   /// print(vector.pow(2));  // Output: [4.0, 9.0]
   /// ```
   Vector pow(num exponent) {
-    return Vector.fromList(
-        _data.map((n) => math.pow(n, exponent) as num).toList());
+    return Vector.fromList(_data.map((n) => math.pow(n, exponent)).toList());
   }
 
   /// Returns a new vector with the absolute values of the original vector's elements.

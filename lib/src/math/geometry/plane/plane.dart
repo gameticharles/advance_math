@@ -159,12 +159,14 @@ class Plane {
       double x = (E * normal.z - D * other.normal.z) / denominator;
       return Line(
           p1: Point(x, 0, 0),
-          p2: Point(x, 0, 0) + Point.fromList(direction.toList()));
+          p2: Point(x, 0, 0) +
+              Point.fromList(direction.toList().map((e) => e as num).toList()));
     } else {
       double y = (D * other.normal.x - E * normal.x) / denominator;
       return Line(
           p1: Point(0, y, 0),
-          p2: Point(0, y, 0) + Point.fromList(direction.toList()));
+          p2: Point(0, y, 0) +
+              Point.fromList(direction.toList().map((e) => e as num).toList()));
     }
   }
 
@@ -210,7 +212,10 @@ class Plane {
 
     // Create a line object from the direction vector.
     return Line(
-        p1: point, p2: point + Point.fromList(directionVector.toList()));
+        p1: point,
+        p2: point +
+            Point.fromList(
+                directionVector.toList().map((e) => e as num).toList()));
   }
 
   /// Calculates the shortest (perpendicular) distance from a point in space to the plane.

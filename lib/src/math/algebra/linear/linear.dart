@@ -44,7 +44,7 @@ class LinearSystemSolvers {
       throw Exception("Matrix A must be a square matrix for Cramer's Rule.");
     }
     int n = a.rowCount;
-    num determinantA = a.determinant();
+    dynamic determinantA = a.determinant();
     if (determinantA == 0) {
       throw Exception(
           "The determinant of A is zero. Cramer's rule is not applicable.");
@@ -55,7 +55,7 @@ class LinearSystemSolvers {
     for (int i = 0; i < n; i++) {
       ai.copyFrom(a);
       ai.setColumn(i, b.flatten());
-      num determinantAi = ai.determinant();
+      dynamic determinantAi = ai.determinant();
       x[i][0] = determinantAi / determinantA;
     }
 
@@ -270,7 +270,7 @@ class LinearSystemSolvers {
       // Perform row reduction
       for (int j = 0; j < rowCount; j++) {
         if (j != i) {
-          double factor = augmentedMatrix[j][i] / augmentedMatrix[i][i];
+          dynamic factor = augmentedMatrix[j][i] / augmentedMatrix[i][i];
           for (int k = i; k < augmentedMatrix.columnCount; k++) {
             augmentedMatrix[j][k] -= factor * augmentedMatrix[i][k];
           }
@@ -278,7 +278,7 @@ class LinearSystemSolvers {
       }
 
       // Normalize the pivot row
-      num pivot = augmentedMatrix[i][i];
+      dynamic pivot = augmentedMatrix[i][i];
       for (int k = i; k < augmentedMatrix.columnCount; k++) {
         augmentedMatrix[i][k] /= pivot;
       }
@@ -399,7 +399,7 @@ class LinearSystemSolvers {
 
     for (int iteration = 0; iteration < maxIterations; iteration++) {
       for (int i = 0; i < n; i++) {
-        double sum = 0;
+        dynamic sum = Complex(0);
         for (int j = 0; j < n; j++) {
           if (i != j) {
             sum += a[i][j] * x[j][0];
@@ -456,12 +456,12 @@ class LinearSystemSolvers {
     for (int iteration = 0; iteration < maxIterations; iteration++) {
       Matrix xOld = x.copy();
       for (int i = 0; i < n; i++) {
-        double sum1 = 0;
+        dynamic sum1 = Complex(0);
         for (int j = 0; j < i; j++) {
           sum1 += a[i][j] * x[j][0];
         }
 
-        double sum2 = 0;
+        dynamic sum2 = Complex(0);
         for (int j = i + 1; j < n; j++) {
           sum2 += a[i][j] * x[j][0];
         }
@@ -517,18 +517,18 @@ class LinearSystemSolvers {
     for (int iteration = 0; iteration < maxIterations; iteration++) {
       Matrix xOld = x.copy();
       for (int i = 0; i < n; i++) {
-        double sum1 = 0;
+        dynamic sum1 = Complex(0);
         for (int j = 0; j < i; j++) {
           sum1 += a[i][j] * x[j][0];
         }
 
-        double sum2 = 0;
+        dynamic sum2 = Complex(0);
         for (int j = i + 1; j < n; j++) {
           sum2 += a[i][j] * x[j][0];
         }
 
-        x[i][0] =
-            (1 - omega) * x[i][0] + (omega / a[i][i]) * (b[i][0] - sum1 - sum2);
+        x[i][0] = (Complex(1) - Complex(omega)) * x[i][0] +
+            (Complex(omega) / a[i][i]) * (b[i][0] - sum1 - sum2);
       }
 
       if ((x - xOld).norm(Norm.manhattan) / x.norm(Norm.manhattan) <
@@ -576,16 +576,16 @@ class LinearSystemSolvers {
     Matrix x = Matrix.zeros(n, 1);
     Matrix r = b - a * x;
     Matrix p = r.copy();
-    double rsOld = (r.transpose() * r)[0][0];
+    dynamic rsOld = (r.transpose() * r)[0][0];
 
     for (int iteration = 0; iteration < maxIterations; iteration++) {
       Matrix ap = a * p;
       var pap = (p.transpose() * ap)[0][0];
-      double alpha = rsOld / pap;
+      dynamic alpha = rsOld / pap;
       x = x + p * alpha;
       r = r - ap * alpha;
 
-      double rsNew = (r.transpose() * r)[0][0];
+      dynamic rsNew = (r.transpose() * r)[0][0];
 
       if (math.sqrt(rsNew) < tolerance) {
         return x;
@@ -611,16 +611,16 @@ class LinearSystemSolvers {
 
       for (int i = 0; i < j; i++) {
         Vector qi = Vector.fromList(_Utils.toSDList(Q.column(i).asList));
-        double projCoeff = v.dot(qi) / qi.dot(qi);
+        dynamic projCoeff = v.dot(qi) / qi.dot(qi);
         v = v - qi.scale(projCoeff);
       }
 
-      num normV = v.norm();
-      if (normV > 1e-10) {
-        v = v.scale(1 / normV);
+      dynamic normV = Complex(v.norm());
+      if (normV > Complex(1e-10)) {
+        v = v.scale(Complex(1) / normV);
         Q.setColumn(j, v.toList());
       } else {
-        Q.setColumn(j, List.filled(m, 0.0));
+        Q.setColumn(j, List.filled(m, Complex(0)));
       }
     }
 

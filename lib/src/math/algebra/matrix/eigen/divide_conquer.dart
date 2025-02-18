@@ -106,14 +106,13 @@ class DivideAndConquer {
     // Step 3: Conquer
     Eigen eigen1 = solveSmallEigenProblem(t1);
     Eigen eigen2 = solveSmallEigenProblem(t2);
-    print(eigen1.values);
 
     // Step 4: Combine
     List<Matrix> combinedEigenvectors =
         combineEigenvectors(eigen1.vectors, eigen2.vectors, P);
 
     // Step 5: Reconstruction
-    List<double> eigenvalues = [];
+    List eigenvalues = [];
     eigenvalues.addAll(eigen1.values);
     eigenvalues.addAll(eigen2.values);
 

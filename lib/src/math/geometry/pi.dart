@@ -64,7 +64,7 @@ class PI {
   /// `method`: The method to use to calculate the value of pi.
   ///
   /// The computed value of π is stored in the [_piString] field as a string.
-  PI({PiCalcAlgorithm algorithm = PiCalcAlgorithm.Chudnovsky, int? precision})
+  PI({PiCalcAlgorithm algorithm = PiCalcAlgorithm.Ramanujan, int? precision})
       : precision = precision ?? decimalPrecision {
     dynamic pi;
 

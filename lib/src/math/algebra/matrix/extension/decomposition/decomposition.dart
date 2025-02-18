@@ -2,6 +2,8 @@ part of '../../../algebra.dart';
 
 abstract class Decomposition {
   Matrix solve(Matrix b);
+
+  Matrix get checkMatrix;
 }
 
 /// Provides matrix decomposition functions as an extension on Matrix.
@@ -119,18 +121,17 @@ class MatrixDecomposition {
   /// double cond = A.decomposition.conditionNumber();
   /// print('Condition number: $cond');
   /// ```
-  double conditionNumber() {
+  dynamic conditionNumber() {
     // Compute the singular value decomposition of the matrix
     var svd = _matrix.decomposition.singularValueDecomposition();
 
     // Find the largest and smallest singular values
-    double maxSingularValue = (svd.S[0][0] as num).toDouble();
-    double minSingularValue =
-        (svd.S[_matrix.rowCount - 1][_matrix.columnCount - 1] as num)
-            .toDouble();
+    dynamic maxSingularValue = svd.S[0][0];
+    dynamic minSingularValue =
+        svd.S[_matrix.rowCount - 1][_matrix.columnCount - 1];
 
     // Calculate the condition number
-    double conditionNumber = maxSingularValue / minSingularValue;
+    dynamic conditionNumber = maxSingularValue / minSingularValue;
 
     return conditionNumber;
   }
@@ -169,14 +170,14 @@ class MatrixDecomposition {
       Q = Q * qK;
 
       //checks for convergence by computing the off-diagonal Frobenius norm
-      double offDiagonalFrobeniusNorm = 0.0;
+      dynamic offDiagonalFrobeniusNorm = Complex.zero();
       for (int row = 1; row < A.rowCount; row++) {
         for (int col = 0; col < row; col++) {
           offDiagonalFrobeniusNorm += A[row][col] * A[row][col];
         }
       }
 
-      if (offDiagonalFrobeniusNorm <= tolerance * tolerance) {
+      if (offDiagonalFrobeniusNorm <= numToNumber(tolerance * tolerance)) {
         break;
       }
     }
@@ -209,7 +210,7 @@ class MatrixDecomposition {
 
     for (int i = 0; i < A.rowCount; i++) {
       for (int j = 0; j <= i; j++) {
-        double sum = 0.0;
+        dynamic sum = Complex.zero();
 
         if (j == i) {
           for (int k = 0; k < j; k++) {
@@ -220,7 +221,7 @@ class MatrixDecomposition {
           for (int k = 0; k < j; k++) {
             sum += L[i][k] * L[j][k];
           }
-          L[i][j] = (1.0 / L[j][j]) * (A[i][j] - sum);
+          L[i][j] = (Complex.one() / L[j][j]) * (A[i][j] - sum);
         }
       }
     }
@@ -261,12 +262,12 @@ class MatrixDecomposition {
 
       for (int i = 0; i < k; i++) {
         Vector qI = Vector.fromList(_Utils.toSDList(Q.column(i).asList));
-        double projectionScale = u.dot(qI);
+        dynamic projectionScale = u.dot(qI);
         R[i][k] = projectionScale;
         u = u - qI.scale(projectionScale);
       }
 
-      num normU = u.norm();
+      dynamic normU = u.norm();
       R[k][k] = normU;
       Q.setColumn(k, u.map((x) => x / normU).toList());
     }
@@ -425,11 +426,11 @@ class MatrixDecomposition {
 
     for (int k = 0; k < n; k++) {
       // Find the largest pivot in the current column
-      double maxVal = 0.0;
+      dynamic maxVal = Complex.zero();
       int maxIndex = k;
       for (int i = k; i < n; i++) {
         if (A[i][k].abs() > maxVal) {
-          maxVal = (A[i][k] as num).toDouble().abs();
+          maxVal = A[i][k].abs();
           maxIndex = i;
         }
       }
@@ -446,7 +447,7 @@ class MatrixDecomposition {
             U[i][j] = A[i][j];
           }
         } else {
-          double factor = A[i][k] / U[k][k];
+          dynamic factor = A[i][k] / U[k][k];
           L[i][k] = factor;
 
           for (int j = k; j < n; j++) {
@@ -488,7 +489,7 @@ class MatrixDecomposition {
 
     for (int j = 0; j < n; j++) {
       for (int i = j; i < n; i++) {
-        double sum = 0.0;
+        dynamic sum = Complex.zero();
         for (int k = 0; k < j; k++) {
           sum += L[i][k] * U[k][j];
         }
@@ -496,7 +497,7 @@ class MatrixDecomposition {
       }
 
       for (int i = j; i < n; i++) {
-        double sum = 0.0;
+        dynamic sum = Complex.zero();
         for (int k = 0; k < j; k++) {
           sum += L[j][k] * U[k][i];
         }
@@ -536,11 +537,11 @@ class MatrixDecomposition {
 
     for (int k = 0; k < n; k++) {
       // Find the largest pivot in the current column
-      double maxVal = 0.0;
+      dynamic maxVal = Complex.zero();
       int maxIndex = k;
       for (int i = k; i < n; i++) {
         if (A[i][k].abs() > maxVal) {
-          maxVal = (A[i][k] as num).toDouble().abs();
+          maxVal = A[i][k].abs();
           maxIndex = i;
         }
       }
@@ -551,7 +552,7 @@ class MatrixDecomposition {
       A.swapRows(k, maxIndex);
 
       for (int i = k + 1; i < n; i++) {
-        double factor = A[i][k] / A[k][k];
+        dynamic factor = A[i][k] / A[k][k];
         L[i][k] = factor;
 
         for (int j = k; j < n; j++) {
@@ -604,7 +605,7 @@ class MatrixDecomposition {
 
     for (int k = 0; k < n; k++) {
       // Find the largest pivot in the current subMatrix
-      double maxVal = 0.0;
+      dynamic maxVal = Complex.zero();
       int maxRow = k;
       int maxCol = k;
       for (int i = k; i < n; i++) {
@@ -635,7 +636,7 @@ class MatrixDecomposition {
             U[i][j] = A[i][j];
           }
         } else {
-          double factor = A[i][k] / U[k][k];
+          dynamic factor = A[i][k] / U[k][k];
           L[i][k] = factor;
 
           for (int j = k; j < n; j++) {
@@ -721,10 +722,10 @@ class MatrixDecomposition {
           'Matrix must be square for eigenvalue decomposition.');
     }
 
-    if (!_matrix.isSymmetricMatrix()) {
-      throw ArgumentError(
-          'Matrix must be symmetric for this eigenvalue decomposition implementation.');
-    }
+    // if (!_matrix.isSymmetricMatrix()) {
+    //   throw ArgumentError(
+    //       'Matrix must be symmetric for this eigenvalue decomposition implementation.');
+    // }
     var a = _Utils.toNumMatrix(_matrix);
     int n = a.rowCount;
     Matrix ak = a.copy();
@@ -802,8 +803,8 @@ class MatrixDecomposition {
       {DecompositionMethod method = DecompositionMethod.auto,
       double ridgeAlpha = 0.0}) {
     Decomposition decomposition;
-    num conditionNumber = _matrix.conditionNumber();
-    if (conditionNumber > 1e12) {
+    dynamic conditionNumber = _matrix.conditionNumber();
+    if (conditionNumber > Complex(1e12)) {
       print(
           "Warning: The matrix is ill-conditioned (condition number = $conditionNumber). Results may not be accurate.");
     }

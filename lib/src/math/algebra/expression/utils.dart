@@ -120,7 +120,6 @@ final defaultContext = {
   'triangleWave': triangleWave,
 
   // Statistic functions
-  'avg': mean,
   'max': max,
   'min': min,
   'sum': (num x, num y) => x + y,
@@ -129,6 +128,11 @@ final defaultContext = {
   'permutations': (num n, int r) => permutations(n, r).length,
   'nCr': (num n, int r) => combinations(n, r).length,
   'combinations': (num n, int r) => combinations(n, r).length,
+  // 'avg': avg,
+  'avg': (List<dynamic> x) => mean([
+        for (var element in x)
+          if (element is num) element
+      ]),
   'mean': (List<dynamic> x) => mean([
         for (var element in x)
           if (element is num) element
@@ -192,7 +196,7 @@ final defaultContext = {
   'number': (dynamic x) => num.parse(x.toString()),
 
   // Date functions
-  'current_date': () => DateTime.now(),
+  'now': DateTime.now().toString(),
   'daysDiff': (dynamic x, dynamic y) =>
       DateTime.parse(x).difference(DateTime.parse(y)).inDays,
   'hoursDiff': (dynamic x, dynamic y) =>

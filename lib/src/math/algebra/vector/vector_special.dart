@@ -1,22 +1,22 @@
 part of '../algebra.dart';
 
 class Vector2 extends Vector {
-  Vector2(num x, num y) : super.fromList([x, y]);
+  Vector2(num x, num y) : super.fromList([Complex(x), Complex(y)]);
 
   // Specific methods and operators for Vector2.
-  num get x => this[0];
-  set x(num value) => this[0] = value;
+  dynamic get x => this[0];
+  set x(dynamic value) => this[0] = value;
 
-  num get y => this[1];
-  set y(num value) => this[1] = value;
+  dynamic get y => this[1];
+  set y(dynamic value) => this[1] = value;
 
   Vector2 perpendicular() {
     return Vector2(-y, x);
   }
 
   Vector2 rotate(double angle) {
-    double cosTheta = math.cos(angle);
-    double sinTheta = math.sin(angle);
+    dynamic cosTheta = Complex(math.cos(angle));
+    dynamic sinTheta = Complex(math.sin(angle));
 
     return Vector2(
       x * cosTheta - y * sinTheta,
@@ -33,21 +33,22 @@ class Vector2 extends Vector {
 }
 
 class Vector3 extends Vector {
-  Vector3(num x, num y, num z) : super.fromList([x, y, z]);
+  Vector3(num x, num y, num z)
+      : super.fromList([Complex(x), Complex(y), Complex(z)]);
 
   // Specific methods and operators for Vector3.
-  num get x => this[0];
-  set x(num value) => this[0] = value;
+  dynamic get x => this[0];
+  set x(dynamic value) => this[0] = value;
 
-  num get y => this[1];
-  set y(num value) => this[1] = value;
+  dynamic get y => this[1];
+  set y(dynamic value) => this[1] = value;
 
-  num get z => this[2];
-  set z(num value) => this[2] = value;
+  dynamic get z => this[2];
+  set z(dynamic value) => this[2] = value;
 
   Vector3 rotateX(double angleInRadians) {
-    double cosTheta = math.cos(angleInRadians);
-    double sinTheta = math.sin(angleInRadians);
+    dynamic cosTheta = Complex(math.cos(angleInRadians));
+    dynamic sinTheta = Complex(math.sin(angleInRadians));
 
     return Vector3(
       x,
@@ -57,8 +58,8 @@ class Vector3 extends Vector {
   }
 
   Vector3 rotateY(double angleInRadians) {
-    double cosTheta = math.cos(angleInRadians);
-    double sinTheta = math.sin(angleInRadians);
+    dynamic cosTheta = Complex(math.cos(angleInRadians));
+    dynamic sinTheta = Complex(math.sin(angleInRadians));
 
     return Vector3(
       x * cosTheta + z * sinTheta,
@@ -68,8 +69,8 @@ class Vector3 extends Vector {
   }
 
   Vector3 rotateZ(double angleInRadians) {
-    double cosTheta = math.cos(angleInRadians);
-    double sinTheta = math.sin(angleInRadians);
+    dynamic cosTheta = Complex(math.cos(angleInRadians));
+    dynamic sinTheta = Complex(math.sin(angleInRadians));
 
     return Vector3(
       x * cosTheta - y * sinTheta,
@@ -82,9 +83,9 @@ class Vector3 extends Vector {
     // Normalize the axis vector
     Vector3 axisNormalized = axis.normalize() as Vector3;
 
-    num x = axisNormalized.x;
-    num y = axisNormalized.y;
-    num z = axisNormalized.z;
+    dynamic x = axisNormalized.x;
+    dynamic y = axisNormalized.y;
+    dynamic z = axisNormalized.z;
 
     double cosTheta = math.cos(angle);
     double sinTheta = math.sin(angle);
@@ -92,14 +93,14 @@ class Vector3 extends Vector {
     // Create the rotation matrix
     Matrix3 rotationMatrix = Matrix3(
       cosTheta + x * x * (1 - cosTheta),
-      x * y * (1 - cosTheta) - z * sinTheta,
-      x * z * (1 - cosTheta) + y * sinTheta,
-      y * x * (1 - cosTheta) + z * sinTheta,
-      cosTheta + y * y * (1 - cosTheta),
-      y * z * (1 - cosTheta) - x * sinTheta,
-      z * x * (1 - cosTheta) - y * sinTheta,
-      z * y * (1 - cosTheta) + x * sinTheta,
-      cosTheta + z * z * (1 - cosTheta),
+      x * y * Complex(1 - cosTheta) - z * sinTheta,
+      x * z * Complex(1 - cosTheta) + y * sinTheta,
+      y * x * Complex(1 - cosTheta) + z * sinTheta,
+      cosTheta + y * y * Complex(1 - cosTheta),
+      y * z * Complex(1 - cosTheta) - x * sinTheta,
+      z * x * Complex(1 - cosTheta) - y * sinTheta,
+      z * y * Complex(1 - cosTheta) + x * sinTheta,
+      cosTheta + z * z * Complex(1 - cosTheta),
     );
 
     // Apply the rotation matrix to the vector
@@ -116,23 +117,26 @@ class Vector3 extends Vector {
 }
 
 class Vector4 extends Vector {
-  Vector4(num x, num y, num z, num w) : super.fromList([x, y, z, w]);
+  Vector4(num x, num y, num z, num w)
+      : super.fromList([Complex(x), Complex(y), Complex(z), Complex(w)]);
 
   // Specific methods and operators for Vector4.
-  num get x => this[0];
-  set x(num value) => this[0] = value;
+  dynamic get x => this[0];
+  set x(dynamic value) => this[0] = value;
 
-  num get y => this[1];
-  set y(num value) => this[1] = value;
+  dynamic get y => this[1];
+  set y(dynamic value) => this[1] = value;
 
-  num get z => this[2];
-  set z(num value) => this[2] = value;
+  dynamic get z => this[2];
+  set z(dynamic value) => this[2] = value;
 
-  num get w => this[3];
-  set w(num value) => this[3] = value;
+  dynamic get w => this[3];
+  set w(dynamic value) => this[3] = value;
 
   Vector4 homogenize() {
-    return (w != 0) ? Vector4(x / w, y / w, z / w, 1) : Vector4(x, y, z, w);
+    return (w != Complex.zero())
+        ? Vector4(x / w, y / w, z / w, 1)
+        : Vector4(x, y, z, w);
   }
 
   Vector4 rotate(double angle, {String plane = "xy"}) {

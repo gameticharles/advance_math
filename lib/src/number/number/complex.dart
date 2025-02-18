@@ -5,10 +5,12 @@ import '../number.dart';
 class Complex extends Number {
   /// Constructs a instance from real and imaginary coefficients
   /// such as (num, double, int).
-  Complex(num realValue, num imagValue)
-      : real = realValue is int
-            ? Integer(realValue)
-            : Double.constant(realValue.toDouble()),
+  Complex(dynamic realValue, [num imagValue = 0])
+      : real = (realValue is Number)
+            ? Double(realValue.toDouble())
+            : (realValue is int)
+                ? Integer(realValue)
+                : Double.constant(realValue.toDouble()),
         imaginary = Imaginary.constant(imagValue is int
             ? Integer(imagValue)
             : Double(imagValue.toDouble()));
@@ -82,15 +84,90 @@ class Complex extends Number {
   /// var z = Complex.parse('2 + 2i');
   ///
   /// print(z); // Output: 2 + 2i
-  /// ```
+  ///
+  /// Complex c4 = Complex.parse('-5 - 6i'); // -5-6i
+  /// print(Complex.parse('7+0i'));     // 7
+  /// print(Complex.parse('-7+5i'));    // -7
+  /// print(Complex.parse('7'));        // 7
+  /// print(Complex.parse('-7'));       // -7
+  /// print(Complex.parse('0.5'));      // 0.5
+  /// print(Complex.parse('-0.5'));     // -0.5
+  /// print(Complex.parse('0.5i'));     // 0.5i
+  /// print(Complex.parse('-0.5i'));    // -0.5i
+  /// print(Complex.parse('0.5+0.5i')); // 0.5 + 0.5i
+  /// print(Complex.parse('i'));        // 1i
+  /// print(Complex.parse('-i'));       // -1i
   factory Complex.parse(String s) {
-    // Simple parsing implementation, assuming input format a +/- bi
-    final hasPlus = s.contains('+');
-    final parts = s.split(hasPlus ? '+' : '-');
-    final real = Double.parse(parts[0].trim());
-    final imaginary =
-        Imaginary(Double.parse(parts[1].trim().replaceFirst('i', '')));
-    return Complex.num(real, hasPlus ? imaginary : -imaginary);
+    // Remove all whitespace for easier processing
+    s = s.replaceAll(' ', '');
+
+    if (s.isEmpty) {
+      throw FormatException("Invalid complex number: empty string");
+    }
+
+    // Check for the presence of 'i' to determine imaginary part
+    bool hasImaginary = s.contains('i');
+
+    if (hasImaginary) {
+      // Ensure there's exactly one 'i' at the end
+      int iIndex = s.indexOf('i');
+      if (iIndex != s.length - 1 || s.lastIndexOf('i') != iIndex) {
+        throw FormatException("Invalid complex number format: $s");
+      }
+
+      String coefficientPart = s.substring(0, iIndex);
+
+      // Handle cases where the coefficient part is empty or just a sign
+      if (coefficientPart.isEmpty) {
+        return Complex(0, 1); // "i"
+      } else if (coefficientPart == '+') {
+        return Complex(0, 1); // "+i"
+      } else if (coefficientPart == '-') {
+        return Complex(0, -1); // "-i"
+      }
+
+      // Split into real and imaginary components
+      // Look for the last occurrence of '+' or '-' to split on
+      int splitIndex = -1;
+      for (int i = coefficientPart.length - 1; i >= 0; i--) {
+        if (coefficientPart[i] == '+' || coefficientPart[i] == '-') {
+          splitIndex = i;
+          break;
+        }
+      }
+
+      num real = 0.0;
+      num imaginary;
+
+      if (splitIndex == -1) {
+        // No split found: whole part is the imaginary component
+        imaginary = num.parse(coefficientPart);
+      } else {
+        // Split into real and imaginary parts
+        String realStr = coefficientPart.substring(0, splitIndex);
+        String imagStr = coefficientPart.substring(splitIndex);
+
+        // Parse real part if not empty
+        if (realStr.isNotEmpty) {
+          real = num.parse(realStr);
+        }
+
+        // Parse imaginary part
+        if (imagStr == '+' || imagStr.isEmpty) {
+          imaginary = 1.0;
+        } else if (imagStr == '-') {
+          imaginary = -1.0;
+        } else {
+          imaginary = num.parse(imagStr);
+        }
+      }
+
+      return Complex(real, imaginary);
+    } else {
+      // No imaginary part, parse as real number
+      num real = num.parse(s);
+      return Complex(real, 0.0);
+    }
   }
 
   /// Computes the complex n-th root of this object. The returned root is the
@@ -110,7 +187,7 @@ class Complex extends Number {
 
   /// Constructs a complex number that represents one.
   Complex.one()
-      : real = Double(1),
+      : real = Integer(1),
         imaginary = Imaginary(0);
 
   /// Constructs a complex number that represents the imaginary unit i.
@@ -148,7 +225,7 @@ class Complex extends Number {
   /// Complex modulus represents the magnitude of this complex number in the complex plane.
   /// Synonymous with abs().
   Number get complexModulus {
-    final num value = math.sqrt(real.value * real.value +
+    final value = math.sqrt(real.value * real.value +
         imaginary.value.value * imaginary.value.value);
     return value.toInt() == value
         ? Integer(value.toInt())

@@ -394,8 +394,8 @@ class Decimal implements Comparable<Decimal> {
       var exp = (exponent is Decimal && exponent.isInteger)
           ? exponent.toBigInt().toInt()
           : exponent;
-      Decimal result = Decimal.one;
-      Decimal factor = this;
+      Rational result = Rational.one;
+      Rational factor = _rational;
 
       while (exp > 0) {
         if (exp % 2 == 1) {
@@ -405,10 +405,10 @@ class Decimal implements Comparable<Decimal> {
         exp ~/= 2;
       }
 
-      return result;
+      return result.toDecimal(precision: decimalPrecision);
     } else {
-      var exp = exponent is Decimal ? exponent : Decimal(exponent);
-      return (exp * ln()).exp();
+      var expValue = exponent is Decimal ? exponent : Decimal(exponent);
+      return (expValue * ln()).exp();
     }
   }
 

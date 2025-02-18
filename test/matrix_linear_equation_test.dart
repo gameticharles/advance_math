@@ -55,33 +55,16 @@ void main() {
   });
 
   test('Jacobi', () {
-    expect(
-        A.linear.solve(b, method: LinearSystemMethod.jacobi).round(),
-        Matrix([
-          [1],
-          [7],
-          [5]
-        ]));
+    expect(A.linear.solve(b, method: LinearSystemMethod.jacobi).round(), res);
   });
 
   test('Successive Over-Relaxation (SOR)', () {
-    expect(
-        A.linear.solve(b, method: LinearSystemMethod.sor).round(),
-        Matrix([
-          [2],
-          [6],
-          [5]
-        ]));
+    expect(A.linear.solve(b, method: LinearSystemMethod.sor).round(), res);
   });
 
   test('Gauss-Seidel method', () {
     expect(
-        A.linear.solve(b, method: LinearSystemMethod.gaussSeidel).round(),
-        Matrix([
-          [2],
-          [6],
-          [5]
-        ]));
+        A.linear.solve(b, method: LinearSystemMethod.gaussSeidel).round(), res);
   });
 
   test('Gram Schmidt method', () {

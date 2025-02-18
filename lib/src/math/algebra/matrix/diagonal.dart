@@ -25,8 +25,8 @@ class DiagonalMatrix extends Matrix {
   /// Generates the 2D list for the diagonal matrix based on the provided `data`.
   static List<List<dynamic>> _createDiagonalMatrix(List<dynamic> data) {
     int n = data.length;
-    List<List<dynamic>> diagonalMatrix =
-        List.generate(n, (i) => List.generate(n, (j) => i == j ? data[i] : 0));
+    List<List<dynamic>> diagonalMatrix = List.generate(
+        n, (i) => List.generate(n, (j) => i == j ? data[i] : Complex.zero()));
     return diagonalMatrix;
   }
 

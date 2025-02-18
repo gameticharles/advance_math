@@ -37,18 +37,14 @@ extension MatrixStatsExtension on Matrix {
 
     switch (axis) {
       case 0:
-        return List<dynamic>.generate(
-            _data[0].length,
-            (i) =>
-                _Utils.toNumList(_data).map((row) => row[i]).reduce(math.min));
+        return List<dynamic>.generate(_data[0].length,
+            (i) => _data.map((row) => row[i]).reduce(math.min));
       case 1:
-        return _Utils.toNumList(_data)
-            .map((row) => row.reduce(math.min))
-            .toList();
+        return _data.map((row) => row.reduce(math.min)).toList();
       default:
         dynamic minValue = _data[0][0];
 
-        for (var row in _Utils.toNumList(_data)) {
+        for (var row in _data) {
           dynamic rowMin = row.reduce(math.min);
           if (rowMin < minValue) {
             minValue = rowMin;
@@ -96,19 +92,15 @@ extension MatrixStatsExtension on Matrix {
 
     switch (axis) {
       case 0:
-        return List<dynamic>.generate(
-            _data[0].length,
-            (i) =>
-                _Utils.toNumList(_data).map((row) => row[i]).reduce(math.max));
+        return List<dynamic>.generate(_data[0].length,
+            (i) => _data.map((row) => row[i]).reduce(math.max));
       case 1:
-        return _Utils.toNumList(_data)
-            .map((row) => row.reduce(math.max))
-            .toList();
+        return _data.map((row) => row.reduce(math.max)).toList();
       default:
         dynamic maxValue = _data[0][0];
 
-        for (var row in _Utils.toNumList(_data)) {
-          num rowMax = row.reduce(math.max);
+        for (var row in _data) {
+          dynamic rowMax = row.reduce(math.max);
           if (rowMax > maxValue) {
             maxValue = rowMax;
           }
@@ -298,7 +290,7 @@ extension MatrixStatsExtension on Matrix {
   /// print(mins);  // Output: [1, 3, 5]
   /// ```
   List<dynamic> rowMins() {
-    return _Utils.toNumList(_data).map((row) => row.reduce(math.min)).toList();
+    return _data.map((row) => row.reduce(math.min)).toList();
   }
 
   /// Calculates the maximum value for each row in the matrix.
@@ -316,7 +308,7 @@ extension MatrixStatsExtension on Matrix {
   /// print(maxs);  // Output: [2, 4, 6]
   /// ```
   List<dynamic> rowMaxs() {
-    return _Utils.toNumList(_data).map((row) => row.reduce(math.max)).toList();
+    return _data.map((row) => row.reduce(math.max)).toList();
   }
 
   /// Calculates the mean value for each row in the matrix.
@@ -387,7 +379,7 @@ extension MatrixStatsExtension on Matrix {
         for (int c = 0; c < rows; ++c) {
           // Changed 'cols' to 'rows'
           if (c != r) {
-            double ratio = reducedMatrix[c][rank] / reducedMatrix[r][rank];
+            dynamic ratio = reducedMatrix[c][rank] / reducedMatrix[r][rank];
             for (int i = rank; i < cols; ++i) {
               reducedMatrix[c][i] -= ratio * reducedMatrix[r][i];
             }
@@ -428,8 +420,8 @@ extension MatrixStatsExtension on Matrix {
   /// var matrix = Matrix([[1.0, 2.0], [3.0, 4.0]]);
   /// print(matrix.mean()); // Output: 2.5
   /// ```
-  num mean() {
-    return sum() / (rowCount * columnCount);
+  dynamic mean() {
+    return sum() / Complex(rowCount * columnCount);
   }
 
   /// Returns the median of all elements in the matrix.
@@ -443,7 +435,7 @@ extension MatrixStatsExtension on Matrix {
   /// var matrix = Matrix([[1.0, 2.0], [3.0, 4.0]]);
   /// print(matrix.median()); // Output: 2.5
   /// ```
-  num median() {
+  dynamic median() {
     var sortedData = _data.expand((element) => element).toList()..sort();
     int midIndex = sortedData.length ~/ 2;
     if (sortedData.length.isEven) {
@@ -460,20 +452,20 @@ extension MatrixStatsExtension on Matrix {
   /// var matrix = Matrix([[2, 3], [1, 4]]);
   /// print(matrix.variance()); // Output: 1.25
   /// ```
-  num variance() {
-    num meanValue = mean();
-    double sum = 0;
+  dynamic variance() {
+    dynamic meanValue = mean();
+    dynamic sum = Complex.zero();
     int count = 0;
 
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
-        double diff = _data[i][j] - meanValue;
+        dynamic diff = _data[i][j] - meanValue;
         sum += diff * diff;
         count++;
       }
     }
 
-    return sum / count;
+    return sum / Complex(count);
   }
 
   /// Returns the standard deviation of the elements in the matrix.
@@ -483,7 +475,7 @@ extension MatrixStatsExtension on Matrix {
   /// var matrix = Matrix([[2, 3], [1, 4]]);
   /// print(matrix.standardDeviation()); // Output: 1.118033988749895
   /// ```
-  num standardDeviation() {
+  dynamic standardDeviation() {
     return math.sqrt(variance());
   }
 
@@ -507,34 +499,34 @@ extension MatrixStatsExtension on Matrix {
     int dimensions = columnCount;
     int n = rowCount;
 
-    List<List<double>> means = [];
+    List<List<dynamic>> means = [];
     for (int j = 0; j < dimensions; j++) {
-      double sum = 0;
+      dynamic sum = Complex.zero();
       for (int i = 0; i < n; i++) {
         sum += _data[i][j];
       }
-      means.add(List<double>.filled(n, sum / n));
+      means.add(List.filled(n, sum / n));
     }
 
-    List<List<double>> centeredData = [];
+    List<List<dynamic>> centeredData = [];
     for (int i = 0; i < n; i++) {
-      List<double> row = [];
+      List<dynamic> row = [];
       for (int j = 0; j < dimensions; j++) {
         row.add(_data[i][j] - means[j][i]);
       }
       centeredData.add(row);
     }
 
-    List<List<double>> covMatrix =
+    List<List<dynamic>> covMatrix =
         List.generate(dimensions, (_) => List<double>.filled(dimensions, 0));
 
     for (int i = 0; i < dimensions; i++) {
       for (int j = 0; j < dimensions; j++) {
-        double sum = 0;
+        dynamic sum = Complex.zero();
         for (int k = 0; k < n; k++) {
           sum += centeredData[k][i] * centeredData[k][j];
         }
-        covMatrix[i][j] = sum / (n - 1);
+        covMatrix[i][j] = sum / Complex(n - 1);
       }
     }
 
@@ -669,7 +661,7 @@ extension MatrixStatsExtension on Matrix {
       }
       result.swapRows(i, r);
       if (result[r][lead] != 0) {
-        result.scaleRow(r, 1 / result[r][lead]);
+        result.scaleRow(r, Complex.one() / result[r][lead]);
       }
       for (i = r + 1; i < rowCount; i++) {
         result.addRow(r, i, -result[i][lead]);

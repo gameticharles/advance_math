@@ -10,7 +10,6 @@ class UnaryExpression extends Expression {
   UnaryExpression(this.operator, this.operand, {this.prefix = true});
 
   @override
-  @override
   dynamic evaluate([dynamic arg]) {
     final operandVal = operand.evaluate(arg);
 

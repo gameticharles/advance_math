@@ -1,3 +1,8 @@
+# 5.0.1
+
+* **[BUG_FIX]** Fixed error from `svd` as from issues [#3](https://github.com/gameticharles/advance_math/issues/3)
+* **[IMPROVEMENT]** Change the default PiI computation to use 
+
 # 5.0.0
 
 * **[IMPROVEMENT]** `pseudoInverse` function has been improved to work with singular and poorly conditioned matrices. Added condition number check and SVD fallback for improved robustness with singular and poorly conditioned matrices.

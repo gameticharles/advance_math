@@ -1,6 +1,6 @@
 part of '../../algebra.dart';
 
-class VectorIterator implements Iterator<num> {
+class VectorIterator implements Iterator<dynamic> {
   final Vector _vector;
   int _current;
   final int _max;
@@ -11,11 +11,11 @@ class VectorIterator implements Iterator<num> {
         _max = _vector.length;
 
   @override
-  num get current {
+  dynamic get current {
     if (_current >= 0 && _current < _max) {
       return _vector[_current];
     }
-    return double.nan;
+    return Complex.nan();
   }
 
   @override

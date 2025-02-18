@@ -32,8 +32,8 @@ abstract class BaseLeastSquares {
 
   // Cached values
   Matrix? _residuals;
-  num? _unitVariance;
-  num? _standardDeviation;
+  dynamic _unitVariance;
+  dynamic _standardDeviation;
 
   /// Constructor for the LeastSquares class.
   /// If no weights are provided, it defaults to using the identity matrix.
@@ -77,7 +77,7 @@ abstract class BaseLeastSquares {
   }
 
   /// Compute unit variance, also known as the mean square error (MSE).
-  num unitVariance() {
+  dynamic unitVariance() {
     _unitVariance ??=
         ((residuals.transpose() * (W ?? Matrix.eye(A.rowCount)) * residuals) /
             (A.rowCount - A.columnCount))[0][0];
@@ -97,13 +97,13 @@ abstract class BaseLeastSquares {
   }
 
   /// Compute standard deviation of residuals.
-  num standardDeviation() {
+  dynamic standardDeviation() {
     _standardDeviation ??= math.sqrt(unitVariance());
     return _standardDeviation!;
   }
 
   /// Compute standard error of residuals, which is the standard deviation divided by the square root of the number of observations.
-  num standardError() {
+  dynamic standardError() {
     return standardDeviation() / math.sqrt(A.rowCount);
   }
 
@@ -117,24 +117,26 @@ abstract class BaseLeastSquares {
   }
 
   /// Compute confidence level. Actual implementation depends on the fit and residuals.
-  num confidenceLevel() {
-    return 1 - standardError();
+  dynamic confidenceLevel() {
+    return Complex.one() - standardError();
   }
 
   /// Detect outliers in the data using Chauvenet's criterion with a given confidence level.
   List<int> detectOutliers(double confidenceLevel) {
     // Compute mean and standard deviation of residuals
-    num mean = residuals.mean();
+    dynamic mean = residuals.mean();
 
     // Compute z-scores
     Matrix zScores = (residuals - mean) / standardDeviation();
 
     // Apply Chauvenet's criterion
     List<int> outliers = [];
+    final cc = Complex(math.sqrt(2 * math.pi));
     for (int i = 0; i < zScores.rowCount; i++) {
       // Compute the probability assuming normal distribution
-      double probability = math.exp(-0.5 * math.pow(zScores[i][0], 2)) /
-          (standardDeviation() * math.sqrt(2 * math.pi));
+      dynamic probability =
+          Complex(Complex(-0.5) * math.pow(zScores[i][0], 2)).exp() /
+              (standardDeviation() * cc);
 
       // Apply the criterion
       if (probability < (1 - confidenceLevel) / residuals.rowCount) {

@@ -677,8 +677,8 @@ extension MatrixManipulationExtension on Matrix {
     }
 
     if (resize && !retainSize) {
-      _data = List.generate(
-          other.rowCount, (i) => List<dynamic>.filled(other.columnCount, 0));
+      _data = List.generate(other.rowCount,
+          (i) => List.filled(other.columnCount, Complex.zero()));
     }
 
     if (!resize && retainSize) {

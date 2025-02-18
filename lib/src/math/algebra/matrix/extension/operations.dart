@@ -47,9 +47,14 @@ extension MatrixOperationExtension on Matrix {
           (i) => List.generate(columnCount, (j) => _data[i][j] + other[i]));
 
       return Matrix(newData);
-    } else if (other is num) {
-      List<List<dynamic>> newData = List.generate(rowCount,
-          (i) => List.generate(columnCount, (j) => _data[i][j] + other));
+    } else if (other is num || other is Number) {
+      List<List<dynamic>> newData = List.generate(
+          rowCount,
+          (i) => List.generate(
+              columnCount,
+              (j) =>
+                  _data[i][j] +
+                  (other is num ? Complex.fromReal(other) : other)));
 
       return Matrix(newData);
     } else {
@@ -93,9 +98,14 @@ extension MatrixOperationExtension on Matrix {
           (i) => List.generate(columnCount, (j) => _data[i][j] - other[i]));
 
       return Matrix(newData);
-    } else if (other is num) {
-      List<List<dynamic>> newData = List.generate(rowCount,
-          (i) => List.generate(columnCount, (j) => _data[i][j] - other));
+    } else if (other is num || other is Number) {
+      List<List<dynamic>> newData = List.generate(
+          rowCount,
+          (i) => List.generate(
+              columnCount,
+              (j) =>
+                  _data[i][j] -
+                  (other is num ? Complex.fromReal(other) : other)));
 
       return Matrix(newData);
     } else {
@@ -174,17 +184,17 @@ extension MatrixOperationExtension on Matrix {
       }
 
       return ColumnMatrix(result.toList());
-    } else if (other is num) {
+    } else if (other is num || other is Number) {
       return scale(other);
     } else {
-      throw Exception('Invalid operand type');
+      throw Exception('Invalid operand type ${other.runtimeType}');
     }
   }
 
   // Helper function to multiply small matrices
   Matrix _normalMultiply(Matrix other) {
-    List<List<dynamic>> newData =
-        List.generate(rowCount, (_) => List.filled(other.columnCount, 0.0));
+    List<List<dynamic>> newData = List.generate(
+        rowCount, (_) => List.filled(other.columnCount, Complex.zero()));
 
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < other.columnCount; j++) {
@@ -331,13 +341,15 @@ extension MatrixOperationExtension on Matrix {
   /// // │  8 10 12 │
   /// // └ 14 16 18 ┘
   /// ```
-  Matrix scale(num scaleFactor) {
+  Matrix scale(dynamic scaleFactor) {
     List<List<dynamic>> newData = [];
 
     for (int i = 0; i < rowCount; i++) {
       List<dynamic> row = [];
       for (int j = 0; j < columnCount; j++) {
-        row.add(this[i][j] * scaleFactor);
+        row.add(
+            (scaleFactor is num ? Complex.fromReal(scaleFactor) : scaleFactor) *
+                this[i][j]);
       }
       newData.add(row);
     }
@@ -426,13 +438,18 @@ extension MatrixOperationExtension on Matrix {
   /// // 3  4
   /// ```
   Matrix operator /(dynamic other) {
-    if (other is num) {
+    if (other is num || other is Number) {
       if (other == 0) {
         throw Exception('Cannot divide by zero');
       }
 
-      List<List<dynamic>> newData = List.generate(rowCount,
-          (i) => List.generate(columnCount, (j) => _data[i][j] / other));
+      List<List<dynamic>> newData = List.generate(
+          rowCount,
+          (i) => List.generate(
+              columnCount,
+              (j) =>
+                  _data[i][j] /
+                  (other is num ? Complex.fromReal(other) : other)));
 
       return Matrix(newData);
     } else {
@@ -655,7 +672,7 @@ extension MatrixOperationExtension on Matrix {
   /// Throws [ArgumentError] if [axis] is not null, 0, 1, 2, 3 or 4.
   dynamic sum({bool absolute = false, int? axis}) {
     if (_data.isEmpty) {
-      return 0;
+      return Complex.zero();
     }
 
     if (axis != null &&
@@ -683,7 +700,7 @@ extension MatrixOperationExtension on Matrix {
             .toList();
       case 2:
         int diagonalLength = math.min(rowCount, columnCount);
-        num diagonalSum = 0;
+        dynamic diagonalSum = Complex.zero();
         for (int i = 0; i < diagonalLength; i++) {
           diagonalSum += absolute ? _data[i][i].abs() : _data[i][i];
         }
@@ -691,10 +708,10 @@ extension MatrixOperationExtension on Matrix {
 
       case 3:
       case 4:
-        List<num> sums = [];
+        List sums = [];
         var data = axis == 4 ? _data.reversed.toList() : _data;
         for (int offset = 1 - rowCount; offset < columnCount; offset++) {
-          num diagonalSum = 0;
+          dynamic diagonalSum = Complex.zero();
           for (int row = 0; row < rowCount; row++) {
             int col = row + offset;
             if (col >= 0 && col < columnCount) {
@@ -706,9 +723,9 @@ extension MatrixOperationExtension on Matrix {
         return sums;
 
       default:
-        num sum = 0;
+        dynamic sum = Complex.zero();
         for (dynamic element in elements) {
-          sum += absolute ? (element as num).abs() : (element as num);
+          sum += absolute ? element.abs() : element;
         }
         return sum;
     }
@@ -727,7 +744,7 @@ extension MatrixOperationExtension on Matrix {
   ///   - 4: Diagonal (top-right to bottom-left)
   ///
   /// Returns:
-  /// - [List<num>] when axis is null
+  /// - [List<dynamic>] when axis is null
   /// - [Matrix] when axis is specified
   ///
   /// Examples:
@@ -798,14 +815,15 @@ extension MatrixOperationExtension on Matrix {
     int rows = _data.length;
     int cols = _data[0].length;
 
-    List<List<num>> result = List.generate(rows, (i) => List.filled(cols, 0));
+    List<List<dynamic>> result =
+        List.generate(rows, (i) => List.filled(cols, 0));
 
     switch (axis) {
       case null:
         if (continuous) {
           // Continuous accumulation across entire matrix
-          List<num> flat = [];
-          num cumulative = 0;
+          List flat = [];
+          dynamic cumulative = 0;
           for (var row in _data) {
             for (var val in row) {
               cumulative += val;
@@ -815,9 +833,9 @@ extension MatrixOperationExtension on Matrix {
           return flat;
         } else {
           // Row-wise accumulation without continuity
-          List<num> flat = [];
+          List flat = [];
           for (var row in _data) {
-            num rowSum = 0;
+            dynamic rowSum = 0;
             for (var val in row) {
               rowSum += val;
               flat.add(rowSum);
@@ -882,7 +900,7 @@ extension MatrixOperationExtension on Matrix {
               return a[0].compareTo(b[0]);
             }
           });
-          num cumulative = 0;
+          dynamic cumulative = 0;
           for (var coord in coords) {
             int i = coord[0];
             int j = coord[1];
@@ -917,7 +935,7 @@ extension MatrixOperationExtension on Matrix {
               return b[0].compareTo(a[0]);
             }
           });
-          num cumulative = 0;
+          dynamic cumulative = 0;
           for (var coord in coords) {
             int i = coord[0];
             int j = coord[1];
@@ -953,7 +971,7 @@ extension MatrixOperationExtension on Matrix {
               return b[1].compareTo(a[1]);
             }
           });
-          num cumulative = 0;
+          dynamic cumulative = 0;
           for (var coord in coords) {
             int i = coord[0];
             int j = coord[1];
@@ -993,7 +1011,7 @@ extension MatrixOperationExtension on Matrix {
   /// print(matrix.product());
   /// // Output: 362880
   /// ```
-  num product() {
+  dynamic product() {
     return _data.expand((element) => element).reduce((a, b) => a * b);
   }
 
@@ -1007,7 +1025,7 @@ extension MatrixOperationExtension on Matrix {
   /// var result = matrix.trace();
   /// print(result); // Output: 5
   /// ```
-  num trace() {
+  dynamic trace() {
     if (_data.isEmpty) {
       throw Exception("Matrix is empty");
     }
@@ -1020,7 +1038,7 @@ extension MatrixOperationExtension on Matrix {
     return diag.sum();
   }
 
-  num norm([Norm normType = Norm.frobenius]) {
+  dynamic norm([Norm normType = Norm.frobenius]) {
     switch (normType) {
       case Norm.manhattan:
         return _l1Norm();
@@ -1059,11 +1077,11 @@ extension MatrixOperationExtension on Matrix {
   ///
   /// Returns:
   /// A double representing the L1 norm of the matrix.
-  num _l1Norm() {
-    num maxSum = 0.0;
+  dynamic _l1Norm() {
+    dynamic maxSum = Complex(0.0, 0.0);
 
     for (int j = 0; j < columnCount; j++) {
-      num colSum = 0.0;
+      dynamic colSum = Complex(0.0, 0.0);
       for (int i = 0; i < rowCount; i++) {
         colSum += this[i][j].abs();
       }
@@ -1090,8 +1108,8 @@ extension MatrixOperationExtension on Matrix {
   ///
   /// Returns:
   /// A double representing the L2 norm of the matrix.
-  num _l2Norm() {
-    num sum = 0.0;
+  dynamic _l2Norm() {
+    dynamic sum = Complex(0.0, 0.0);
 
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
@@ -1119,11 +1137,11 @@ extension MatrixOperationExtension on Matrix {
   ///
   /// Returns:
   /// A double representing the Infinity norm of the matrix.
-  num _infinityNorm() {
-    num maxSum = 0.0;
+  dynamic _infinityNorm() {
+    dynamic maxSum = Complex(0.0, 0.0);
 
     for (int i = 0; i < rowCount; i++) {
-      num rowSum = 0.0;
+      dynamic rowSum = Complex(0.0, 0.0);
       for (int j = 0; j < columnCount; j++) {
         rowSum += this[i][j].abs();
       }
@@ -1154,7 +1172,7 @@ extension MatrixOperationExtension on Matrix {
   /// Note: The output may vary due to numerical precision.
   ///
   /// Throws [Exception] if the matrix is empty.
-  num _spectralNorm() {
+  dynamic _spectralNorm() {
     var singularValues = decomposition.singularValueDecomposition();
 
     return _Utils.toSDList(singularValues.S.diagonal()).reduce(math.max);
@@ -1183,7 +1201,7 @@ extension MatrixOperationExtension on Matrix {
   /// Note: The output may vary due to numerical precision.
   ///
   /// Throws [Exception] if the matrix is empty.
-  num _traceNorm() {
+  dynamic _traceNorm() {
     var singularValues = decomposition.singularValueDecomposition();
     return singularValues.S.diagonal().reduce((a, b) => a + b);
   }
@@ -1215,7 +1233,8 @@ extension MatrixOperationExtension on Matrix {
   /// Note: The output may vary due to numerical precision.
   ///
   /// Throws [Exception] if the matrices have different dimensions.
-  num distance(Matrix other, {DistanceType distance = DistanceType.frobenius}) {
+  dynamic distance(Matrix other,
+      {DistanceType distance = DistanceType.frobenius}) {
     return Matrix.distance(this, other, distance: distance);
   }
 
@@ -1391,13 +1410,13 @@ extension MatrixOperationExtension on Matrix {
   /// \[ \text{Determinant} = 1 \times 4 - 2 \times 3 = -2 \]
   ///
   /// @param method The method used for calculating the determinant. One of [DeterminantMethod.Laplace] or [DeterminantMethod.LU].
-  /// @return The determinant of the matrix as a [num].
-  num determinant({DeterminantMethod method = DeterminantMethod.LU}) {
+  /// @return The determinant of the matrix as a [dynamic].
+  dynamic determinant({DeterminantMethod method = DeterminantMethod.LU}) {
     int n = rowCount;
     if (n != columnCount) {
       throw Exception('Matrix must be square to calculate determinant');
     }
-    double det = 1.0;
+    Number det = Complex.one();
     if (method == DeterminantMethod.LU) {
       // Perform LU decomposition
       // (Replace with your actual LU decomposition implementation)
@@ -1462,11 +1481,12 @@ extension MatrixOperationExtension on Matrix {
   ///
   /// Validation:
   /// Throws [RangeError] if [rowIndex] is not a valid row index in the matrix.
-  void scaleRow(int rowIndex, double scaleFactor) {
+  void scaleRow(int rowIndex, dynamic scaleFactor) {
     RangeError.checkValidIndex(rowIndex, this, "rowIndex", rowCount);
 
     for (int j = 0; j < columnCount; j++) {
-      this[rowIndex][j] *= scaleFactor;
+      this[rowIndex][j] *=
+          (scaleFactor is num) ? Complex(scaleFactor) : scaleFactor;
     }
   }
 
@@ -1627,7 +1647,7 @@ extension MatrixOperationExtension on Matrix {
   ///
   /// Validation:
   /// Throws [RangeError] if [sourceIndex] or [targetIndex] is not a valid row index in the matrix.
-  void addRow(int sourceIndex, int targetIndex, num scaleFactor) {
+  void addRow(int sourceIndex, int targetIndex, dynamic scaleFactor) {
     RangeError.checkValidIndex(sourceIndex, this, "sourceIndex", rowCount);
     RangeError.checkValidIndex(targetIndex, this, "targetIndex", rowCount);
 
@@ -1675,7 +1695,7 @@ extension MatrixOperationExtension on Matrix {
 
     print('Condition number is: ${svd.conditionNumber}');
 
-    if (svd.conditionNumber > conditionThreshold) {
+    if (svd.conditionNumber > Complex(conditionThreshold)) {
       print(
           'Matrix condition number exceeds threshold $conditionThreshold. Likely singular.');
     } else {
@@ -1824,11 +1844,10 @@ extension MatrixOperationExtension on Matrix {
     List<List<dynamic>> newData = List.generate(
         rowCount,
         (i) => List.generate(columnCount, (j) {
-              if (_data[i][j] == 0) {
-                throw Exception(
-                    'Cannot take reciprocal of a matrix with zero elements');
+              if (_data[i][j] == Complex.zero()) {
+                return Complex.infinity();
               }
-              return 1 / _data[i][j];
+              return Complex.one() / _data[i][j];
             }));
 
     return Matrix(newData);
@@ -1912,8 +1931,7 @@ extension MatrixOperationExtension on Matrix {
   /// var eigenvalues = matrix.eigenvalues();
   /// print(eigenvalues); // [5.372281323269014, -2.3722813232690143, -1.0000000000000002]
   /// ```
-  List<double> eigenvalues(
-      {int maxIterations = 1000, double tolerance = 1e-10}) {
+  List<dynamic> eigenvalues({int maxIterations = 1000, num tolerance = 1e-10}) {
     return eigen(maxIterations: maxIterations, tolerance: tolerance).values;
   }
 
@@ -1961,7 +1979,7 @@ extension MatrixOperationExtension on Matrix {
   /// print(eigen.values); // [5.372281323269014, -2.3722813232690143, -1.0000000000000002]
   /// print(eigen.vectors[0]); // Matrix([[0.5773502691896258], [0.5773502691896257], [0.5773502691896257]])
   /// ```
-  Eigen eigen({int maxIterations = 1000, double tolerance = 1e-10}) {
+  Eigen eigen({int maxIterations = 1000, num tolerance = 1e-10}) {
     if (!isSquareMatrix()) {
       throw ArgumentError(
           'Eigenvalues and eigenvectors can only be computed for square matrices');
@@ -1995,7 +2013,7 @@ extension MatrixOperationExtension on Matrix {
       }
     }
 
-    List<double> eigenvalues = List.generate(n, (i) => A[i][i]);
+    List<dynamic> eigenvalues = List.generate(n, (i) => A[i][i]);
     List<Matrix> eigenvectors = List.generate(n, (i) => V.column(i));
 
     return Eigen(eigenvalues, eigenvectors);
@@ -2042,9 +2060,9 @@ extension MatrixOperationExtension on Matrix {
   /// tridiagonalA.prettyPrint();
   /// ```
   Matrix tridiagonalize() {
-    List<dynamic> mainDiagonal = diagonal();
-    List<dynamic> subDiagonal = diagonal(k: -1);
-    List<dynamic> superDiagonal = diagonal(k: 1);
+    List mainDiagonal = diagonal();
+    List subDiagonal = diagonal(k: -1);
+    List superDiagonal = diagonal(k: 1);
 
     Matrix tridiagonal = Matrix.zeros(rowCount, columnCount);
 
@@ -2182,7 +2200,7 @@ extension MatrixOperationExtension on Matrix {
   /// double conNumber = A.conditionNumber();
   /// print(conNumber);
   /// ```
-  num conditionNumber() {
+  dynamic conditionNumber() {
     return norm() * inverse().norm();
   }
 }

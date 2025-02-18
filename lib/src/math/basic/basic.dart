@@ -16,7 +16,7 @@ int sumTo(int n) {
 /// ```dart
 /// print(abs(-5));  // Output: 5
 /// ```
-num abs(num x) => x.abs();
+dynamic abs(dynamic x) => x.abs();
 
 /// Returns the square root of a number.
 ///
@@ -148,7 +148,7 @@ double step(double x) {
 /// ```dart
 /// print(rect(0.5));  // Output: 0.5
 /// ```
-double rect(double x) {
+dynamic rect(double x) {
   x = x.abs();
   if (x == 0.5) return x;
   if (x > 0.5) return 0;
@@ -167,7 +167,7 @@ double rect(double x) {
 /// ```dart
 /// print(sinc(1));    // Output: 0.8414709848078965 (approximate value of sin(1)/1)
 /// ```
-double sinc(double x) {
+dynamic sinc(double x) {
   if (x == 0) return 1;
   return sin(x) / x;
 }
@@ -205,7 +205,7 @@ double sinc(double x) {
 /// ```dart
 /// print(mod(10, 3));  // Output: 1
 /// ```
-num mod(num a, num b) {
+dynamic mod(dynamic a, dynamic b) {
   if (a is int && b is int) {
     return a % b;
   } else {
@@ -270,7 +270,7 @@ dynamic modInv(num a, num m) {
 /// num actual = nChooseRModPrime(N, R, P);
 /// print(actual); // 515561345
 ///```
-num nChooseRModPrime(int N, int R, int P) {
+dynamic nChooseRModPrime(int N, int R, int P) {
   if (R == 0) return 1;
 
   List<num> factorial = List.filled(N + 1, 0);
@@ -367,12 +367,11 @@ int ceil(num x) => x.ceil();
 ///
 /// [x] is the number to be rounded.
 /// [decimalPlaces] specifies the number of decimal places to round to.
-num round(num x, [int decimalPlaces = 0]) {
+dynamic round(num x, [int decimalPlaces = 0]) {
   if (decimalPlaces == 0) {
     return x.round();
   } else {
-    return (x * math.pow(10, decimalPlaces)).round() /
-        math.pow(10, decimalPlaces);
+    return (x * pow(10, decimalPlaces)).round() / pow(10, decimalPlaces);
   }
 }
 
@@ -383,7 +382,7 @@ num round(num x, [int decimalPlaces = 0]) {
 /// print(max(2, 3));  // Output: 3
 /// ```
 //num max(num x, num y) => math.max(x, y);
-T max<T extends num>(T a, T b) => math.max(a, b);
+T max<T extends dynamic>(T a, T b) => (a > b) ? a : b;
 
 /// Returns the minimum of two or more numbers.
 ///
@@ -391,7 +390,7 @@ T max<T extends num>(T a, T b) => math.max(a, b);
 /// ```dart
 /// print(min(2, 3));  // Output: 2
 /// ```
-T min<T extends num>(T a, T b) => math.min(a, b);
+T min<T extends dynamic>(T a, T b) => (a < b) ? a : b;
 
 /// Returns the hypotenuse or Euclidean norm, sqrt(xx + yy).
 ///
@@ -399,8 +398,8 @@ T min<T extends num>(T a, T b) => math.min(a, b);
 /// ```dart
 /// print(hypot(3, 4));  // Output: 5.0
 /// ```
-num hypot(num x, num y) {
-  return math.sqrt(x * x + y * y);
+dynamic hypot(num x, num y) {
+  return sqrt(x * x + y * y);
 }
 
 /// Returns the sign of a number.

@@ -14,6 +14,7 @@ class QRDecomposition extends Decomposition {
 
   /// Checks the decomposition by reconstructing the original matrix.
   /// Returns the reconstructed matrix as Q * R.
+  @override
   Matrix get checkMatrix => Q * R;
 
   /// Solves a linear equation system Ax = b for the given matrix b.
@@ -54,6 +55,7 @@ class LQDecomposition extends Decomposition {
 
   /// Checks the decomposition by reconstructing the original matrix.
   /// Returns the reconstructed matrix as L * Q.
+  @override
   Matrix get checkMatrix => L * Q;
 
   /// Solves a linear equation system Ax = b for the given matrix b.
@@ -88,6 +90,7 @@ class EigenvalueDecomposition extends Decomposition {
 
   /// Checks the decomposition by reconstructing the original matrix.
   /// Returns the reconstructed matrix as V * D * V.inverse().
+  @override
   Matrix get checkMatrix => V * D * V.inverse();
 
   /// Verifies the eigenvalues and eigenvectors by checking if A * x = λ * x
@@ -117,7 +120,7 @@ class EigenvalueDecomposition extends Decomposition {
     // Compute D^-1
     Matrix dInv = D.copy();
     for (int i = 0; i < D.rowCount; i++) {
-      dInv[i][i] = 1 / dInv[i][i];
+      dInv[i][i] = Complex.one() / dInv[i][i];
     }
 
     // Compute x = V * D^-1 * V^-1 * b
@@ -179,6 +182,7 @@ class CholeskyDecomposition extends Decomposition {
 
   /// Checks the decomposition by reconstructing the original matrix.
   /// Returns the reconstructed matrix as L * L.transpose().
+  @override
   Matrix get checkMatrix => L * L.transpose();
 
   /// Solves the linear system Ax = b using Cholesky decomposition, where A is the original matrix.
@@ -225,6 +229,7 @@ class SchurDecomposition extends Decomposition {
 
   /// Checks the decomposition by reconstructing the original matrix.
   /// Returns the reconstructed matrix as Q * A * Q.transpose().
+  @override
   Matrix get checkMatrix => Q * T * Q.transpose();
 
   /// Solves a linear equation system Ax = b using the Schur decomposition of A.
@@ -304,6 +309,7 @@ class LUDecomposition extends Decomposition {
   /// If P and Q are not null, returns P * L * U * Q.
   /// If only P is not null, returns P * L * U.
   /// If both P and Q are null, returns L * U.
+  @override
   Matrix get checkMatrix {
     if (P != null && Q != null) {
       return P! * L * U * Q!;
@@ -354,9 +360,9 @@ class SingularValueDecomposition extends Decomposition {
   Matrix get V => _svd.V();
 
   /// Two norm condition number
-  double get conditionNumber => _svd.cond();
+  dynamic get conditionNumber => _svd.cond();
 
-  /// ,. bhng,hh,.h .hh.t./u,t...t.xzh.....     fChecks if U is an orthogonal matrix.
+  /// Checks if U is an orthogonal matrix.
   bool get isOrthogonalU => U.isOrthogonalMatrix();
 
   /// Checks if V is an orthogonal matrix.
@@ -364,6 +370,7 @@ class SingularValueDecomposition extends Decomposition {
 
   /// Checks the decomposition by reconstructing the original matrix.
   /// Returns the reconstructed matrix as U * S * V.transpose().
+  @override
   Matrix get checkMatrix => U * S * V.transpose();
 
   /// Solves a linear equation system Ax = b for the given matrix b.
@@ -371,9 +378,10 @@ class SingularValueDecomposition extends Decomposition {
   @override
   Matrix solve(Matrix b) {
     // Compute the pseudo-inverse of S
-    var sPseudoInverse = Matrix.fill(S.rowCount, S.columnCount, 0.0);
+    var sPseudoInverse = Matrix.fill(S.rowCount, S.columnCount, Complex.zero());
     for (int i = 0; i < S.rowCount; i++) {
-      sPseudoInverse[i][i] = S[i][i] != 0 ? 1 / S[i][i] : 0;
+      sPseudoInverse[i][i] =
+          S[i][i] != 0 ? Complex.one() / S[i][i] : Complex.zero();
     }
 
     // Compute x = V * S^+ * U^T * b
