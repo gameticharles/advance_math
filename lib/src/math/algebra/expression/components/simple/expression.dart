@@ -204,7 +204,10 @@ class ThisExpression extends Expression {
   Expression differentiate() => this;
 
   @override
-  evaluate([arg]) => evaluate(arg);
+  evaluate([arg]) {
+    arg = {...defaultContext, ...arg};
+    return evaluate(arg);
+  }
 
   @override
   Expression expand() => expand();

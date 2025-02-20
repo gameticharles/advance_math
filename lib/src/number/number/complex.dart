@@ -561,32 +561,61 @@ class Complex extends Number {
   /// ```
   @override
   Number pow(dynamic exponent) {
+    // For real (num) exponents, use a simplified polar approach.
     if (exponent is num) {
-      final r = math.pow(magnitude.toDouble(), exponent);
+      final baseVal = magnitude.toDouble();
+      // If the base is nearly zero (use an epsilon threshold)
+      if (baseVal.abs() < 1e-15) {
+        if (exponent > 0) return Number.simplifyType(Complex(0, 0));
+        throw ArgumentError(
+            "0 raised to a non-positive exponent is undefined.");
+      }
+      final r = math.pow(baseVal, exponent);
       final theta = angle * exponent;
       return Number.simplifyType(Complex.fromPolar(r, theta.toDouble()));
     }
 
+    // Convert exponent to Complex if it isn't already.
     if (exponent is Complex) {
-      exponent = exponent;
+      // Already complex.
     } else if (exponent is Imaginary) {
       exponent = Complex.num(Double.zero, exponent);
     } else if (exponent is Real) {
       exponent = Complex.num(exponent, Imaginary(0));
     }
 
-    var r = magnitude;
-    var theta = phase;
-    var realExp = exponent.real;
-    var imagExp = exponent.imaginary;
+    final baseVal = numberToNum(magnitude);
+    // Check for near-zero base using a small epsilon
+    if (baseVal.abs() < 1e-15) {
+      if (exponent.real.value > 0) return Number.simplifyType(Complex(0, 0));
+      throw ArgumentError("0 raised to a non-positive exponent is undefined.");
+    }
 
-    num newR = math.pow(numberToNum(r), realExp.value) *
+    final theta = phase;
+    final realExp = exponent.real;
+    final imagExp = exponent.imaginary;
+
+    // Compute new magnitude and angle using polar exponentiation:
+    //   z^w = (r e^(i theta))^w = r^(realExp) * e^(-imagExp * theta)
+    //         * e^(i (realExp * theta + imagExp * log(r)))
+    num newR = math.pow(baseVal, realExp.value) *
         math.exp(-(imagExp.getValue) * theta.value);
-    num newTheta = realExp.value * theta.value +
-        imagExp.getValue * math.log(numberToNum(r));
+    num newTheta =
+        realExp.value * theta.value + imagExp.getValue * math.log(baseVal);
+
+    // If the computed intermediate values are non-finite, signal an error.
+    if (!newR.isFinite || !newTheta.isFinite) {
+      throw ArgumentError(
+          "Result of exponentiation is non-finite (Infinity or NaN).");
+    }
 
     num newReal = newR * math.cos(newTheta);
     num newImaginary = newR * math.sin(newTheta);
+
+    if (!newReal.isFinite || !newImaginary.isFinite) {
+      throw ArgumentError(
+          "Result of exponentiation is non-finite (Infinity or NaN).");
+    }
 
     return Number.simplifyType(Complex(newReal, newImaginary));
   }

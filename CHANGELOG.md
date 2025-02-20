@@ -1,7 +1,8 @@
-# 5.0.1
+# 5.1.0
 
 * **[BUG_FIX]** Fixed error from `svd` as from issues [#3](https://github.com/gameticharles/advance_math/issues/3)
-* **[IMPROVEMENT]** Change the default PiI computation to use 
+* **[IMPROVEMENT]** Changed the default PiI computation to use
+* **[IMPROVEMENT]** Changed the entire `Matrix` class and `Vector` class to use `Complex` for all operations.
 
 # 5.0.0
 

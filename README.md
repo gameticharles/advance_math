@@ -47,6 +47,7 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
   - From the matrix, row and columns of the matrix are iterables and also iterate on every element.
   - Eigen values and vectors.
 - Supports vectors, complex numbers and complex vectors with most of the basic functionalities and operations.
+- Supports math expressions with context and functions.
 
 ## Todo
 
@@ -2873,6 +2874,403 @@ print(normalized);  // Output: [(0.18257418583505536 + 0.3651483716701107i), (0.
 ```
 
 The above sections provide a basic introduction to vectors, complex numbers, and complex vectors. The full API of these classes offers even more possibilities, including conversions to other forms of vectors, multiplication by scalars, and more. These classes aim to make mathematical programming in Dart efficient, flexible, and enjoyable.
+
+</details>
+
+<details>
+<summary>EXPRESSIONS</summary>
+
+This module demonstrates the usage of mathematical expressions in Dart. It includes examples of handling positional and named arguments, evaluating various mathematical expressions, and performing operations on polynomials and multi-variable polynomials.
+
+## Features in expression library
+
+- Examples
+  - Positional and Named Arguments
+  - Average Function
+  - Evaluating Expressions
+  - Simple Math
+  - Complex Math
+  - Conditional Math
+  - Logic Math
+  - String Math
+  - DateTime Math
+  - Polynomials
+  - Multi-variable Polynomials
+  - Expression Math
+- Extension Methods
+
+## Examples
+
+### Positional and Named Arguments
+
+This example demonstrates handling positional and named arguments using the `VarArgsFunction`.
+
+```dart
+dynamic superHeroes = VarArgsFunction((args, kwargs) {
+  for (final superHero in args) {
+    print("There's no stopping $superHero");
+  }
+});
+
+superHeroes('UberMan', 'Exceptional Woman', 'The Hunk'); // Positional args only
+
+dynamic myFunc = VarArgsFunction((args, kwargs) {
+  print('Got args: $args, kwargs: $kwargs');
+});
+
+myFunc(1, 2, 3, x: 'hello', y: 'world'); // Positional + Named args
+myFunc(10, 20, x: true, y: false); // Another set of Positional + Named args
+myFunc('A', 'B', 'C'); // Positional args only
+```
+
+### Average Function
+
+This example demonstrates using the `avg` function to calculate the average of numbers.
+
+```dart
+print(avg([1, 2, 3, 4, 5])); // This will print the average of the numbers
+print(avg(1, 2, 3, 4, 5));
+```
+
+### Helper Functions and Constants
+
+These are helper function to support the examples:
+
+```dart
+// Create custom context
+final context1 = {
+  'x': 3.0,
+  'y': 4.0,
+  'z': 2,
+  'a': true,
+  'b': [1, 2, 3],
+  'pi': pi,
+  'e': e,
+};
+
+// Merge it with the default context
+final context = {...defaultContext, ...context1};
+
+var parsec = ExpressionParser();
+void printExpressionResult(String expression, dynamic context) {
+  try {
+    var result = parsec.parse(expression).evaluate(context);
+    print('Expression: $expression => $result');
+  } catch (e) {
+    print('Error evaluating expression `$expression`: $e');
+  }
+}
+
+void evaluateExpressions(
+    List<String> expressions, String category, dynamic context) {
+  printLine(category);
+  for (var expr in expressions) {
+    printExpressionResult(expr, context);
+  }
+}
+
+```
+
+### Evaluating Expressions
+
+This example demonstrates evaluating a list of expressions.
+
+```dart
+final testCases = [
+  "1 + 2 * 3",
+  "x + y - z",
+  "(1 + 2) * 3",
+  "foo.bar.baz",
+  "foo(bar, baz)",
+  "b[z]",
+  "1 + 2 * (3 - 4)",
+  "true",
+  "null",
+  "[1, 2, 3]",
+  "{'a': 1, 'b': 2}",
+  "'hello world'",
+  '"this is \\nJSEP"',
+  'a ? y : x',
+  "-1",
+  '!true',
+  '1 - -2',
+  '5! + 1',
+  '(2 + 3)!',
+  '3 != 3',
+  '5! != 120',
+  '5! + 3!',
+  'x! != y'
+];
+
+evaluateExpressions(testCases, "Test Cases", context);
+```
+
+### Simple Math
+
+This example demonstrates evaluating simple mathematical expressions.
+
+```dart
+List<String> expressions = [
+  '(5 + 1) + (6 - 2)',
+  '4 + 4 * 3',
+  '6*x + 4',
+  'pi',
+  '10.5 / 5.25',
+  'abs(-5)',
+  'sqrt(49)+10',
+  'cos(x) + 2',
+  'sqrt(x) - 3',
+  'sqrt(x) + sin(pi/2)',
+  'sqrt(16) + cbrt(8)',
+  'log10(10)',
+  'round(4.4)',
+  '(3^3)^2',
+  '3^(3^(2))',
+  '3^2',
+  'factorial(10)',
+  'bigIntNChooseRModPrime(500, 250, 1000000007)',
+  'string(10)',
+  'roundTo(123.4567, 2)',
+  'mean([1, 2, 3, 4, 5])',
+  'nPr(5, 3)',
+  '5P3',
+  'nCr(5, 3)',
+  '5C3',
+  '5P3 + 5C3',
+  'cosh(60)',
+  'acosh(60)',
+  'acot(0.5)',
+  'csc(60)',
+  'atan2(3,2)'
+];
+
+evaluateExpressions(expressions, "Simple Math equations", context);
+```
+
+### Complex Math
+
+This example demonstrates evaluating complex mathematical expressions.
+
+```dart
+List<String> expressions = [
+  'log10(10) + ln(e) + log(10)',
+  'sin(1) + cos(0) + tan(0.15722)',
+  'max(1, 2) + min(3, 4) + sum(5, 6)',
+  'avg([9, 9.8, 10])',
+  'pow(2, 3)',
+  'round(4.559, 2)'
+];
+
+evaluateExpressions(expressions, "Complex Math equations", context);
+```
+
+### Conditional Math
+
+This example demonstrates evaluating conditional expressions.
+
+```dart
+List<String> expressions = [
+  '4 > 2 ? "bigger" : "smaller"',
+  '2 == 2 ? true : false',
+  '2 != 2 ? true : false',
+  '"this" == "this" ? "yes" : "no"',
+  '"this" != "that" ? "yes" : "no"'
+];
+
+evaluateExpressions(expressions, "IF THEN ELSE equations", context);
+```
+
+### Logic Math
+
+This example demonstrates evaluating logical expressions.
+
+```dart
+List<String> expressions = [
+  '!true',
+  'true and false',
+  'true or false',
+  '(3==3) and (3!=3)',
+  'exp(1) == e'
+];
+
+evaluateExpressions(expressions, "Logic equations", context);
+```
+
+### String Math
+
+This example demonstrates evaluating string-related expressions.
+
+```dart
+List<String> expressions = [
+  'length("test string")',
+  'toUpper("test string")',
+  'toLower("TEST STRING")',
+  'concat("Hello ", "World")',
+  'link("Title", "http://foo.bar")',
+  'str2number("5")',
+  'left("Hello World", 5)',
+  'right("Hello World", 5)',
+  'number("5")'
+];
+
+evaluateExpressions(expressions, "String equations", context);
+```
+
+### DateTime Math
+
+This example demonstrates evaluating date and time-related expressions.
+
+```dart
+List<String> expressions = [
+  'now',
+  'daysDiff(now, "2018-10-04")',
+  'daysDiff("2018-01-01", "2018-12-31")',
+  'hoursDiff("2018-01-01", "2018-01-02")',
+  'hoursDiff("2019-02-01T08:00", "2019-02-01T12:00")',
+  'hoursDiff("2019-02-01T08:20", "2019-02-01T12:00")',
+  'hoursDiff("2018-01-01", "2018-01-01")'
+];
+
+evaluateExpressions(expressions, "DateTime Math equations", context);
+```
+
+### Polynomials
+
+This example demonstrates performing operations on polynomials.
+
+```dart
+printLine('Polynomials');
+var p = Polynomial.fromString('x^2 + 2x + 1');
+print(p.factorize());
+print(p.factorizeString());
+print(p.roots());
+
+Polynomial P = Polynomial.fromString("x^4 + 6x^2 + 4");
+print(P);
+Polynomial Q = Polynomial.fromString('(x-2) - 9');
+print(Q);
+
+print(Expression.parse('(x-2)^2 - 9').expand());
+
+print(Q.factorizeString());
+print(Q.factorize());
+print(Q.roots());
+print(P / Q);
+
+var result = RationalFunction(P, Q);
+
+print("Quotient: ${result.quotient}");
+print("Remainder: ${result.remainder}");
+```
+
+### Multi-variable Polynomials
+
+This example demonstrates performing operations on multi-variable polynomials.
+
+```dart
+printLine("Multi Polynomial");
+var polynomial = MultiVariablePolynomial([
+  Term(3, {'x': 2, 'y': 1}),
+  Term(2, {'x': 1}),
+  Term(1, {'y': 2}),
+  Term(4, {})
+]);
+
+var result = polynomial.evaluate({'x': 2, 'y': 3});
+
+print(polynomial);
+print(result);
+
+var parsedPolynomial = MultiVariablePolynomial.fromString("7x^2y^3 + 2x + 5");
+print(parsedPolynomial);
+
+print(polynomial * parsedPolynomial);
+```
+
+### Expression Math
+
+This example demonstrates performing various operations on expressions.
+
+```dart
+printLine("Expressions Math");
+Variable x = Variable('x'), y = Variable('y');
+var one = Literal(1);
+var two = Literal(2);
+var expr = Add(Pow(x, two), one);
+print(expr);
+print(expr.integrate());
+print(Expression.parse('(x^2) + 1').integrate().simplify());
+
+print(Add(Multiply(Literal(6), Variable('x')), Literal(4)).integrate());
+print(Expression.parse('6 * x + 4').integrate());
+
+print(Expression.parse('6 * x + 4').evaluate({'x': 2}));
+
+Pow xSquare = Pow(x, Literal(2));
+var yCos = Trigonometric('cos', y);
+Literal three = Literal(3);
+Expression exp = (xSquare + yCos) / three;
+print(exp);
+
+print(Ln(Add(xSquare, Literal(1))).differentiate());
+
+print((Cos(x) + Sin(x)).integrate());
+
+print(Csc(x).integrate());
+print(Pow(Csc(x), Literal(2)).integrate());
+print(Csc(Multiply(Literal(2), x)).integrate());
+print(Csc(Multiply(Literal(3), x)).integrate());
+print(Csc(Add(Multiply(Literal(4), x), Literal(1))).integrate());
+
+print(Csc(x, n: 2).differentiate());
+
+print(Add(Multiply(Literal(2), x), Add(Add(Literal(5), x), Multiply(Literal(2), x))).simplify());
+
+print(Add(Multiply(Literal(8), y), Multiply(Literal(2), x)).simplify().evaluate({'x': 1}));
+
+print(Add(Multiply(Literal(8), y), Multiply(Literal(2), x)).simplify().evaluate({'x': 1, 'y': 2}));
+
+exp = Add(Add(Multiply(Literal(2), xSquare), Multiply(Literal(3), xSquare)), Add(Literal(4) * Multiply(x, y), Literal(2) * Multiply(x, y))).simplify();
+print(exp.getVariables());
+print(exp.getVariableTerms());
+
+exp = Subtract(Multiply(Literal(1), x), Literal(-5));
+print(exp);
+print(exp.simplify());
+print(Pow(Add(x, y), Literal(2)));
+print(Pow(Pow(Literal(3), Literal(3)), Literal(2)).evaluate());
+print(Pow(Literal(3), Pow(Literal(3), Literal(2))).evaluate());
+print(Expression.parse(r'3^(3^(2))').evaluate());
+print(Expression.parse('10^2').evaluate());
+print(Pow(Literal(10), Literal(2)).evaluate());
+
+x = Variable('x');
+final expr1 = E(2) + x;
+final expr2 = x + 2;
+
+print('Expression 1: $expr1');
+print('Expression 2: $expr2');
+
+final expr3 = E(3) * (x ^ 2) - E(4) / x;
+print('Expression 3: $expr3');
+```
+
+## Extension Methods
+
+This project includes extension methods for the `num` type to allow for operator overloading with expressions.
+
+```dart
+extension E on num {
+  Expression operator +(Expression other) => Literal(this) + other;
+  Expression operator -(Expression other) => Literal(this) - other;
+  Expression operator *(Expression other) => Literal(this) * other;
+  Expression operator /(Expression other) => Literal(this) / other;
+  Expression operator ^(Expression other) => Literal(this) ^ other;
+  Expression operator -() => -Literal(this);
+}
+```
+
+These extension methods allow for more intuitive and readable code when working with expressions.
 
 </details>
 

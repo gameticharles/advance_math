@@ -6,6 +6,13 @@ abstract class Decomposition {
   Matrix get checkMatrix;
 }
 
+// A class to hold the result of the Hessenberg reduction.
+class HessenbergResult {
+  final Matrix H; // The Hessenberg matrix.
+  final Matrix Q; // The orthogonal matrix such that A_original = Q * H * Q^T.
+  HessenbergResult(this.H, this.Q);
+}
+
 /// Provides matrix decomposition functions as an extension on Matrix.
 class MatrixDecomposition {
   final Matrix _matrix;

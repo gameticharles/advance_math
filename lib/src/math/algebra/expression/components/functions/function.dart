@@ -12,7 +12,7 @@ class FunctionExpression extends Expression {
     // To evaluate a function, we need to evaluate its body.
     // However, since this is a generic function representation, a real-world use case would involve
     // substituting actual values for its parameters before evaluation.
-    return body.evaluate();
+    return body.evaluate(arg);
   }
 
   @override

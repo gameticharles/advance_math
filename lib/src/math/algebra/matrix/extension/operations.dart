@@ -1976,22 +1976,104 @@ extension MatrixOperationExtension on Matrix {
   ///   [3, 2, 1]
   /// ]);
   /// var eigen = matrix.eigen();
-  /// print(eigen.values); // [5.372281323269014, -2.3722813232690143, -1.0000000000000002]
+  /// print(eigen.values); // [5.701562118716425, -1.9999999999999998, -0.701562118716424]
   /// print(eigen.vectors[0]); // Matrix([[0.5773502691896258], [0.5773502691896257], [0.5773502691896257]])
   /// ```
+  Eigen eigen1({int maxIterations = 1000, num tolerance = 1e-10}) {
+    // Ensure the matrix is square.
+    if (!isSquareMatrix()) {
+      throw ArgumentError(
+          'Eigenvalues and eigenvectors can only be computed for square matrices');
+    }
+    int n = rowCount;
+    // Convert to a numerical matrix (assuming this converts to a double-based Matrix).
+    Matrix A = _Utils.toNumMatrix(this);
+
+    // Initialize eigenvector accumulator as the identity matrix.
+    Matrix V = Matrix.eye(n, isDouble: true);
+    Matrix aPrev;
+
+    // Iteratively apply the Householder-based QR algorithm.
+    for (int iter = 0; iter < maxIterations; iter++) {
+      aPrev = A.copy();
+      final qr = A.decomposition.qrDecompositionHouseholder();
+      Matrix Q = qr.Q;
+      Matrix R = qr.R;
+      A = R * Q;
+      V = V * Q;
+
+      Matrix diff = A - aPrev;
+      if (diff.norm(Norm.chebyshev) < tolerance) {
+        break;
+      }
+    }
+
+    // Now A should be in (quasi-triangular) Schur form.
+    // For symmetric matrices, A is (approximately) diagonal.
+    // For general matrices, A is block upper-triangular with 1x1 blocks (real eigenvalues)
+    // and 2x2 blocks (representing complex conjugate eigenvalue pairs).
+    List<Complex> eigenvalues = [];
+    int i = 0;
+    while (i < n) {
+      // Check if a 2x2 block is present: off-diagonal element A[i+1][i] is significant.
+      if (i < n - 1 && (A[i + 1][i]).abs() > tolerance) {
+        dynamic a = A[i][i];
+        dynamic b = A[i][i + 1];
+        dynamic c = A[i + 1][i];
+        dynamic d = A[i + 1][i + 1];
+        dynamic trace = a + d;
+        dynamic det = a * d - b * c;
+        dynamic disc = trace * trace - Complex(4) * det;
+        if (disc >= 0) {
+          eigenvalues.add(Complex((trace + math.sqrt(disc)) / 2, 0));
+          eigenvalues.add(Complex((trace - math.sqrt(disc)) / 2, 0));
+        } else {
+          eigenvalues.add(Complex(trace / 2, math.sqrt(-disc) / 2));
+          eigenvalues.add(Complex(trace / 2, -math.sqrt(-disc) / 2));
+        }
+        i += 2;
+      } else {
+        eigenvalues.add(Complex(A[i][i], 0));
+        i++;
+      }
+    }
+
+    // For symmetric matrices, the accumulated Q gives eigenvectors.
+    List<Matrix> eigenvectors = [];
+    if (isSymmetricMatrix(tolerance: tolerance)) {
+      eigenvectors = List.generate(n, (i) => V.column(i));
+    } else {
+      // Computing eigenvectors for non-symmetric matrices requires additional work (e.g. via inverse iteration)
+      // and is not provided in this simple implementation.
+      eigenvectors =
+          []; // or you could throw an error if eigenvectors are required.
+    }
+
+    return Eigen(eigenvalues, eigenvectors);
+  }
+
   Eigen eigen({int maxIterations = 1000, num tolerance = 1e-10}) {
     if (!isSquareMatrix()) {
       throw ArgumentError(
           'Eigenvalues and eigenvectors can only be computed for square matrices');
     }
+    // Convert matrix to a numerical matrix.
+    Matrix A = _Utils.toNumMatrix(this);
+    Matrix
+        QH; // Will hold the orthogonal transformation from Hessenberg reduction.
+
+    // If the matrix is not symmetric (within tolerance), reduce to Hessenberg form.
     if (!isSymmetricMatrix(tolerance: tolerance)) {
-      throw ArgumentError(
-          'This implementation only supports symmetric matrices');
+      var hessResult = A.hessenberg();
+      A = hessResult.H;
+      QH = hessResult.Q; // QH satisfies: A_original = QH * A * QH^T.
+    } else {
+      QH = Matrix.eye(rowCount, isDouble: true);
     }
 
     int n = rowCount;
-    Matrix A = _Utils.toNumMatrix(this);
-    Matrix V = Matrix.eye(n, isDouble: true);
+    Matrix V = Matrix.eye(n,
+        isDouble: true); // Accumulate Q factors from QR iterations.
     Matrix aPrev;
 
     for (int i = 0; i < maxIterations; i++) {
@@ -2007,16 +2089,85 @@ extension MatrixOperationExtension on Matrix {
       if (diff.norm(Norm.chebyshev) < tolerance) {
         break;
       }
-
       if (A.isUpperTriangular(tolerance) && A.isLowerTriangular(tolerance)) {
         break;
       }
     }
 
+    // The eigenvalues are the diagonal entries of A.
     List<dynamic> eigenvalues = List.generate(n, (i) => A[i][i]);
-    List<Matrix> eigenvectors = List.generate(n, (i) => V.column(i));
+    // The eigenvectors computed from the QR algorithm (in V) correspond to the Hessenberg matrix.
+    // To obtain eigenvectors of the original matrix, back-transform:
+    List<Matrix> eigenvectors = List.generate(n, (i) => QH * V.column(i));
 
     return Eigen(eigenvalues, eigenvectors);
+  }
+
+// Returns the Hessenberg form of this square matrix along with the accumulated
+  // orthogonal transformation Q such that A_original = Q * H * Q^T.
+  HessenbergResult hessenberg({num tol = 1e-15}) {
+    if (!isSquareMatrix()) {
+      throw ArgumentError("Hessenberg reduction requires a square matrix.");
+    }
+    int n = rowCount;
+    // Work on a copy of the matrix.
+    Matrix H = copy();
+    // Initialize Q as the identity matrix.
+    Matrix Q = Matrix.eye(n, isDouble: true);
+
+    // For each column k from 0 to n-2:
+    for (int k = 0; k < n - 2; k++) {
+      // Build the vector x = H[k+1:n][k] (elements below the diagonal in column k).
+      List<dynamic> x = [];
+      for (int i = k + 1; i < n; i++) {
+        x.add(H[i][k]);
+      }
+
+      // Compute the Euclidean norm of x.
+      dynamic normX = Complex(0);
+      for (var xi in x) {
+        normX += xi * xi;
+      }
+      normX = math.sqrt(normX);
+      if (normX.abs() < tol) continue;
+
+      // Determine r = -sign(x[0]) * normX.
+      dynamic r = (x[0] >= Complex(0)) ? -normX : normX;
+
+      // Compute u = x - r * e1, where e1 = [1, 0, ..., 0].
+      List<dynamic> u = List.from(x);
+      u[0] = u[0] - r;
+
+      // Compute the norm of u.
+      dynamic normU = Complex(0);
+      for (var ui in u) {
+        normU += ui * ui;
+      }
+      normU = math.sqrt(normU);
+      if (normU.abs() < tol) continue;
+
+      // Compute the Householder vector v = u / normU.
+      List<dynamic> v = u.map((ui) => ui / normU).toList();
+
+      // Construct the full n x n Householder matrix P.
+      Matrix P = Matrix.eye(n, isDouble: true);
+      for (int i = k + 1; i < n; i++) {
+        for (int j = k + 1; j < n; j++) {
+          P[i][j] = P[i][j] - Complex(2) * v[i - (k + 1)] * v[j - (k + 1)];
+        }
+      }
+
+      // Apply the transformation from both sides: H = P * H * P.
+      H = P * H * P;
+      // Accumulate the transformation: Q = Q * P.
+      Q = Q * P;
+
+      // Explicitly zero out entries below the first subdiagonal in column k.
+      for (int i = k + 2; i < n; i++) {
+        H[i][k] = Complex(0);
+      }
+    }
+    return HessenbergResult(H, Q);
   }
 
   // Performs a plane rotation (Givens rotation) on the matrix.
