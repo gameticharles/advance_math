@@ -6,7 +6,7 @@
 /// used in a purely mathematical context.
 library number;
 
-export 'number/complex.dart';
+// export 'number/complex.dart';
 export 'number/double.dart';
 export 'number/precision.dart';
 export 'number/fraction.dart';
@@ -16,6 +16,9 @@ export 'roman_numerals/roman_numerals.dart';
 export 'number/number.dart';
 export 'number/number_exception.dart';
 export 'number/real.dart';
+
+// export 'complex/complex.dart';
+
 export 'util/converters.dart';
 export 'util/erf.dart';
 export 'util/jenkins_hash.dart';
@@ -23,4 +26,4 @@ export 'util/romans_exception.dart';
 
 export 'decimal/decimal.dart';
 export 'decimal/rational.dart';
-export 'number/perfect_number.dart';
+export 'perfect_number.dart';

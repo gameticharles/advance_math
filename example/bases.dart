@@ -29,4 +29,12 @@ void main(List<String> args) {
 
   var eigen = matrix.decomposition.choleskyDecomposition();
   print(eigen);
+
+  Matrix mat = Matrix.fromList([
+    [3, 2, 2],
+    [2, 3, -2]
+  ]);
+
+  var svd = mat.decomposition.singularValueDecomposition();
+  print(svd);
 }
