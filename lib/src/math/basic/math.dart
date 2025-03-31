@@ -3,7 +3,8 @@ library maths;
 import 'dart:math' as math;
 import 'dart:typed_data';
 
-import '../../../advance_math.dart';
+import '../../../advance_math.dart' hide Complex,Number;
+import '../../number/complex/complex.dart';
 
 part 'basic.dart';
 part 'statistics.dart';

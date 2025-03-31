@@ -29,12 +29,12 @@ void main() {
     });
 
     test('Invalid Roman numerals', () {
-      expect(() => RomanNumerals.fromRoman('IIII'),
-          throwsA(isA<InvalidRomanNumeralException>));
+      expect(() => RomanNumerals.fromRoman('IIII'), 
+          throwsA(TypeMatcher<InvalidRomanNumeralException>()));
       expect(() => RomanNumerals.fromRoman('VV'),
-          throwsA(isA<InvalidRomanNumeralException>));
+          throwsA(TypeMatcher<InvalidRomanNumeralException>()));
       expect(() => RomanNumerals.fromRoman('XXXX'),
-          throwsA(isA<InvalidRomanNumeralException>));
+          throwsA(TypeMatcher<InvalidRomanNumeralException>()));
     });
 
     test('Bitwise operations', () {

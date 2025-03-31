@@ -25,7 +25,7 @@ class LU {
   /// - [_m] column dimension.
   /// - [_n] row dimension.
   /// - [_pivsign] pivot sign.
-  int _m = 0, _n = 0;  Number _pivsign = Complex.one();
+  int _m = 0, _n = 0;  dynamic _pivsign = Complex.one();
 
   /// Internal storage of pivot vector.
   /// - [_piv] pivot vector.
@@ -254,7 +254,7 @@ class LU {
     // Copy right hand side with pivoting
     var nx = B.columnCount;
     var X = B.subMatrix(
-        rowIndices: _piv.flatten().map((e) => (e as Number).toInt()).toList(),
+        rowIndices: _piv.flatten().map((e) => (e as Complex).toInt()).toList(),
         colStart: 0,
         colEnd: nx - 1);
 

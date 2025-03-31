@@ -28,25 +28,25 @@ part of '../algebra.dart';
 /// ```
 class ComplexVector {
   /// Internal data of the ComplexVector.
-  final List<Number> _data;
+  final List<dynamic> _data;
 
   /// Constructs a ComplexVector with the given length, with all elements initialized to 0.
   ComplexVector(int length)
-      : _data = List<Number>.filled(length, Complex(0, 0));
+      : _data = List<Complex>.filled(length, Complex(0, 0));
 
   /// Constructs a ComplexVector from a list of Complex numbers.
-  ComplexVector.fromList(List<Number> data) : _data = data;
+  ComplexVector.fromList(List<dynamic> data) : _data = data;
 
   /// Returns the complex number at the given index in the vector.
-  Number operator [](int index) => _data[index];
+  dynamic operator [](int index) => _data[index];
 
   /// Sets the complex number at the given index in the vector to the given value.
-  void operator []=(int index, Number value) {
+  void operator []=(int index, dynamic value) {
     _data[index] = value;
   }
 
   /// Returns the vector as a list of complex numbers.
-  List<Number> toList() => _data;
+  List<dynamic> toList() => _data;
 
   /// Returns the length of the vector.
   int get length => _data.length;
@@ -55,15 +55,15 @@ class ComplexVector {
   ///
   /// The dot product of two vectors is the sum of the product of their corresponding entries.
   /// For complex vectors, the dot product involves complex multiplication.
-  Number dot(ComplexVector other) {
+  dynamic dot(ComplexVector other) {
     if (length != other.length) {
       throw ArgumentError("Vectors must have the same length for dot product.");
     }
-    Number result = Complex(0, 0);
+    var result = Complex(0, 0);
     for (int i = 0; i < length; i++) {
       result += this[i] * other[i];
     }
-    return result;
+    return result.simplify();
   }
 
   ComplexVector operator +(ComplexVector other) {
@@ -115,9 +115,9 @@ class ComplexVector {
     double sum = 0;
     for (int i = 0; i < length; i++) {
       sum +=
-          ((this[i] as Complex).real.value * (this[i] as Complex).real.value) +
-              ((this[i] as Complex).imaginary.value.value *
-                  (this[i] as Complex).imaginary.value.value);
+          ((this[i] as Complex).real * (this[i] as Complex).real) +
+              ((this[i] as Complex).imaginary *
+                  (this[i] as Complex).imaginary);
     }
     return math.sqrt(sum);
   }
@@ -148,8 +148,8 @@ class ComplexVector {
   /// ```
   bool isZero() {
     for (int i = 0; i < length; i++) {
-      if ((this[i] as Complex).real.value != 0 ||
-          (this[i] as Complex).imaginary.value.value != 0) {
+      if ((this[i] as Complex).real != 0 ||
+          (this[i] as Complex).imaginary != 0) {
         return false;
       }
     }
@@ -173,7 +173,7 @@ class ComplexVector {
   /// ```
   /// var v = ComplexVector.fromList([Complex(1, 1), Complex(2, -1), Complex(3, 0)]);
   /// print(v.isZero());  // Output: false
-  /// v.setAll(Complex.coeff(0, 0));
+  /// v.setAll(Complex(0, 0));
   /// print(v.isZero());  // Output: true
   /// ```
   void setAll(Complex value) {

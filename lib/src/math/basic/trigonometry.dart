@@ -19,8 +19,8 @@ dynamic sin(dynamic x) {
     return math.sin(x);
   } else if (x is Complex) {
     // Using the identity: sin(a + bi) = sin(a)cosh(b) + i*cos(a)sinh(b)
-    return Complex(math.sin(x.real.value) * cosh(x.imaginary.getValue),
-        math.cos(x.real.value) * sinh(x.imaginary.getValue));
+    return Complex(math.sin(x.real) * cosh(x.imaginary),
+        math.cos(x.real) * sinh(x.imaginary));
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -45,8 +45,8 @@ dynamic cos(dynamic x) {
     return math.cos(x);
   } else if (x is Complex) {
     // Using the identity: cos(a + bi) = cos(a)cosh(b) - i*sin(a)sinh(b)
-    return Complex(math.cos(x.real.value) * cosh(x.imaginary.getValue),
-        -math.sin(x.real.value) * sinh(x.imaginary.getValue));
+    return Complex(math.cos(x.real) * cosh(x.imaginary),
+        -math.sin(x.real) * sinh(x.imaginary));
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -139,7 +139,7 @@ dynamic asin(dynamic x) {
     } else {
       // Since math.asin does not support inputs outside [-1, 1], we need to use the complex formula
       Complex z = Complex(x, 0);
-      Number result =
+      dynamic result =
           -Complex(0, 1) * log(Complex(0, 1) * z + sqrt(Complex(1, 0) - z * z));
       return result;
     }
@@ -170,7 +170,7 @@ dynamic acos(dynamic x) {
     } else {
       // Since math.acos does not support inputs outside [-1, 1], we need to use the complex formula
       Complex z = Complex(x, 0);
-      Number result =
+      dynamic result =
           -Complex(0, 1) * log(z + Complex(0, 1) * sqrt(Complex(1, 0) - z * z));
       return result;
     }
@@ -200,7 +200,7 @@ dynamic atan(dynamic x) {
   } else if (x is Complex) {
     // Using the formula: atan(z) = (i/2) * (log(1 - iz) - log(1 + iz))
     Complex i = Complex(0, 1);
-    Number result =
+    dynamic result =
         (i / 2) * (log(Complex(1, 0) - i * x) - log(Complex(1, 0) + i * x));
     return result;
   } else {
@@ -236,7 +236,7 @@ dynamic atan2(dynamic a, dynamic b) {
 
     // Using the formula: atan2(a, b) = (1/2i) * log((b + ai) / (b - ai))
     Complex i = Complex(0, 1);
-    Number result = (Integer.one / (i * 2)) *
+    dynamic result = (Integer.one / (i * 2)) *
         log((bComplex + i * aComplex) / (bComplex - i * aComplex));
     return result;
   }

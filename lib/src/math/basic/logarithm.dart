@@ -16,7 +16,7 @@ dynamic log10(dynamic x) {
     num nx = x is! num ? numberToNum(x) : x;
     return math.log(nx) / math.ln10;
   } else if (x is Complex || x is Imaginary) {
-    Complex nx = x is Complex ? x : Complex.num(Integer.zero, x);
+    Complex nx = x is Complex ? x : Complex(Integer.zero, x);
     Complex lnZ =
         Complex(math.log(numberToNum(nx.magnitude)), nx.argument.value);
     return lnZ / math.log(10);
@@ -48,7 +48,7 @@ dynamic log(dynamic x, [dynamic b]) {
     }
     return b != null ? math.log(nx) / math.log(b) : math.log(nx);
   } else if (x is Complex || x is Imaginary) {
-    Complex nx = x is Complex ? x : Complex.num(Integer.zero, x);
+    Complex nx = x is Complex ? x : Complex(Integer.zero, x);
     Complex lnZ =
         Complex(math.log(numberToNum(nx.magnitude)), nx.argument.value);
     if (b == null) {
@@ -100,12 +100,12 @@ dynamic logBase(dynamic base, dynamic x) {
     Complex cBase = base is Complex
         ? base
         : base is Imaginary
-            ? Complex.num(Integer.zero, base)
+            ? Complex(Integer.zero, base)
             : Complex(base, 0);
     Complex cx = x is Complex
         ? x
         : x is Imaginary
-            ? Complex.num(Integer.zero, x)
+            ? Complex(Integer.zero, x)
             : Complex(x, 0);
 
     Complex lnBase =

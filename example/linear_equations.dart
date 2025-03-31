@@ -18,20 +18,20 @@ void main() {
   print('Properties of the Matrix:\n$mat\n');
   mat.matrixProperties().forEach((element) => print(' - $element'));
 
-  // var A = Matrix([
-  //   [-7, -2, 9, 4],
-  //   [-4, -9, 3, 0],
-  //   [-3, 4, 6, -2],
-  //   [6, 7, -4, -8]
-  // ]);
+  var A = Matrix([
+    [-7, -2, 9, 4],
+    [-4, -9, 3, 0],
+    [-3, 4, 6, -2],
+    [6, 7, -4, -8]
+  ]);
 
-  var A = Matrix('4 4 ; -3 3');
-  var eig = A.decomposition.singularValueDecomposition();
+  // var A = Matrix('4 4 ; -3 3');
+  var svd = A.decomposition.singularValueDecomposition();
 
-  print(eig.S);
-  print(eig.U);
-  print(eig.V);
-  print(eig.checkMatrix.round(1));
+  print(svd.S);
+  print(svd.U);
+  print(svd.V);
+  print(svd.checkMatrix.round(1));
 
   printLine();
   var matrix = Matrix([
@@ -51,17 +51,14 @@ void main() {
     [5, 6]
   ]);
 
-  var svd = a.decomposition.singularValueDecomposition();
+  svd = a.decomposition.singularValueDecomposition();
   var S = svd.S;
   var U = svd.U;
   var V = svd.V;
   print('S = $S');
   print('U = $U');
   print('V = $V');
-
-  // var identity = Matrix.eye(a.rowCount);
-  // var svdInverse = svd.solve(identity);
-  // print(svdInverse);
+  print(svd.checkMatrix.round(1));
 
   printLine("Try inverse");
 
@@ -71,14 +68,4 @@ void main() {
 
   Matrix aPseudoInverse = a.pseudoInverse();
   print(aPseudoInverse);
-
-  // // Compute x = V * S^+ * U^T * b
-  // Matrix x = V * sPseudoInverse * U.transpose();
-  // print(x);
-  // print(svd.solve(identity));
-
-  /// ### Output:
-  /// ```
-  /// -1.333333333333333   1.083333333333333
-  ///  1.083333333333333  -0.333333333333333
 }

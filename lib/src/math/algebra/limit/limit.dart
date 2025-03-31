@@ -7,7 +7,7 @@ class Limit {
 
   Limit(this.function, this.point, {this.direction = 'both'});
 
-  Number compute() {
+  dynamic compute() {
     // Check for indeterminate forms
     if (function.isIndeterminate(point)) {
       try {
@@ -22,8 +22,8 @@ class Limit {
     } else if (direction == 'right') {
       return _rightLimit();
     } else {
-      Number left = _leftLimit();
-      Number right = _rightLimit();
+      dynamic left = _leftLimit();
+      dynamic right = _rightLimit();
       if (left == right) {
         return left;
       } else {
@@ -32,7 +32,7 @@ class Limit {
     }
   }
 
-  Number _applyLHopitalsRule() {
+  dynamic _applyLHopitalsRule() {
     if (function is RationalFunction) {
       RationalFunction ratio = function as RationalFunction;
       Expression newNumerator = ratio.numerator.differentiate();
@@ -48,17 +48,17 @@ class Limit {
     }
   }
 
-  Number _leftLimit() {
+  dynamic _leftLimit() {
     double h = 0.0001; // Small value
     return function.evaluate(point - h);
   }
 
-  Number _rightLimit() {
+  dynamic _rightLimit() {
     double h = 0.0001; // Small value
     return function.evaluate(point + h);
   }
 
-  Number _numericalApproach() {
+  dynamic _numericalApproach() {
     // This is a basic numerical approximation. More sophisticated methods like adaptive algorithms can be used.
     return direction == 'both'
         ? (function.evaluate(point + 0.0001) +

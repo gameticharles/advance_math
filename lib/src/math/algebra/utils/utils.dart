@@ -8,7 +8,7 @@ Performance Optimizations:
 */
 
 class _Utils {
-  static List<List<Number>> parseMatrixString(String input) {
+  static List<List<dynamic>> parseMatrixString(String input) {
     return input
         .split(';')
         .map((rowString) => rowString
@@ -31,12 +31,22 @@ class _Utils {
     return [start, end];
   }
 
-  ///Convert the dynamic matrix to num type
-  static List<List<Number>> toNumList(List<List<dynamic>> input) {
+  ///Convert the dynamic matrix to appropriate types
+  ///Converts numbers and strings to Complex, preserves other types like boolean
+  static List<List<dynamic>> toNumList(List<List<dynamic>> input) {
     return input
         .map((row) => row
-            .map((value) =>
-                value is Number ? value : Complex.parse(value.toString()))
+            .map((value) {
+              if (value is Complex) return value;
+              if (value is num || value is String) {
+                try {
+                  return Complex.parse(value.toString());
+                } catch (_) {
+                  return value; // Keep original if parsing fails
+                }
+              }
+              return value; // Preserve other types (boolean, etc.)
+            })
             .toList())
         .toList();
   }
@@ -47,10 +57,10 @@ class _Utils {
   }
 
   ///Convert a dynamic list to double list
-  static List<Number> toSDList(List<dynamic> list) {
+  static List<dynamic> toSDList(List<dynamic> list) {
     return list.map((e) {
-      if (e is num || e is Number) {
-        return e is Number ? e : Complex.parse(e.toString());
+      if (e is num || e is Complex) {
+        return e is Complex ? e : Complex.parse(e.toString());
       } else {
         throw ArgumentError('List element is not of type num');
       }
@@ -146,7 +156,7 @@ class _Utils {
 
   // Helper function to get the sum
   static dynamic sumLUk(Matrix L, Matrix U, int k, int row, int col) {
-    Number sum = Complex.zero();
+    Complex sum = Complex.zero();
     for (int p = 0; p < k; p++) {
       sum += L[row][p] * U[p][col];
     }

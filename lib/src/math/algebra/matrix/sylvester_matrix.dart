@@ -49,14 +49,14 @@ class SylvesterMatrix extends Matrix {
      */
     for (var i = 0; i < size - coefficients.length + 1; ++i) {
       for (var j = 0; j < coefficients.length; ++j) {
-        flatData[(size * i + (j + i)).toInt()] = numberToNum(coefficients[j]);
+        flatData[(size * i + (j + i)).toInt()] = Complex(coefficients[j]).toNum();
       }
     }
 
     var pos = 0;
     for (var i = size - coefficients.length + 1; i < size; ++i) {
       for (var j = 0; j < derivative.length; ++j) {
-        flatData[(size * i + (j + pos)).toInt()] = numberToNum(derivative[j]);
+        flatData[(size * i + (j + pos)).toInt()] = Complex(derivative[j]).toNum();
       }
       ++pos;
     }
@@ -84,8 +84,8 @@ class SylvesterMatrix extends Matrix {
   ///  always computed regardless the degree of the polynomial.
   ///
   /// You should keep the default value of [optimize].
-  Number polynomialDiscriminant({bool optimize = true}) {
-    final quarticOrLower = polynomial is Number ||
+  dynamic polynomialDiscriminant({bool optimize = true}) {
+    final quarticOrLower = polynomial is Complex ||
         polynomial is Linear ||
         polynomial is Quadratic ||
         polynomial is Cubic ||

@@ -188,7 +188,7 @@ extension MatrixStructure on Matrix {
 
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
-        if ((this[i][j] - other[i][j]).abs() > Complex(tolerance)) {
+        if ((this[i][j] - other[i][j]).abs() > tolerance) {
           return false;
         }
       }
@@ -213,11 +213,11 @@ extension MatrixStructure on Matrix {
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
         if (i == j) {
-          if (product[i][j] - 1.abs() > Complex(tolerance)) {
+          if (product[i][j] - 1.abs() > tolerance) {
             return false;
           }
         } else {
-          if (product[i][j].abs() > Complex(tolerance)) {
+          if (product[i][j].abs() > tolerance) {
             return false;
           }
         }
@@ -255,7 +255,7 @@ extension MatrixStructure on Matrix {
   bool isToeplitzMatrix({num tolerance = 1e-10}) {
     for (int i = 0; i < rowCount - 1; i++) {
       for (int j = 0; j < columnCount - 1; j++) {
-        if ((_data[i][j] - _data[i + 1][j + 1]).abs() > Complex(tolerance)) {
+        if ((_data[i][j] - _data[i + 1][j + 1]).abs() > tolerance) {
           return false;
         }
       }
@@ -275,7 +275,7 @@ extension MatrixStructure on Matrix {
   bool isHankelMatrix({num tolerance = 1e-10}) {
     for (int i = 0; i < rowCount - 1; i++) {
       for (int j = 0; j < columnCount - 1; j++) {
-        if ((_data[i + 1][j] - _data[i][j + 1]).abs() > Complex(tolerance)) {
+        if ((_data[i + 1][j] - _data[i][j + 1]).abs() > tolerance) {
           return false;
         }
       }
@@ -299,7 +299,7 @@ extension MatrixStructure on Matrix {
     for (int i = 0; i < rowCount - 1; i++) {
       for (int j = 0; j < columnCount - 1; j++) {
         if ((_data[i][j] - _data[i + 1][(j + 1) % columnCount]).abs() >
-            Complex(tolerance)) {
+            tolerance) {
           return false;
         }
       }
@@ -321,7 +321,7 @@ extension MatrixStructure on Matrix {
       dynamic ratio = _data[i + 1][0] / _data[i][0];
       for (int j = 1; j < columnCount; j++) {
         dynamic currentRatio = _data[i + 1][j] / _data[i][j];
-        if ((currentRatio - ratio).abs() > Complex(tolerance)) {
+        if ((currentRatio - ratio).abs() > tolerance) {
           return false;
         }
       }
@@ -345,8 +345,8 @@ extension MatrixStructure on Matrix {
     for (int i = 0; i < rowCount; i++) {
       int onesCount = 0;
       for (int j = 0; j < columnCount; j++) {
-        if (_data[i][j].abs() < Complex(tolerance)) continue;
-        if ((_data[i][j] - 1.0).abs() < Complex(tolerance)) {
+        if (_data[i][j].abs() < tolerance) continue;
+        if ((_data[i][j] - 1.0).abs() < tolerance) {
           onesCount++;
         } else {
           return false;
@@ -358,8 +358,8 @@ extension MatrixStructure on Matrix {
     for (int j = 0; j < columnCount; j++) {
       int onesCount = 0;
       for (int i = 0; i < rowCount; i++) {
-        if (_data[i][j].abs() < Complex(tolerance)) continue;
-        if ((_data[i][j] - 1.0).abs() < Complex(tolerance)) {
+        if (_data[i][j].abs() < tolerance) continue;
+        if ((_data[i][j] - 1.0).abs() < tolerance) {
           onesCount++;
         } else {
           return false;
@@ -391,7 +391,7 @@ extension MatrixStructure on Matrix {
           conjugateValue = this[j][i];
         }
 
-        if ((this[i][j] - conjugateValue).abs() > Complex(tolerance)) {
+        if ((this[i][j] - conjugateValue).abs() > tolerance) {
           return false;
         }
       }
@@ -435,7 +435,7 @@ extension MatrixStructure on Matrix {
         eigenvalues.map((e) => e.abs()).reduce((a, b) => a + b);
 
     return (maxEigenvalue.abs() - (sumEigenvalues - maxEigenvalue.abs())) >
-        Complex(tolerance);
+        tolerance;
   }
 
   /// Checks if the matrix is a Tridiagonal matrix.
@@ -452,7 +452,7 @@ extension MatrixStructure on Matrix {
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
         if (i < j - 1 || i > j + 1) {
-          if ((this[i][j]).abs() > Complex(tolerance)) {
+          if ((this[i][j]).abs() > tolerance) {
             return false;
           }
         }
@@ -522,7 +522,7 @@ extension MatrixStructure on Matrix {
   bool isUpperTriangular([num tolerance = 1e-10]) {
     for (int i = 1; i < rowCount; i++) {
       for (int j = 0; j < i; j++) {
-        if (this[i][j].abs() > Complex(tolerance)) {
+        if (this[i][j].abs() > tolerance) {
           return false;
         }
       }
@@ -538,7 +538,7 @@ extension MatrixStructure on Matrix {
   bool isLowerTriangular([num tolerance = 1e-10]) {
     for (int i = 0; i < rowCount - 1; i++) {
       for (int j = i + 1; j < columnCount; j++) {
-        if (this[i][j].abs() > Complex(tolerance)) {
+        if (this[i][j].abs() > tolerance) {
           return false;
         }
       }
@@ -632,7 +632,7 @@ extension MatrixStructure on Matrix {
 
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
-        if (i != j && this[i][j].abs() > Complex(tolerance)) return false;
+        if (i != j && this[i][j].abs() > tolerance) return false;
       }
     }
     return true;
@@ -655,7 +655,7 @@ extension MatrixStructure on Matrix {
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
         dynamic expectedValue = (i == j) ? Complex.one() : Complex.zero();
-        if ((this[i][j] - expectedValue).abs() > Complex(tolerance)) {
+        if ((this[i][j] - expectedValue).abs() > tolerance) {
           return false;
         }
       }
@@ -679,7 +679,7 @@ extension MatrixStructure on Matrix {
 
     dynamic scalarValue = this[0][0];
     for (int i = 1; i < rowCount; i++) {
-      if ((this[i][i] - scalarValue).abs() > Complex(tolerance)) return false;
+      if ((this[i][i] - scalarValue).abs() > tolerance) return false;
     }
     return true;
   }
@@ -696,7 +696,7 @@ extension MatrixStructure on Matrix {
   bool isNullMatrix({num tolerance = 1e-10}) {
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
-        if (this[i][j].abs() > Complex(tolerance)) return false;
+        if (this[i][j].abs() > tolerance) return false;
       }
     }
     return true;
@@ -714,7 +714,7 @@ extension MatrixStructure on Matrix {
   /// ```
   bool isZeroMatrix({num tolerance = 1e-10}) {
     return every(
-        (row) => row.every((element) => element.abs() <= Complex(tolerance)));
+        (row) => row.every((element) => element.abs() <= tolerance));
   }
 
   /// Checks if the matrix is an orthogonal matrix.
@@ -776,7 +776,7 @@ extension MatrixStructure on Matrix {
     if (rowCount != columnCount) return false;
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < i; j++) {
-        if ((this[i][j] - this[j][i]).abs() > Complex(tolerance)) {
+        if ((this[i][j] - this[j][i]).abs() > tolerance) {
           return false;
         }
       }
@@ -798,7 +798,7 @@ extension MatrixStructure on Matrix {
     if (rowCount != columnCount) return false;
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < i; j++) {
-        if ((this[i][j] + this[j][i]).abs() > Complex(tolerance)) {
+        if ((this[i][j] + this[j][i]).abs() > tolerance) {
           return false;
         }
       }
@@ -955,7 +955,7 @@ extension MatrixStructure on Matrix {
 
     for (dynamic eigenvalue in eigenvalues) {
       eigenvalueCounts[eigenvalue] =
-          ((eigenvalueCounts[eigenvalue] ?? Complex(0)) as Number) +
+          ((eigenvalueCounts[eigenvalue] ?? Complex(0))) +
               Complex.one();
     }
 
@@ -980,7 +980,7 @@ extension MatrixStructure on Matrix {
   /// ```
   bool isDiagonallyDominantMatrix() {
     for (int i = 0; i < rowCount; i++) {
-      dynamic rowSum = Complex(0);
+      dynamic rowSum = 0.0;
       for (int j = 0; j < columnCount; j++) {
         if (i != j) {
           rowSum += this[i][j].abs();
@@ -1006,7 +1006,7 @@ extension MatrixStructure on Matrix {
   /// ```
   bool isStrictlyDiagonallyDominantMatrix() {
     for (int i = 0; i < rowCount; i++) {
-      dynamic rowSum = Complex(0);
+      dynamic rowSum = 0.0;
       for (int j = 0; j < columnCount; j++) {
         if (i != j) {
           rowSum += this[i][j].abs();

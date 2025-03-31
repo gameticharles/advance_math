@@ -5,7 +5,7 @@ library advance_math;
 
 import 'src/math/basic/math.dart' as math;
 
-export 'package:dartframe/dartframe.dart' hide fileIO;
+export 'package:dartframe/dartframe.dart';
 export 'src/math/basic/math.dart';
 export 'src/math/geometry/geometry.dart';
 export 'src/math/algebra/algebra.dart';

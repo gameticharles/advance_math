@@ -13,7 +13,7 @@ extension VectorOperations on Vector {
   dynamic operator +(dynamic other) {
     if (other is Matrix) {
       return other + this;
-    } else if (other is num || other is Number) {
+    } else if (other is num || other is Complex) {
       Vector result = Vector(length);
       for (int i = 0; i < length; i++) {
         result[i] = this[i] + (other is num ? Complex(other) : other);
@@ -38,7 +38,7 @@ extension VectorOperations on Vector {
   dynamic operator -(dynamic other) {
     if (other is Matrix) {
       return other - this;
-    } else if (other is num || other is Number) {
+    } else if (other is num || other is Complex) {
       Vector result = Vector(length);
       for (int i = 0; i < length; i++) {
         result[i] = this[i] - (other is num ? Complex(other) : other);
@@ -62,7 +62,7 @@ extension VectorOperations on Vector {
 
   Vector operator *(dynamic other) {
     Vector result = Vector(length);
-    if (other is num || other is Number) {
+    if (other is num || other is Complex) {
       for (int i = 0; i < length; i++) {
         result[i] = this[i] * (other is num ? Complex(other) : other);
       }
@@ -83,7 +83,7 @@ extension VectorOperations on Vector {
 
   Vector operator /(dynamic other) {
     Vector result = Vector(length);
-    if (other is num || other is Number) {
+    if (other is num || other is Complex) {
       for (int i = 0; i < length; i++) {
         result[i] = this[i] / (other is num ? Complex(other) : other);
       }

@@ -111,9 +111,9 @@ void main() {
   var b = Complex(1, 2);
 
   print(a + 5); // 8.0 + 4.0i
-  //   print(2.0 - a); // -1.0 - 4.0
-  //   print(3.0 * b); // 3.0 + 6.0i
-  //   print(15.0 / a); // 1.8 - 2.4
+    // print(2.0 - a); // -1.0 - 4.0
+    // print(3.0 * b); // 3.0 + 6.0i
+    // print(15.0 / a); // 1.8 - 2.4
   print(~a); // 0.12 - 0.16i
 
   final c = Complex.fromReal(5);
@@ -221,6 +221,20 @@ void main() {
   print(Complex.parse('1e3 + 2.5e-2i')); // 1000 + 0.025i
   print(Complex('1.2e3+3.4e-5i')); // 1200 + 0.000034i
   print(Complex.parse('2.5e3+4.2e-2i')); // 2500 + 0.042i
+
+  math.printLine();
+  print(Complex(3, 0).toInt());
+  print(Complex(3, 1e-16).toInt());
+  print(Complex(3.5, 0).toInt());
+  try {print(Complex(3, 4).toInt()); } catch (e) {print(e);}
+  
+
+  math.printLine();
+
+  print(Complex.parse('0.5+0.5i').toNum());  
+  print(Complex.parse('0.5+0.5i').simplify());
+  try {print(Complex.parse('0.5+0.5i').toInt()); } catch (e) {print(e);}
+  try {print(Complex.parse('0.5+0.5i').toInt()); } catch (e) {print(e);} 
 }
 
 // void main() {

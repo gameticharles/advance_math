@@ -105,7 +105,7 @@ class MatrixFactory {
     }
 
     // Generate matrix with appropriate type of zeros
-    List<List<Number>> data = List.generate(
+    List<List<dynamic>> data = List.generate(
         rowCount,
         (_) => List.filled(
             columnCount, isDouble ? Complex(0.0, 0.0) : Complex(0, 0),
@@ -275,9 +275,8 @@ class MatrixFactory {
           for (int j = i; j < columnCount; j++) {
             if (i == j) {
               final value = isDouble
-                  ? numToNumber(random.nextDouble() * (max - min) + min)
-                  : numToNumber(
-                      random.nextInt(max.toInt() - min.toInt()) + min.toInt());
+                  ? random.nextDouble() * (max - min) + min
+                  :random.nextInt(max.toInt() - min.toInt()) + min.toInt();
               data[i][j] = value;
             } else {
               final realPart = isDouble

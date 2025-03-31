@@ -8,7 +8,7 @@ void main() {
   ]);
   var b = ColumnMatrix([106.8, 177.2, 279.2]);
 
-  Matrix A = Matrix.fromList([
+  Matrix A = Matrix([
     [4, 1, -1],
     [1, 4, -1],
     [-1, -1, 4]
@@ -21,15 +21,22 @@ void main() {
 
   printLine('Properties of the Matrix');
   print('\n$mat\n');
+  print('\nInverse:\n${mat.inverse()}\n');
   print('l1Norm: ${mat.norm(Norm.manhattan)}');
   print('l2Norm: ${mat.norm()}');
+  print('Rank: ${mat.rank()}');
+  print('Determinant: ${mat.determinant()}');
+  print('Trace: ${mat.trace()}');
   print('Condition number: ${mat.conditionNumber()}');
   mat.matrixProperties().forEach((element) => print(' - $element'));
 
   print('\n\n$A\n');
+  print('\nInverse:\n${A.inverse()}\n');
   print('l1Norm: ${A.norm(Norm.manhattan)}');
   print('l2Norm: ${A.norm()}');
   print('Rank: ${A.rank()}');
+  print('Determinant: ${A.determinant()}');
+  print('Trace: ${A.trace()}');
   print('Condition number: ${A.conditionNumber()}');
   print('Decomposition Condition number: ${A.decomposition.conditionNumber()}');
   A.matrixProperties().forEach((element) => print(' - $element'));
@@ -49,7 +56,7 @@ void main() {
   print(qr1.R.isUpperTriangular());
   print(qr1.checkMatrix);
   print(qr1.solve(b0));
-  // print(matt.isAlmostEqual(qr1.checkMatrix));
+  print(A.isAlmostEqual(qr1.checkMatrix));
 
   printLine('QR decomposition Householder');
 
@@ -62,11 +69,7 @@ void main() {
   print(qr2.solve(b0));
 
   printLine('LQ decomposition');
-  mat = Matrix([
-    [4.0, 2.0, 1.0],
-    [16.0, 4.0, 1.0],
-    [64.0, 8.0, 1.0]
-  ]);
+
   var lq = A.decomposition.lqDecomposition();
   print("L:\n ${lq.L}");
   print("Q:\n ${lq.Q}");
@@ -83,11 +86,6 @@ void main() {
   print(choleskyDec.solve(b0));
 
   printLine('Eigenvalue Decomposition');
-  mat = Matrix([
-    [4.0, 2.0, 1.0],
-    [16.0, 4.0, 1.0],
-    [64.0, 8.0, 1.0]
-  ]);
 
   var egd = A.decomposition.eigenvalueDecomposition();
   print("D:\n ${egd.D}");
@@ -101,12 +99,26 @@ void main() {
   //print(egd.verify(b0));
   print(egd.checkMatrix);
 
+  printLine('Single Value Decomposition');
+
   var svd = A.decomposition.singularValueDecomposition();
   print("U:\n ${svd.U}");
   print("S:\n ${svd.S}");
   print("V:\n ${svd.V}");
-  print(svd.checkMatrix);
+  print(svd.checkMatrix.round());
+  print("Is equal to original: ${A.isAlmostEqual(svd.checkMatrix.round())}");
   print(svd.solve(b0));
+
+  Matrix positiveDefiniteMatrix = Matrix([
+    [3, -1, 1],
+    [-1, 3, 1],
+    [1, 1, 2]
+  ]);
+  svd = positiveDefiniteMatrix.decomposition.singularValueDecomposition();
+  print(svd);
+  print(svd.checkMatrix.round());
+  print("Is equal to original: ${positiveDefiniteMatrix.isAlmostEqual(svd.checkMatrix.round())}");
+
 
   printLine('Schur Decomposition');
 
@@ -121,11 +133,6 @@ void main() {
   print(schur.solve(b0));
 
   printLine('LU Decomposition Doolittle\'s algorithm');
-  mat = Matrix([
-    [4.0, 2.0, 1.0],
-    [16.0, 4.0, 1.0],
-    [64.0, 8.0, 1.0]
-  ]);
 
   var lud = mat.decomposition.luDecompositionDoolittle();
   print("L:\n ${lud.L}");
@@ -134,11 +141,7 @@ void main() {
   print(lud.solve(b));
 
   printLine('LU Decomposition Doolittle Partial Pivoting');
-  mat = Matrix([
-    [4.0, 2.0, 1.0],
-    [16.0, 4.0, 1.0],
-    [64.0, 8.0, 1.0]
-  ]);
+
   lud = mat.decomposition.luDecompositionDoolittlePartialPivoting();
   print("L:\n ${lud.L}");
   print("U:\n ${lud.U}");
@@ -147,11 +150,6 @@ void main() {
   print(lud.solve(b));
 
   printLine('LU Decomposition Doolittle Complete Pivoting');
-  mat = Matrix([
-    [4.0, 2.0, 1.0],
-    [16.0, 4.0, 1.0],
-    [64.0, 8.0, 1.0]
-  ]);
 
   lud = mat.decomposition.luDecompositionDoolittleCompletePivoting();
   print("L:\n ${lud.L}");
@@ -162,11 +160,6 @@ void main() {
   print(lud.solve(b));
 
   printLine('LU Decomposition Crout');
-  mat = Matrix([
-    [4.0, 2.0, 1.0],
-    [16.0, 4.0, 1.0],
-    [64.0, 8.0, 1.0]
-  ]);
 
   lud = mat.decomposition.luDecompositionCrout();
   print("L:\n ${lud.L}");
@@ -175,11 +168,6 @@ void main() {
   print(lud.solve(b));
 
   printLine('LU Decomposition Gauss');
-  mat = Matrix([
-    [4.0, 2.0, 1.0],
-    [16.0, 4.0, 1.0],
-    [64.0, 8.0, 1.0]
-  ]);
 
   lud = mat.decomposition.luDecompositionGauss();
   print("L:\n ${lud.L}");

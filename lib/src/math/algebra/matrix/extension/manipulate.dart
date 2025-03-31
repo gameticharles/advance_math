@@ -519,7 +519,7 @@ extension MatrixManipulationExtension on Matrix {
     if (row < 0 || row >= rowCount || col < 0 || col >= columnCount) {
       throw Exception('Index out of range');
     }
-    return this[row][col];
+    return this[row][col].simplify();
   }
 
   /// Replaces the elements in the specified rows and columns with the given value.
@@ -571,7 +571,7 @@ extension MatrixManipulationExtension on Matrix {
     //List<dynamic> list = rowIterable.expand((x) => x).toList();
     List<dynamic> newData = [
       for (int i = 0; i < rowCount; i++)
-        for (int j = 0; j < columnCount; j++) this[i][j]
+        for (int j = 0; j < columnCount; j++) this[i][j].simplify()
     ];
     return newData;
   }

@@ -32,7 +32,7 @@ void main() {
     'Newton-Euler': (int digits) => NewtonEuler(digits),
   };
 
-  int digits = 100; // Example number of digits to compute
+  int digits = 20; // Example number of digits to compute
 
   for (var entry in algorithms.entries) {
     // Call factory function with digits
@@ -88,4 +88,23 @@ void main() {
   Decimal number = Decimal('2'); // Example number
   Decimal sqrtResult = number.pow(1 / 3);
   print('Square root of $number with precision $precision: $sqrtResult');
+
+  printLine();
+  print(collatz(6));
+ 
+  print(collatzPeak(6));  // Output: 16
+  print(collatzPeak(27)); // Output: 9232
+
+  print(longestCollatzInRange(1, 30)); // Output: {number: 27, length: 111}
+
+  print(isKaprekarNumber(9));   // Output: true (9² = 81, 8+1 = 9)
+  print(isKaprekarNumber(45));  // Output: true (45² = 2025, 20+25 = 45)
+  print(isKaprekarNumber(10));  // Output: false
+  print('');
+  print(isNarcissisticNumber(153)); // Output: true (1³ + 5³ + 3³ = 153)
+  print(isNarcissisticNumber(370)); // Output: true (3³ + 7³ + 0³ = 370)
+  print(isNarcissisticNumber(100)); // Output: false
+
+  print(isHappyNumber(19)); // Output: true (1² + 9² = 82, 8² + 2² = 68, 6² + 8² = 100, 1² + 0² + 0² = 1)
+  print(isHappyNumber(4));  // Output: false
 }

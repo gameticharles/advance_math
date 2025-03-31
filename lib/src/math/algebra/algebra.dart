@@ -5,10 +5,12 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 //import '../complex.dart';
-import '../../number/number.dart';
+import 'package:dartframe/dartframe.dart';
+
+import '../../number/util/utils.dart';
+import '../../number/complex/complex.dart';
 import '../geometry/geometry.dart';
 import '/src/math/basic/math.dart' as math;
-import 'interoperability/file_helper/file_io.dart';
 
 import 'expression/expression.dart';
 export 'expression/expression.dart';
@@ -71,8 +73,6 @@ part 'least_squares/z_score.dart';
 
 part 'limit/limit.dart';
 
-// This function should return an instance of FileIODesktop or FileIOWeb depending on the platform.
-FileIO fileIO = FileIO();
 
 
 //Learn more about the library at https://commons.apache.org/

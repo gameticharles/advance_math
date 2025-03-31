@@ -31,7 +31,7 @@ dynamic sqrt(dynamic x) {
     } else {
       return Complex(0, math.sqrt(-x));
     }
-  } else if (x is Number) {
+  } else if (x is Complex) {
     return x.sqrt();
   } else {
     throw ArgumentError('Input should be either num or Number');
@@ -44,7 +44,7 @@ dynamic sqrt(dynamic x) {
 /// ```dart
 /// print(cbrt(8));  // Output: 2.0
 /// ```
-dynamic cbrt(num x) {
+dynamic cbrt(dynamic x) {
   return nthRoot(x, 3);
 }
 
@@ -55,14 +55,14 @@ dynamic cbrt(num x) {
 /// // The cube root of 8 will be:
 /// print(nthRoot(8, 3));  // Output: 2.0
 /// ```
-dynamic nthRoot(dynamic x, double nth) {
+dynamic nthRoot(dynamic x, int nth) {
   if (x is num) {
     if (x >= 0) {
       return math.pow(x, 1 / nth);
     } else {
       return Complex(0, math.pow(-x, 1 / nth));
     }
-  } else if (x is Number) {
+  } else if (x is Complex) {
     return x.nthRoot(nth);
   } else {
     throw ArgumentError('Input should be either num or Number');
@@ -78,7 +78,7 @@ dynamic nthRoot(dynamic x, double nth) {
 dynamic exp(dynamic x) {
   if (x is num) {
     return math.exp(x);
-  } else if (x is Number) {
+  } else if (x is Complex) {
     return x.exp();
   } else {
     throw ArgumentError('Input should be either num or Number');
@@ -104,11 +104,10 @@ dynamic pow(dynamic x, dynamic exponent) {
     } else {
       return Complex(x, 0).pow(exponent);
     }
-  } else if (x is Number) {
-    if (exponent is Number) {
-      if (x is Complex) return x.pow(exponent);
-      if (x is Imaginary) return Complex.num(Double.zero, x).pow(exponent);
-      if (x is Real) return Complex.num(x, Imaginary(0)).pow(exponent);
+  } else if (x is Complex) {
+    if (exponent is Complex) {
+      return x.pow(exponent);
+      
     }
     return x.pow(exponent);
   } else {
@@ -343,7 +342,7 @@ BigInt bigIntNChooseRModPrime(int N, int R, int P) {
 /// ```dart
 /// print(floor(2.3));  // Output: 2
 /// ```
-int floor(num x) => x.floor();
+int floor(dynamic x) => x.floor();
 
 /// Rounds a number up to the nearest integer.
 ///
@@ -351,7 +350,7 @@ int floor(num x) => x.floor();
 /// ```dart
 /// print(ceil(2.3));  // Output: 3
 /// ```
-int ceil(num x) => x.ceil();
+int ceil(dynamic x) => x.ceil();
 
 /// Rounds the number [x] to the specified number of [decimalPlaces].
 ///
@@ -363,15 +362,22 @@ int ceil(num x) => x.ceil();
 /// ```dart
 /// print(round(123.4567, 2)); // Output: 123.46
 /// print(round(123.4567));    // Output: 123
+/// print(round(Complex(3.7, 2.9))); // Output: Complex(4, 3)
 /// ```
 ///
 /// [x] is the number to be rounded.
 /// [decimalPlaces] specifies the number of decimal places to round to.
-dynamic round(num x, [int decimalPlaces = 0]) {
-  if (decimalPlaces == 0) {
-    return x.round();
+dynamic round(dynamic x, [int decimalPlaces = 0]) {
+  if (x is num) {
+    if (decimalPlaces == 0) {
+      return x.round();
+    } else {
+      return (x * math.pow(10, decimalPlaces)).round() / math.pow(10, decimalPlaces);
+    }
+  } else if (x is Complex) {
+    return x.roundTo(decimals: decimalPlaces).simplify();
   } else {
-    return (x * pow(10, decimalPlaces)).round() / pow(10, decimalPlaces);
+    throw ArgumentError('Input should be either num or Complex');
   }
 }
 
@@ -397,29 +403,62 @@ T min<T extends dynamic>(T a, T b) => (a < b) ? a : b;
 /// Example:
 /// ```dart
 /// print(hypot(3, 4));  // Output: 5.0
+/// print(hypot(Complex(3, 0), Complex(0, 4))); // Output: 5.0
 /// ```
-dynamic hypot(num x, num y) {
-  return sqrt(x * x + y * y);
+dynamic hypot(dynamic x, dynamic y) {
+  if (x is num && y is num) {
+    return math.sqrt(x * x + y * y);
+  } else {
+    // Convert to Complex if needed
+    Complex cx = x is Complex ? x : Complex(x, 0);
+    Complex cy = y is Complex ? y : Complex(y, 0);
+    
+    // Calculate x² + y²
+    Complex sumOfSquares = (cx * cx) + (cy * cy);
+    
+    // Take the square root and simplify
+    return sqrt(sumOfSquares).simplify();
+  }
 }
 
 /// Returns the sign of a number.
 ///
+/// For complex numbers, returns the sign of the real part.
+/// If the real part is zero, returns the sign of the imaginary part.
+/// 
 /// Example:
 /// ```dart
 /// print(sign(-15));  // Output: -1
+/// print(sign(Complex(-3, 4))); // Output: -1
+/// print(sign(Complex(0, -5))); // Output: -1
 /// ```
-int sign(num x) {
-  return x < 0 ? -1 : (x > 0 ? 1 : 0);
+dynamic sign(dynamic x) {
+  if (x is num) {
+    return x < 0 ? -1 : (x > 0 ? 1 : 0);
+  } else if (x is Complex) {
+    return x.sign;
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Clamps x between min and max.
 ///
+/// For complex numbers, clamps both real and imaginary parts separately.
+///
 /// Example:
 /// ```dart
 /// print(clamp(10, 1, 5));  // Output: 5
+/// print(clamp(Complex(10, 7), 1, 5)); // Output: Complex(5, 5)
 /// ```
-num clamp(num x, num min, num max) {
-  return x < min ? min : (x > max ? max : x);
+dynamic clamp(dynamic x, num min, num max) {
+  if (x is num) {
+    return x < min ? min : (x > max ? max : x);
+  } else if (x is Complex) {
+    return x.clamp(min, max).simplify();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Linear interpolation between a and b by t.
@@ -427,9 +466,20 @@ num clamp(num x, num min, num max) {
 /// Example:
 /// ```dart
 /// print(lerp(0, 10, 0.5));  // Output: 5.0
+/// print(lerp(Complex(0, 0), Complex(10, 20), 0.5)); // Output: Complex(5, 10)
 /// ```
-num lerp(num a, num b, num t) {
-  return a + (b - a) * t;
+dynamic lerp(dynamic a, dynamic b, num t) {
+  if (a is num && b is num) {
+    return a + (b - a) * t;
+  } else {
+    // Convert to Complex if needed
+    Complex ca = a is Complex ? a : Complex(a, 0);
+    Complex cb = b is Complex ? b : Complex(b, 0);
+    
+    // Calculate a + (b - a) * t
+    Complex result = ca + ((cb - ca) * Complex(t, 0));
+    return result.simplify();
+  }
 }
 
 /// Converts polar coordinates (r, theta) to rectangular coordinates (x, y).
@@ -478,6 +528,34 @@ num lerp(num a, num b, num t) {
     theta = toDegrees(theta);
   }
   return (r: r, theta: theta);
+}
+
+/// Determines whether two floating-point numbers are approximately equal.
+///
+/// This function checks if the absolute difference between two numbers is less than
+/// or equal to the maximum of:
+/// - An absolute tolerance value [absTol]
+/// - A relative tolerance value [relTol] multiplied by the maximum absolute value of the inputs
+///
+/// This approach handles both small and large numbers appropriately.
+///
+/// Parameters:
+///  - [a]: First floating-point number to compare
+///  - [b]: Second floating-point number to compare
+///  - [relTol]: Relative tolerance (default: 1e-9)
+///  - [absTol]: Absolute tolerance (default: 1e-15)
+///
+/// Returns:
+///  - `true` if the numbers are approximately equal, `false` otherwise
+///
+/// Example:
+/// ```dart
+/// print(isClose(0.1 + 0.2, 0.3)); // true
+/// print(isClose(1e10, 1.00001e10)); // true
+/// print(isClose(1.0, 1.1)); // false
+/// ```
+bool isClose(double a, double b, {double relTol = 1e-9, double absTol = 1e-15}) {
+  return (a - b).abs() <= max(absTol, relTol * max(a.abs(), b.abs()));
 }
 
 /// Checks if the provided string characters [input] are a digit(s) (0-9).
@@ -1495,4 +1573,231 @@ int binomialCoefficient(int n, int k) {
     result ~/= i + 1;
   }
   return result;
+}
+
+
+/// Computes the Collatz sequence for a given positive integer.
+///
+/// The Collatz Conjecture states that for any positive integer, if you repeatedly apply
+/// the following rules, you'll eventually reach 1:
+/// - If the number is even, divide it by 2
+/// - If the number is odd, multiply it by 3 and add 1
+///
+/// Parameters:
+///  - [n]: A positive integer to start the sequence.
+///  - [returnSequence]: If true, returns the entire sequence. If false, returns only the number of steps. Default is false.
+///
+/// Returns:
+///  - If [returnSequence] is true, returns a list containing the entire Collatz sequence.
+///  - If [returnSequence] is false, returns the number of steps it takes to reach 1.
+///
+/// Throws:
+///  - ArgumentError if [n] is not a positive integer.
+///
+/// Example:
+/// ```dart
+/// print(collatz(6));  // Output: 8 (steps to reach 1)
+/// print(collatz(6, true));  // Output: [6, 3, 10, 5, 16, 8, 4, 2, 1]
+/// ```
+dynamic collatz(int n, [bool returnSequence = true]) {
+  if (n <= 0) {
+    throw ArgumentError('Input must be a positive integer');
+  }
+  
+  List<int> sequence = [n];
+  int steps = 0;
+  
+  while (n != 1) {
+    if (n.isEven) {
+      n ~/= 2;
+    } else {
+      n = 3 * n + 1;
+    }
+    
+    sequence.add(n);
+    steps++;
+  }
+  
+  return returnSequence ? sequence : steps;
+}
+
+/// Computes the maximum value reached in the Collatz sequence for a given positive integer.
+///
+/// Parameters:
+///  - [n]: A positive integer to start the sequence.
+///
+/// Returns:
+///  - The maximum value reached in the Collatz sequence starting from [n].
+///
+/// Throws:
+///  - ArgumentError if [n] is not a positive integer.
+///
+/// Example:
+/// ```dart
+/// print(collatzPeak(6));  // Output: 16
+/// print(collatzPeak(27)); // Output: 9232
+/// ```
+int collatzPeak(int n) {
+  if (n <= 0) {
+    throw ArgumentError('Input must be a positive integer');
+  }
+  
+  int maxValue = n;
+  
+  while (n != 1) {
+    if (n.isEven) {
+      n ~/= 2;
+    } else {
+      n = 3 * n + 1;
+    }
+    
+    if (n > maxValue) {
+      maxValue = n;
+    }
+  }
+  
+  return maxValue;
+}
+
+/// Finds the number with the longest Collatz sequence in a given range.
+///
+/// Parameters:
+///  - [start]: The start of the range (inclusive).
+///  - [end]: The end of the range (inclusive).
+///
+/// Returns:
+///  - A map containing the number with the longest sequence and its length.
+///
+/// Throws:
+///  - ArgumentError if [start] or [end] is not a positive integer, or if [start] > [end].
+///
+/// Example:
+/// ```dart
+/// var result = longestCollatzInRange(1, 10);
+/// print(result); // Output: {number: 9, length: 20}
+/// ```
+Map<String, int> longestCollatzInRange(int start, int end) {
+  if (start <= 0 || end <= 0) {
+    throw ArgumentError('Inputs must be positive integers');
+  }
+  if (start > end) {
+    throw ArgumentError('Start must be less than or equal to end');
+  }
+  
+  int maxLength = 0;
+  int maxNumber = start;
+  
+  for (int i = start; i <= end; i++) {
+    int length = collatz(i, false) as int;
+    if (length > maxLength) {
+      maxLength = length;
+      maxNumber = i;
+    }
+  }
+  
+  return {'number': maxNumber, 'length': maxLength};
+}
+
+/// Checks if a number is a Kaprekar number.
+///
+/// A Kaprekar number is a number whose square can be split into two parts 
+/// that add up to the original number.
+///
+/// Parameters:
+///  - [n]: The number to check.
+///
+/// Returns:
+///  - `true` if [n] is a Kaprekar number, `false` otherwise.
+///
+/// Example:
+/// ```dart
+/// print(isKaprekarNumber(9));   // Output: true (9² = 81, 8+1 = 9)
+/// print(isKaprekarNumber(45));  // Output: true (45² = 2025, 20+25 = 45)
+/// print(isKaprekarNumber(10));  // Output: false
+/// ```
+bool isKaprekarNumber(int n) {
+  if (n < 1) return false;
+  
+  BigInt square = BigInt.from(n) * BigInt.from(n);
+  String squareStr = square.toString();
+  int squareDigits = squareStr.length;
+  
+  // Special case for 1
+  if (n == 1) return true;
+  
+  // Try all possible splits of the square
+  for (int i = 1; i < squareDigits; i++) {
+    String leftPart = squareStr.substring(0, i);
+    String rightPart = squareStr.substring(i);
+    
+    // Skip if right part is just zeros
+    if (rightPart == '0' * rightPart.length) continue;
+    
+    int leftNum = int.parse(leftPart);
+    int rightNum = int.parse(rightPart);
+    
+    if (leftNum + rightNum == n) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+/// Checks if a number is a narcissistic number (also known as an Armstrong number).
+///
+/// A narcissistic number is a number that is the sum of its own digits each raised to the 
+/// power of the number of digits.
+///
+/// Parameters:
+///  - [n]: The number to check.
+///
+/// Returns:
+///  - `true` if [n] is a narcissistic number, `false` otherwise.
+///
+/// Example:
+/// ```dart
+/// print(isNarcissisticNumber(153)); // Output: true (1³ + 5³ + 3³ = 153)
+/// print(isNarcissisticNumber(370)); // Output: true (3³ + 7³ + 0³ = 370)
+/// print(isNarcissisticNumber(100)); // Output: false
+/// ```
+bool isNarcissisticNumber(int n) {
+  if (n < 0) return false;
+  
+  List<int> digits = getDigits(n);
+  int power = digits.length;
+  num sum = 0;
+  
+  for (int digit in digits) {
+    sum += pow(digit, power).toInt();
+  }
+  
+  return sum == n;
+}
+
+/// Checks if a number is a happy number.
+///
+/// A happy number is a number which eventually reaches 1 when replaced by the sum
+/// of the square of each digit.
+///
+/// Parameters:
+///  - [n]: The number to check.
+///
+/// Returns:
+///  - `true` if [n] is a happy number, `false` otherwise.
+///
+/// Example:
+/// ```dart
+/// print(isHappyNumber(19)); // Output: true (1² + 9² = 82, 8² + 2² = 68, 6² + 8² = 100, 1² + 0² + 0² = 1)
+/// print(isHappyNumber(4));  // Output: false
+/// ```
+bool isHappyNumber(int n) {
+  Set<int> seen = {};
+  
+  while (n != 1 && !seen.contains(n)) {
+    seen.add(n);
+    n = getDigits(n).fold(0, (sum, digit) => sum + digit * digit);
+  }
+  
+  return n == 1;
 }

@@ -38,7 +38,7 @@ class SVD {
   /// Construct the singular value decomposition
   /// Structure to access U, S and V.
   /// - [mat] Rectangular matrix
-  SVD(Matrix mat) {
+  SVD(Matrix mat, {int? maxIterations}) {
     // Derived from LINPACK code.
     // Initialize.
     _m = mat.rowCount;
@@ -107,7 +107,7 @@ class SVD {
         if ((k < nct) && (_s[0][k] != Complex.zero())) {
           // Apply the transformation.
 
-          Number t = Complex.zero();
+          dynamic t = Complex.zero();
           for (var i = k; i < _m; i++) {
             t += A[i][k] * A[i][j];
           }
@@ -203,7 +203,7 @@ class SVD {
       for (var k = nct - 1; k >= 0; k--) {
         if (_s[0][k] != Complex.zero()) {
           for (var j = k + 1; j < nu; j++) {
-            Number t = Complex.zero();
+            dynamic t = Complex.zero();
             for (var i = k; i < _m; i++) {
               t += _u[i][k] * _u[i][j];
             }
@@ -234,7 +234,7 @@ class SVD {
       for (var k = _n - 1; k >= 0; k--) {
         if ((k < nrt) && (e[0][k] != Complex.zero())) {
           for (var j = k + 1; j < nu; j++) {
-            Number t = Complex.zero();
+            dynamic t = Complex.zero();
             for (var i = k + 1; i < _n; i++) {
               t += _v[i][k] * _v[i][j];
             }
@@ -257,11 +257,24 @@ class SVD {
     var iter = 0;
     var eps = Complex(math.pow(2.0, -52.0));
     var tiny = Complex(math.pow(2.0, -966.0));
+
+    // Add maximum iteration count to prevent infinite loops
+    maxIterations = maxIterations ?? 100 * math.max(_m, _n);
+
     while (p > 0) {
+      // Check if we've exceeded the maximum number of iterations
+      if (iter > maxIterations) {
+        // Force convergence by setting remaining e values to zero
+        for (int i = 0; i < e[0].length; i++) {
+          e[0][i] = Complex.zero();
+        }
+        break;
+      }
+
       int k, kase;
 
       // Here is where a test for too many iterations would go.
-
+      
       // This section of the program inspects for
       // negligible elements in the s and e arrays.  On
       // completion the variables kase and k are set as follows.
@@ -275,8 +288,7 @@ class SVD {
         if (k == -1) {
           break;
         }
-        if (e[0][k].abs() <=
-            (tiny + (eps * (_s[0][k].abs() + _s[0][k + 1].abs())))) {
+        if (Complex(e[0][k].abs()) <= (tiny + (eps * Complex(_s[0][k].abs() + _s[0][k + 1].abs())))) {
           e[0][k] = Complex.zero();
           break;
         }
@@ -289,9 +301,9 @@ class SVD {
           if (ks == k) {
             break;
           }
-          var t = (ks != p ? e[0][ks].abs() : Complex.zero()) +
-              (ks != k + 1 ? e[0][ks - 1].abs() : Complex.zero());
-          if (_s[0][ks].abs() <= (tiny + (eps * t))) {
+          var t = (ks != p ? (e[0][ks].abs() ): 0) +
+              (ks != k + 1 ? e[0][ks - 1].abs() : 0);
+          if (Complex(_s[0][ks].abs()) <= (tiny + (eps * Complex(t)))) {
             _s[0][ks] = Complex.zero();
             break;
           }
@@ -377,9 +389,9 @@ class SVD {
             var epm1 = e[0][p - 2] / scale;
             var sk = _s[0][k] / scale;
             var ek = e[0][k] / scale;
-            var b = ((spm1 + sp) * (spm1 - sp) + (epm1 * epm1)) / 2.0;
+            var b = ((spm1 + sp) * (spm1 - sp) + (epm1 * epm1)) / Complex(2.0);
             var c = (sp * epm1) * (sp * epm1);
-            Number shift = Complex.zero();
+            dynamic shift = Complex.zero();
             if ((b != Complex.zero()) | (c != Complex.zero())) {
               shift = math.sqrt((b * b) + c);
               if (b < Complex.zero()) {
@@ -511,8 +523,24 @@ class SVD {
   /// Check if a is an Odd number.
   bool isOdd(int a) => a % 2 != 0;
 
+  // Modified hypotenuse function to properly handle Complex numbers
   dynamic hypotenuse(dynamic x, dynamic y) {
-    return math.sqrt(math.pow(x, 2) + math.pow(y, 2));
+    // Handle the case when both are Complex
+    if (x is Complex && y is Complex) {
+      return Complex(math.sqrt(math.pow(x.abs(), 2) + math.pow(y.abs(), 2)), 0);
+    }
+    
+    // Handle the case when one is Complex
+    if (x is Complex) {
+      return Complex(math.sqrt(math.pow(x.abs(), 2) + math.pow(y as num, 2)), 0);
+    }
+    
+    if (y is Complex) {
+      return Complex(math.sqrt(math.pow(x as num, 2) + math.pow(y.abs(), 2)), 0);
+    }
+    
+    // Original implementation for numeric values
+    return math.sqrt(math.pow(x as num, 2) + math.pow(y as num, 2));
   }
 
   /// Return the left singular vectors
@@ -539,13 +567,40 @@ class SVD {
   /// Return the diagonal matrix of singular values
   /// return S
   Matrix S() {
-    return DiagonalMatrix(_s.flatten());
+    // Create a matrix with the same dimensions as the original matrix
+    Matrix result = Matrix.zeros(_m, _n);
+    
+    // Get the minimum dimension to avoid index out of bounds
+    int minDim = math.min(_m, _n);
+    
+    // Set the diagonal elements to the singular values
+    for (int i = 0; i < minDim; i++) {
+      result[i][i] = _s[0][i];
+    }
+    
+    return result;
   }
 
-  /// Two norm condition number
+    /// Two norm condition number
   /// return max(S)/min(S)
   dynamic cond() {
-    return _s[0][0] / _s[0][math.min(_m, _n) - 1];
+    // Get the largest singular value (always at position [0][0])
+    dynamic maxSingularValue = _s[0][0];
+    
+    // Find the smallest non-zero singular value
+    int minDim = math.min(_m, _n);
+    dynamic minSingularValue = maxSingularValue; // Start with the largest value
+    
+    for (int i = 0; i < minDim; i++) {
+      dynamic value = _s[0][i];
+      // Only consider non-zero values to avoid division by zero
+      if (value.abs() > 1e-15 && value.abs() < minSingularValue.abs()) {
+        minSingularValue = value;
+      }
+    }
+    
+    // Calculate the condition number
+    return maxSingularValue / minSingularValue;
   }
 
 //#endregion

@@ -47,7 +47,7 @@ extension MatrixOperationExtension on Matrix {
           (i) => List.generate(columnCount, (j) => _data[i][j] + other[i]));
 
       return Matrix(newData);
-    } else if (other is num || other is Number) {
+    } else if (other is num || other is Complex) {
       List<List<dynamic>> newData = List.generate(
           rowCount,
           (i) => List.generate(
@@ -98,7 +98,7 @@ extension MatrixOperationExtension on Matrix {
           (i) => List.generate(columnCount, (j) => _data[i][j] - other[i]));
 
       return Matrix(newData);
-    } else if (other is num || other is Number) {
+    } else if (other is num || other is Complex) {
       List<List<dynamic>> newData = List.generate(
           rowCount,
           (i) => List.generate(
@@ -184,7 +184,7 @@ extension MatrixOperationExtension on Matrix {
       }
 
       return ColumnMatrix(result.toList());
-    } else if (other is num || other is Number) {
+    } else if (other is num || other is Complex) {
       return scale(other);
     } else {
       throw Exception('Invalid operand type ${other.runtimeType}');
@@ -438,7 +438,7 @@ extension MatrixOperationExtension on Matrix {
   /// // 3  4
   /// ```
   Matrix operator /(dynamic other) {
-    if (other is num || other is Number) {
+    if (other is num || other is Complex) {
       if (other == 0) {
         throw Exception('Cannot divide by zero');
       }
@@ -1038,6 +1038,43 @@ extension MatrixOperationExtension on Matrix {
     return diag.sum();
   }
 
+  /// Calculates the norm of the matrix based on the specified norm type.
+  ///
+  /// The norm of a matrix is a measure of its "size" or "magnitude" and can be calculated
+  /// in various ways depending on the application.
+  ///
+  /// Parameters:
+  ///   - [normType]: The type of norm to calculate. Default is [Norm.frobenius].
+  ///     Available norm types:
+  ///     - [Norm.manhattan]: L1 norm (maximum absolute column sum)
+  ///     - [Norm.frobenius]: L2/Frobenius norm (square root of sum of squares of elements)
+  ///     - [Norm.chebyshev]: Infinity norm (maximum absolute row sum)
+  ///     - [Norm.spectral]: Maximum singular value of the matrix
+  ///     - [Norm.trace]: Sum of singular values of the matrix
+  ///
+  /// Returns:
+  ///   A dynamic value representing the calculated norm.
+  ///
+  /// Throws:
+  ///   - [UnimplementedError] for unimplemented norm types like Mahalanobis
+  ///   - [Exception] for invalid norm types
+  ///
+  /// Example:
+  /// ```dart
+  /// var matrix = Matrix([[1, 2], [3, 4]]);
+  /// 
+  /// // Calculate Frobenius norm (default)
+  /// var frobeniusNorm = matrix.norm();
+  /// print(frobeniusNorm);  // Output: 5.477225575051661
+  /// 
+  /// // Calculate Manhattan norm
+  /// var manhattanNorm = matrix.norm(Norm.manhattan);
+  /// print(manhattanNorm);  // Output: 6.0
+  /// 
+  /// // Calculate Infinity norm
+  /// var infinityNorm = matrix.norm(Norm.chebyshev);
+  /// print(infinityNorm);  // Output: 7.0
+  /// ```
   dynamic norm([Norm normType = Norm.frobenius]) {
     switch (normType) {
       case Norm.manhattan:
@@ -1261,7 +1298,7 @@ extension MatrixOperationExtension on Matrix {
     }
 
     dynamic maxValue = max();
-    if (maxValue == 0) {
+    if (maxValue == Complex(0)) {
       throw Exception("Matrix is filled with zeros, cannot normalize");
     }
 
@@ -1416,7 +1453,7 @@ extension MatrixOperationExtension on Matrix {
     if (n != columnCount) {
       throw Exception('Matrix must be square to calculate determinant');
     }
-    Number det = Complex.one();
+    dynamic det = Complex.one();
     if (method == DeterminantMethod.LU) {
       // Perform LU decomposition
       // (Replace with your actual LU decomposition implementation)
@@ -1686,43 +1723,60 @@ extension MatrixOperationExtension on Matrix {
   /// // └  1.5 -0.5 ┘
   /// ```
   Matrix inverse({double conditionThreshold = 1e-3}) {
-    // if (rowCount != columnCount) {
-    //   throw Exception('Matrix must be square to calculate inverse');
-    // }
-
-    // Compute SVD decomposition.
-    var svd = decomposition.singularValueDecomposition();
-
-    print('Condition number is: ${svd.conditionNumber}');
-
-    if (svd.conditionNumber > Complex(conditionThreshold)) {
-      print(
-          'Matrix condition number exceeds threshold $conditionThreshold. Likely singular.');
-    } else {
-      try {
-        // Attempt regular inversion using LU solve.
-        var lu = decomposition.luDecompositionDoolittle();
-        var identity = Matrix.eye(rowCount);
-        return lu
-            .solve(identity); // Solve A * X = I for X (generalized inverse).
-      } catch (e) {
-        print('Failed regular inversion: $e. Falling back to SVD inversion...');
-      }
+    
+    // For non-square matrices, compute the pseudo-inverse directly
+    if (!isSquareMatrix()) {
+      return pseudoInverse();
+    } 
+    try {
+      // First attempt: Try LU decomposition for efficiency (works for most well-conditioned matrices)
+      var lu = decomposition.luDecompositionDoolittle();
+      var identity = Matrix.eye(rowCount);
+      return lu.solve(identity);
+    } catch (e) {
+      // LU decomposition failed, continue to SVD
     }
 
-    // SVD Inversion.
+    // Second attempt: Use SVD which is more robust for ill-conditioned matrices
     try {
-      print('Attempting SVD inversion...');
-      // Identity matrix of the same size.
+      var svd = decomposition.singularValueDecomposition();
+      
+      // Check condition number to determine if the matrix is numerically invertible
+      if (svd.conditionNumber > Complex(conditionThreshold)) {
+        // Matrix is ill-conditioned but we can still compute a regularized inverse
+        return _computeRegularizedInverse(svd, conditionThreshold);
+      }
+      
+      // Standard SVD-based inverse
       var identity = Matrix.eye(rowCount);
       return svd.solve(identity);
     } catch (e) {
-      print('SVD inversion failed: $e');
+      // If all else fails, use the generalized pseudo-inverse approach
+      return pseudoInverse();
     }
+  }
 
-    // Generalized Inverse Fallback.
-    print('Falling back to generalized inverse...');
-    return pseudoInverse();
+  // Helper method for computing regularized inverse for ill-conditioned matrices
+  Matrix _computeRegularizedInverse(SingularValueDecomposition svd, double threshold) {
+    // Use Tikhonov regularization to handle ill-conditioning
+    Matrix U = svd.U;
+    Matrix S = svd.S;
+    Matrix V = svd.V;
+    
+    // Create regularized S^(-1) by filtering small singular values
+    Matrix SInv = Matrix.zeros(columnCount, rowCount);
+    for (int i = 0; i < math.min(rowCount, columnCount); i++) {
+      dynamic s = S[i][i];
+      if (s.abs() > threshold) {
+        SInv[i][i] = Complex.one() / s;
+      } else {
+        // For very small singular values, use regularized inversion
+        SInv[i][i] = s / (s * s + threshold);
+      }
+    }
+    
+    // Compute V·S^(-1)·U^T
+    return V * SInv * U.transpose();
   }
 
   /// Computes the pseudo-inverse of a matrix using Singular Value Decomposition (SVD).
@@ -1774,14 +1828,18 @@ extension MatrixOperationExtension on Matrix {
   Matrix pseudoInverse() {
     Matrix a = copy();
     Matrix aTranspose = a.transpose();
-    return (aTranspose * a).inverse() * aTranspose;
+    
+    if (rowCount >= columnCount) {
+      // Overdetermined system (more rows than columns)
+      // Pseudo-inverse = (A^T·A)^(-1)·A^T
+      return (aTranspose * a).inverse() * aTranspose;
+    } else {
+      // Underdetermined system (more columns than rows)
+      // Pseudo-inverse = A^T·(A·A^T)^(-1)
+      return aTranspose * (a * aTranspose).inverse();
+    }
   }
-  // Matrix pseudoInverse() {
-  //   var svd = decomposition.singularValueDecomposition();
-  //   // Identity matrix of the same size.
-  //   var identity = Matrix.eye(rowCount);
-  //   return svd.solve(identity);
-  // }
+
 
   /// Calculates the dot product of two matrices.
   ///
@@ -1815,7 +1873,7 @@ extension MatrixOperationExtension on Matrix {
     for (int i = 0; i < rowsA; i++) {
       List<dynamic> row = [];
       for (int j = 0; j < colsB; j++) {
-        dynamic sum = 0;
+        dynamic sum = Complex(0);
         for (int k = 0; k < colsA; k++) {
           sum += this[i][k] * other[k][j];
         }
@@ -2059,8 +2117,7 @@ extension MatrixOperationExtension on Matrix {
     }
     // Convert matrix to a numerical matrix.
     Matrix A = _Utils.toNumMatrix(this);
-    Matrix
-        QH; // Will hold the orthogonal transformation from Hessenberg reduction.
+    Matrix QH = Matrix(); // Will hold the orthogonal transformation from Hessenberg reduction.
 
     // If the matrix is not symmetric (within tolerance), reduce to Hessenberg form.
     if (!isSymmetricMatrix(tolerance: tolerance)) {

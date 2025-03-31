@@ -1,7 +1,26 @@
+# 5.2.0
+
+* **[FEATURE]** Added `isClose` similar to that of Python
+* **[FEATURE]** Added conversion of `Complex` to `num`
+* **[FEATURE]** Added more functions to `Complex`
+* **[BREAKING]** Remove the FileIO form the library as it is the same from [DartFrame](https://pub.dev/packages/dartframe).
+* **[IMPROVEMENT]** Enhanced Complex number integration throughout the library
+* **[FEATURE]** Added `simplify()` method to return appropriate data types from mathematical operations
+* **[IMPROVEMENT]** Updated mathematical functions to work with Complex numbers:
+  * `round()` - Now supports rounding both real and imaginary parts
+  * `hypot()` - Enhanced to work with Complex inputs
+  * `sign()` - Added support for Complex numbers
+  * `clamp()` - Now clamps both real and imaginary parts of Complex numbers
+  * `lerp()` - Added support for linear interpolation between Complex numbers
+* **[BUG_FIX]** Fixed test cases for Roman numerals
+* **[IMPROVEMENT]** `SVD` and `LU` algorithms
+* **[IMPROVEMENT]** Standardized error handling across mathematical functions
+* **[IMPROVEMENT]** Improved documentation with examples for Complex number operations
+
 # 5.1.0
 
 * **[BUG_FIX]** Fixed error from `svd` as from issues [#3](https://github.com/gameticharles/advance_math/issues/3)
-* **[IMPROVEMENT]** Changed the default PiI computation to use
+* **[IMPROVEMENT]** Changed the default PI computation to use
 * **[IMPROVEMENT]** Changed the entire `Matrix` class and `Vector` class to use `Complex` for all operations.
 
 # 5.0.0

@@ -4,7 +4,7 @@ part of '../algebra.dart';
 /// along with various utility methods for manipulating these arrays.
 ///
 /// The class extends `IterableMixin` allowing iteration over the rows or columns of the matrix.
-class Matrix extends IterableMixin<List<dynamic>> {
+class Matrix extends IterableMixin<List<dynamic>>{
   /// Private field to hold the actual data of the matrix.
   List<List<dynamic>> _data = const [];
 
@@ -37,6 +37,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
           throw Exception('Rows have different lengths');
         }
       }
+      // Convert all to Complex if they num else the data type
       _data = _Utils.toNumList(input);
     } else {
       throw Exception('Invalid input type');
@@ -1155,15 +1156,15 @@ class Matrix extends IterableMixin<List<dynamic>> {
 
     if (k > 0) {
       for (int i = 0; i < n - k; i++) {
-        diagonal.add(data[i][i + k]);
+        diagonal.add(data[i][i + k].simplify());
       }
     } else if (k < 0) {
       for (int i = 0; i < n + k; i++) {
-        diagonal.add(data[i - k][i]);
+        diagonal.add(data[i - k][i].simplify());
       }
     } else {
       for (int i = 0; i < n; i++) {
-        diagonal.add(data[i][i]);
+        diagonal.add(data[i][i].simplify());
       }
     }
 

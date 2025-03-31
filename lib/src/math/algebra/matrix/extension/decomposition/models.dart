@@ -346,22 +346,62 @@ class LUDecomposition extends Decomposition {
 }
 
 class SingularValueDecomposition extends Decomposition {
-  final SVD _svd;
+  final SVD? _svd;
+  final Matrix? _U;
+  final Matrix? _S;
+  final Matrix? _V;
+  final dynamic _conditionNumber;
 
-  SingularValueDecomposition(SVD svd) : _svd = svd;
+  /// Constructor that takes an SVD object
+  SingularValueDecomposition(SVD svd) 
+    : _svd = svd,
+      _U = null,
+      _S = null,
+      _V = null,
+      _conditionNumber = null;
+
+  /// Constructor that takes pre-computed U, S, and V matrices
+  /// 
+  /// [u] The left singular vectors matrix
+  /// [s] The diagonal matrix of singular values
+  /// [v] The right singular vectors matrix (V^T)
+  /// [condNumber] Optional pre-computed condition number
+  SingularValueDecomposition.fromComponents(Matrix u, Matrix s, Matrix v, {dynamic condNumber}) 
+    : _svd = null,
+      _U = u,
+      _S = s,
+      _V = v,
+      _conditionNumber = condNumber;
 
   /// Returns the left singular vectors
-  Matrix get U => _svd.U();
-
-  /// Returns the right singular vectors
-  Matrix get S => _svd.S();
+  Matrix get U => _svd != null ? _svd.U() : _U!;
 
   /// Returns the diagonal matrix of singular values
-  Matrix get V => _svd.V();
+  Matrix get S => _svd != null ? _svd.S() : _S!;
+
+  /// Returns the right singular vectors (V^T)
+  Matrix get V => _svd != null ? _svd.V() : _V!;
 
   /// Two norm condition number
-  dynamic get conditionNumber => _svd.cond();
+  dynamic get conditionNumber {
+    if (_conditionNumber != null) return _conditionNumber;
+    if (_svd != null) return _svd.cond();
+    
+    // Calculate condition number from singular values if not provided
+    dynamic maxSingularValue = S[0][0];
+    dynamic minSingularValue = maxSingularValue;
+    
+    int minDim = math.min(S.rowCount, S.columnCount);
+    for (int i = 0; i < minDim; i++) {
+      if (S[i][i] != Complex.zero() && S[i][i].abs() < minSingularValue.abs()) {
+        minSingularValue = S[i][i];
+      }
+    }
+    
+    return maxSingularValue / minSingularValue;
+  }
 
+  // Rest of the class remains the same
   /// Checks if U is an orthogonal matrix.
   bool get isOrthogonalU => U.isOrthogonalMatrix();
 
