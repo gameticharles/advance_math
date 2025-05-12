@@ -236,7 +236,7 @@ dynamic atan2(dynamic a, dynamic b) {
 
     // Using the formula: atan2(a, b) = (1/2i) * log((b + ai) / (b - ai))
     Complex i = Complex(0, 1);
-    dynamic result = (Integer.one / (i * 2)) *
+    dynamic result = (Complex.zero() / (i * 2)) *
         log((bComplex + i * aComplex) / (bComplex - i * aComplex));
     return result;
   }

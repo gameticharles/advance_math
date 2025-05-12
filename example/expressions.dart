@@ -33,8 +33,10 @@ void main(List<String> args) {
   myFunc('A', 'B', 'C'); // Positional args only
 
   // Example 3: Use the avg function
-  print(avg([1, 2, 3, 4, 5])); // This will print the average of the numbers
+  print(avg([1, 2, 3, 4, 5]));
   print(avg(1, 2, 3, 4, 5));
+
+
 
   final testCases = [
     "1 + 2 * 3",

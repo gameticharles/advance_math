@@ -6,32 +6,32 @@ part of '../../expression.dart';
 /// This equation has exactly 1 solution, which can be real or complex.
 class Linear extends Polynomial {
   Linear({
-    Number a = Integer.one,
-    Number b = Integer.zero,
+    dynamic a = 1,
+    dynamic b = 0,
   }) : super([a, b]);
 
   Linear.num({
     num a = 1,
     num b = 0,
-  }) : super([numToNumber(a), numToNumber(b)]);
+  }) : super([a, b]);
 
-  Linear.fromList(List<Number> coefficients) : super(coefficients) {
+  Linear.fromList(List<dynamic> coefficients) : super(coefficients) {
     if (coefficients.length != 2) {
       throw ArgumentError('The input list must contain exactly 2 elements.');
     }
   }
 
   @override
-  Number discriminant() => Complex.fromReal(1);
+  dynamic discriminant() => 1;
 
   @override
-  List<Number> roots() => [-b / a];
+  List<dynamic> roots() => [-b / a];
 
   /// The first coefficient of the equation in the form _f(x) = ab + b_.
-  Number get a => coefficients.first;
+  dynamic get a => coefficients.first.simplify();
 
   /// The second coefficient of the equation in the form _f(x) = ab + b_.
-  Number get b => coefficients[1];
+  dynamic get b => coefficients[1].simplify();
 
   Linear copyWith({
     Complex? a,

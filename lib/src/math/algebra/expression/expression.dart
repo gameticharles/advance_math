@@ -1,7 +1,10 @@
 library expression;
 
-import 'package:advance_math/advance_math.dart';
+
+import '../../../../advance_math.dart' hide Complex,Number, Integer, Double;
+import '../../../number/complex/complex.dart';
 import 'package:petitparser/petitparser.dart';
+
 
 part 'parser.dart';
 part 'utils.dart';

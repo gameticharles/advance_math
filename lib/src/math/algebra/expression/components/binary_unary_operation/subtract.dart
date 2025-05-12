@@ -119,7 +119,7 @@ class Subtract extends BinaryOperationsExpression {
         );
       }
       // Handle terms of type x^2y, x^3, etc.
-      else if (term is Multiply || term is Power) {
+      else if (term is Multiply || term is Pow) {
         likeTerms.update(
           term.toString(),
           (value) => value + 1,

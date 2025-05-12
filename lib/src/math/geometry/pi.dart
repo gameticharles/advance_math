@@ -47,7 +47,7 @@ enum PiCalcAlgorithm {
 /// - `compute<T>(Decimal Function(Decimal) func)`: Applies a function that requires the value of pi to the computed value.
 /// - `countDigitFrequency()`: Counts the frequency of each digit in the decimal representation of pi.
 /// - `findPatternIndices(String pattern)`: Finds the indices of a given pattern in the string representation of pi.
-class PI {
+class PI extends Decimal{
   /// The precision of the computed value of pi, in decimal places.
   final int precision;
 
@@ -55,6 +55,17 @@ class PI {
 
   /// The time taken per digit of the computed value of pi.
   late final double timePerDigit;
+
+  /// The total taken for the computed value of pi
+  late final int totalDuration;
+
+  /// Constructs a [PI] object with the specified precision.
+  ///
+  /// The [precision] parameter determines the number of decimal places to compute for the value of π.
+  /// If no [precision] is provided, the default is 100 decimal places.
+  ///
+  /// `algorithm`: The algorithm to use to calculate the value of pi.
+  PI._internal(Decimal super.piValue, this.precision, this._piString, this.timePerDigit, this.totalDuration);
 
   /// Constructs a [PI] object with the specified precision.
   ///
@@ -64,41 +75,36 @@ class PI {
   /// `method`: The method to use to calculate the value of pi.
   ///
   /// The computed value of π is stored in the [_piString] field as a string.
-  PI({PiCalcAlgorithm algorithm = PiCalcAlgorithm.Ramanujan, int? precision})
-      : precision = precision ?? decimalPrecision {
-    dynamic pi;
+  /// Factory constructor that handles the calculation
+  factory PI({PiCalcAlgorithm algorithm = PiCalcAlgorithm.Ramanujan, int? precision}) {
+    final actualPrecision = precision ?? decimalPrecision;
+    PiAlgorithm pi;
 
     switch (algorithm) {
       case PiCalcAlgorithm.BBP:
-        pi = BBP(this.precision);
+        pi = BBP(actualPrecision);
         break;
-
       case PiCalcAlgorithm.GaussLegendre:
-        pi = GaussLegendre(this.precision);
+        pi = GaussLegendre(actualPrecision);
         break;
-
       case PiCalcAlgorithm.Chudnovsky:
-        pi = Chudnovsky(this.precision);
+        pi = Chudnovsky(actualPrecision);
         break;
-
       case PiCalcAlgorithm.Ramanujan:
-        pi = Ramanujan(this.precision);
+        pi = Ramanujan(actualPrecision);
         break;
-
       case PiCalcAlgorithm.NewtonEuler:
-        pi = NewtonEuler(this.precision);
+        pi = NewtonEuler(actualPrecision);
         break;
-
       case PiCalcAlgorithm.Madhava:
-        pi = Madhava(this.precision);
+        pi = Madhava(actualPrecision);
         break;
     }
 
-    // Perform pi calculation.
+    // Perform pi calculation
     Decimal piValue = pi.calculate();
-    _piString = piValue.toStringAsFixed(this.precision);
-
-    timePerDigit = pi.getTimePerDigit();
+    String piString = piValue.toStringAsFixed(actualPrecision);
+    return PI._internal(piValue, actualPrecision, piString, pi.getTimePerDigit(), pi.getTotalTime());
   }
 
   /// Performs a binary split on the given range [a, b] to calculate the
@@ -311,8 +317,17 @@ abstract class PiAlgorithm {
   /// dividing the total time taken to compute the digits by the number of
   /// digits computed.
   double getTimePerDigit() {
-    return (endTime - startTime) / digits;
+    return getTotalTime() / digits;
   }
+
+  /// Calculate the duration of the algorithm
+  /// 
+  /// The number of milliseconds since the "Unix epoch" 1970-01-01T00:00:00Z (UTC).
+  /// 
+  /// This value is independent of the time zone.
+  /// 
+  /// This value is at most 8,640,000,000,000,000ms (100,000,000 days) from the Unix epoch. In other words: millisecondsSinceEpoch.abs() <= 8640000000000000.
+  int getTotalTime() => endTime - startTime;
 
   /// Calculates the value of pi to the specified number of digits.
   Decimal calculate();

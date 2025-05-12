@@ -35,11 +35,11 @@ class Quartic extends Polynomial {
   /// values are required, then consider using [Quartic.realEquation] for a
   /// less verbose syntax.
   Quartic({
-    Number a = Integer.one,
-    Number b = Integer.zero,
-    Number c = Integer.zero,
-    Number d = Integer.zero,
-    Number e = Integer.zero,
+    dynamic a = 1,
+    dynamic b = 0,
+    dynamic c = 0,
+    dynamic d = 0,
+    dynamic e = 0,
   }) : super([a, b, c, d, e]);
 
   /// This is an example of a quartic equations, where the coefficient with the
@@ -57,22 +57,16 @@ class Quartic extends Polynomial {
   /// If the coefficients of your polynomial contain complex numbers, consider
   /// using the [Quartic.new] constructor instead.
   Quartic.num({num a = 1, num b = 0, num c = 0, num d = 0, num e = 0})
-      : super([
-          numToNumber(a),
-          numToNumber(b),
-          numToNumber(c),
-          numToNumber(d),
-          numToNumber(e)
-        ]);
+      : super([a, b, c, d, e]);
 
-  Quartic.fromList(List<Number> coefficients) : super(coefficients) {
+  Quartic.fromList(List<dynamic> coefficients) : super(coefficients) {
     if (coefficients.length != 5) {
       throw ArgumentError('The input list must contain exactly 5 elements.');
     }
   }
 
   @override
-  Number discriminant() {
+  dynamic discriminant() {
     final k = (b * b * c * c * d * d) -
         (d * d * d * b * b * b * Complex.fromReal(4)) -
         (d * d * c * c * c * a * Complex.fromReal(4)) +
@@ -98,7 +92,7 @@ class Quartic extends Polynomial {
   }
 
   @override
-  List<Number> roots() {
+  List<dynamic> roots() {
     final fb = b / a;
     final fc = c / a;
     final fd = d / a;
@@ -144,30 +138,30 @@ class Quartic extends Polynomial {
 
   /// The first coefficient of the equation in the form
   /// _f(x) = ax^4 + bx^3 + cx^2 + dx + e = 0_
-  Number get a => coefficients.first;
+  dynamic get a => coefficients.first;
 
   /// The second coefficient of the equation in the form
   /// _f(x) = ax^4 + bx^3 + cx^2 + dx + e = 0_
-  Number get b => coefficients[1];
+  dynamic get b => coefficients[1];
 
   /// The third coefficient of the equation in the form
   /// _f(x) = ax^4 + bx^3 + cx^2 + dx + e = 0_
-  Number get c => coefficients[2];
+  dynamic get c => coefficients[2];
 
   /// The fourth coefficient of the equation in the form
   /// _f(x) = ax^4 + bx^3 + cx^2 + dx + e = 0_
-  Number get d => coefficients[3];
+  dynamic get d => coefficients[3];
 
   /// The fifth coefficient of the equation in the form
   /// _f(x) = ax^4 + bx^3 + cx^2 + dx + e = 0_
-  Number get e => coefficients[4];
+  dynamic get e => coefficients[4];
 
   Quartic copyWith({
-    Number? a,
-    Number? b,
-    Number? c,
-    Number? d,
-    Number? e,
+    dynamic a,
+    dynamic b,
+    dynamic c,
+    dynamic d,
+    dynamic e,
   }) =>
       Quartic(
         a: a ?? this.a,

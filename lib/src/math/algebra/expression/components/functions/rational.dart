@@ -27,7 +27,7 @@ class RationalFunction extends Expression {
   }
 
   @override
-  Number evaluate([dynamic arg]) {
+  dynamic evaluate([dynamic arg]) {
     return Divide(numerator, denominator).evaluate(arg);
   }
 
@@ -50,15 +50,15 @@ class RationalFunction extends Expression {
 
   @override
   bool isIndeterminate(num x) {
-    Number numValue = numerator.evaluate(x);
-    Number denValue = denominator.evaluate(x);
-    return (numValue == Integer(0) && denValue == Integer(0)) ||
+    dynamic numValue = numerator.evaluate(x);
+    dynamic denValue = denominator.evaluate(x);
+    return (numValue == 0 && denValue == 0) ||
         (numValue.isInfinite && denValue.isInfinite);
   }
 
   @override
   bool isInfinity(num x) {
-    Number value = evaluate(x);
+    dynamic value = evaluate(x);
     return value.isInfinite;
   }
 

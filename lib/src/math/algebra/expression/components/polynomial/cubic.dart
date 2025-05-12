@@ -12,24 +12,24 @@ part of '../../expression.dart';
 /// The above cases depend on the value of the discriminant.
 class Cubic extends Polynomial {
   Cubic({
-    Number a = Integer.one,
-    Number b = Integer.zero,
-    Number c = Integer.zero,
-    Number d = Integer.zero,
+    dynamic a = 1,
+    dynamic b = 0,
+    dynamic c = 0,
+    dynamic d = 0,
   }) : super([a, b, c, d]);
 
   /// Constructs a quadratic equation with coefficients [a], [b], and [c].
   Cubic.num({num a = 1, num b = 0, num c = 0, num d = 0})
-      : super([numToNumber(a), numToNumber(b), numToNumber(c), numToNumber(d)]);
+      : super([a, b, c, d]);
 
-  Cubic.fromList(List<Number> coefficients) : super(coefficients) {
+  Cubic.fromList(List<dynamic> coefficients) : super(coefficients) {
     if (coefficients.length != 4) {
       throw ArgumentError('The input list must contain exactly 4 elements.');
     }
   }
 
   @override
-  Number discriminant() {
+  dynamic discriminant() {
     final p1 = c * c * b * b;
     final p2 = d * b * b * b * Complex.fromReal(4);
     final p3 = c * c * c * a * Complex.fromReal(4);
@@ -40,7 +40,7 @@ class Cubic extends Polynomial {
   }
 
   @override
-  List<Number> roots() {
+  List<dynamic> roots() {
     var two = Complex.fromReal(2);
     var three = Complex.fromReal(3);
     final sigma = Complex(-1 / 2, 1 / 2 * sqrt(3));
@@ -53,7 +53,7 @@ class Cubic extends Polynomial {
     final C = ((d1 + sqrtD) / two).nthRoot(3);
     final constTerm = Complex.fromReal(-1) / (a * three);
 
-    return <Number>[
+    return <dynamic>[
       constTerm * (b + C + (d0 / C)),
       constTerm * (b + (C * sigma) + (d0 / (C * sigma))),
       constTerm * (b + (C * sigma.pow(2)) + (d0 / (C * sigma.pow(2)))),
@@ -62,26 +62,26 @@ class Cubic extends Polynomial {
 
   /// The first coefficient of the equation in the form
   /// _f(x) = ax^3 + bx^2 + cx + d = 0_
-  Number get a => coefficients.first;
+  dynamic get a => coefficients.first.simplify();
 
   /// The second coefficient of the equation in the form
   /// _f(x) = ax^3 + bx^2 + cx + d = 0_
-  Number get b => coefficients[1];
+  dynamic get b => coefficients[1].simplify();
 
   /// The third coefficient of the equation in the form
   /// _f(x) = ax^3 + bx^2 + cx + d = 0_
-  Number get c => coefficients[2];
+  dynamic get c => coefficients[2].simplify();
 
   /// The fourth coefficient of the equation in the form
   /// _f(x) = ax^3 + bx^2 + cx + d = 0_
-  Number get d => coefficients[3];
+  dynamic get d => coefficients[3].simplify();
 
   /// {@macro algebraic_deep_copy}
   Cubic copyWith({
-    Number? a,
-    Number? b,
-    Number? c,
-    Number? d,
+    dynamic a,
+    dynamic b,
+    dynamic c,
+    dynamic d,
   }) =>
       Cubic(
         a: a ?? this.a,

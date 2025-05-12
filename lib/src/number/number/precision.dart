@@ -9,10 +9,7 @@ import 'number_exception.dart';
 import 'real.dart';
 import '../util/jenkins_hash.dart';
 
-/// The default precision of a `Precision`.
-/// The default value is 50.
-/// This can be changed by setting the global variable `decimalPrecision`.
-int decimalPrecision = 50;
+
 
 /// `Precision` represents an arbitrary precision number.
 ///

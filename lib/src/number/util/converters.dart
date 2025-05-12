@@ -5,9 +5,9 @@ import '../number/integer.dart';
 import '../number/number.dart';
 import '../number/precision.dart';
 
+export '../number/fraction.dart';
 export '../number/complex.dart';
 export '../number/double.dart';
-export '../number/fraction.dart';
 export '../number/imaginary.dart';
 export '../number/integer.dart';
 export '../number/number.dart';

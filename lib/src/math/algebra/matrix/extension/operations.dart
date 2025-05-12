@@ -1950,23 +1950,22 @@ extension MatrixOperationExtension on Matrix {
   /// // 1.235  2.346
   /// // 3.457  4.568
   /// ```
-  Matrix round([int decimalPlaces = 0]) {
-    // Create a new data structure for the rounded matrix
-    List<List<dynamic>> newData = List.generate(
-        rowCount, (i) => List<dynamic>.generate(columnCount, (j) => 0));
-
-    // Iterate over each element in the matrix
-    for (int i = 0; i < rowCount; i++) {
-      for (int j = 0; j < columnCount; j++) {
-        if (decimalPlaces == 0) {
-          newData[i][j] = _data[i][j].round();
-        } else {
-          newData[i][j] = (_data[i][j] * math.pow(10, decimalPlaces)).round() /
-              math.pow(10, decimalPlaces);
-        }
-      }
-    }
-
+  Matrix round([int decimals = 0]) {
+    var newData = List<List<dynamic>>.generate(
+        rowCount,
+        (i) => List<dynamic>.generate(columnCount, (j) {
+              var value = _data[i][j];
+              if (value is Complex) {
+                return value.roundTo(decimals: decimals);
+              } else if (value is num) {
+                if (value.isNaN || value.isInfinite) {
+                  return value; // Preserve NaN and Infinity values
+                }
+                final factor = math.pow(10, decimals);
+                return (value * factor).round() / factor;
+              }
+              return value;
+            }));
     return Matrix(newData);
   }
 

@@ -59,7 +59,7 @@ final class DurandKerner extends Polynomial {
   ///   ],
   /// );
   /// ```
-  final List<Number> initialGuess;
+  final List<dynamic> initialGuess;
 
   /// The accuracy of the algorithm.
   final double precision;
@@ -125,11 +125,11 @@ final class DurandKerner extends Polynomial {
   /// If the coefficients of your polynomial contain complex numbers, consider
   /// using the [DurandKerner.new] constructor instead.
   DurandKerner.num(
-    List<num> coefficients, {
+    List<dynamic> coefficients, {
     this.initialGuess = const [],
     this.precision = 1.0e-10,
     this.maxSteps = 2000,
-  }) : super(coefficients.map((e) => numToNumber(e)).toList());
+  }) : super(coefficients.map((e) => Complex(e)).toList());
 
   @override
   bool operator ==(Object other) {
@@ -181,7 +181,7 @@ final class DurandKerner extends Polynomial {
   }
 
   @override
-  Number discriminant() {
+  dynamic discriminant() {
     // // Say that P(x) is the polynomial represented by this instance and
     // // P'(x) is the derivative of P. In order to calculate the discriminant of
     // // a polynomial, we need to first compute the resultant Res(A, A') which
@@ -193,11 +193,11 @@ final class DurandKerner extends Polynomial {
     // // Computes Res(A, A') and then determines the sign according with the
     // // degree of the polynomial.
     // return sylvester.polynomialDiscriminant();
-    return Integer(0); // Remove and uncomment the above
+    return 0; // Remove and uncomment the above
   }
 
   @override
-  List<Number> roots() {
+  List<dynamic> roots() {
     // In case the polynomial was a constant, just return an empty array because
     // there are no solutions.
     if (coefficients.length <= 1) {
@@ -209,10 +209,10 @@ final class DurandKerner extends Polynomial {
     final reversedCoeffs = coefficients.reversed.toList(growable: false);
 
     // Buffers for numerators and denominators or real and complex parts.
-    final realBuffer = reversedCoeffs.map((e) => numberToNum(e)).toList(
+    final realBuffer = reversedCoeffs.map((e) => e.simply()).toList(
           growable: false,
         );
-    final imaginaryBuffer = reversedCoeffs.map((e) => numberToNum(e)).toList(
+    final imaginaryBuffer = reversedCoeffs.map((e) => e.simply()).toList(
           growable: false,
         );
 
@@ -244,10 +244,10 @@ final class DurandKerner extends Polynomial {
     // Using default values to compute the solutions. If they aren't provided,
     // we will generate default ones.
     if (initialGuess.isNotEmpty) {
-      final real = initialGuess.map((e) => numberToNum(e)).toList(
+      final real = initialGuess.map((e) => e.simply()).toList(
             growable: false,
           );
-      final complex = initialGuess.map((e) => numberToNum(e)).toList(
+      final complex = initialGuess.map((e) => e.simply()).toList(
             growable: false,
           );
 
@@ -318,8 +318,8 @@ final class DurandKerner extends Polynomial {
   /// Returns the maximum magnitude of the complex number, increased by 1.
   double _bound({
     required int value,
-    required List<num> realBuffer,
-    required List<num> imaginaryBuffer,
+    required List<dynamic> realBuffer,
+    required List<dynamic> imaginaryBuffer,
   }) {
     num bound = 0.0;
 
@@ -334,11 +334,11 @@ final class DurandKerner extends Polynomial {
   }
 
   /// The Durand-Kerner algorithm that finds the roots of the polynomial.
-  List<Number> _solve({
-    required List<num> realValues,
-    required List<num> imaginaryValues,
-    required List<num> realBuffer,
-    required List<num> imaginaryBuffer,
+  List<dynamic> _solve({
+    required List<dynamic> realValues,
+    required List<dynamic> imaginaryValues,
+    required List<dynamic> realBuffer,
+    required List<dynamic> imaginaryBuffer,
   }) {
     final coefficientsLength = coefficients.length;
     final realValuesLen = realValues.length;
@@ -476,7 +476,7 @@ final class DurandKerner extends Polynomial {
     }
 
     // Merging the two real and complex helper arrays into a single list.
-    return List<Number>.generate(
+    return List<Complex>.generate(
       coefficientsLength - 1,
       (index) => Complex(realValues[index], imaginaryValues[index]),
       growable: false,

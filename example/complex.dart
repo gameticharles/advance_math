@@ -1,7 +1,34 @@
-import 'package:advance_math/advance_math.dart' as math;
+import 'package:advance_math/advance_math.dart' hide Complex;
 import 'package:advance_math/src/number/complex/complex.dart';
 
+// Example of using memoized functions
 void main() {
+  
+  // Benchmark comparison
+  final stopwatch = Stopwatch()..start();
+  
+  // Regular method
+  for (int i = 0; i < 10; i++) {
+    var res = time(() => pow); // Computes the sum
+    print('Result: ${res.result}, Time: ${res.elapsed.inMicroseconds} μs');
+  }
+  print('Regular exp: ${stopwatch.elapsedMicroseconds} μs');
+  
+  stopwatch.reset();
+  
+  // Memoized method
+  final memoizedPow = pow.memoize();
+  for (int i = 0; i < 10; i++) {
+
+    var res = time(() => memoizedPow); // Computes the sum
+    print('Result: ${res.result}, Time: ${res.elapsed.inMicroseconds} μs');
+  }
+  print('Memoized exp: ${stopwatch.elapsedMicroseconds} μs');
+}
+
+
+
+void main1() {
   const inf = double.infinity;
   const neginf = double.negativeInfinity;
   const nan = double.nan;
@@ -159,7 +186,7 @@ void main() {
   print(c2.toStringAsFixed(1)); // 2.5
   print(c2.toStringAsFraction()); // 2 1/2
 
-  c3 = Complex.polar(2, math.pi / 2);
+  c3 = Complex.polar(2, pi / 2);
   print(c3.toStringAsFixed(3)); // 0.000 + 2.000i
 
   // Case 1: (5 - i) + (2 + 2i)i
@@ -222,78 +249,28 @@ void main() {
   print(Complex('1.2e3+3.4e-5i')); // 1200 + 0.000034i
   print(Complex.parse('2.5e3+4.2e-2i')); // 2500 + 0.042i
 
-  math.printLine();
+  printLine();
   print(Complex(3, 0).toInt());
   print(Complex(3, 1e-16).toInt());
   print(Complex(3.5, 0).toInt());
   try {print(Complex(3, 4).toInt()); } catch (e) {print(e);}
   
 
-  math.printLine();
+  printLine();
 
   print(Complex.parse('0.5+0.5i').toNum());  
   print(Complex.parse('0.5+0.5i').simplify());
   try {print(Complex.parse('0.5+0.5i').toInt()); } catch (e) {print(e);}
   try {print(Complex.parse('0.5+0.5i').toInt()); } catch (e) {print(e);} 
+
+  // print(2 + Complex(4));
+  print(Complex.infinity());
+
+  var i = Imaginary(1);  // 1i
+  var j = Imaginary(2);  // 2i
+  print(i + j);  // 3i
+  print(i * j);  // -2 (real number)
+  print(i / j);  // 0.5 (real number)
+
+  
 }
-
-// void main() {
-//   test('Simplification', () {
-//     expect(Complex(5, 0).value, 5);
-//     expect(Complex(5.5, 0).value, 5.5);
-//     expect(Complex(double.infinity, 0).value, double.infinity);
-//     expect(Complex(double.nan, 0).value, isNaN);
-//     expect(Complex(1e30, 0).value, 1000000000000000000000000000000);
-//   });
-
-//   test('Edge Cases', () {
-//     expect(Complex(0.0, 0).value, 0);
-//     expect(Complex(-0.0, 0).value, 0);
-//     expect(Complex(9007199254740992.0, 0).value, 9007199254740992);
-//     expect(Complex(9007199254740993.0, 0).value, 9007199254740993.0);
-//   });
-
-//  test('Precision Edge Cases', () {
-//    expect(Complex(0.0000000000000001, 0).value, 0);
-//    expect(Complex(1.000000000000001, 0).value, 1.000000000000001);
-//    expect(Complex(123456789012345678901234567890.0, 0).value, 
-//      123456789012345678901234567890);
-//    expect(Complex(-0.0, 0).value, 0);
-//    expect(Complex(1e308, 0).value, double.infinity);
-//  });
- 
-//  test('Special Values', () {
-//    expect(Complex(double.nan, 0).value, isNaN);
-//    expect(Complex(double.infinity, 0).value, double.infinity);
-//    expect(Complex(double.negativeInfinity, 0).value, double.negativeInfinity);
-//  });
-
-//  test('Simplification', () {
-//     expect(Complex(5, 0).toString(), '5');
-//     expect(Complex(5.0, 0).toString(), '5');
-//     expect(Complex(5.5, 0).toString(), '5.5');
-//     expect(Complex(0.0000000001, 0).toString(), '0');
-//     expect(Complex(1e30, 0).toString(), '1000000000000000000000000000000');
-//   });
-
-//   test('Special Values', () {
-//     expect(Complex(double.nan, 0).toString(), 'NaN');
-//     expect(Complex(0, double.nan).toString(), 'NaNi');
-//     expect(Complex(double.infinity, 1).toString(), 'Infinity + i');
-//     expect(Complex(double.negativeInfinity, -1).toString(), '-Infinity - i');
-//   });
-
-//   test('Imaginary Formatting', () {
-//     expect(Complex(0, 1).toString(), 'i');
-//     expect(Complex(0, -1).toString(), '-i');
-//     expect(Complex(0, 2).toString(), '2i');
-//     expect(Complex(0, -2.5).toString(), '0 - 2.5i');
-//   });
-
-//   test('Complex Numbers', () {
-//     expect(Complex(3, 4).toString(), '3 + 4i');
-//     expect(Complex(2.5, -1).toString(), '2.5 - i');
-//     expect(Complex(-1.2, -3.4).toString(), '-1.2 - 3.4i');
-//   });
-
-// }

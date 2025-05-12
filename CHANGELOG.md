@@ -1,3 +1,12 @@
+# 5.3.0
+
+* **[FEATURE]** Added `isClose` similar to that of Python
+* **[IMPROVEMENT]** Enhanced Complex number
+* **[IMPROVEMENT]** Improved Decimal and Rational Numbers
+* **[BUG_FIX]** Fix bugs and matrices
+* **[FEATURE]** Added `memoize` class wrapper (see examples from `var_args_function_test.dart` )
+* **[FEATURE]** Added more functions including: `sumUpTo`, `timeAsync`, `time` etc.
+
 # 5.2.0
 
 * **[FEATURE]** Added `isClose` similar to that of Python

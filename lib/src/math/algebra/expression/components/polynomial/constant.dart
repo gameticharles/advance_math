@@ -14,23 +14,23 @@ final class Constant extends Polynomial {
   /// The only coefficient of the polynomial is represented by a [Complex]
   /// number [a].
   Constant({
-    Number a = Integer.zero,
+    dynamic a = 0,
   }) : super([a]);
 
   /// The only coefficient of the polynomial is represented by a [double]
   /// (real) number [a].
   Constant.num({
     num a = 1,
-  }) : super([numToNumber(a)]);
+  }) : super([a]);
 
   @override
-  Number discriminant() => Complex(double.nan, double.nan);
+  dynamic discriminant() => Complex(double.nan, double.nan);
 
   @override
-  List<Number> roots() => const [];
+  List<dynamic> roots() => const [];
 
   /// The constant coefficient.
-  Number get a => coefficients.first;
+  dynamic get a => coefficients.first.simplify();
 
   Constant copyWith({Complex? a}) => Constant(a: a ?? this.a);
 

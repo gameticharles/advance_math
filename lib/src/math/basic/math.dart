@@ -1,9 +1,10 @@
 library maths;
 
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:typed_data';
 
-import '../../../advance_math.dart' hide Complex,Number;
+import '../../../advance_math.dart' hide Complex,Number, Integer, Double, Imaginary;
 import '../../number/complex/complex.dart';
 
 part 'basic.dart';
@@ -11,7 +12,6 @@ part 'statistics.dart';
 part 'constants.dart';
 part 'trigonometry.dart';
 part 'logarithm.dart';
-part 'extension.dart';
 
 /// A generator of random byte, bool, int, BigInt, or double values.
 ///
@@ -504,4 +504,135 @@ String randomMerge(String a, String b) {
   final chars = [...a.codeUnits, ...b.codeUnits];
   chars.shuffle(_internal);
   return String.fromCharCodes(chars);
+}
+
+/// Measures the execution time of a function, expression, or computation and returns
+/// a tuple containing both the result and the elapsed duration.
+///
+/// This function can be used in multiple ways:
+/// 1. With a function reference: `time(() => factorial(20))`
+/// 2. With a direct expression: `time(factorial(20))`
+/// 3. With a callback that receives a measurement function: `time((measure) => measure(factorial)(20))`
+///
+/// Example 1 - With function reference:
+/// ```dart
+/// final result = time(() => factorial(20));
+/// print('Result: ${result.result}, Time: ${result.elapsed.inMilliseconds}ms');
+/// ```
+///
+/// Example 2 - With direct expression:
+/// ```dart
+/// final result = time(factorial(20));
+/// print('Result: ${result.result}, Time: ${result.elapsed.inMilliseconds}ms');
+/// ```
+///
+/// Example 3 - With measurement callback:
+/// ```dart
+/// final result = time((measure) {
+///   final wrappedFactorial = measure(factorial);
+///   return wrappedFactorial(20);
+/// });
+/// print('Result: ${result.result}, Time: ${result.elapsed.inMilliseconds}ms');
+/// ```
+///
+/// Example 4 - Measuring multiple operations:
+/// ```dart
+/// final result = time((measure) {
+///   final a = measure(() => operation1())(arg1);
+///   final b = measure(() => operation2())(arg2);
+///   return a + b;
+/// });
+/// ```
+///
+/// The returned [Duration] can be inspected using properties like:
+/// - [Duration.inMicroseconds]
+/// - [Duration.inMilliseconds]
+/// - [Duration.inSeconds]
+///
+/// For more precise measurements of very fast operations, consider using
+/// [Stopwatch] directly with [Stopwatch.elapsedMicroseconds].
+({T result, Duration elapsed}) time<T>(dynamic functionOrValue) {
+  // Case 1: Measurement callback with access to measure function
+  if (functionOrValue is Function(Function)) {
+    final sw = Stopwatch()..start();
+    
+    // Create a measure function that wraps any function to track its execution time
+    measure(fn) {
+      return (fn is Function)
+          ? ((dynamic args) {
+              final innerSw = Stopwatch()..start();
+              final result = args != null ? fn(args) : fn();
+              innerSw.stop();
+              print('Operation took: ${innerSw.elapsed.inMicroseconds}μs');
+              return result;
+            })
+          : fn;
+    }
+    
+    final result = functionOrValue(measure);
+    sw.stop();
+    return (result: result as T, elapsed: sw.elapsed);
+  }
+  // Case 2: Function was passed
+  else if (functionOrValue is Function) {
+    final sw = Stopwatch()..start();
+    final result = functionOrValue();
+    sw.stop();
+    return (result: result as T, elapsed: sw.elapsed);
+  }
+  // Case 3: Direct value was passed
+  else {
+    return (result: functionOrValue as T, elapsed: Duration.zero);
+  }
+}
+
+/// Measures the execution time of an asynchronous function and returns a tuple
+/// containing both the result and the elapsed duration.
+///
+/// Example:
+/// ```dart
+/// final result = await timeAsync(() async => await fetchData());
+/// print('Result: ${result.result}, Time: ${result.elapsed.inMilliseconds}ms');
+/// ```
+///
+/// For measuring multiple async operations:
+/// ```dart
+/// final result = await timeAsync((measure) async {
+///   final a = await measure(() => fetchData1())();
+///   final b = await measure(() => fetchData2())();
+///   return combineResults(a, b);
+/// });
+/// ```
+Future<({T result, Duration elapsed})> timeAsync<T>(dynamic functionOrValue) async {
+  // Case 1: Measurement callback with access to measure function
+  if (functionOrValue is Function(Function)) {
+    final sw = Stopwatch()..start();
+    
+    // Create a measure function that wraps any async function to track its execution time
+    Future<R> Function() measure<R>(dynamic fn) {
+      return () async {
+        final innerSw = Stopwatch()..start();
+        final result = fn is Future ? await fn : await fn();
+        innerSw.stop();
+        print('Async operation took: ${innerSw.elapsed.inMicroseconds}μs');
+        return result;
+      };
+    }
+    
+    final result = await functionOrValue(measure);
+    sw.stop();
+    return (result: result as T, elapsed: sw.elapsed);
+  }
+  // Case 2: Async function was passed
+  else if (functionOrValue is Function) {
+    final sw = Stopwatch()..start();
+    final result = await functionOrValue();
+    sw.stop();
+    return (result: result as T, elapsed: sw.elapsed);
+  }
+  // Case 3: Direct value or Future was passed
+  else {
+    final value = functionOrValue is Future ? await functionOrValue : functionOrValue;
+    return (result: value as T, elapsed: Duration.zero);
+  }
 }

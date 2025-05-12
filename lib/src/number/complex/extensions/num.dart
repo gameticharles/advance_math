@@ -111,14 +111,14 @@ extension NumComplexExtension on num {
   Complex get c => Complex(this, 0);
 
   /// {@macro ComplexerX_real}
-  Complex get real => Complex(toDouble());
+  Complex get real => Complex(this);
 
   /// {@macro ComplexerX_real}
-  Complex get re => Complex(toDouble());
+  Complex get re => Complex(this);
 
   /// {@macro ComplexerX_imag}
-  Complex get imag => Complex(0, toDouble());
+  Complex get imag => Complex(0, this);
 
   /// {@macro ComplexerX_imag}
-  Complex get im => Complex(0, toDouble());
+  Complex get im => Complex(0, this);
 }

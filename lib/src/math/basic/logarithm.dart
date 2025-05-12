@@ -12,13 +12,13 @@ part of 'math.dart';
 /// print(log10(Complex(1, 2))); // Output: 0.3494850021680094 + 0.480828578784234i
 /// ```
 dynamic log10(dynamic x) {
-  if (x is num || x is Double || x is Integer || x is Real || x is Decimal) {
-    num nx = x is! num ? numberToNum(x) : x;
+  if (x is num || x is Decimal) {
+    num nx = x is! num ? (x as Decimal).toDouble(): x;
     return math.log(nx) / math.ln10;
   } else if (x is Complex || x is Imaginary) {
-    Complex nx = x is Complex ? x : Complex(Integer.zero, x);
+    Complex nx = x is Complex ? x : Complex(0, x);
     Complex lnZ =
-        Complex(math.log(numberToNum(nx.magnitude)), nx.argument.value);
+        Complex(math.log(nx.magnitude), nx.argument);
     return lnZ / math.log(10);
   } else {
     throw ArgumentError('Input should be either num or Complex');
@@ -41,16 +41,16 @@ dynamic log10(dynamic x) {
 /// print(log(math.e));  // Output: 1.0
 /// ```
 dynamic log(dynamic x, [dynamic b]) {
-  if (x is num || x is Double || x is Integer || x is Real || x is Decimal) {
-    num nx = x is! num ? numberToNum(x) : x;
+  if (x is num || x is Decimal) {
+    num nx = x is! num ? (x as Decimal).toDouble() : x;
     if (nx <= 0 || (b != null && b <= 0)) {
       throw ArgumentError('Invalid input for log: n and b must be > 0');
     }
     return b != null ? math.log(nx) / math.log(b) : math.log(nx);
   } else if (x is Complex || x is Imaginary) {
-    Complex nx = x is Complex ? x : Complex(Integer.zero, x);
+    Complex nx = x is Complex ? x : Complex(0, x);
     Complex lnZ =
-        Complex(math.log(numberToNum(nx.magnitude)), nx.argument.value);
+        Complex(math.log(nx.magnitude), nx.argument);
     if (b == null) {
       return lnZ;
     } else if (b is num) {
@@ -86,12 +86,9 @@ dynamic log(dynamic x, [dynamic b]) {
 /// ```
 dynamic logBase(dynamic base, dynamic x) {
   if ((base is num ||
-          base is Double ||
-          base is Integer ||
-          base is Real ||
           base is Decimal) &&
       x is num) {
-    num nBase = base is! num ? numberToNum(base) : base;
+    num nBase = base is! num ? (base as Decimal).toDouble() : base;
     return math.log(x) / math.log(nBase);
   } else if (base is Complex ||
       x is Complex ||
@@ -100,18 +97,18 @@ dynamic logBase(dynamic base, dynamic x) {
     Complex cBase = base is Complex
         ? base
         : base is Imaginary
-            ? Complex(Integer.zero, base)
+            ? Complex(0, base)
             : Complex(base, 0);
     Complex cx = x is Complex
         ? x
         : x is Imaginary
-            ? Complex(Integer.zero, x)
+            ? Complex(0, x)
             : Complex(x, 0);
 
     Complex lnBase =
-        Complex(math.log(numberToNum(cBase.magnitude)), cBase.argument.value);
+        Complex(math.log(cBase.magnitude), cBase.argument);
     Complex lnX =
-        Complex(math.log(numberToNum(cx.magnitude)), cx.argument.value);
+        Complex(math.log(cx.magnitude), cx.argument);
 
     return lnX / lnBase;
   } else {

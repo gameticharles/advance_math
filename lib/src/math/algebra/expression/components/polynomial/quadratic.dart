@@ -21,36 +21,37 @@ part of '../../expression.dart';
 class Quadratic extends Polynomial {
   /// Constructs a quadratic equation with coefficients [a], [b], and [c].
   Quadratic({
-    Number a = Integer.one,
-    Number b = Integer.zero,
-    Number c = Integer.zero,
+    dynamic a = 1,
+    dynamic b = 0,
+    dynamic c = 0,
   }) : super([a, b, c]);
 
   /// Constructs a quadratic equation with coefficients [a], [b], and [c].
   Quadratic.num({num a = 1, num b = 0, num c = 0})
-      : super([numToNumber(a), numToNumber(b), numToNumber(c)]);
+      : super([Complex(a), Complex(b), Complex(c)]);
 
-  Quadratic.fromList(List<Number> coefficients) : super(coefficients) {
+  Quadratic.fromList(List<dynamic> coefficients) : super(coefficients) {
     if (coefficients.length != 3) {
       throw ArgumentError('The input list must contain exactly 3 elements.');
     }
   }
+  
 
   /// The first coefficient of the equation in the form
   /// _f(x) = ax^2 + bx + c = 0_
-  Number get a => coefficients.first;
+  dynamic get a => coefficients.first;
 
   /// The second coefficient of the equation in the form
   /// _f(x) = ax^2 + bx + c = 0_
-  Number get b => coefficients[1];
+  dynamic get b => coefficients[1];
 
   /// The third coefficient of the equation in the form
   /// _f(x) = ax^2 + bx + c = 0_
-  Number get c => coefficients[2];
+  dynamic get c => coefficients[2];
 
   /// Returns the discriminant of the quadratic equation, which is b^2 - 4ac.
   @override
-  Number discriminant() => (b * b) - Complex.fromReal(4) * a * c;
+  dynamic discriminant() => (b * b) - Complex.fromReal(4) * a * c;
 
   /// Returns the roots of the quadratic equation as a list.
   ///
@@ -58,11 +59,11 @@ class Quadratic extends Polynomial {
   /// If the discriminant is zero, there is one real root, which is returned as a list with one number.
   /// If the discriminant is greater than zero, there are two real roots, which are returned as a list with two numbers.
   @override
-  List<Number> roots() {
+  List<dynamic> roots() {
     final disc = discriminant();
     final twoA = Complex.fromReal(2) * a;
 
-    return <Number>[(-b + disc.sqrt()) / twoA, (-b - disc.sqrt()) / twoA];
+    return <dynamic>[(-b + disc.sqrt()) / twoA, (-b - disc.sqrt()) / twoA];
   }
 
   /// Returns the vertex of the quadratic equation as a [Point].
@@ -71,7 +72,7 @@ class Quadratic extends Polynomial {
   Point vertex() {
     var x = -b / (a * 2);
     var y = c - b * b / (a * 4);
-    return Point(numberToNum(x), numberToNum(y));
+    return Point(x.simplify(), y.simplify());
   }
 
   @override
@@ -100,7 +101,7 @@ class Quadratic extends Polynomial {
   /// var quad = Quadratic(2, -3, -2);
   /// print(quad.sumOfRoots()); // Output: 1.5
   /// ```
-  Number sumOfRoots() {
+  dynamic sumOfRoots() {
     return -b / a;
   }
 
@@ -111,7 +112,7 @@ class Quadratic extends Polynomial {
   /// var quad = Quadratic(2, -3, -2);
   /// print(quad.productOfRoots()); // Output: -1
   /// ```
-  Number productOfRoots() {
+  dynamic productOfRoots() {
     return c / a;
   }
 

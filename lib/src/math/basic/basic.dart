@@ -10,6 +10,42 @@ int sumTo(int n) {
   return n * (n + 1) ~/ 2;
 }
 
+/// Sums all values from [start] to [end] (inclusive), stepping by [step].
+///
+/// Throws an [ArgumentError] if [step] is zero or its sign doesn’t allow
+/// reaching [end] from [start].
+///
+/// Example:
+/// ```dart
+/// print(sumUpTo(1, 5));                 // 15  (1+2+3+4+5)
+/// print(sumUpTo(5, 1, step: -1));       // 15  (5+4+3+2+1)
+/// print(sumUpTo(1, 5));                 // 15
+/// print(sumUpTo(5, 1, step: -1));       // 15
+/// print(sumUpTo(7, 7));                 // 7
+/// print(sumUpTo(0, 10, step: 2));       // 30  (0+2+4+6+8+10)
+/// sumUpTo(1, 5, step: -1);              // throws ArgumentError
+/// sumUpTo(2, 8, step: 0);               // throws ArgumentError
+/// ```
+num sumUpTo(num start, num end, {num step = 1}) {
+  if (step == 0) {
+    throw ArgumentError('Step cannot be zero');
+  }
+  if ((step > 0 && start > end) || (step < 0 && start < end)) {
+    throw ArgumentError(
+      'Invalid range: step direction must match range direction',
+    );
+  }
+
+  num total = 0.0;
+  for (var current = start;
+       step > 0 ? current <= end : current >= end;
+       current += step) {
+    total += current;
+  }
+  return total;
+}
+
+
 /// Returns the absolute value of a number.
 ///
 /// Example:
@@ -1182,7 +1218,7 @@ double numIntegrate(Function f, double a, double b,
 /// var result = gamma(0.5);
 /// print(result);  // Expected output: ~1.77245385091 (which is the square root of Pi)
 /// ```
-double gamma(double z) {
+double gamma(num z) {
   const int g = 7;
   const List<double> C = [
     0.99999999999980993,

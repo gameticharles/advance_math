@@ -108,12 +108,12 @@ class MultiVariablePolynomial extends Expression {
 
   /// Evaluates the MultiPolynomial for a given x value.
   @override
-  Number evaluate([dynamic x]) {
-    Number total = Integer.zero;
+  dynamic evaluate([dynamic x]) {
+    dynamic total = Complex.zero();
     for (var term in terms) {
-      total += term.evaluate(x);
+      total += Complex(term.evaluate(x));
     }
-    return total;
+    return total.simplify();
   }
 
   @override
@@ -127,7 +127,7 @@ class MultiVariablePolynomial extends Expression {
         for (int i = 0; i < resultTerms.length; i++) {
           if (_mapEquals(resultTerms[i].variables, term.variables)) {
             var newCoefficient = resultTerms[i].coefficient + term.coefficient;
-            resultTerms[i] = Term(numberToNum(newCoefficient),
+            resultTerms[i] = Term(newCoefficient,
                 Map.from(resultTerms[i].variables));
             found = true;
             break;
@@ -136,7 +136,7 @@ class MultiVariablePolynomial extends Expression {
 
         if (!found) {
           resultTerms.add(
-              Term(numberToNum(term.coefficient), Map.from(term.variables)));
+              Term(term.coefficient, Map.from(term.variables)));
         }
       }
 
@@ -156,7 +156,7 @@ class MultiVariablePolynomial extends Expression {
         for (int i = 0; i < resultTerms.length; i++) {
           if (_mapEquals(resultTerms[i].variables, term.variables)) {
             var newCoefficient = resultTerms[i].coefficient - term.coefficient;
-            resultTerms[i] = Term(numberToNum(newCoefficient),
+            resultTerms[i] = Term(newCoefficient,
                 Map.from(resultTerms[i].variables));
             found = true;
             break;
@@ -164,7 +164,7 @@ class MultiVariablePolynomial extends Expression {
         }
         if (!found) {
           resultTerms.add(
-              Term(numberToNum(-term.coefficient), Map.from(term.variables)));
+              Term(-term.coefficient, Map.from(term.variables)));
         }
       }
 
@@ -192,7 +192,7 @@ class MultiVariablePolynomial extends Expression {
           }
 
           resultTerms
-              .add(Term(numberToNum(newCoefficient), Map.from(newVariables)));
+              .add(Term(newCoefficient, Map.from(newVariables)));
         }
       }
 
@@ -235,7 +235,7 @@ class MultiVariablePolynomial extends Expression {
     }
 
     // If all coefficients are zero, return "0"
-    if (terms.every((term) => term.coefficient == Integer.zero)) {
+    if (terms.every((term) => Complex(term.coefficient) == Complex.zero())) {
       return "0";
     }
 
@@ -251,8 +251,8 @@ class MultiVariablePolynomial extends Expression {
         buffer.write('-');
       }
       final absCoeff = coeff.abs();
-      if (absCoeff != Integer.one || term.variables.isEmpty) {
-        buffer.write(Number.simplifyType(absCoeff));
+      if (absCoeff != 0 || term.variables.isEmpty) {
+        buffer.write(absCoeff);
       }
 
       // Handle variables and their powers

@@ -1,11 +1,11 @@
 part of '../../../expression.dart';
 
 class Term {
-  final Number coefficient;
+  final dynamic coefficient;
   final Map<String, int> variables;
 
-  Term(num coefficient, this.variables)
-      : coefficient = numToNumber(coefficient);
+  Term(dynamic coefficient, this.variables)
+      : coefficient = Complex(coefficient).simplify();
 
   @override
   String toString() {
@@ -30,8 +30,8 @@ class Term {
   @override
   int get hashCode => coefficient.hashCode ^ variables.hashCode;
 
-  Number evaluate(Map<String, num> values) {
-    Number result = coefficient;
+  dynamic evaluate(Map<String, num> values) {
+    dynamic result = coefficient;
     variables.forEach((varName, power) {
       if (values.containsKey(varName)) {
         result *= pow(values[varName], power);

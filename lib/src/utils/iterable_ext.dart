@@ -105,3 +105,81 @@ extension MapListGroupingExtension on List<Map<String, dynamic>> {
     return groupBy((map) => map[key]);
   }
 }
+
+extension IterableExt<E> on Iterable<E> {
+  /// Extends [Iterable] with the ability to intersperse an element of type [T] between each element.
+  ///
+  /// This extension adds the `insertBetween` method to any `Iterable` object,
+  /// allowing for the insertion of a separator of type [T] between each of the iterable's elements.
+  ///
+  /// The separator is inserted after each element except the last,
+  /// ensuring that the iterable's original order is preserved with the
+  /// separator neatly placed in between.
+  ///
+  /// The method is generic, allowing the separator to be of a different type from the elements
+  /// in the iterable. This is particularly useful when the elements are of a basic type (like `int`),
+  /// and the separator is of a different type (like `String`).
+  ///
+  /// Example Usage:
+  /// ```dart
+  /// final numbers = [1, 2, 3];
+  /// final withComma = numbers.insertBetween<String>(',').toList();
+  /// print(withComma); // Output: ['1', ',', '2', ',', '3']
+  /// ```
+  ///
+  /// In a Flutter context, it can be used to intersperse widgets, such as:
+  /// ```dart
+  /// Column(
+  ///   children: <Widget>[
+  ///     FloatingActionButton(onPressed: () {}, tooltip: 'Increment', child: const Icon(Icons.add)),
+  ///     FloatingActionButton(onPressed: () {}, tooltip: 'Increment', child: const Icon(Icons.add)),
+  ///   ].insertBetween<Widget>(const SizedBox(height: 5.0)).toList(),
+  /// )
+  /// ```
+  ///
+  /// [E] - The type of elements in the iterable.
+  ///
+  /// [T] - The type of the separator to be inserted.
+  Iterable<T> insertBetween<T>(T separator) sync* {
+    final iterator = this.iterator;
+    if (!iterator.moveNext()) return; // Exit if the iterable is empty
+
+    while (true) {
+      yield iterator.current as T; // Cast each element to type T
+      if (!iterator.moveNext()) break; // Stop if no more elements
+      yield separator;
+    }
+  }
+
+  /// Returns the sum of all elements in this iterable.
+  /// 
+  /// For numeric types, this adds all elements together.
+  /// Example: [1, 2, 3].sum() => 6
+  /// 
+  /// For non-numeric types, you must provide a [selector] function to extract
+  /// a numeric value from each element.
+  /// Example: ['a', 'aa', 'aaa'].sum((s) => s.length) => 6
+  /// 
+  /// If any element is a Complex number, all elements will be converted to Complex
+  /// and the result will be Complex.
+  /// Example: [1, 2, Complex(1,5), 9.7] => Complex(12.7, 5)
+  dynamic sum([Function(E)? selector]) {
+    if (selector != null) {
+      return fold<dynamic>(0, (sum, element) => sum + selector(element));
+    }
+
+    try {
+      // Convert all elements to Complex and sum them
+      return fold<Complex>(Complex.zero(), (sum, element) {
+        final complexElement = element is Complex ? element : Complex(element);
+        return sum + complexElement;
+      }).simplify();
+    } catch (e) {
+      throw ArgumentError('Cannot sum non-numeric elements without a selector function');
+    }
+
+    
+
+    
+  }
+}

@@ -114,20 +114,44 @@ extension ComplexHyperbolicX<T extends Complex> on T {
   ///
   /// print(z_tanh); // Output: 0.0 + 0.0i
   /// ```
-  Complex tanh() => sinh() / cosh();
+  // Complex tanh() => sinh() / cosh();
+  Complex tanh() {
+    if (isNaN || imaginary.isInfinite || real.isInfinite) {
+      return Complex.nan();
+    }
+
+    // Handle infinities: tanh(inf + bi) = ±1 + 0i, tanh(a + inf i) = NaN + NaN i
+    if (real.isInfinite) {
+      if (real > 0) return Complex.one();
+      if (real < 0) return Complex(-1.0, 0.0);
+    }  
+    
+    // Use the optimized formula for regular values
+    final real2 = 2.0 * real;
+    final imaginary2 = 2.0 * imaginary;
+    final d = math.cosh(real2) + math.cos(imaginary2);
+
+    // If denominator is zero, result is infinite in imaginary part
+    if (d == 0.0) {
+      return Complex(double.nan, math.sin(imaginary2).sign * double.infinity);
+    }
+
+    return Complex(math.sinh(real2) / d, math.sin(imaginary2) / d);
+  }
+
 
   /// Returns the inverse hyperbolic sine
-Complex asinh() {
-  return (this + (this * this + Complex.one()).sqrt()).log();
-}
+  Complex asinh() {
+    return (this + (this * this + Complex.one()).sqrt()).log();
+  }
 
-/// Returns the inverse hyperbolic cosine
-Complex acosh() {
-  return (this + ((this + Complex.one()) * (this - Complex.one())).sqrt()).log();
-}
+  /// Returns the inverse hyperbolic cosine
+  Complex acosh() {
+    return (this + ((this + Complex.one()) * (this - Complex.one())).sqrt()).log();
+  }
 
-/// Returns the inverse hyperbolic tangent
-Complex atanh() {
-  return ((Complex.one() + this) / (Complex.one() - this)).log() * Complex(0.5);
-}
+  /// Returns the inverse hyperbolic tangent
+  Complex atanh() {
+    return ((Complex.one() + this) / (Complex.one() - this)).log() * Complex(0.5);
+  }
 }

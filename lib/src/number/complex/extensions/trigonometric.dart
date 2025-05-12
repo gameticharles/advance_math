@@ -120,7 +120,7 @@ extension ComplexTrigonometricX<T extends Complex> on T {
   /// input argument is `NaN` or infinite.
   Complex acos() {
     if (isNaN) return Complex.nan();
-    return (this + (sqrt1z() * Complex.i)).log() * (-Complex.i());
+    return (this + (sqrt1z() * Complex.i())).log() * (-Complex.i());
   }
 
   /// ## Arccosine
@@ -136,7 +136,7 @@ extension ComplexTrigonometricX<T extends Complex> on T {
   /// input argument is `NaN` or infinite.
   Complex asin() {
     if (isNaN) return Complex.nan();
-    return (sqrt1z() + (this * Complex.i)).log() * -Complex.i();
+    return (sqrt1z() + (this * Complex.i())).log() * -Complex.i();
   }
 
   /// ## Arctangent
@@ -153,6 +153,6 @@ extension ComplexTrigonometricX<T extends Complex> on T {
   Complex atan() {
     if (isNaN) return Complex.nan();
 
-    return ((this + Complex.i) / (Complex.i() - this)).log() * 0.5.imag;
+    return ((this + Complex.i()) / (Complex.i() - this)).log() * 0.5.imag;
   }
 }

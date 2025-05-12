@@ -9,7 +9,6 @@ library number;
 // export 'number/complex.dart';
 export 'number/double.dart';
 export 'number/precision.dart';
-export 'number/fraction.dart';
 export 'number/imaginary.dart';
 export 'number/integer.dart';
 export 'roman_numerals/roman_numerals.dart';
@@ -24,6 +23,5 @@ export 'util/erf.dart';
 export 'util/jenkins_hash.dart';
 export 'util/romans_exception.dart';
 
-export 'decimal/decimal.dart';
 export 'decimal/rational.dart';
 export 'perfect_number.dart';
