@@ -49,6 +49,7 @@ enum PiCalcAlgorithm {
 /// - `findPatternIndices(String pattern)`: Finds the indices of a given pattern in the string representation of pi.
 class PI extends Decimal{
   /// The precision of the computed value of pi, in decimal places.
+  @override
   final int precision;
 
   late final String _piString;

@@ -95,12 +95,12 @@ class Double extends Real {
 
   @override
   // ignore: non_nullable_equals_parameter
-  bool operator ==(dynamic obj) {
-    if (obj is num && obj.isNaN) return value.isNaN;
-    if (obj is Real || obj is num) return obj == value;
-    if (obj is Imaginary) return value == 0.0 && obj.value.toDouble() == 0.0;
-    if (obj is Complex) {
-      return obj.real.toDouble() == value && obj.imaginary.toDouble() == 0.0;
+  bool operator ==(dynamic other) {
+    if (other is num && other.isNaN) return value.isNaN;
+    if (other is Real || other is num) return other == value;
+    if (other is Imaginary) return value == 0.0 && other.value.toDouble() == 0.0;
+    if (other is Complex) {
+      return other.real.toDouble() == value && other.imaginary.toDouble() == 0.0;
     }
 
     return false;

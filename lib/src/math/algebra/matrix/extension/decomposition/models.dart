@@ -347,17 +347,17 @@ class LUDecomposition extends Decomposition {
 
 class SingularValueDecomposition extends Decomposition {
   final SVD? _svd;
-  final Matrix? _U;
-  final Matrix? _S;
-  final Matrix? _V;
+  final Matrix? _u;
+  final Matrix? _s;
+  final Matrix? _v;
   final dynamic _conditionNumber;
 
   /// Constructor that takes an SVD object
   SingularValueDecomposition(SVD svd) 
     : _svd = svd,
-      _U = null,
-      _S = null,
-      _V = null,
+      _u = null,
+      _s = null,
+      _v = null,
       _conditionNumber = null;
 
   /// Constructor that takes pre-computed U, S, and V matrices
@@ -368,19 +368,19 @@ class SingularValueDecomposition extends Decomposition {
   /// [condNumber] Optional pre-computed condition number
   SingularValueDecomposition.fromComponents(Matrix u, Matrix s, Matrix v, {dynamic condNumber}) 
     : _svd = null,
-      _U = u,
-      _S = s,
-      _V = v,
+      _u = u,
+      _s = s,
+      _v = v,
       _conditionNumber = condNumber;
 
   /// Returns the left singular vectors
-  Matrix get U => _svd != null ? _svd.U() : _U!;
+  Matrix get U => _svd != null ? _svd.U() : _u!;
 
   /// Returns the diagonal matrix of singular values
-  Matrix get S => _svd != null ? _svd.S() : _S!;
+  Matrix get S => _svd != null ? _svd.S() : _s!;
 
   /// Returns the right singular vectors (V^T)
-  Matrix get V => _svd != null ? _svd.V() : _V!;
+  Matrix get V => _svd != null ? _svd.V() : _v!;
 
   /// Two norm condition number
   dynamic get conditionNumber {

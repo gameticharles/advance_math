@@ -1764,19 +1764,19 @@ extension MatrixOperationExtension on Matrix {
     Matrix V = svd.V;
     
     // Create regularized S^(-1) by filtering small singular values
-    Matrix SInv = Matrix.zeros(columnCount, rowCount);
+    Matrix sInv = Matrix.zeros(columnCount, rowCount);
     for (int i = 0; i < math.min(rowCount, columnCount); i++) {
       dynamic s = S[i][i];
       if (s.abs() > threshold) {
-        SInv[i][i] = Complex.one() / s;
+        sInv[i][i] = Complex.one() / s;
       } else {
         // For very small singular values, use regularized inversion
-        SInv[i][i] = s / (s * s + threshold);
+        sInv[i][i] = s / (s * s + threshold);
       }
     }
     
     // Compute V·S^(-1)·U^T
-    return V * SInv * U.transpose();
+    return V * sInv * U.transpose();
   }
 
   /// Computes the pseudo-inverse of a matrix using Singular Value Decomposition (SVD).
@@ -2116,15 +2116,15 @@ extension MatrixOperationExtension on Matrix {
     }
     // Convert matrix to a numerical matrix.
     Matrix A = _Utils.toNumMatrix(this);
-    Matrix QH = Matrix(); // Will hold the orthogonal transformation from Hessenberg reduction.
+    Matrix qH = Matrix(); // Will hold the orthogonal transformation from Hessenberg reduction.
 
     // If the matrix is not symmetric (within tolerance), reduce to Hessenberg form.
     if (!isSymmetricMatrix(tolerance: tolerance)) {
       var hessResult = A.hessenberg();
       A = hessResult.H;
-      QH = hessResult.Q; // QH satisfies: A_original = QH * A * QH^T.
+      qH = hessResult.Q; // QH satisfies: A_original = QH * A * QH^T.
     } else {
-      QH = Matrix.eye(rowCount, isDouble: true);
+      qH = Matrix.eye(rowCount, isDouble: true);
     }
 
     int n = rowCount;
@@ -2154,7 +2154,7 @@ extension MatrixOperationExtension on Matrix {
     List<dynamic> eigenvalues = List.generate(n, (i) => A[i][i]);
     // The eigenvectors computed from the QR algorithm (in V) correspond to the Hessenberg matrix.
     // To obtain eigenvectors of the original matrix, back-transform:
-    List<Matrix> eigenvectors = List.generate(n, (i) => QH * V.column(i));
+    List<Matrix> eigenvectors = List.generate(n, (i) => qH * V.column(i));
 
     return Eigen(eigenvalues, eigenvectors);
   }

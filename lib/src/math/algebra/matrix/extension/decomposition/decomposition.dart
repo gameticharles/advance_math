@@ -747,14 +747,14 @@ SingularValueDecomposition singularValueDecomposition({int? maxIterations}) {
     print("Standard SVD failed, using robust alternative approach");
     
     // Alternative approach: compute A^T*A and A*A^T for right and left singular vectors
-    Matrix ATA = _matrix.transpose() * _matrix;
-    Matrix AAT = _matrix * _matrix.transpose();
+    Matrix ata = _matrix.transpose() * _matrix;
+    Matrix aat = _matrix * _matrix.transpose();
     
     // Compute eigendecomposition of A^T*A for V
-    var eigV = ATA.decomposition.eigenvalueDecomposition(maxIterations: maxIterations);
+    var eigV = ata.decomposition.eigenvalueDecomposition(maxIterations: maxIterations);
     
     // Compute eigendecomposition of A*A^T for U
-    var eigU = AAT.decomposition.eigenvalueDecomposition(maxIterations: maxIterations);
+    var eigU = aat.decomposition.eigenvalueDecomposition(maxIterations: maxIterations);
     
     // Create S matrix with square roots of eigenvalues of A^T*A
     Matrix S = Matrix.zeros(_matrix.rowCount, _matrix.columnCount);
