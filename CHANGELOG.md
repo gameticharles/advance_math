@@ -1,3 +1,7 @@
+# 5.3.1
+
+* **[IMPROVEMENT]** Improved Imaginary
+
 # 5.3.0
 
 * **[FEATURE]** Added `isClose` similar to that of Python

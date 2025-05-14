@@ -1,5 +1,14 @@
 part of 'complex.dart';
 
+/// The imaginary unit 'i' (where i² = -1)
+/// This can be used in expressions like: 2 + 3*i
+final Imaginary i = Imaginary(1);
+
+/// The imaginary unit 'j' (where j² = -1)
+/// Common in engineering notation, equivalent to 'i'
+/// This can be used in expressions like: 2 + 3*j
+final Imaginary j = Imaginary(1);
+
 /// A specialized class representing purely imaginary numbers (0 + bi).
 /// Extends [Complex] and provides optimized operations for imaginary numbers.
 class Imaginary extends Complex {
@@ -9,7 +18,6 @@ class Imaginary extends Complex {
 
   /// Returns a Complex number equivalent to this Imaginary number.
   Complex toComplex() => Complex(0, coefficient);
-
 
   /// The coefficient of the imaginary unit (i).
   num get coefficient => imaginary;
@@ -38,21 +46,19 @@ class Imaginary extends Complex {
   @override
   Imaginary operator -() => Imaginary(-coefficient);
 
-
   @override
   // ignore: non_nullable_equals_parameter
   bool operator ==(dynamic other) {
-    if (other is Imaginary) return value == other.value;
-    if (other is Complex) return other.real == 0.0 && this == other.imaginary;
-    if (other is num) return value.toDouble() == 0.0 && other == 0.0;
-
+    if (other is Imaginary) return coefficient == other.coefficient;
+    if (other is Complex) return other.real == 0.0 && coefficient == other.imaginary;
+    if (other is num) return coefficient == 0.0 && other == 0.0;
     return false;
   }
 
-   @override
+  @override
   int get hashCode {
-    if (value.toDouble() == 0) return 0.hashCode;
-    return hashObjects(<Object>[0, value]);
+    if (coefficient == 0) return 0.hashCode;
+    return hashObjects(<Object>[0, coefficient]);
   }
 
   /// Returns the conjugate of this imaginary number (sign of coefficient flipped).
@@ -63,15 +69,66 @@ class Imaginary extends Complex {
   @override
   num abs() => coefficient.abs();
 
-// Support [dart:convert] json.
+  /// The complex modulus is the absolute value of this Imaginary number.
+  num get complexModulus => coefficient.abs();
+
+  /// The complex argument, or phase, of this imaginary number in radians.
+  num get complexArgument => coefficient < 0 ? -math.pi / 2.0 : math.pi / 2.0;
+
+  /// The phase is synonymous with the complex argument.
+  num get phase => complexArgument;
+
+  /// If [obj] is an [Imaginary] number then the comparison is made in the imaginary dimension.
+  /// For all other types of numbers the comparison is made in the real dimension, so this [Imaginary] number
+  /// is regarded as zero.
+  @override
+  bool operator >(dynamic obj) {
+    if (obj is num) return 0 > obj;
+    if (obj is Imaginary) return coefficient > obj.coefficient;
+    if (obj is Complex) return 0 > obj.real;
+    // treat obj as zero
+    return false;
+  }
+
+  @override
+  bool operator >=(dynamic obj) {
+    // Check for equality.
+    if ((obj is Imaginary || obj is Complex) && this == obj) return true;
+    if (obj is num) return obj <= 0;
+    return this > obj;
+  }
+
+  @override
+  bool operator <(dynamic obj) => !(this >= obj);
+
+  @override
+  bool operator <=(dynamic obj) => !(this > obj);
+
+  /// The integer ceiling of a purely imaginary number is always zero.
+  @override
+  num ceil() => 0;
+
+  /// The integer floor of a purely imaginary number is always zero.
+  @override
+  int floor() => 0;
+
+  /// The nearest integer of a purely imaginary number is always zero.
+  @override
+  int round() => 0;
+
+  /// The integer resulting from truncation of a purely imaginary number is always zero.
+  @override
+  int truncate() => 0;
+
+  /// Support [dart:convert] json.
   ///
   /// Map Contents:
-  ///     'imag' : toJson map of value
+  ///     'imag' : coefficient value
   ///
   /// Example:
-  ///     {'imag':{'d':456.7}}
+  ///     {'imag': 456.7}
   @override
-  Map<String, dynamic> toJson() => <String, dynamic>{'imag': value.toJson()};
+  Map<String, dynamic> toJson() => <String, dynamic>{'imag': coefficient};
 
   /// Returns the exponential form string representation.
   @override
@@ -87,4 +144,5 @@ class Imaginary extends Complex {
     final angle = coefficient > 0 ? 'π/2' : '-π/2';
     return '${r.toStringAsFixed(6)}(cos($angle) + i⋅sin($angle))';
   }
+
 }

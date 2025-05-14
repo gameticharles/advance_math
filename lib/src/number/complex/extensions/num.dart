@@ -121,4 +121,12 @@ extension NumComplexExtension on num {
 
   /// {@macro ComplexerX_imag}
   Complex get im => Complex(0, this);
+
+   /// Enables syntax like: 3i or 4i
+  /// Returns a new imaginary number with this number as coefficient
+  Complex get i => Complex(0, this);
+  
+  /// Enables syntax like: 3j or 4j
+  /// Returns a new imaginary number with this number as coefficient
+  Complex get j => Complex(0, this);
 }
