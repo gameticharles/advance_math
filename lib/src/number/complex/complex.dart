@@ -5,8 +5,6 @@ import '../../math/basic/math.dart' as math;
 import '../util/jenkins_hash.dart';
 // import 'package:advance_math/src/number/util/jenkins_hash.dart';
 
-export '../complex/extensions/matcher.dart';
-
 part 'extensions/num.dart';
 part 'extensions/trigonometric.dart';
 part 'extensions/hyperbolic.dart';
