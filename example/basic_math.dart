@@ -39,7 +39,7 @@ void main() {
   printLine('Compute PI Algorithm');
 
   var thisPI = PI(precision: 100);
-  print((thisPI/Decimal(2)).toDecimal()); // Output: ~3.141592653589793238462643383
+  print((thisPI/Decimal(5.5)).toDecimal()); // Output: ~3.141592653589793238462643383
 
   final algorithms = {
     'BBP': (int digits) => BBP(digits),
@@ -50,7 +50,7 @@ void main() {
     'Newton-Euler': (int digits) => NewtonEuler(digits),
   };
 
-  int digits = 20; // Example number of digits to compute
+  int digits = 50; // Example number of digits to compute
 
   for (var entry in algorithms.entries) {
     // Call factory function with digits
@@ -65,7 +65,7 @@ void main() {
 
   printLine();
 
-  int precision = 100; // Desired precision (number of decimal places)
+  int precision = 500; // Desired precision (number of decimal places)
   decimalPrecision = precision;
   PI pi = PI(precision: precision);
 
