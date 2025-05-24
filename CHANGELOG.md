@@ -1,3 +1,8 @@
+# 5.3.3
+
+* **[IMPROVEMENT]** Added detailed documentations
+* **[IMPROVEMENT]** Updated packages
+
 # 5.3.2
 
 * **[IMPROVEMENT]** Clean code

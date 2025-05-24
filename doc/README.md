@@ -5,12 +5,16 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
 Whether you're developing a cutting-edge machine learning application, or simply need to perform calculations with complex numbers. It also provides the tools you need in a well-organized and easy-to-use package.
 
 
-## [Angle](angle.md)
 
-## [Logarithm](logarithm.md)
+## Table of Contents
 
-## [Matrix](matrix.md)
+- [Mathematics (`math.md`)](./math.md)
+- [Numbers (`number.md`)](./number.md)
+- [Algebra (`algebra.md`)](./algebra.md)
+- [Geometry (`geometry.md`)](./geometry.md)
+- [Physical Quantities (`quantity.md`)](./quantity.md)
+- [Interpolation (`interpolate.md`)](./interpolate.md)
+- [Code Translators (`code_translator.md`)](./code_translator.md)
+- [Utilities (`utils.md`)](./utils.md)
 
-## [Vector](vector.md)
-
-## [Complex Numbers and Complex Vectors](complex.md)
+Navigate to the respective module documentation for detailed information.
