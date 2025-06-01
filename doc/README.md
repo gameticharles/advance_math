@@ -8,13 +8,13 @@ Whether you're developing a cutting-edge machine learning application, or simply
 
 ## Table of Contents
 
-- [Mathematics (`math.md`)](./math.md)
-- [Numbers (`number.md`)](./number.md)
-- [Algebra (`algebra.md`)](./algebra.md)
-- [Geometry (`geometry.md`)](./geometry.md)
-- [Physical Quantities (`quantity.md`)](./quantity.md)
-- [Interpolation (`interpolate.md`)](./interpolate.md)
-- [Code Translators (`code_translator.md`)](./code_translator.md)
-- [Utilities (`utils.md`)](./utils.md)
+- [Mathematics](./math.md)
+- [Numbers](./number.md)
+- [Algebra](./algebra.md)
+- [Geometry](./geometry.md)
+- [Physical Quantities](./quantity.md)
+- [Interpolation](./interpolate.md)
+- [Code Translators](./code_translator.md)
+- [Utilities](./utils.md)
 
 Navigate to the respective module documentation for detailed information.
