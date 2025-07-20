@@ -1,3 +1,7 @@
+# 5.3.4
+
+* **[FEATURE]** Changed to MIT License
+
 # 5.3.3
 
 * **[BUG_FIX]** Fixed error from `Package conflict after update` as from issues [#8](https://github.com/gameticharles/advance_math/issues/8)
