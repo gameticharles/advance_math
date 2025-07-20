@@ -104,11 +104,11 @@ class Trapezoid extends PlaneGeometry {
   /// Calculates the lengths of the diagonals of the Trapezoid.
   ///
   /// Uses the law of cosines to find the diagonal lengths.
-  /// Returns the lengths of the diagonals as a [List<double>].
-  List<double> diagonals() {
-    double diagonal1 =
+  /// Returns the lengths of the diagonals as a [List<dynamic>].
+  List<dynamic> diagonals() {
+    dynamic diagonal1 =
         sqrt(side1 * side1 + side2 * side2 + (base1 - base2) * (base1 - base2));
-    double diagonal2 =
+    dynamic diagonal2 =
         sqrt(side1 * side1 + side2 * side2 + (base2 - base1) * (base2 - base1));
     return [diagonal1, diagonal2];
   }
@@ -117,13 +117,13 @@ class Trapezoid extends PlaneGeometry {
   ///
   /// Uses trigonometric functions to find the angles.
   /// Returns a [List] of four [double] values representing the angles in radians.
-  List<double> angles() {
-    double angle1 = acos(
+  List<dynamic> angles() {
+    dynamic angle1 = acos(
         (base2 - base1 + side1 * side1 + side2 * side2) / (2 * side1 * side2));
-    double angle2 = acos(
+    dynamic angle2 = acos(
         (base1 - base2 + side1 * side1 + side2 * side2) / (2 * side1 * side2));
-    double angle3 = pi - angle1;
-    double angle4 = pi - angle2;
+    dynamic angle3 = Complex(pi) - angle1;
+    dynamic angle4 = Complex(pi) - angle2;
     return [angle1, angle2, angle3, angle4];
   }
 }
