@@ -2,13 +2,13 @@ library bases;
 
 part 'ext.dart';
 
-/// Supports bases up to 36.
+/// Supports bases up to 64.
 const _chars =
     '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/';
 
 /// A utility class for converting numbers between various bases.
 ///
-/// The `BaseConverter` class supports conversions between bases ranging from 2 to 36.
+/// The `BaseConverter` class supports conversions between bases ranging from 2 to 64.
 /// It includes methods for direct conversions between common bases (binary, octal, decimal,
 /// and hexadecimal) as well as a general-purpose conversion method.
 class Bases {
@@ -28,7 +28,7 @@ class Bases {
   /// ```
   static bool isValidForBase(String value, int base) {
     final allowedChars = Set.from(_chars.substring(0, base).split(''));
-    return value.toUpperCase().split('').every(allowedChars.contains);
+    return value.split('').every(allowedChars.contains);
   }
 
   /// Converts a number [value] in the specified [sourceBase] to a decimal integer.
@@ -44,7 +44,27 @@ class Bases {
       throw ArgumentError('Invalid characters for base $sourceBase');
     }
     value = value.replaceAll('_', '');
-    return int.parse(value, radix: sourceBase);
+
+    // Use Dart's built-in parser for bases 2-36
+    if (sourceBase <= 36) {
+      return int.parse(value, radix: sourceBase);
+    }
+
+    // Manual conversion for bases > 36
+    int result = 0;
+    int power = 1;
+
+    for (int i = value.length - 1; i >= 0; i--) {
+      int digitValue = _chars.indexOf(value[i]);
+      if (digitValue == -1 || digitValue >= sourceBase) {
+        throw ArgumentError(
+            'Invalid character "${value[i]}" for base $sourceBase');
+      }
+      result += digitValue * power;
+      power *= sourceBase;
+    }
+
+    return result;
   }
 
   /// Converts a decimal integer [value] to a string in the specified [targetBase].

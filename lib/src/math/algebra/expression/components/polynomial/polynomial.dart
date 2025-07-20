@@ -4,9 +4,10 @@ part of '../../expression.dart';
 class Polynomial extends Expression {
   final List<dynamic> coefficients;
 
-  Polynomial(List<dynamic> coefficients):coefficients = coefficients
-          .map((e) => e is num ? Complex(e) : Complex.parse(e.toString()))
-          .toList();
+  Polynomial(List<dynamic> coefficients)
+      : coefficients = coefficients
+            .map((e) => e is num ? Complex(e) : Complex.parse(e.toString()))
+            .toList();
 
   late Polynomial polynomial;
 
@@ -198,8 +199,9 @@ class Polynomial extends Expression {
 
       for (var i = 0; i < maxDegree; i++) {
         dynamic a = i < coefficients.length ? coefficients[i] : Complex(0.0);
-        dynamic b =
-            i < other.coefficients.length ? other.coefficients[i] : Complex(0.0);
+        dynamic b = i < other.coefficients.length
+            ? other.coefficients[i]
+            : Complex(0.0);
         result[i] = a + b;
       }
       return Polynomial(result);
@@ -217,8 +219,9 @@ class Polynomial extends Expression {
 
       for (var i = 0; i < maxDegree; i++) {
         dynamic a = i < coefficients.length ? coefficients[i] : Complex(0.0);
-        dynamic b =
-            i < other.coefficients.length ? other.coefficients[i] : Complex(0.0);
+        dynamic b = i < other.coefficients.length
+            ? other.coefficients[i]
+            : Complex(0.0);
         result[i] = a - b;
       }
       return Polynomial(result);
@@ -549,8 +552,7 @@ class Polynomial extends Expression {
   dynamic evaluate([dynamic x]) {
     dynamic result = Complex.zero();
     for (var i = 0; i < coefficients.length; i++) {
-      result += coefficients[i] *
-          pow(x, coefficients.length - 1 - i);
+      result += coefficients[i] * pow(x, coefficients.length - 1 - i);
     }
     return result;
   }
@@ -617,8 +619,7 @@ class Polynomial extends Expression {
 
     for (var root in roots()) {
       if (root is Complex) {
-        String realPart =
-            '(x ${root.real > 0 ? '-' : '+'} ${root.real.abs()}';
+        String realPart = '(x ${root.real > 0 ? '-' : '+'} ${root.real.abs()}';
         String imaginaryPart = '';
 
         if (root.imaginary != 0) {

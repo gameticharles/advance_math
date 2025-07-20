@@ -1,34 +1,6 @@
-import 'package:advance_math/advance_math.dart' hide Complex;
-import 'package:advance_math/src/number/complex/complex.dart';
+import 'package:advance_math/advance_math.dart';
 
-// Example of using memoized functions
 void main() {
-  
-  // Benchmark comparison
-  final stopwatch = Stopwatch()..start();
-  
-  // Regular method
-  for (int i = 0; i < 10; i++) {
-    var res = time(() => pow); // Computes the sum
-    print('Result: ${res.result}, Time: ${res.elapsed.inMicroseconds} μs');
-  }
-  print('Regular exp: ${stopwatch.elapsedMicroseconds} μs');
-  
-  stopwatch.reset();
-  
-  // Memoized method
-  final memoizedPow = pow.memoize();
-  for (int i = 0; i < 10; i++) {
-
-    var res = time(() => memoizedPow); // Computes the sum
-    print('Result: ${res.result}, Time: ${res.elapsed.inMicroseconds} μs');
-  }
-  print('Memoized exp: ${stopwatch.elapsedMicroseconds} μs');
-}
-
-
-
-void main1() {
   const inf = double.infinity;
   const neginf = double.negativeInfinity;
   const nan = double.nan;
@@ -138,9 +110,9 @@ void main1() {
   var b = Complex(1, 2);
 
   print(a + 5); // 8.0 + 4.0i
-    // print(2.0 - a); // -1.0 - 4.0
-    // print(3.0 * b); // 3.0 + 6.0i
-    // print(15.0 / a); // 1.8 - 2.4
+  // print(2.0 - a); // -1.0 - 4.0
+  // print(3.0 * b); // 3.0 + 6.0i
+  // print(15.0 / a); // 1.8 - 2.4
   print(~a); // 0.12 - 0.16i
 
   final c = Complex.fromReal(5);
@@ -253,24 +225,33 @@ void main1() {
   print(Complex(3, 0).toInt());
   print(Complex(3, 1e-16).toInt());
   print(Complex(3.5, 0).toInt());
-  try {print(Complex(3, 4).toInt()); } catch (e) {print(e);}
-  
+  try {
+    print(Complex(3, 4).toInt());
+  } catch (e) {
+    print(e);
+  }
 
   printLine();
 
-  print(Complex.parse('0.5+0.5i').toNum());  
+  print(Complex.parse('0.5+0.5i').toNum());
   print(Complex.parse('0.5+0.5i').simplify());
-  try {print(Complex.parse('0.5+0.5i').toInt()); } catch (e) {print(e);}
-  try {print(Complex.parse('0.5+0.5i').toInt()); } catch (e) {print(e);} 
+  try {
+    print(Complex.parse('0.5+0.5i').toInt());
+  } catch (e) {
+    print(e);
+  }
+  try {
+    print(Complex.parse('0.5+0.5i').toInt());
+  } catch (e) {
+    print(e);
+  }
 
   // print(2 + Complex(4));
   print(Complex.infinity());
 
-  var i = Imaginary(1);  // 1i
-  var j = Imaginary(2);  // 2i
-  print(i + j);  // 3i
-  print(i * j);  // -2 (real number)
-  print(i / j);  // 0.5 (real number)
-
-  
+  var i = Imaginary(1); // 1i
+  var j = Imaginary(2); // 2i
+  print(i + j); // 3i
+  print(i * j); // -2 (real number)
+  print(i / j); // 0.5 (real number)
 }

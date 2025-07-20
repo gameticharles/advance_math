@@ -15,10 +15,9 @@ class Decimal implements Comparable<Decimal> {
   ///
   /// Throws an [Exception] if the [value] is of an invalid type or does not meet the
   /// requirements for a valid [Decimal] value.
-  Decimal(dynamic value, {int? sigDigits})
-      : _rational = _parseValue(value) {
+  Decimal(dynamic value, {int? sigDigits}) : _rational = _parseValue(value) {
     setPrecision(sigDigits ?? decimalPrecision);
-    
+
     if (value is num) {
       if (value.isNaN || value.isInfinite) {
         throw Exception('Decimal value must be a valid finite number');
@@ -48,7 +47,7 @@ class Decimal implements Comparable<Decimal> {
       // if (value.isInfinite) {
       //   return value.isNegative ? Rational.negativeInfinity : Rational.infinity;
       // }
-      
+
       // Convert double to string and parse
       return Rational.parse(value.toString());
     } else if (value is String) {
@@ -72,7 +71,10 @@ class Decimal implements Comparable<Decimal> {
 
   /// Internal constructor that creates a Decimal directly from a Rational
   /// without additional validation to avoid infinite recursion
-  Decimal._fromRational(Rational rational , {int? precision}) : _rational = rational {setPrecision(precision ?? decimalPrecision);}
+  Decimal._fromRational(Rational rational, {int? precision})
+      : _rational = rational {
+    setPrecision(precision ?? decimalPrecision);
+  }
 
   /// Creates a new [Decimal] instance from the provided [BigInt] value.
   ///
@@ -215,7 +217,7 @@ class Decimal implements Comparable<Decimal> {
   /// - 1 if the [Decimal] is positive
   int get sigNum => _rational.sign;
 
-    /// Returns true if this [Decimal] can be exactly represented as an [int].
+  /// Returns true if this [Decimal] can be exactly represented as an [int].
   bool get isExactInt => isInteger && _rational.numerator.bitLength <= 63;
 
   /// Returns true if this [Decimal] can be exactly represented as a [double].
@@ -224,21 +226,21 @@ class Decimal implements Comparable<Decimal> {
       // Integers up to 2^53 can be exactly represented as double
       return _rational.numerator.abs() <= BigInt.from(9007199254740992); // 2^53
     }
-    
+
     // Check if denominator is a power of 2 (can be exactly represented in binary)
     var den = _rational.denominator;
     while (den > BigInt.one && den.isEven) {
       den = den >> 1;
     }
-    
-    return den == BigInt.one && 
-           _rational.numerator.abs() <= BigInt.from(9007199254740992); // 2^53
+
+    return den == BigInt.one &&
+        _rational.numerator.abs() <= BigInt.from(9007199254740992); // 2^53
   }
 
   /// Optimized method to check if this Decimal is a power of 10
   bool isPowerOfTen() {
     if (!isInteger || this <= Decimal.zero) return false;
-    
+
     final str = toBigInt().toString();
     return str[0] == '1' && str.substring(1).split('').every((c) => c == '0');
   }
@@ -432,7 +434,7 @@ class Decimal implements Comparable<Decimal> {
     if (exponent == Decimal.zero || (exponent is num && exponent == 0)) {
       return Decimal.one;
     }
-    
+
     // Handle integer exponents efficiently
     if ((exponent is Decimal && exponent.isInteger) || exponent is int) {
       var exp = (exponent is Decimal && exponent.isInteger)
@@ -452,7 +454,10 @@ class Decimal implements Comparable<Decimal> {
       return result.toDecimal(precision: decimalPrecision);
     } else {
       var expValue = exponent is Decimal ? exponent : Decimal(exponent);
-      return (expValue * ln()).exp()._rational.toDecimal(precision: decimalPrecision);
+      return (expValue * ln())
+          .exp()
+          ._rational
+          .toDecimal(precision: decimalPrecision);
     }
   }
 
@@ -527,7 +532,7 @@ class Decimal implements Comparable<Decimal> {
     return (sin() / cos()).toDecimal(precision: decimalPrecision);
   }
 
-      /// Calculates the arc sine (inverse sine) of the current [Decimal] value.
+  /// Calculates the arc sine (inverse sine) of the current [Decimal] value.
   ///
   /// The result is in radians and will be in the range [-π/2, π/2].
   /// Throws an [ArgumentError] if the value is outside the range [-1, 1].
@@ -535,33 +540,36 @@ class Decimal implements Comparable<Decimal> {
     if (this < Decimal.fromInt(-1) || this > Decimal.fromInt(1)) {
       throw ArgumentError('asin(x) is only defined for x in the range [-1, 1]');
     }
-    
+
     // Use the series expansion: asin(x) = x + (1/2)(x^3/3) + (1·3/2·4)(x^5/5) + ...
     if (abs() < (Rational.one / Rational.fromInt(2)).toDecimal()) {
       Rational result = toRational();
       Rational term = toRational();
       Rational x2 = _rational * _rational;
-      
+
       for (int n = 1; n < decimalPrecision * 2; n++) {
-        term = term * x2 * (Rational.fromInt(2 * n - 1) / Rational.fromInt(2 * n));
+        term =
+            term * x2 * (Rational.fromInt(2 * n - 1) / Rational.fromInt(2 * n));
         Rational nextTerm = term / Decimal.fromInt(2 * n + 1).toRational();
         result += nextTerm;
-        
+
         // Check for convergence
-        if (nextTerm.abs() < Decimal.parse('1e-$decimalPrecision').toRational()) {
+        if (nextTerm.abs() <
+            Decimal.parse('1e-$decimalPrecision').toRational()) {
           break;
         }
       }
-      
+
       return result.toDecimal(precision: decimalPrecision);
     } else {
       // For values close to 1 or -1, use the identity: asin(x) = π/2 - asin(sqrt(1-x²))
       Decimal pi2 = Decimal.parse("1.5707963267948966192313216916398");
-      Decimal sign = this < Decimal.zero ? Decimal.fromInt(-1) : Decimal.fromInt(1);
+      Decimal sign =
+          this < Decimal.zero ? Decimal.fromInt(-1) : Decimal.fromInt(1);
       return sign * (pi2 - (Decimal.one - this * this).sqrt().asin());
     }
   }
-  
+
   /// Calculates the arc cosine (inverse cosine) of the current [Decimal] value.
   ///
   /// The result is in radians and will be in the range [0, π].
@@ -570,12 +578,12 @@ class Decimal implements Comparable<Decimal> {
     if (this < Decimal.fromInt(-1) || this > Decimal.fromInt(1)) {
       throw ArgumentError('acos(x) is only defined for x in the range [-1, 1]');
     }
-    
+
     // Use the identity: acos(x) = π/2 - asin(x)
     Decimal pi2 = Decimal.parse("1.5707963267948966192313216916398");
     return pi2 - asin();
   }
-  
+
   /// Calculates the arc tangent (inverse tangent) of the current [Decimal] value.
   ///
   /// The result is in radians and will be in the range [-π/2, π/2].
@@ -585,18 +593,19 @@ class Decimal implements Comparable<Decimal> {
       Rational result = toRational();
       Decimal term = this;
       Decimal x2 = this * this;
-      
+
       for (int n = 1; n < decimalPrecision * 2; n++) {
         term = -term * x2;
         var nextTerm = term / Decimal.fromInt(2 * n + 1);
         result += nextTerm;
-        
+
         // Check for convergence
-        if (nextTerm.abs() < Decimal.parse('1e-$decimalPrecision').toRational()) {
+        if (nextTerm.abs() <
+            Decimal.parse('1e-$decimalPrecision').toRational()) {
           break;
         }
       }
-      
+
       return result.toDecimal(precision: decimalPrecision);
     } else {
       // For larger values, use the identity: atan(x) = π/2 - atan(1/x) for x > 0
@@ -605,7 +614,8 @@ class Decimal implements Comparable<Decimal> {
       if (this > Decimal.zero) {
         return pi2 - (Decimal.one / this).toDecimal().atan();
       } else {
-        return -pi2 - (Decimal.one / this).toDecimal()..atan();
+        return -pi2 - (Decimal.one / this).toDecimal()
+          ..atan();
       }
     }
   }
@@ -752,7 +762,6 @@ extension IntExt on int {
   Rational toRational() => Rational.fromInt(this);
 }
 
-
 //     /// Calculates the arc sine (inverse sine) of the current [Decimal] value.
 //   ///
 //   /// The result is in radians and will be in the range [-π/2, π/2].
@@ -761,24 +770,24 @@ extension IntExt on int {
 //     if (this < Decimal.fromInt(-1) || this > Decimal.fromInt(1)) {
 //       throw ArgumentError('asin(x) is only defined for x in the range [-1, 1]');
 //     }
-    
+
 //     // Use the series expansion: asin(x) = x + (1/2)(x^3/3) + (1·3/2·4)(x^5/5) + ...
 //     if (abs() < (Rational.one / Rational.fromInt(2)).toDecimal()) {
 //       Rational result = toRational();
 //       Rational term = toRational();
 //       Rational x2 = toRational() * toDecimal();
-      
+
 //       for (int n = 1; n < decimalPrecision * 2; n++) {
 //         term = term * x2 * (Rational.fromInt(2 * n - 1) / Rational.fromInt(2 * n));
 //         Rational nextTerm = term / Decimal.fromInt(2 * n + 1).toRational();
 //         result += nextTerm;
-        
+
 //         // Check for convergence
 //         if (nextTerm.abs() < Decimal.parse('1e-$decimalPrecision').toRational()) {
 //           break;
 //         }
 //       }
-      
+
 //       return result.toDecimal(precision: decimalPrecision);
 //     } else {
 //       // For values close to 1 or -1, use the identity: asin(x) = π/2 - asin(sqrt(1-x²))
@@ -787,7 +796,7 @@ extension IntExt on int {
 //       return sign * (pi2 - (Decimal.one - this * this).sqrt().asin());
 //     }
 //   }
-  
+
 //   /// Calculates the arc cosine (inverse cosine) of the current [Decimal] value.
 //   ///
 //   /// The result is in radians and will be in the range [0, π].
@@ -796,12 +805,12 @@ extension IntExt on int {
 //     if (this < Decimal.fromInt(-1) || this > Decimal.fromInt(1)) {
 //       throw ArgumentError('acos(x) is only defined for x in the range [-1, 1]');
 //     }
-    
+
 //     // Use the identity: acos(x) = π/2 - asin(x)
 //     Decimal pi2 = Decimal.parse("1.5707963267948966192313216916398");
 //     return pi2 - asin();
 //   }
-  
+
 //   /// Calculates the arc tangent (inverse tangent) of the current [Decimal] value.
 //   ///
 //   /// The result is in radians and will be in the range [-π/2, π/2].
@@ -811,18 +820,18 @@ extension IntExt on int {
 //       Rational result = toRational();
 //       Decimal term = this;
 //       Decimal x2 = this * this;
-      
+
 //       for (int n = 1; n < decimalPrecision * 2; n++) {
 //         term = -term * x2;
 //         var nextTerm = term / Decimal.fromInt(2 * n + 1);
 //         result += nextTerm;
-        
+
 //         // Check for convergence
 //         if (nextTerm.abs() < Decimal.parse('1e-$decimalPrecision').toRational()) {
 //           break;
 //         }
 //       }
-      
+
 //       return result.toDecimal(precision: decimalPrecision);
 //     } else {
 //       // For larger values, use the identity: atan(x) = π/2 - atan(1/x) for x > 0
@@ -960,9 +969,9 @@ extension IntExt on int {
 //   bool get hasFinitePrecision {
 //     // Quick check for integers
 //     if (isInteger) return true;
-    
+
 //     // Quick check for common denominators
-//     if (denominator == BigInt.from(2) || 
+//     if (denominator == BigInt.from(2) ||
 //         denominator == BigInt.from(4) ||
 //         denominator == BigInt.from(5) ||
 //         denominator == BigInt.from(8) ||
@@ -975,20 +984,20 @@ extension IntExt on int {
 //         denominator == BigInt.from(100)) {
 //       return true;
 //     }
-    
+
 //     // For other denominators, check if they only have 2 and 5 as prime factors
 //     var d = denominator;
-    
+
 //     // Remove all factors of 2
 //     while (d.isEven && d != BigInt.one) {
 //       d = d >> 1; // Faster than division
 //     }
-    
+
 //     // Remove all factors of 5
 //     while (d % BigInt.from(5) == BigInt.zero && d != BigInt.one) {
 //       d = d ~/ BigInt.from(5);
 //     }
-    
+
 //     // If only 2s and 5s were factors, d should now be 1
 //     return d == BigInt.one;
 //   }
@@ -1016,22 +1025,22 @@ extension IntExt on int {
 //       return Decimal.fromDouble(toDouble());
 //     }
 //   }
-  
+
 //   /// Adds this [num] to a [Decimal].
 //   Decimal operator +(Decimal other) => toDecimal() + other;
-  
+
 //   /// Subtracts a [Decimal] from this [num].
 //   Decimal operator -(Decimal other) => toDecimal() - other;
-  
+
 //   /// Multiplies this [num] by a [Decimal].
 //   Decimal operator *(Decimal other) => toDecimal() * other;
-  
+
 //   /// Divides this [num] by a [Decimal].
 //   dynamic operator /(Decimal other) => toDecimal() / other;
-  
+
 //   /// Returns the remainder when this [num] is divided by a [Decimal].
 //   Decimal operator %(Decimal other) => toDecimal() % other;
-  
+
 //   /// Performs integer division of this [num] by a [Decimal].
 //   BigInt operator ~/(Decimal other) => toDecimal() ~/ other;
 // }

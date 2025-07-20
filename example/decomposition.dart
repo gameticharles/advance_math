@@ -117,8 +117,8 @@ void main() {
   svd = positiveDefiniteMatrix.decomposition.singularValueDecomposition();
   print(svd);
   print(svd.checkMatrix.round());
-  print("Is equal to original: ${positiveDefiniteMatrix.isAlmostEqual(svd.checkMatrix.round())}");
-
+  print(
+      "Is equal to original: ${positiveDefiniteMatrix.isAlmostEqual(svd.checkMatrix.round())}");
 
   printLine('Schur Decomposition');
 

@@ -9,8 +9,6 @@ import 'src/math/basic/math.dart' as math;
 import 'src/number/complex/complex.dart';
 
 export 'src/number/complex/complex.dart';
-
-export 'package:dartframe/dartframe.dart';
 export 'src/math/basic/math.dart';
 export 'src/math/geometry/geometry.dart';
 export 'src/math/algebra/algebra.dart';

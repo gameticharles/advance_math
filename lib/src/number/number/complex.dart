@@ -327,8 +327,12 @@ class Complex extends Number {
   @override
   // ignore: non_nullable_equals_parameter
   bool operator ==(dynamic other) {
-    if (other is num) return real.value == other && imaginary.value.value == 0.0;
-    if (other is Complex) return real == other.real && imaginary == other.imaginary;
+    if (other is num) {
+      return real.value == other && imaginary.value.value == 0.0;
+    }
+    if (other is Complex) {
+      return real == other.real && imaginary == other.imaginary;
+    }
     if (other is Imaginary) return real.value == 0.0 && imaginary == other;
     if (other is Real) return other == real && imaginary.value.value == 0.0;
     return false;

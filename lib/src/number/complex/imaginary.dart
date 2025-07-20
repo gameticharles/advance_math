@@ -50,7 +50,9 @@ class Imaginary extends Complex {
   // ignore: non_nullable_equals_parameter
   bool operator ==(dynamic other) {
     if (other is Imaginary) return coefficient == other.coefficient;
-    if (other is Complex) return other.real == 0.0 && coefficient == other.imaginary;
+    if (other is Complex) {
+      return other.real == 0.0 && coefficient == other.imaginary;
+    }
     if (other is num) return coefficient == 0.0 && other == 0.0;
     return false;
   }
@@ -70,12 +72,15 @@ class Imaginary extends Complex {
   num abs() => coefficient.abs();
 
   /// The complex modulus is the absolute value of this Imaginary number.
+  @override
   num get complexModulus => coefficient.abs();
 
   /// The complex argument, or phase, of this imaginary number in radians.
+  @override
   num get complexArgument => coefficient < 0 ? -math.pi / 2.0 : math.pi / 2.0;
 
   /// The phase is synonymous with the complex argument.
+  @override
   num get phase => complexArgument;
 
   /// If [obj] is an [Imaginary] number then the comparison is made in the imaginary dimension.
@@ -144,5 +149,4 @@ class Imaginary extends Complex {
     final angle = coefficient > 0 ? 'π/2' : '-π/2';
     return '${r.toStringAsFixed(6)}(cos($angle) + i⋅sin($angle))';
   }
-
 }

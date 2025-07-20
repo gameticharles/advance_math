@@ -98,9 +98,12 @@ class Double extends Real {
   bool operator ==(dynamic other) {
     if (other is num && other.isNaN) return value.isNaN;
     if (other is Real || other is num) return other == value;
-    if (other is Imaginary) return value == 0.0 && other.value.toDouble() == 0.0;
+    if (other is Imaginary) {
+      return value == 0.0 && other.value.toDouble() == 0.0;
+    }
     if (other is Complex) {
-      return other.real.toDouble() == value && other.imaginary.toDouble() == 0.0;
+      return other.real.toDouble() == value &&
+          other.imaginary.toDouble() == 0.0;
     }
 
     return false;

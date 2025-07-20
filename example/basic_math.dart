@@ -17,9 +17,12 @@ void main() {
   print(Decimal.parse('0.5').sin()); // Output: ~0.4794255386042030002732879352
   print(Decimal.parse('0.5').tan()); // Output: ~0.5463024898437905
   print(Decimal.parse('0.5').exp()); // Output: ~1.648721270700128146848650781
-  print(Decimal.parse('0.5').ln()); // Output: ~-0.69314718055994530941723212145817656807550013436026
-  print(Decimal.parse('2.1').pow(Decimal.parse('5.21'))); // Output: ~47.72682295935301454674160047008481922823908643816666
-  print(Decimal.parse('2.0').pow(Decimal.parse('0.5'))); // Output: ~1.4142135623730950487965748420755316907
+  print(Decimal.parse('0.5')
+      .ln()); // Output: ~-0.69314718055994530941723212145817656807550013436026
+  print(Decimal.parse('2.1').pow(Decimal.parse(
+      '5.21'))); // Output: ~47.72682295935301454674160047008481922823908643816666
+  print(Decimal.parse('2.0').pow(Decimal.parse(
+      '0.5'))); // Output: ~1.4142135623730950487965748420755316907
 
   printLine();
 
@@ -39,7 +42,8 @@ void main() {
   printLine('Compute PI Algorithm');
 
   var thisPI = PI(precision: 100);
-  print((thisPI/Decimal(5.5)).toDecimal()); // Output: ~3.141592653589793238462643383
+  print((thisPI / Decimal(5.5))
+      .toDecimal()); // Output: ~3.141592653589793238462643383
 
   final algorithms = {
     'BBP': (int digits) => BBP(digits),
@@ -110,20 +114,21 @@ void main() {
 
   printLine();
   print(collatz(6));
- 
-  print(collatzPeak(6));  // Output: 16
+
+  print(collatzPeak(6)); // Output: 16
   print(collatzPeak(27)); // Output: 9232
 
   print(longestCollatzInRange(1, 30)); // Output: {number: 27, length: 111}
 
-  print(isKaprekarNumber(9));   // Output: true (9² = 81, 8+1 = 9)
-  print(isKaprekarNumber(45));  // Output: true (45² = 2025, 20+25 = 45)
-  print(isKaprekarNumber(10));  // Output: false
+  print(isKaprekarNumber(9)); // Output: true (9² = 81, 8+1 = 9)
+  print(isKaprekarNumber(45)); // Output: true (45² = 2025, 20+25 = 45)
+  print(isKaprekarNumber(10)); // Output: false
   print('');
   print(isNarcissisticNumber(153)); // Output: true (1³ + 5³ + 3³ = 153)
   print(isNarcissisticNumber(370)); // Output: true (3³ + 7³ + 0³ = 370)
   print(isNarcissisticNumber(100)); // Output: false
 
-  print(isHappyNumber(19)); // Output: true (1² + 9² = 82, 8² + 2² = 68, 6² + 8² = 100, 1² + 0² + 0² = 1)
-  print(isHappyNumber(4));  // Output: false
+  print(isHappyNumber(
+      19)); // Output: true (1² + 9² = 82, 8² + 2² = 68, 6² + 8² = 100, 1² + 0² + 0² = 1)
+  print(isHappyNumber(4)); // Output: false
 }

@@ -84,8 +84,7 @@ class LeastSquares extends BaseLeastSquares {
   ///
   /// The `method` parameter is an optional parameter specifying the equation method to be used.
   /// By default, it is set to `EquationMethod.linear`.
-  LeastSquares(super.A, super.b, DiagonalMatrix W,
-      {super.method})
+  LeastSquares(super.A, super.b, DiagonalMatrix W, {super.method})
       : super(W: W);
 }
 
@@ -111,8 +110,7 @@ class OrdinaryLeastSquares extends BaseLeastSquares {
   ///
   /// The `method` parameter is an optional parameter specifying the equation method to be used.
   /// By default, it is set to `EquationMethod.linear`.
-  OrdinaryLeastSquares(super.A, super.b,
-      {DiagonalMatrix? W, super.method});
+  OrdinaryLeastSquares(super.A, super.b, {DiagonalMatrix? W, super.method});
 }
 
 /// Implements Weighted Least Squares method for linear regression.
@@ -140,8 +138,7 @@ class WeightedLeastSquares extends BaseLeastSquares {
   ///
   /// The `method` parameter is an optional parameter specifying the equation method to be used.
   /// By default, it is set to `EquationMethod.linear`.
-  WeightedLeastSquares(super.A, super.b, DiagonalMatrix W,
-      {super.method})
+  WeightedLeastSquares(super.A, super.b, DiagonalMatrix W, {super.method})
       : super(W: W);
 
   /// Computes the residuals of the regression model, taking into account
@@ -182,8 +179,7 @@ class GeneralizedLeastSquares extends BaseLeastSquares {
   ///
   /// The `method` parameter is an optional parameter specifying the equation method to be used.
   /// By default, it is set to `EquationMethod.linear`.
-  GeneralizedLeastSquares(super.A, super.b, DiagonalMatrix W,
-      {super.method})
+  GeneralizedLeastSquares(super.A, super.b, DiagonalMatrix W, {super.method})
       : super(W: W);
 
   /// Computes the residuals of the regression model, taking into account
@@ -209,8 +205,7 @@ class TotalLeastSquares extends BaseLeastSquares {
   ///
   /// [A] is the matrix of observations, [b] is the vector of dependent variable values
   /// [method] determines the solving method, defaults to linear.
-  TotalLeastSquares(super.A, super.b,
-      {super.method});
+  TotalLeastSquares(super.A, super.b, {super.method});
 
   /// Overridden fit method that solves the Total Least Squares problem
   ///
@@ -291,8 +286,7 @@ class TotalLeastSquares extends BaseLeastSquares {
 class RidgeRegression extends BaseLeastSquares {
   final double alpha;
 
-  RidgeRegression(super.A, super.b, this.alpha,
-      {super.W, super.method});
+  RidgeRegression(super.A, super.b, this.alpha, {super.W, super.method});
 
   @override
   void fit(
@@ -342,8 +336,7 @@ class RidgeRegression extends BaseLeastSquares {
 class LassoRegression extends BaseLeastSquares {
   final double alpha;
 
-  LassoRegression(super.A, super.b, this.alpha,
-      {super.W, super.method});
+  LassoRegression(super.A, super.b, this.alpha, {super.W, super.method});
 
   @override
   void fit(
@@ -413,8 +406,7 @@ class ElasticNetRegression extends BaseLeastSquares {
 /// // Output: Column Matrix of the residuals (difference between observed and predicted responses)
 /// ```
 class RobustLeastSquares extends BaseLeastSquares {
-  RobustLeastSquares(super.A, super.b,
-      {super.W, super.method});
+  RobustLeastSquares(super.A, super.b, {super.W, super.method});
 
   // Implement the special method here
   void fitRobustly() {

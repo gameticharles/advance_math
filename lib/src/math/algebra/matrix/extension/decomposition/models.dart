@@ -353,25 +353,26 @@ class SingularValueDecomposition extends Decomposition {
   final dynamic _conditionNumber;
 
   /// Constructor that takes an SVD object
-  SingularValueDecomposition(SVD svd) 
-    : _svd = svd,
-      _u = null,
-      _s = null,
-      _v = null,
-      _conditionNumber = null;
+  SingularValueDecomposition(SVD svd)
+      : _svd = svd,
+        _u = null,
+        _s = null,
+        _v = null,
+        _conditionNumber = null;
 
   /// Constructor that takes pre-computed U, S, and V matrices
-  /// 
+  ///
   /// [u] The left singular vectors matrix
   /// [s] The diagonal matrix of singular values
   /// [v] The right singular vectors matrix (V^T)
   /// [condNumber] Optional pre-computed condition number
-  SingularValueDecomposition.fromComponents(Matrix u, Matrix s, Matrix v, {dynamic condNumber}) 
-    : _svd = null,
-      _u = u,
-      _s = s,
-      _v = v,
-      _conditionNumber = condNumber;
+  SingularValueDecomposition.fromComponents(Matrix u, Matrix s, Matrix v,
+      {dynamic condNumber})
+      : _svd = null,
+        _u = u,
+        _s = s,
+        _v = v,
+        _conditionNumber = condNumber;
 
   /// Returns the left singular vectors
   Matrix get U => _svd != null ? _svd.U() : _u!;
@@ -386,18 +387,18 @@ class SingularValueDecomposition extends Decomposition {
   dynamic get conditionNumber {
     if (_conditionNumber != null) return _conditionNumber;
     if (_svd != null) return _svd.cond();
-    
+
     // Calculate condition number from singular values if not provided
     dynamic maxSingularValue = S[0][0];
     dynamic minSingularValue = maxSingularValue;
-    
+
     int minDim = math.min(S.rowCount, S.columnCount);
     for (int i = 0; i < minDim; i++) {
       if (S[i][i] != Complex.zero() && S[i][i].abs() < minSingularValue.abs()) {
         minSingularValue = S[i][i];
       }
     }
-    
+
     return maxSingularValue / minSingularValue;
   }
 

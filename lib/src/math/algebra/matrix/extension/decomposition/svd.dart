@@ -274,7 +274,7 @@ class SVD {
       int k, kase;
 
       // Here is where a test for too many iterations would go.
-      
+
       // This section of the program inspects for
       // negligible elements in the s and e arrays.  On
       // completion the variables kase and k are set as follows.
@@ -288,7 +288,8 @@ class SVD {
         if (k == -1) {
           break;
         }
-        if (Complex(e[0][k].abs()) <= (tiny + (eps * Complex(_s[0][k].abs() + _s[0][k + 1].abs())))) {
+        if (Complex(e[0][k].abs()) <=
+            (tiny + (eps * Complex(_s[0][k].abs() + _s[0][k + 1].abs())))) {
           e[0][k] = Complex.zero();
           break;
         }
@@ -301,7 +302,7 @@ class SVD {
           if (ks == k) {
             break;
           }
-          var t = (ks != p ? (e[0][ks].abs() ): 0) +
+          var t = (ks != p ? (e[0][ks].abs()) : 0) +
               (ks != k + 1 ? e[0][ks - 1].abs() : 0);
           if (Complex(_s[0][ks].abs()) <= (tiny + (eps * Complex(t)))) {
             _s[0][ks] = Complex.zero();
@@ -529,16 +530,18 @@ class SVD {
     if (x is Complex && y is Complex) {
       return Complex(math.sqrt(math.pow(x.abs(), 2) + math.pow(y.abs(), 2)), 0);
     }
-    
+
     // Handle the case when one is Complex
     if (x is Complex) {
-      return Complex(math.sqrt(math.pow(x.abs(), 2) + math.pow(y as num, 2)), 0);
+      return Complex(
+          math.sqrt(math.pow(x.abs(), 2) + math.pow(y as num, 2)), 0);
     }
-    
+
     if (y is Complex) {
-      return Complex(math.sqrt(math.pow(x as num, 2) + math.pow(y.abs(), 2)), 0);
+      return Complex(
+          math.sqrt(math.pow(x as num, 2) + math.pow(y.abs(), 2)), 0);
     }
-    
+
     // Original implementation for numeric values
     return math.sqrt(math.pow(x as num, 2) + math.pow(y as num, 2));
   }
@@ -569,28 +572,28 @@ class SVD {
   Matrix S() {
     // Create a matrix with the same dimensions as the original matrix
     Matrix result = Matrix.zeros(_m, _n);
-    
+
     // Get the minimum dimension to avoid index out of bounds
     int minDim = math.min(_m, _n);
-    
+
     // Set the diagonal elements to the singular values
     for (int i = 0; i < minDim; i++) {
       result[i][i] = _s[0][i];
     }
-    
+
     return result;
   }
 
-    /// Two norm condition number
+  /// Two norm condition number
   /// return max(S)/min(S)
   dynamic cond() {
     // Get the largest singular value (always at position [0][0])
     dynamic maxSingularValue = _s[0][0];
-    
+
     // Find the smallest non-zero singular value
     int minDim = math.min(_m, _n);
     dynamic minSingularValue = maxSingularValue; // Start with the largest value
-    
+
     for (int i = 0; i < minDim; i++) {
       dynamic value = _s[0][i];
       // Only consider non-zero values to avoid division by zero
@@ -598,7 +601,7 @@ class SVD {
         minSingularValue = value;
       }
     }
-    
+
     // Calculate the condition number
     return maxSingularValue / minSingularValue;
   }

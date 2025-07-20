@@ -49,14 +49,16 @@ class SylvesterMatrix extends Matrix {
      */
     for (var i = 0; i < size - coefficients.length + 1; ++i) {
       for (var j = 0; j < coefficients.length; ++j) {
-        flatData[(size * i + (j + i)).toInt()] = Complex(coefficients[j]).toNum();
+        flatData[(size * i + (j + i)).toInt()] =
+            Complex(coefficients[j]).toNum();
       }
     }
 
     var pos = 0;
     for (var i = size - coefficients.length + 1; i < size; ++i) {
       for (var j = 0; j < derivative.length; ++j) {
-        flatData[(size * i + (j + pos)).toInt()] = Complex(derivative[j]).toNum();
+        flatData[(size * i + (j + pos)).toInt()] =
+            Complex(derivative[j]).toNum();
       }
       ++pos;
     }

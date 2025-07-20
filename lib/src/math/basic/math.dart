@@ -4,7 +4,8 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'dart:typed_data';
 
-import '../../../advance_math.dart' hide Complex,Number, Integer, Double, Imaginary;
+import '../../../advance_math.dart'
+    hide Complex, Number, Integer, Double, Imaginary;
 import '../../number/complex/complex.dart';
 
 part 'basic.dart';
@@ -555,7 +556,7 @@ String randomMerge(String a, String b) {
   // Case 1: Measurement callback with access to measure function
   if (functionOrValue is Function(Function)) {
     final sw = Stopwatch()..start();
-    
+
     // Create a measure function that wraps any function to track its execution time
     measure(fn) {
       return (fn is Function)
@@ -568,7 +569,7 @@ String randomMerge(String a, String b) {
             })
           : fn;
     }
-    
+
     final result = functionOrValue(measure);
     sw.stop();
     return (result: result as T, elapsed: sw.elapsed);
@@ -603,11 +604,12 @@ String randomMerge(String a, String b) {
 ///   return combineResults(a, b);
 /// });
 /// ```
-Future<({T result, Duration elapsed})> timeAsync<T>(dynamic functionOrValue) async {
+Future<({T result, Duration elapsed})> timeAsync<T>(
+    dynamic functionOrValue) async {
   // Case 1: Measurement callback with access to measure function
   if (functionOrValue is Function(Function)) {
     final sw = Stopwatch()..start();
-    
+
     // Create a measure function that wraps any async function to track its execution time
     Future<R> Function() measure<R>(dynamic fn) {
       return () async {
@@ -618,7 +620,7 @@ Future<({T result, Duration elapsed})> timeAsync<T>(dynamic functionOrValue) asy
         return result;
       };
     }
-    
+
     final result = await functionOrValue(measure);
     sw.stop();
     return (result: result as T, elapsed: sw.elapsed);
@@ -632,7 +634,8 @@ Future<({T result, Duration elapsed})> timeAsync<T>(dynamic functionOrValue) asy
   }
   // Case 3: Direct value or Future was passed
   else {
-    final value = functionOrValue is Future ? await functionOrValue : functionOrValue;
+    final value =
+        functionOrValue is Future ? await functionOrValue : functionOrValue;
     return (result: value as T, elapsed: Duration.zero);
   }
 }

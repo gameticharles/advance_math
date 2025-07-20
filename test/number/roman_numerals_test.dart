@@ -29,7 +29,7 @@ void main() {
     });
 
     test('Invalid Roman numerals', () {
-      expect(() => RomanNumerals.fromRoman('IIII'), 
+      expect(() => RomanNumerals.fromRoman('IIII'),
           throwsA(TypeMatcher<InvalidRomanNumeralException>()));
       expect(() => RomanNumerals.fromRoman('VV'),
           throwsA(TypeMatcher<InvalidRomanNumeralException>()));

@@ -1,15 +1,15 @@
 part of '/advance_math.dart';
 
 extension NumExtension on num {
-
   /// Generates a range from this number to [end] (inclusive).
   /// Example: 1.to(5) => [1, 2, 3, 4, 5]
   Iterable<num> to(num end, {num step = 1}) sync* {
     if (step == 0) throw ArgumentError('Step cannot be zero');
     if ((step > 0 && this > end) || (step < 0 && this < end)) {
-      throw ArgumentError('Invalid range: step direction must match range direction');
+      throw ArgumentError(
+          'Invalid range: step direction must match range direction');
     }
-    
+
     var current = this;
     while (step > 0 ? current <= end : current >= end) {
       yield current;
@@ -84,6 +84,7 @@ extension NumExtension on num {
           math.pow(10, decimalPlaces);
     }
   }
+
   /// Raises a number to the power of another number.
   dynamic pow(dynamic exponent) => math.pow(this, exponent);
 }
@@ -118,4 +119,3 @@ extension BigIntSqrt on BigInt {
     return (this & (this - BigInt.one)) == BigInt.zero;
   }
 }
-

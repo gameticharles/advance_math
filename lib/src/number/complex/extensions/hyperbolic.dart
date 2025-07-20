@@ -124,8 +124,8 @@ extension ComplexHyperbolicX<T extends Complex> on T {
     if (real.isInfinite) {
       if (real > 0) return Complex.one();
       if (real < 0) return Complex(-1.0, 0.0);
-    }  
-    
+    }
+
     // Use the optimized formula for regular values
     final real2 = 2.0 * real;
     final imaginary2 = 2.0 * imaginary;
@@ -139,7 +139,6 @@ extension ComplexHyperbolicX<T extends Complex> on T {
     return Complex(math.sinh(real2) / d, math.sin(imaginary2) / d);
   }
 
-
   /// Returns the inverse hyperbolic sine
   Complex asinh() {
     return (this + (this * this + Complex.one()).sqrt()).log();
@@ -147,11 +146,13 @@ extension ComplexHyperbolicX<T extends Complex> on T {
 
   /// Returns the inverse hyperbolic cosine
   Complex acosh() {
-    return (this + ((this + Complex.one()) * (this - Complex.one())).sqrt()).log();
+    return (this + ((this + Complex.one()) * (this - Complex.one())).sqrt())
+        .log();
   }
 
   /// Returns the inverse hyperbolic tangent
   Complex atanh() {
-    return ((Complex.one() + this) / (Complex.one() - this)).log() * Complex(0.5);
+    return ((Complex.one() + this) / (Complex.one() - this)).log() *
+        Complex(0.5);
   }
 }

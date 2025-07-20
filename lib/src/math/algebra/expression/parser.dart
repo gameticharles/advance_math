@@ -154,7 +154,15 @@ class ExpressionParser {
   }
 
   Parser<Expression> get binaryExpression =>
-      token.separatedBy(binaryOperation).map((elements) {
+      token.starSeparated(binaryOperation).map((result) {
+        // Reconstruct the flat list with elements and separators interleaved
+        final List<dynamic> elements = <dynamic>[];
+        for (int i = 0; i < result.elements.length; i++) {
+          elements.add(result.elements[i]);
+          if (i < result.separators.length) {
+            elements.add(result.separators[i]);
+          }
+        }
         // elements = [leftOperand, operator, rightOperand, operator, rightOperand, ...]
         if (elements.length == 1) {
           return elements[0]; // Only a single operand, return it directly
@@ -249,14 +257,16 @@ class ExpressionParser {
   // until the terminator character `)` or `]` is encountered.
   // e.g. `foo(bar, baz)`, `my_func()`, or `[bar, baz]`
   Parser<List<Expression>> get arguments => expression
-      .separatedBy(char(',').trim(), includeSeparators: false)
+      .starSeparated(char(',').trim())
+      .map((result) => result.elements)
       .castList<Expression>()
       .optionalWith([]);
 
   Parser<Map<Expression, Expression>> get mapArguments =>
       (expression & char(':').trim() & expression)
           .map((l) => MapEntry<Expression, Expression>(l[0], l[2]))
-          .separatedBy(char(',').trim(), includeSeparators: false)
+          .starSeparated(char(',').trim())
+          .map((result) => result.elements)
           .castList<MapEntry<Expression, Expression>>()
           .map((l) => Map.fromEntries(l))
           .optionalWith({});

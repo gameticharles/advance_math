@@ -6,6 +6,7 @@ import 'quantity_exception.dart';
 class ImmutableQuantityException extends QuantityException {
   ///  Constructs a ImmutableQuantityException with an optional message (str).
   ImmutableQuantityException(
-      {String str = 'An attempt was made to modify an immutable quantity:  ', required Quantity q})
+      {String str = 'An attempt was made to modify an immutable quantity:  ',
+      required Quantity q})
       : super('$str $q');
 }

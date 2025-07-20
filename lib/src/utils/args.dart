@@ -46,7 +46,7 @@ class VarArgsFunction<T> {
   VarArgsFunction(this.callback);
 
   /// Factory constructor to create a VarArgsFunction from a standard Dart function.
-  /// 
+  ///
   /// This allows easy conversion of regular functions to VarArgsFunction:
   /// ```dart
   /// int add(int a, int b) => a + b;
@@ -58,7 +58,7 @@ class VarArgsFunction<T> {
     return VarArgsFunction<R>((args, kwargs) {
       // Process args to handle both direct arguments and list arguments
       List<dynamic> processedArgs;
-      
+
       if (args.length == 1 && args.first is List) {
         // If the first argument is a list, use it as the arguments list
         processedArgs = args.first;
@@ -66,10 +66,10 @@ class VarArgsFunction<T> {
         // Otherwise use the args directly
         processedArgs = args;
       }
-      
+
       // Use reflection to call the function with the provided arguments
-      return Function.apply(function, processedArgs, 
-        kwargs.map((key, value) => MapEntry(Symbol(key), value)));
+      return Function.apply(function, processedArgs,
+          kwargs.map((key, value) => MapEntry(Symbol(key), value)));
     });
   }
 
@@ -80,11 +80,11 @@ class VarArgsFunction<T> {
   /// var func = VarArgsFunction<int>((args, kwargs) => args.length);
   /// print(func(1, 2, 3)); // Outputs: 3
   /// ```
-   T call([dynamic args = const [], Map<String, dynamic> kwargs = const {}]) {
+  T call([dynamic args = const [], Map<String, dynamic> kwargs = const {}]) {
     try {
       // Handle different types of arguments
       List<dynamic> processedArgs;
-      
+
       if (args is List) {
         // If args is already a list, use it directly
         processedArgs = args;
@@ -92,7 +92,7 @@ class VarArgsFunction<T> {
         // If args is a single value, wrap it in a list
         processedArgs = [args];
       }
-      
+
       return callback(processedArgs, kwargs);
     } catch (e) {
       throw ArgumentError('Error in direct call: $e');
@@ -143,7 +143,7 @@ class VarArgsFunction<T> {
     });
   }
 
-    /// Implements currying, converting a function that takes multiple arguments
+  /// Implements currying, converting a function that takes multiple arguments
   /// into a sequence of functions that each take a single argument.
   ///
   /// ```dart
@@ -157,7 +157,7 @@ class VarArgsFunction<T> {
     if (arity <= 0) {
       throw ArgumentError('Arity must be greater than 0');
     }
-    
+
     // Helper function to implement the currying
     Function curryHelper(List<dynamic> collectedArgs, int remaining) {
       return (arg) {
@@ -171,7 +171,7 @@ class VarArgsFunction<T> {
         }
       };
     }
-    
+
     return curryHelper([], arity);
   }
 
@@ -191,7 +191,9 @@ class VarArgsFunction<T> {
   /// var sayHi = greet.partial([], {'greeting': 'Hi'});
   /// print(sayHi('Alice')); // Outputs: Hi, Alice!
   /// ```
-  VarArgsFunction<T> partial([List<dynamic> preArgs = const [], Map<String, dynamic> preKwargs = const {}]) {
+  VarArgsFunction<T> partial(
+      [List<dynamic> preArgs = const [],
+      Map<String, dynamic> preKwargs = const {}]) {
     return VarArgsFunction<T>((args, kwargs) {
       final combinedArgs = [...preArgs, ...args];
       final combinedKwargs = {...preKwargs, ...kwargs};
@@ -213,20 +215,20 @@ class VarArgsFunction<T> {
   /// ```
   VarArgsFunction<T> memoized() {
     final cache = <String, T>{};
-    
+
     return VarArgsFunction<T>((args, kwargs) {
       // Create a cache key from the arguments
       final key = '${args.toString()}|${kwargs.toString()}';
-      
+
       if (!cache.containsKey(key)) {
         cache[key] = callback(args, kwargs);
       }
-      
+
       return cache[key]!;
     });
   }
 
-    /// Creates a memoized version of this function with a custom key generator.
+  /// Creates a memoized version of this function with a custom key generator.
   ///
   /// This allows for more efficient caching when the default string representation
   /// of arguments is not optimal:
@@ -241,18 +243,18 @@ class VarArgsFunction<T> {
   VarArgsFunction<T> memoizedWithKey(
       String Function(List<dynamic>, Map<String, dynamic>) keyGenerator) {
     final cache = <String, T>{};
-    
+
     return VarArgsFunction<T>((args, kwargs) {
       final key = keyGenerator(args, kwargs);
-      
+
       if (!cache.containsKey(key)) {
         cache[key] = callback(args, kwargs);
       }
-      
+
       return cache[key]!;
     });
   }
-  
+
   /// Creates a debounced version of this function that only executes
   /// after a specified delay has passed without any new invocations.
   ///
@@ -271,16 +273,16 @@ class VarArgsFunction<T> {
   /// search('appl');
   /// search('apple'); // Only this one will be executed
   /// ```
-   FutureVarArgsFunction<T> debounced(Duration delay) {
+  FutureVarArgsFunction<T> debounced(Duration delay) {
     Timer? timer;
-    
-    return  FutureVarArgsFunction<T>((args, kwargs) {
+
+    return FutureVarArgsFunction<T>((args, kwargs) {
       if (timer != null) {
         timer!.cancel();
       }
-      
+
       final completer = Completer<T>();
-      
+
       timer = Timer(delay, () {
         try {
           final result = callback(args, kwargs);
@@ -289,7 +291,7 @@ class VarArgsFunction<T> {
           completer.completeError(e);
         }
       });
-      
+
       return completer.future;
     });
   }
@@ -310,14 +312,14 @@ class VarArgsFunction<T> {
   /// saveData('data3'); // Ignored
   /// // After 2 seconds, the next call will execute
   /// ```
-   FutureVarArgsFunction<T> throttled(Duration interval) {
+  FutureVarArgsFunction<T> throttled(Duration interval) {
     DateTime? lastExecuted;
     T? lastResult;
-    
-    return  FutureVarArgsFunction<T>((args, kwargs) {
+
+    return FutureVarArgsFunction<T>((args, kwargs) {
       final now = DateTime.now();
       final completer = Completer<T>();
-      
+
       if (lastExecuted == null || now.difference(lastExecuted!) >= interval) {
         lastExecuted = now;
         try {
@@ -330,11 +332,11 @@ class VarArgsFunction<T> {
         // If we're still in the throttle period, return the last result
         completer.complete(lastResult);
       }
-      
+
       return completer.future;
     });
   }
-  
+
   /// Creates a version of this function that will retry execution
   /// a specified number of times if it throws an exception.
   ///
@@ -358,7 +360,7 @@ class VarArgsFunction<T> {
     return FutureVarArgsFunction<T>((args, kwargs) async {
       int attempts = 0;
       dynamic lastError;
-      
+
       // First attempt
       try {
         attempts++;
@@ -371,14 +373,14 @@ class VarArgsFunction<T> {
         lastError = e;
         // Continue to retries
       }
-      
+
       // Retry attempts (up to maxRetries)
       while (attempts <= maxRetries) {
         try {
           // Add delay between retries if specified
           if (delay != null) {
             await Future.delayed(delay);
-          }     
+          }
           // print('Retry attempt $attempts of $maxRetries');
           final result = callback(args, kwargs);
           if (result is Future<T>) {
@@ -387,14 +389,14 @@ class VarArgsFunction<T> {
           return result;
         } catch (e) {
           lastError = e;
-          
+
           if (attempts >= maxRetries) {
             break;
           }
           attempts++;
         }
       }
-      
+
       throw Exception('Failed after $maxRetries retries: $lastError');
     });
   }
@@ -414,7 +416,7 @@ class VarArgsFunction<T> {
       return g(result)([]);
     });
   }
-  
+
   /// Converts this VarArgsFunction to a standard Dart function with the specified
   /// signature. This is useful when you need to pass the function to APIs that
   /// expect specific function signatures.
@@ -428,13 +430,12 @@ class VarArgsFunction<T> {
   R Function() toFunction<R>(R Function() fn) => fn;
 }
 
-
 /// A specialized version of VarArgsFunction that returns Future results.
 /// This helps maintain proper type information for async operations.
 class FutureVarArgsFunction<T> extends VarArgsFunction<Future<T>> {
   /// Constructor for creating a [FutureVarArgsFunction] instance.
   FutureVarArgsFunction(super.callback);
-  
+
   /// Creates a new FutureVarArgsFunction that applies a transformation to the result
   /// of this function.
   FutureVarArgsFunction<R> mapFuture<R>(R Function(T result) transform) {
@@ -443,7 +444,7 @@ class FutureVarArgsFunction<T> extends VarArgsFunction<Future<T>> {
       return transform(result);
     });
   }
-  
+
   /// Adds a timeout to this future function, throwing an exception if the
   /// operation takes longer than the specified duration.
   FutureVarArgsFunction<T> withTimeout(Duration timeout) {
@@ -451,7 +452,7 @@ class FutureVarArgsFunction<T> extends VarArgsFunction<Future<T>> {
       return callback(args, kwargs).timeout(timeout);
     });
   }
-  
+
   /// Adds a fallback value to return if the operation fails.
   FutureVarArgsFunction<T> withFallback(T fallbackValue) {
     return FutureVarArgsFunction<T>((args, kwargs) {

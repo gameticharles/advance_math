@@ -713,8 +713,7 @@ extension MatrixStructure on Matrix {
   /// print(A.isZeroMatrix()); // Output: true
   /// ```
   bool isZeroMatrix({num tolerance = 1e-10}) {
-    return every(
-        (row) => row.every((element) => element.abs() <= tolerance));
+    return every((row) => row.every((element) => element.abs() <= tolerance));
   }
 
   /// Checks if the matrix is an orthogonal matrix.
@@ -955,8 +954,7 @@ extension MatrixStructure on Matrix {
 
     for (dynamic eigenvalue in eigenvalues) {
       eigenvalueCounts[eigenvalue] =
-          ((eigenvalueCounts[eigenvalue] ?? Complex(0))) +
-              Complex.one();
+          ((eigenvalueCounts[eigenvalue] ?? Complex(0))) + Complex.one();
     }
 
     for (dynamic eigenvalue in eigenvalueCounts.keys) {

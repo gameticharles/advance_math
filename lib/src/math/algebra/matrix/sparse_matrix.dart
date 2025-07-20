@@ -17,7 +17,6 @@ abstract class SparseMatrix extends Matrix {
         return SparseMatrixDOK.fromList(data);
       case SparseFormat.lil:
         return SparseMatrixLIL.fromList(data);
-
     }
   }
 

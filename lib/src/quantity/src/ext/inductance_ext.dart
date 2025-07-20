@@ -4,7 +4,8 @@ import '../si/types/inductance.dart';
 InductanceUnits henries = Inductance.henries;
 
 /// ESU of inductance as a unit.
-InductanceUnits esuOfInductance = InductanceUnits('esu of inductance', null, null, null, 8.9876e11, false);
+InductanceUnits esuOfInductance =
+    InductanceUnits('esu of inductance', null, null, null, 8.9876e11, false);
 
 // Convenience units.
 

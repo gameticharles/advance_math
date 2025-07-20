@@ -89,35 +89,42 @@ final TimeUnits days = daysMeanSolar;
 /// A sidereal day is the time between two consecutive transits of the First Point of Aries. It represents the time
 /// taken by the Earth to rotate on its axis relative to the stars, and is almost four minutes shorter than the solar
 /// day because of the Earth's orbital motion.
-final TimeUnits daysSidereal = TimeUnits('days (sidereal)', null, 'days (sid)', 'day (sidereal)', 8.6164090e4, false);
+final TimeUnits daysSidereal = TimeUnits('days (sidereal)', null, 'days (sid)',
+    'day (sidereal)', 8.6164090e4, false);
 
 /// A unit of one hour in the sidereal day.
-final TimeUnits hoursSidereal = TimeUnits('hours (sidereal)', null, 'hr (sid)', 'hour (sidereal)', 3.5901704e3, false);
+final TimeUnits hoursSidereal = TimeUnits('hours (sidereal)', null, 'hr (sid)',
+    'hour (sidereal)', 3.5901704e3, false);
 
 /// A unit of one minute in the sidereal day.
-final TimeUnits minutesSidereal =
-    TimeUnits('minutes (sidereal)', null, 'min (sid)', 'minute (sidereal)', 5.9836174e1, false);
+final TimeUnits minutesSidereal = TimeUnits('minutes (sidereal)', null,
+    'min (sid)', 'minute (sidereal)', 5.9836174e1, false);
 
 /// A unit of one second in the sidereal day.
-final TimeUnits secondsSidereal =
-    TimeUnits('seconds (sidereal)', null, 's (sid)', 'second (sidereal)', 9.9726957e-1, false);
+final TimeUnits secondsSidereal = TimeUnits('seconds (sidereal)', null,
+    's (sid)', 'second (sidereal)', 9.9726957e-1, false);
 
 /// Calendar years as a unit.
-final TimeUnits yearsCalendar = TimeUnits('years', null, 'yr', null, 3.1536e7, false);
+final TimeUnits yearsCalendar =
+    TimeUnits('years', null, 'yr', null, 3.1536e7, false);
 
 /// Sidereal years as a unit.
-final TimeUnits yearsSidereal = TimeUnits('years (sidereal)', null, 'yr (sid)', 'year (sidereal)', 3.1558150e7, false);
+final TimeUnits yearsSidereal = TimeUnits('years (sidereal)', null, 'yr (sid)',
+    'year (sidereal)', 3.1558150e7, false);
 
 /// Tropical years as a unit.
-final TimeUnits yearsTropical = TimeUnits('years (tropical)', null, 'yr (trop)', 'year (tropical)', 3.1556926e7, false);
+final TimeUnits yearsTropical = TimeUnits('years (tropical)', null, 'yr (trop)',
+    'year (tropical)', 3.1556926e7, false);
 
 /// Defined as exactly 365.25 days of 86400 SI seconds each.
 /// The length of the Julian year is the average length of the year in the Julian calendar that was used in Western
 /// societies until some centuries ago, and from which the unit is named.
-final TimeUnits yearsJulian = TimeUnits('years (Julian)', null, 'yr (Jul)', 'year (Julian)', 3.15576e7, false);
+final TimeUnits yearsJulian = TimeUnits(
+    'years (Julian)', null, 'yr (Jul)', 'year (Julian)', 3.15576e7, false);
 
 /// A unit of one billion years.
-final TimeUnits aeons = TimeUnits('aeons', null, 'aeons', null, 3.1536e18, false);
+final TimeUnits aeons =
+    TimeUnits('aeons', null, 'aeons', null, 3.1536e18, false);
 
 /// A synonym for [aeons].
 final TimeUnits eons = aeons;
@@ -125,4 +132,5 @@ final TimeUnits eons = aeons;
 // Constants.
 
 /// The time required for light to travel in a vacuum a distance of one Planck length.
-const Time planckTime = Time.constant(Double.constant(5.391247e-44), uncert: 0.000011129150639916886);
+const Time planckTime = Time.constant(Double.constant(5.391247e-44),
+    uncert: 0.000011129150639916886);

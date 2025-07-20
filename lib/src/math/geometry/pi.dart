@@ -47,7 +47,7 @@ enum PiCalcAlgorithm {
 /// - `compute<T>(Decimal Function(Decimal) func)`: Applies a function that requires the value of pi to the computed value.
 /// - `countDigitFrequency()`: Counts the frequency of each digit in the decimal representation of pi.
 /// - `findPatternIndices(String pattern)`: Finds the indices of a given pattern in the string representation of pi.
-class PI extends Decimal{
+class PI extends Decimal {
   /// The precision of the computed value of pi, in decimal places.
   @override
   final int precision;
@@ -66,7 +66,8 @@ class PI extends Decimal{
   /// If no [precision] is provided, the default is 100 decimal places.
   ///
   /// `algorithm`: The algorithm to use to calculate the value of pi.
-  PI._internal(Decimal super.piValue, this.precision, this._piString, this.timePerDigit, this.totalDuration);
+  PI._internal(Decimal super.piValue, this.precision, this._piString,
+      this.timePerDigit, this.totalDuration);
 
   /// Constructs a [PI] object with the specified precision.
   ///
@@ -77,7 +78,8 @@ class PI extends Decimal{
   ///
   /// The computed value of π is stored in the [_piString] field as a string.
   /// Factory constructor that handles the calculation
-  factory PI({PiCalcAlgorithm algorithm = PiCalcAlgorithm.Ramanujan, int? precision}) {
+  factory PI(
+      {PiCalcAlgorithm algorithm = PiCalcAlgorithm.Ramanujan, int? precision}) {
     final actualPrecision = precision ?? decimalPrecision;
     PiAlgorithm pi;
 
@@ -105,7 +107,8 @@ class PI extends Decimal{
     // Perform pi calculation
     Decimal piValue = pi.calculate();
     String piString = piValue.toStringAsFixed(actualPrecision);
-    return PI._internal(piValue, actualPrecision, piString, pi.getTimePerDigit(), pi.getTotalTime());
+    return PI._internal(piValue, actualPrecision, piString,
+        pi.getTimePerDigit(), pi.getTotalTime());
   }
 
   /// Performs a binary split on the given range [a, b] to calculate the
@@ -322,11 +325,11 @@ abstract class PiAlgorithm {
   }
 
   /// Calculate the duration of the algorithm
-  /// 
+  ///
   /// The number of milliseconds since the "Unix epoch" 1970-01-01T00:00:00Z (UTC).
-  /// 
+  ///
   /// This value is independent of the time zone.
-  /// 
+  ///
   /// This value is at most 8,640,000,000,000,000ms (100,000,000 days) from the Unix epoch. In other words: millisecondsSinceEpoch.abs() <= 8640000000000000.
   int getTotalTime() => endTime - startTime;
 

@@ -743,7 +743,8 @@ void main() {
         // ignore: unrelated_type_equality_checks
         expect(Complex(5.5, -1) == Precision('5.5'), false);
         // ignore: unrelated_type_equality_checks
-        expect(Complex(5.5, 0) == Precision('5.50000000000000000000001'), false);
+        expect(
+            Complex(5.5, 0) == Precision('5.50000000000000000000001'), false);
       });
 
       test('operator == Reals', () {

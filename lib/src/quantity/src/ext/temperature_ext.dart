@@ -17,24 +17,30 @@ const double fiveNinths = 5.0 / 9.0;
 
 /// Fahrenheit scale units.
 // ignore:non_constant_identifier_names
-final TemperatureUnits Fahrenheit = TemperatureUnits(
-    'degrees Fahrenheit', 'F', null, 'degree Fahrenheit', fiveNinths, false, 273.15 - (fiveNinths * 32.0));
+final TemperatureUnits Fahrenheit = TemperatureUnits('degrees Fahrenheit', 'F',
+    null, 'degree Fahrenheit', fiveNinths, false, 273.15 - (fiveNinths * 32.0));
 
 /// Rankine scale units.
 // ignore:non_constant_identifier_names
-final TemperatureUnits Rankine =
-    TemperatureUnits('degrees Rankine', 'deg R', null, 'degree Rankine', fiveNinths, false, 0);
+final TemperatureUnits Rankine = TemperatureUnits(
+    'degrees Rankine', 'deg R', null, 'degree Rankine', fiveNinths, false, 0);
 
 /// Degrees in the Fahrenheit scale.
-final TemperatureIntervalUnits degreesFahrenheit =
-    TemperatureIntervalUnits('degrees Fahrenheit', 'deg F', null, 'degree Fahrenheit', fiveNinths, false, 0.0);
+final TemperatureIntervalUnits degreesFahrenheit = TemperatureIntervalUnits(
+    'degrees Fahrenheit',
+    'deg F',
+    null,
+    'degree Fahrenheit',
+    fiveNinths,
+    false,
+    0.0);
 
 /// A synonym for [degreesFahrenheit].
 final TemperatureIntervalUnits degF = degreesFahrenheit;
 
 /// Degrees in the Rankine scale.
-final TemperatureIntervalUnits degreesRankine =
-    TemperatureIntervalUnits('degrees Rankine', 'deg R', null, 'degree Rankine', fiveNinths, false, 0.0);
+final TemperatureIntervalUnits degreesRankine = TemperatureIntervalUnits(
+    'degrees Rankine', 'deg R', null, 'degree Rankine', fiveNinths, false, 0.0);
 
 /// A synonym for [degreesRankine].
 final TemperatureIntervalUnits degR = degreesRankine;
@@ -42,5 +48,6 @@ final TemperatureIntervalUnits degR = degreesRankine;
 // Constants
 
 /// Contemporary models of physical cosmology postulate that the highest possible temperature is the Planck temperature.
-const Temperature planckTemperature =
-    Temperature.constant(Double.constant(1.416784e32), uncert: 0.000011293182305841964);
+const Temperature planckTemperature = Temperature.constant(
+    Double.constant(1.416784e32),
+    uncert: 0.000011293182305841964);

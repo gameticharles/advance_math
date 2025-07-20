@@ -71,8 +71,12 @@ class Imaginary extends Number {
   // ignore: non_nullable_equals_parameter
   bool operator ==(dynamic other) {
     if (other is Imaginary) return value == other.value;
-    if (other is Complex) return other.real.value == 0.0 && this == other.imaginary;
-    if (other is Real || other is num) return value.toDouble() == 0.0 && other == 0.0;
+    if (other is Complex) {
+      return other.real.value == 0.0 && this == other.imaginary;
+    }
+    if (other is Real || other is num) {
+      return value.toDouble() == 0.0 && other == 0.0;
+    }
 
     return false;
   }

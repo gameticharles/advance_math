@@ -2,7 +2,6 @@ import 'package:test/test.dart';
 import 'package:advance_math/src/number/complex/complex.dart';
 import 'package:advance_math/advance_math.dart' as math;
 
-
 /// Class to test extending Complex
 class TestComplex extends Complex {
   TestComplex(num super.real, num super.imaginary);
@@ -225,7 +224,7 @@ void main() {
     group('Properties and Methods', () {
       test('Modulus', () {
         final c = Complex(2, 5);
-        expect(c.modulus, closeTo(c.complexModulus, 1.0e-9) );
+        expect(c.modulus, closeTo(c.complexModulus, 1.0e-9));
         expect(c.modulus, closeTo(math.sqrt(29), 1.0e-9));
         // expect(c.modulus, c.complexModulus);
         // expect(c.modulus, math.sqrt(29));
@@ -397,13 +396,13 @@ void main() {
   test('DivideReal', () {
     var x = Complex(2, 3);
     var y = Complex(2, 0);
-    expect( Complex(1, 1.5), equals(x / y));
+    expect(Complex(1, 1.5), equals(x / y));
   });
 
   test('DivideImaginary', () {
     var x = Complex(2, 3);
     var y = Complex(0, 2);
-    expect( Complex(1.5, -1), equals(x / y));
+    expect(Complex(1.5, -1), equals(x / y));
   });
 
   test('DivideInf', () {
@@ -526,12 +525,12 @@ void main() {
   test('ReciprocalReal', () {
     var z = Complex(-2.0, 0.0);
     //expect(Complex.equals(Complex(-0.5, 0.0), z.reciprocal()), isTrue);
-    expect( Complex(-0.5, 0.0), equals(z.reciprocal));
+    expect(Complex(-0.5, 0.0), equals(z.reciprocal));
   });
 
   test('ReciprocalImaginary', () {
     var z = Complex(0.0, -2.0);
-    expect( Complex(0.0, 0.5), equals(z.reciprocal));
+    expect(Complex(0.0, 0.5), equals(z.reciprocal));
   });
 
   test('ReciprocalInf', () {
@@ -541,7 +540,7 @@ void main() {
     }
 
     {
-      final z =  Complex(1, inf).reciprocal;
+      final z = Complex(1, inf).reciprocal;
       expect(z, equals(Complex.zero()));
     }
   });
@@ -588,9 +587,10 @@ void main() {
     }
 
     // [MATH-164]
-    expect( Complex(1, 0) * infInf == Complex.infinity(), isTrue);
-    expect( (Complex(-1, 0) * infInf) == Complex.infinity(), isFalse); // -Infinity
-    expect( Complex(1, 0) * negInfZero == Complex.infinity(), isFalse);
+    expect(Complex(1, 0) * infInf == Complex.infinity(), isTrue);
+    expect(
+        (Complex(-1, 0) * infInf) == Complex.infinity(), isFalse); // -Infinity
+    expect(Complex(1, 0) * negInfZero == Complex.infinity(), isFalse);
 
     {
       final w = oneInf * oneNegInf;
@@ -848,16 +848,16 @@ void main() {
     final msg = "'==' not compatible with 'hashCode'";
 
     {
-     var x = Complex(0.0, 0.0);
-     var y = Complex(0.0, -0.0);
-     expect(x.hashCode != y.hashCode, isFalse);
-     expect(x != y, isFalse, reason: msg);
+      var x = Complex(0.0, 0.0);
+      var y = Complex(0.0, -0.0);
+      expect(x.hashCode != y.hashCode, isFalse);
+      expect(x != y, isFalse, reason: msg);
     }
     {
-     var x = Complex(0.0, 0.0);
-     var y = Complex(-0.0, 0.0);
-     expect(x.hashCode != y.hashCode, isFalse);
-     expect(x != y, isFalse, reason:msg);
+      var x = Complex(0.0, 0.0);
+      var y = Complex(-0.0, 0.0);
+      expect(x.hashCode != y.hashCode, isFalse);
+      expect(x != y, isFalse, reason: msg);
     }
   });
 
@@ -976,7 +976,7 @@ void main() {
     var expected = Complex(-13.12878, -15.20078);
     expect(expected, closeToZ(z.exp(), 1.0e-5));
     expect(Complex.one(), closeToZ(Complex.zero().exp(), 10e-12));
-    final iPi = Complex.i() *  Complex(pi, 0);
+    final iPi = Complex.i() * Complex(pi, 0);
     expect(-Complex.one(), closeToZ(iPi.exp(), 10e-12));
   });
 
@@ -1006,14 +1006,16 @@ void main() {
   });
 
   test('LogInf', () {
-    expect( Complex(inf, pi / 2), closeToZ(oneInf.log(), 10e-12));
-    expect( Complex(inf, -pi / 2), closeToZ(oneNegInf.log(), 10e-12));
+    expect(Complex(inf, pi / 2), closeToZ(oneInf.log(), 10e-12));
+    expect(Complex(inf, -pi / 2), closeToZ(oneNegInf.log(), 10e-12));
     expect(infZero, closeToZ(infOne.log(), 10e-12));
-    expect( Complex(inf, pi), closeToZ(negInfOne.log(), 10e-12));
-    expect( Complex(inf, pi / 4), closeToZ(infInf.log(), 10e-12));
-    expect( Complex(inf, -pi / 4), closeToZ(infNegInf.log(), 10e-12));
-    expect( Complex(inf, 3 * pi / 4), closeToZ(negInfInf.log(), 10e-12));
-    expect( Complex(inf, -3 * pi / 4), closeToZ(negInfNegInf.log(), 10e-12),
+    expect(Complex(inf, pi), closeToZ(negInfOne.log(), 10e-12));
+    expect(Complex(inf, pi / 4), closeToZ(infInf.log(), 10e-12));
+    expect(Complex(inf, -pi / 4), closeToZ(infNegInf.log(), 10e-12));
+    expect(Complex(inf, 3 * pi / 4), closeToZ(negInfInf.log(), 10e-12));
+    expect(
+      Complex(inf, -3 * pi / 4),
+      closeToZ(negInfNegInf.log(), 10e-12),
     );
   });
 
@@ -1067,7 +1069,8 @@ void main() {
     expect(Complex.nan(), equals(Complex.zero().power(Complex.one())));
     expect(Complex.nan(), equals(Complex.zero().power(Complex.zero())));
     expect(Complex.nan(), equals(Complex.zero().power(Complex.i())));
-    expect(Complex.one(), closeToZ(Complex.one().power(Complex.zero()), 10e-12));
+    expect(
+        Complex.one(), closeToZ(Complex.one().power(Complex.zero()), 10e-12));
     expect(Complex.one(), closeToZ(Complex.i().power(Complex.zero()), 10e-12));
     expect(Complex.one(), closeToZ((3.im - 1).power(Complex.zero()), 10e-12));
   });
@@ -1115,7 +1118,7 @@ void main() {
     expect(Complex.nan(), equals(Complex.zero().pow(0.0)));
     expect(Complex.one(), closeToZ(Complex.one().pow(0.0), 10e-12));
     expect(Complex.one(), closeToZ(Complex.i().pow(0.0), 10e-12));
-    expect(Complex.one(), closeToZ( Complex(-1, 3).pow(0.0), 10e-12));
+    expect(Complex.one(), closeToZ(Complex(-1, 3).pow(0.0), 10e-12));
   });
 
   test('Sin', () {
@@ -1252,8 +1255,8 @@ void main() {
   });
 
   test('TanInf', () {
-    expect( Complex(0.0, 1.0), equals(oneInf.tan()));
-    expect( Complex(0.0, -1.0), equals(oneNegInf.tan()));
+    expect(Complex(0.0, 1.0), equals(oneInf.tan()));
+    expect(Complex(0.0, -1.0), equals(oneNegInf.tan()));
     expect(Complex.nan(), equals(infOne.tan()));
     expect(Complex.nan(), equals(negInfOne.tan()));
     expect(Complex.nan(), equals(infInf.tan()));
@@ -1263,8 +1266,8 @@ void main() {
   });
 
   test('TanCritical', () {
-    expect(infNaN, equals( Complex(pi / 2, 0).tan()));
-    expect(negInfNaN, equals( Complex(-pi / 2, 0).tan()));
+    expect(infNaN, equals(Complex(pi / 2, 0).tan()));
+    expect(negInfNaN, equals(Complex(-pi / 2, 0).tan()));
   });
 
   test('Tanh', () {
@@ -1272,7 +1275,7 @@ void main() {
     var expected = Complex(1.00071, 0.00490826);
     expect(expected, closeToZ(z.tanh(), 1.0e-5));
     /* Check that no overflow occurs (MATH-722) */
-    final actual =  Complex(1E10, 3.0).tanh();
+    final actual = Complex(1E10, 3.0).tanh();
     {
       var expected = Complex(1, 0);
       expect(expected, closeToZ(actual, 1.0e-5));
@@ -1300,13 +1303,13 @@ void main() {
   });
 
   test('TanhCritical', () {
-    expect(nanInf, equals( Complex(0, pi / 2).tanh()));
+    expect(nanInf, equals(Complex(0, pi / 2).tanh()));
   });
 
   /// test issue MATH-221
 
   test('Math221', () {
-    expect( Complex(0, -1) == Complex.i() *  Complex(-1, 0), isTrue);
+    expect(Complex(0, -1) == Complex.i() * Complex(-1, 0), isTrue);
   });
 
   /// Test: computing <b>third roots</b> of z.
@@ -1320,7 +1323,7 @@ void main() {
     // The complex number we want to compute all third-roots for.
     var z = Complex(-2, 2);
     // The List holding all third roots
-    final thirdRootsOfZ = z.nthRoot(3,allRoots: true); //.toArray(Complex[0]);
+    final thirdRootsOfZ = z.nthRoot(3, allRoots: true); //.toArray(Complex[0]);
     // Returned Collection must not be empty!
     expect(3, equals(thirdRootsOfZ.length));
     // test z_0
@@ -1456,28 +1459,28 @@ void main() {
   /// Test standard values
 
   test('argument', () {
-    var z =  Complex(1, 0);
+    var z = Complex(1, 0);
     expect(0.0, closeTo(z.argument, 1.0e-12));
 
-    z =  Complex(1, 1);
+    z = Complex(1, 1);
     expect(math.pi / 4, closeTo(z.argument, 1.0e-12));
 
-    z =  Complex(0, 1);
+    z = Complex(0, 1);
     expect(math.pi / 2, closeTo(z.argument, 1.0e-12));
 
-    z =  Complex(-1, 1);
+    z = Complex(-1, 1);
     expect(3 * math.pi / 4, closeTo(z.argument, 1.0e-12));
 
-    z =  Complex(-1, 0);
+    z = Complex(-1, 0);
     expect(math.pi, closeTo(z.argument, 1.0e-12));
 
-    z =  Complex(-1, -1);
+    z = Complex(-1, -1);
     expect(-3 * math.pi / 4, closeTo(z.argument, 1.0e-12));
 
-    z =  Complex(0, -1);
+    z = Complex(0, -1);
     expect(-math.pi / 2, closeTo(z.argument, 1.0e-12));
 
-    z =  Complex(1, -1);
+    z = Complex(1, -1);
     expect(-math.pi / 4, closeTo(z.argument, 1.0e-12));
   });
 
@@ -1502,7 +1505,3 @@ void main() {
     expect(Complex.nan().argument.isNaN, isTrue);
   });
 }
-
-
-
-

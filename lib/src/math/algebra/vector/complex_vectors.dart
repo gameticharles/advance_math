@@ -114,10 +114,8 @@ class ComplexVector {
   double norm() {
     double sum = 0;
     for (int i = 0; i < length; i++) {
-      sum +=
-          ((this[i] as Complex).real * (this[i] as Complex).real) +
-              ((this[i] as Complex).imaginary *
-                  (this[i] as Complex).imaginary);
+      sum += ((this[i] as Complex).real * (this[i] as Complex).real) +
+          ((this[i] as Complex).imaginary * (this[i] as Complex).imaginary);
     }
     return math.sqrt(sum);
   }

@@ -1,11 +1,10 @@
 part of '../complex.dart';
 
 extension ComplexOperationX<T extends Complex> on T {
-
   // Operations with Complex and num types
   Complex operator +(dynamic other) {
     if (isNaN) return Complex.nan();
-    
+
     if (other is Complex) {
       if (other.isNaN) return Complex.nan();
       return Complex(real + other.real, imaginary + other.imaginary);
@@ -19,7 +18,7 @@ extension ComplexOperationX<T extends Complex> on T {
 
   Complex operator -(dynamic other) {
     if (isNaN) return Complex.nan();
-    
+
     if (other is Complex) {
       if (other.isNaN) return Complex.nan();
       return Complex(real - other.real, imaginary - other.imaginary);
@@ -90,7 +89,7 @@ extension ComplexOperationX<T extends Complex> on T {
       // Normal case - use the formula (a+bi)/(c+di) = ((ac+bd)/(c²+d²)) + ((bc-ad)/(c²+d²))i
       final c = other.real;
       final d = other.imaginary;
-      
+
       // Use a more numerically stable algorithm based on the magnitudes of c and d
       if (c.abs() < d.abs()) {
         final q = c / d;
@@ -127,10 +126,10 @@ extension ComplexOperationX<T extends Complex> on T {
   }
 
   /// Integer division operator
-  /// 
+  ///
   /// Performs integer division between complex numbers.
   /// Returns the quotient of the division with the fractional part truncated.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// Complex(5, 3) ~/ Complex(2, 1)  // Returns the integer part of the division
@@ -138,7 +137,7 @@ extension ComplexOperationX<T extends Complex> on T {
   Complex operator ~/(dynamic divisor) {
     // Special cases handling
     if (isNaN) return Complex.nan();
-    
+
     if (divisor is Complex) {
       // Special cases for NaN and infinity
       if (divisor.isNaN) return Complex.nan();
@@ -151,15 +150,13 @@ extension ComplexOperationX<T extends Complex> on T {
       if (divisor.isInfinite) return Complex.zero();
 
       // Use the optimized division algorithm from the existing implementation
-       // (a + bi) / (c + di) = (ac + bd) / (c^2 + d^2) + i * (bc - ad) / (c^2 + d^2)
+      // (a + bi) / (c + di) = (ac + bd) / (c^2 + d^2) + i * (bc - ad) / (c^2 + d^2)
       final c = divisor.real;
       final d = divisor.imaginary;
       final c2d2 = (c * c) + (d * d);
-      
-      return Complex(
-        ((real * c + imaginary * d) / c2d2).truncate(),
-        ((imaginary * c - real * d) / c2d2).truncate()
-      );
+
+      return Complex(((real * c + imaginary * d) / c2d2).truncate(),
+          ((imaginary * c - real * d) / c2d2).truncate());
     } else if (divisor is num) {
       // Special cases
       if (divisor.isNaN) return Complex.nan();
@@ -171,10 +168,12 @@ extension ComplexOperationX<T extends Complex> on T {
       if (divisor.isInfinite) return Complex.zero();
 
       // Normal integer division
-      return Complex((real / divisor).truncate(), (imaginary / divisor).truncate());
+      return Complex(
+          (real / divisor).truncate(), (imaginary / divisor).truncate());
     }
-    
-    throw ArgumentError('Invalid type for integer division: ${divisor.runtimeType}');
+
+    throw ArgumentError(
+        'Invalid type for integer division: ${divisor.runtimeType}');
   }
 
   /// The modulo operator (not supported).
@@ -278,11 +277,10 @@ extension ComplexOperationX<T extends Complex> on T {
     throw ArgumentError('Comparison only supported with Complex and num types');
   }
 
-
   /// Computes the n-th roots of the complex number represented by this object.
   ///
   /// By default, returns the principal n-th root (the one with the smallest positive argument).
-  /// If [allRoots] is set to true, returns a list containing all n complex numbers 
+  /// If [allRoots] is set to true, returns a list containing all n complex numbers
   /// that are the n-th roots of this complex number.
   ///
   /// The method handles:
@@ -311,15 +309,15 @@ extension ComplexOperationX<T extends Complex> on T {
   /// // Get all square roots of -1
   /// var bothRoots = Complex(-1, 0).nthRoot(2, allRoots: true);
   /// print(bothRoots); // Output: [0 + 1i, 0 - 1i]
-  /// 
+  ///
   /// // Get the reciprocal of the square root (negative exponent)
   /// var recipRoot = Complex(4, 0).nthRoot(-2);
   /// print(recipRoot); // Output: 0.5 + 0i
-  /// 
+  ///
   /// // Handle zero case
   /// var zeroRoot = Complex(0, 0).nthRoot(3);
   /// print(zeroRoot); // Output: 0 + 0i
-  /// 
+  ///
   /// // Handle n = 0 case
   /// var zeroExponent = Complex(5, 5).nthRoot(0);
   /// print(zeroExponent); // Output: 1 + 0i
@@ -352,28 +350,29 @@ extension ComplexOperationX<T extends Complex> on T {
 
     // Compute the magnitude of the result
     final nthRootOfAbs = math.pow(abs(), 1.0 / absN);
-    
+
     // Compute the argument (phase) for the principal root
     final baseAngle = argument;
-    final normalizedAngle = baseAngle < 0 ? baseAngle + (2 * math.pi) : baseAngle;
+    final normalizedAngle =
+        baseAngle < 0 ? baseAngle + (2 * math.pi) : baseAngle;
     final nthPhi = normalizedAngle / absN;
-    
+
     // For all roots, we need to compute each root with a different angle
     if (allRoots) {
       final slice = 2 * math.pi / absN;
       var roots = List<Complex>.generate(absN, (k) {
         final angle = nthPhi + k * slice;
         final root = Complex.polar(nthRootOfAbs, angle);
-        
+
         // If n is negative, return the reciprocal
         return isNegativeN ? ~root : root;
       });
-      
+
       return roots;
     } else {
       // Return only the principal root
       final principalRoot = Complex.polar(nthRootOfAbs, nthPhi);
-      
+
       // If n is negative, return the reciprocal
       return isNegativeN ? ~principalRoot : principalRoot;
     }
@@ -390,7 +389,7 @@ extension ComplexOperationX<T extends Complex> on T {
   /// print(z_power); // Output: -5 + 12i
   /// ```
   Complex power(dynamic exponent) => pow(exponent);
-  
+
   /// Returns a new complex number representing this number raised to the power of [exponent].
   ///
   /// Example:1
@@ -489,7 +488,6 @@ extension ComplexOperationX<T extends Complex> on T {
     return value.toInt() == value ? value.toInt() : value.toDouble();
   }
 
-
   /// Calculates the natural logarithm of the complex number.
   ///
   /// Implements the formula:
@@ -525,7 +523,6 @@ extension ComplexOperationX<T extends Complex> on T {
     ];
   }
 
-
   /// Returns the ceiling of the real portion of this complex number.
   num ceil() => real.ceil();
 
@@ -542,10 +539,9 @@ extension ComplexOperationX<T extends Complex> on T {
   /// Returns a Complex number whose real portion has been clamped to within [lowerLimit] and
   /// [upperLimit] and whose imaginary portion is the same as the imaginary value in this Complex number.
   dynamic clamp(dynamic lowerLimit, dynamic upperLimit) {
-    return Complex(
-      real.clamp( lowerLimit, upperLimit),
-      imaginary.clamp(lowerLimit, upperLimit)
-    ).simplify();
+    return Complex(real.clamp(lowerLimit, upperLimit),
+            imaginary.clamp(lowerLimit, upperLimit))
+        .simplify();
   }
 
   /// Returns the floor of the real portion of this complex number.
@@ -570,15 +566,14 @@ extension ComplexOperationX<T extends Complex> on T {
     return real.round();
   }
 
-
   /// Returns the rounded value of this complex number.
-  /// 
+  ///
   /// When called without parameters, returns the integer closest to the real portion,
   /// simplifying to a num if possible.
-  /// 
-  /// When called with [decimals], returns a new complex number with both parts 
+  ///
+  /// When called with [decimals], returns a new complex number with both parts
   /// rounded to the specified number of decimal places, simplifying if possible.
-  /// 
+  ///
   /// Examples:
   /// ```dart
   /// Complex(3.7, 0).roundTo()         // returns 4 (int)
@@ -589,27 +584,38 @@ extension ComplexOperationX<T extends Complex> on T {
     if (decimals == null) {
       // Handle special cases for real part
       if (real.isNaN || real.isInfinite) {
-        return asComplex ? Complex(real, imaginary.isNaN || imaginary.isInfinite ? imaginary : imaginary.round()) : real;
+        return asComplex
+            ? Complex(
+                real,
+                imaginary.isNaN || imaginary.isInfinite
+                    ? imaginary
+                    : imaginary.round())
+            : real;
       }
-      
+
       // Handle special cases for imaginary part
       if (imaginary.isNaN || imaginary.isInfinite) {
         return Complex(real.round(), imaginary);
       }
-      
+
       // Round both parts to integers
       // Return simplified version (num or Complex)
-      return asComplex ? Complex(real.round(), imaginary.round()).simplify() : real.round();
+      return asComplex
+          ? Complex(real.round(), imaginary.round()).simplify()
+          : real.round();
     }
-    
+
     final factor = math.pow(10, decimals);
-    
+
     // Handle special cases
-    final roundedReal = real.isNaN || real.isInfinite ? real : (real * factor).round() / factor;
-    final roundedImag = imaginary.isNaN || imaginary.isInfinite ? imaginary : (imaginary * factor).round() / factor;
-    
+    final roundedReal =
+        real.isNaN || real.isInfinite ? real : (real * factor).round() / factor;
+    final roundedImag = imaginary.isNaN || imaginary.isInfinite
+        ? imaginary
+        : (imaginary * factor).round() / factor;
+
     final roundedComplex = Complex(roundedReal, roundedImag);
-    
+
     // Return simplified version (num or Complex)
     return roundedComplex.simplify();
   }
@@ -629,7 +635,6 @@ extension ComplexOperationX<T extends Complex> on T {
 
   /// The remainder method operates on the real portion of this Complex number only.
   num remainder(dynamic divisor) => real.remainder(divisor);
-
 
   /// Returns the distance between this complex number and another in the complex plane.
   ///

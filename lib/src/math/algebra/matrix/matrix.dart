@@ -4,7 +4,7 @@ part of '../algebra.dart';
 /// along with various utility methods for manipulating these arrays.
 ///
 /// The class extends `IterableMixin` allowing iteration over the rows or columns of the matrix.
-class Matrix extends IterableMixin<List<dynamic>>{
+class Matrix extends IterableMixin<List<dynamic>> {
   /// Private field to hold the actual data of the matrix.
   List<List<dynamic>> _data = const [];
 

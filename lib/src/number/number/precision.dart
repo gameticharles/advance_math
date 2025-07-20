@@ -9,8 +9,6 @@ import 'number_exception.dart';
 import 'real.dart';
 import '../util/jenkins_hash.dart';
 
-
-
 /// `Precision` represents an arbitrary precision number.
 ///
 /// It can be used anywhere a `Real` `Number` is used.

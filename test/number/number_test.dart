@@ -35,7 +35,8 @@ void main() {
 
       expect(
           Number.simplifyType(
-              Complex.num(Precision('0'), Imaginary(Precision('0')))) is Precision,
+                  Complex.num(Precision('0'), Imaginary(Precision('0'))))
+              is Precision,
           true);
     });
   });

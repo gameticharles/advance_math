@@ -17,7 +17,7 @@ void main() {
       expect(Bases.toDecimal("A", 16), equals(10));
       expect(Bases.toDecimal("101", 2), equals(5));
       expect(Bases.toDecimal("ZZ", 36), equals(1295));
-      expect(Bases.toDecimal("z/", 64), equals(4095));
+      expect(Bases.toDecimal("z/", 64), equals(3967));
     });
 
     test('Throws error for invalid characters', () {
@@ -30,7 +30,7 @@ void main() {
       expect(Bases.fromDecimal(255, 16), equals("FF"));
       expect(Bases.fromDecimal(5, 2), equals("101"));
       expect(Bases.fromDecimal(1295, 36), equals("ZZ"));
-      expect(Bases.fromDecimal(4095, 64), equals("z/"));
+      expect(Bases.fromDecimal(4095, 64), equals("//"));
     });
 
     test('Handles padding correctly', () {
@@ -46,7 +46,7 @@ void main() {
     test('Converts between arbitrary bases', () {
       expect(Bases.convert("A", 16, 2), equals("1010"));
       expect(Bases.convert("1010", 2, 16), equals("A"));
-      expect(Bases.convert("ZZ", 36, 64), equals("z/"));
+      expect(Bases.convert("ZZ", 36, 64), equals("KF"));
     });
 
     test('Throws error for invalid bases', () {

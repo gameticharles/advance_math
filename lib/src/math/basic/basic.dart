@@ -38,13 +38,12 @@ num sumUpTo(num start, num end, {num step = 1}) {
 
   num total = 0.0;
   for (var current = start;
-       step > 0 ? current <= end : current >= end;
-       current += step) {
+      step > 0 ? current <= end : current >= end;
+      current += step) {
     total += current;
   }
   return total;
 }
-
 
 /// Returns the absolute value of a number.
 ///
@@ -143,7 +142,6 @@ dynamic pow(dynamic x, dynamic exponent) {
   } else if (x is Complex) {
     if (exponent is Complex) {
       return x.pow(exponent);
-      
     }
     return x.pow(exponent);
   } else {
@@ -408,7 +406,8 @@ dynamic round(dynamic x, [int decimalPlaces = 0]) {
     if (decimalPlaces == 0) {
       return x.round();
     } else {
-      return (x * math.pow(10, decimalPlaces)).round() / math.pow(10, decimalPlaces);
+      return (x * math.pow(10, decimalPlaces)).round() /
+          math.pow(10, decimalPlaces);
     }
   } else if (x is Complex) {
     return x.roundTo(decimals: decimalPlaces).simplify();
@@ -448,10 +447,10 @@ dynamic hypot(dynamic x, dynamic y) {
     // Convert to Complex if needed
     Complex cx = x is Complex ? x : Complex(x, 0);
     Complex cy = y is Complex ? y : Complex(y, 0);
-    
+
     // Calculate x² + y²
     Complex sumOfSquares = (cx * cx) + (cy * cy);
-    
+
     // Take the square root and simplify
     return sqrt(sumOfSquares).simplify();
   }
@@ -461,7 +460,7 @@ dynamic hypot(dynamic x, dynamic y) {
 ///
 /// For complex numbers, returns the sign of the real part.
 /// If the real part is zero, returns the sign of the imaginary part.
-/// 
+///
 /// Example:
 /// ```dart
 /// print(sign(-15));  // Output: -1
@@ -511,7 +510,7 @@ dynamic lerp(dynamic a, dynamic b, num t) {
     // Convert to Complex if needed
     Complex ca = a is Complex ? a : Complex(a, 0);
     Complex cb = b is Complex ? b : Complex(b, 0);
-    
+
     // Calculate a + (b - a) * t
     Complex result = ca + ((cb - ca) * Complex(t, 0));
     return result.simplify();
@@ -590,7 +589,8 @@ dynamic lerp(dynamic a, dynamic b, num t) {
 /// print(isClose(1e10, 1.00001e10)); // true
 /// print(isClose(1.0, 1.1)); // false
 /// ```
-bool isClose(double a, double b, {double relTol = 1e-9, double absTol = 1e-15}) {
+bool isClose(double a, double b,
+    {double relTol = 1e-9, double absTol = 1e-15}) {
   return (a - b).abs() <= max(absTol, relTol * max(a.abs(), b.abs()));
 }
 
@@ -1611,7 +1611,6 @@ int binomialCoefficient(int n, int k) {
   return result;
 }
 
-
 /// Computes the Collatz sequence for a given positive integer.
 ///
 /// The Collatz Conjecture states that for any positive integer, if you repeatedly apply
@@ -1639,21 +1638,21 @@ dynamic collatz(int n, [bool returnSequence = true]) {
   if (n <= 0) {
     throw ArgumentError('Input must be a positive integer');
   }
-  
+
   List<int> sequence = [n];
   int steps = 0;
-  
+
   while (n != 1) {
     if (n.isEven) {
       n ~/= 2;
     } else {
       n = 3 * n + 1;
     }
-    
+
     sequence.add(n);
     steps++;
   }
-  
+
   return returnSequence ? sequence : steps;
 }
 
@@ -1677,21 +1676,21 @@ int collatzPeak(int n) {
   if (n <= 0) {
     throw ArgumentError('Input must be a positive integer');
   }
-  
+
   int maxValue = n;
-  
+
   while (n != 1) {
     if (n.isEven) {
       n ~/= 2;
     } else {
       n = 3 * n + 1;
     }
-    
+
     if (n > maxValue) {
       maxValue = n;
     }
   }
-  
+
   return maxValue;
 }
 
@@ -1719,10 +1718,10 @@ Map<String, int> longestCollatzInRange(int start, int end) {
   if (start > end) {
     throw ArgumentError('Start must be less than or equal to end');
   }
-  
+
   int maxLength = 0;
   int maxNumber = start;
-  
+
   for (int i = start; i <= end; i++) {
     int length = collatz(i, false) as int;
     if (length > maxLength) {
@@ -1730,13 +1729,13 @@ Map<String, int> longestCollatzInRange(int start, int end) {
       maxNumber = i;
     }
   }
-  
+
   return {'number': maxNumber, 'length': maxLength};
 }
 
 /// Checks if a number is a Kaprekar number.
 ///
-/// A Kaprekar number is a number whose square can be split into two parts 
+/// A Kaprekar number is a number whose square can be split into two parts
 /// that add up to the original number.
 ///
 /// Parameters:
@@ -1753,36 +1752,36 @@ Map<String, int> longestCollatzInRange(int start, int end) {
 /// ```
 bool isKaprekarNumber(int n) {
   if (n < 1) return false;
-  
+
   BigInt square = BigInt.from(n) * BigInt.from(n);
   String squareStr = square.toString();
   int squareDigits = squareStr.length;
-  
+
   // Special case for 1
   if (n == 1) return true;
-  
+
   // Try all possible splits of the square
   for (int i = 1; i < squareDigits; i++) {
     String leftPart = squareStr.substring(0, i);
     String rightPart = squareStr.substring(i);
-    
+
     // Skip if right part is just zeros
     if (rightPart == '0' * rightPart.length) continue;
-    
+
     int leftNum = int.parse(leftPart);
     int rightNum = int.parse(rightPart);
-    
+
     if (leftNum + rightNum == n) {
       return true;
     }
   }
-  
+
   return false;
 }
 
 /// Checks if a number is a narcissistic number (also known as an Armstrong number).
 ///
-/// A narcissistic number is a number that is the sum of its own digits each raised to the 
+/// A narcissistic number is a number that is the sum of its own digits each raised to the
 /// power of the number of digits.
 ///
 /// Parameters:
@@ -1799,15 +1798,15 @@ bool isKaprekarNumber(int n) {
 /// ```
 bool isNarcissisticNumber(int n) {
   if (n < 0) return false;
-  
+
   List<int> digits = getDigits(n);
   int power = digits.length;
   num sum = 0;
-  
+
   for (int digit in digits) {
     sum += pow(digit, power).toInt();
   }
-  
+
   return sum == n;
 }
 
@@ -1829,11 +1828,11 @@ bool isNarcissisticNumber(int n) {
 /// ```
 bool isHappyNumber(int n) {
   Set<int> seen = {};
-  
+
   while (n != 1 && !seen.contains(n)) {
     seen.add(n);
     n = getDigits(n).fold(0, (sum, digit) => sum + digit * digit);
   }
-  
+
   return n == 1;
 }

@@ -99,6 +99,4 @@ class Rectangle extends PlaneGeometry {
       b: Angle(rad: atan(length / width)),
     );
   }
-
-  
 }

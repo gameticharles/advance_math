@@ -131,7 +131,7 @@ class MatrixDecomposition {
   dynamic conditionNumber() {
     // Compute the singular value decomposition of the matrix
     var svd = _matrix.decomposition.singularValueDecomposition();
-    
+
     return svd.conditionNumber;
   }
 
@@ -665,20 +665,21 @@ class MatrixDecomposition {
   /// svd.S.prettyPrint();
   /// svd.V.prettyPrint();
   /// ```
-SingularValueDecomposition singularValueDecomposition({int? maxIterations}) {
+  SingularValueDecomposition singularValueDecomposition({int? maxIterations}) {
     // Try standard SVD first
     try {
       var svd = SVD(_matrix, maxIterations: maxIterations);
       return SingularValueDecomposition(svd);
     } catch (e) {
       print("Standard SVD failed, trying specialized approaches: $e");
-      
+
       // If standard SVD fails, try specialized approaches
-      SingularValueDecomposition? result = _trySpecializedSVD(maxIterations ?? 1000);
+      SingularValueDecomposition? result =
+          _trySpecializedSVD(maxIterations ?? 1000);
       if (result != null) {
         return result;
       }
-      
+
       // If all else fails, use the robust fallback approach
       return _computeRobustSVD(maxIterations ?? 1000);
     }
@@ -690,25 +691,28 @@ SingularValueDecomposition singularValueDecomposition({int? maxIterations}) {
     if (_matrix.isSymmetricMatrix()) {
       try {
         // Compute eigendecomposition
-        var eig = _matrix.decomposition.eigenvalueDecomposition(maxIterations: maxIterations);
-        
+        var eig = _matrix.decomposition
+            .eigenvalueDecomposition(maxIterations: maxIterations);
+
         // Create matrices for SVD
         Matrix U = eig.V.copy();
         Matrix V = eig.V.copy();
-        
+
         // Create S matrix with absolute eigenvalues on diagonal
         Matrix S = Matrix.zeros(_matrix.rowCount, _matrix.columnCount);
-        for (int i = 0; i < math.min(_matrix.rowCount, _matrix.columnCount); i++) {
+        for (int i = 0;
+            i < math.min(_matrix.rowCount, _matrix.columnCount);
+            i++) {
           S[i][i] = eig.D[i][i]; // Use absolute values for singular values
         }
-        
+
         // Sort singular values in descending order and adjust U and V accordingly
         _sortSingularValues(S, U, V);
 
         // Ensure orthogonality of U and V (can be affected by numerical errors)
         U = _reorthogonalize(U);
         V = _reorthogonalize(V);
-        
+
         // Create SVD wrapper
         return SingularValueDecomposition.fromComponents(U, S, V);
       } catch (e) {
@@ -723,100 +727,102 @@ SingularValueDecomposition singularValueDecomposition({int? maxIterations}) {
         // For positive definite matrices, we can use Cholesky decomposition
         var chol = _matrix.decomposition.choleskyDecomposition();
         Matrix L = chol.L;
-        
+
         // Compute SVD of L
-        var svdL = L.decomposition.singularValueDecomposition(maxIterations: maxIterations);
-        
+        var svdL = L.decomposition
+            .singularValueDecomposition(maxIterations: maxIterations);
+
         // Adjust the decomposition for the original matrix
         return SingularValueDecomposition.fromComponents(
-          svdL.U, 
-          svdL.S * svdL.S, // Square the singular values
-          svdL.V
-        );
+            svdL.U,
+            svdL.S * svdL.S, // Square the singular values
+            svdL.V);
       } catch (e) {
         print("Positive definite approach failed: $e");
         // Continue to next approach
       }
     }
-    
+
     return null; // No specialized approach succeeded
   }
-  
+
   // Helper method for robust SVD computation as a fallback
   SingularValueDecomposition _computeRobustSVD(int maxIterations) {
     print("Standard SVD failed, using robust alternative approach");
-    
+
     // Alternative approach: compute A^T*A and A*A^T for right and left singular vectors
     Matrix ata = _matrix.transpose() * _matrix;
     Matrix aat = _matrix * _matrix.transpose();
-    
+
     // Compute eigendecomposition of A^T*A for V
-    var eigV = ata.decomposition.eigenvalueDecomposition(maxIterations: maxIterations);
-    
+    var eigV =
+        ata.decomposition.eigenvalueDecomposition(maxIterations: maxIterations);
+
     // Compute eigendecomposition of A*A^T for U
-    var eigU = aat.decomposition.eigenvalueDecomposition(maxIterations: maxIterations);
-    
+    var eigU =
+        aat.decomposition.eigenvalueDecomposition(maxIterations: maxIterations);
+
     // Create S matrix with square roots of eigenvalues of A^T*A
     Matrix S = Matrix.zeros(_matrix.rowCount, _matrix.columnCount);
     int minDim = math.min(_matrix.rowCount, _matrix.columnCount);
     for (int i = 0; i < minDim; i++) {
       S[i][i] = math.sqrt(eigV.D[i][i].abs());
     }
-    
+
     // Sort singular values and adjust U and V
     _sortSingularValues(S, eigU.V, eigV.V);
-    
+
     // Ensure orthogonality
     Matrix U = _reorthogonalize(eigU.V);
     Matrix V = _reorthogonalize(eigV.V);
-    
+
     return SingularValueDecomposition.fromComponents(U, S, V);
   }
 
   // Helper method to sort singular values in descending order and adjust U and V accordingly
   void _sortSingularValues(Matrix S, Matrix U, Matrix V) {
     int minDim = math.min(S.rowCount, S.columnCount);
-    
+
     // Create list of indices and values for sorting
     List<MapEntry<int, dynamic>> singularValues = [];
     for (int i = 0; i < minDim; i++) {
       singularValues.add(MapEntry(i, S[i][i]));
     }
-    
+
     // Sort by singular value in descending order
     singularValues.sort((a, b) => b.value.compareTo(a.value));
-    
+
     // Create new matrices with sorted values
     Matrix newS = Matrix.zeros(S.rowCount, S.columnCount);
     Matrix newU = Matrix.zeros(U.rowCount, U.columnCount);
     Matrix newV = Matrix.zeros(V.rowCount, V.columnCount);
-    
+
     for (int i = 0; i < minDim; i++) {
       int oldIndex = singularValues[i].key;
       newS[i][i] = S[oldIndex][oldIndex];
-      
+
       for (int j = 0; j < U.rowCount; j++) {
         newU[j][i] = U[j][oldIndex];
       }
-      
+
       for (int j = 0; j < V.rowCount; j++) {
         newV[j][i] = V[j][oldIndex];
       }
     }
-    
+
     // Copy sorted values back to original matrices
     for (int i = 0; i < S.rowCount; i++) {
       for (int j = 0; j < S.columnCount; j++) {
         S[i][j] = newS[i][j];
       }
     }
-    
+
     for (int i = 0; i < U.rowCount; i++) {
       for (int j = 0; j < U.columnCount; j++) {
         U[i][j] = newU[i][j];
       }
     }
-    
+
     for (int i = 0; i < V.rowCount; i++) {
       for (int j = 0; j < V.columnCount; j++) {
         V[i][j] = newV[i][j];
@@ -828,24 +834,25 @@ SingularValueDecomposition singularValueDecomposition({int? maxIterations}) {
   Matrix _reorthogonalize(Matrix M) {
     int n = M.columnCount;
     Matrix result = M.copy();
-    
+
     for (int j = 0; j < n; j++) {
       Vector vj = Vector.fromList(_Utils.toSDList(result.column(j).asList));
-      
+
       // Orthogonalize against previous vectors
       for (int k = 0; k < j; k++) {
         Vector vk = Vector.fromList(_Utils.toSDList(result.column(k).asList));
         dynamic projection = vj.dot(vk);
         vj = vj - vk.scale(projection);
       }
-      
+
       // Normalize
       dynamic norm = vj.norm();
-      if (norm > 1e-10) { // Avoid division by very small numbers
+      if (norm > 1e-10) {
+        // Avoid division by very small numbers
         result.setColumn(j, vj.map((x) => x / norm).toList());
       }
     }
-    
+
     return result;
   }
 

@@ -1,4 +1,3 @@
-
 import 'package:advance_math/advance_math.dart';
 part 'decimal.dart';
 
@@ -8,12 +7,11 @@ final _r0 = Rational.zero;
 final _r5 = Rational.fromInt(5);
 final _r10 = Rational.fromInt(10);
 
-final _i2 = BigInt.two;
-final _i5 = BigInt.from(5);
+// final _i2 = BigInt.two;
+// final _i5 = BigInt.from(5);
 
 final _pattern = RegExp(
     r'^([+-]?(\d+\s+\d+/\d+|\d+/\d+|\d+|\d*\.\d+)([eE][+-]?\d+)?|\.\d+([eE][+-]?\d+)?)$');
-
 
 /// A number that can be expressed as a fraction of two integers, a [numerator]
 /// and a non-zero [denominator].
@@ -336,7 +334,6 @@ class Rational implements Comparable<Rational> {
           denominator.pow(exponent),
         );
 
-    
   /// Converts the current [Rational] value to a [Decimal] with the specified precision.
   ///
   /// If the [Rational] has a finite precision, it is directly converted to a [Decimal].
@@ -357,16 +354,16 @@ class Rational implements Comparable<Rational> {
     return Decimal(toBigInt(this * scaleFactor).toRational() / scaleFactor);
   }
 
-    /// Returns true if this [Rational] has a finite decimal representation.
+  /// Returns true if this [Rational] has a finite decimal representation.
   ///
   /// A rational number has a finite decimal representation if and only if
   /// its denominator, when expressed in lowest form, has only 2 and 5 as prime factors.
   bool get hasFinitePrecision {
     // Quick check for integers
     if (isInteger) return true;
-    
+
     // Quick check for common denominators
-    if (denominator == BigInt.from(2) || 
+    if (denominator == BigInt.from(2) ||
         denominator == BigInt.from(4) ||
         denominator == BigInt.from(5) ||
         denominator == BigInt.from(8) ||
@@ -379,20 +376,20 @@ class Rational implements Comparable<Rational> {
         denominator == BigInt.from(100)) {
       return true;
     }
-    
+
     // For other denominators, check if they only have 2 and 5 as prime factors
     var d = denominator;
-    
+
     // Remove all factors of 2
     while (d.isEven && d != BigInt.one) {
       d = d >> 1; // Faster than division
     }
-    
+
     // Remove all factors of 5
     while (d % BigInt.from(5) == BigInt.zero && d != BigInt.one) {
       d = d ~/ BigInt.from(5);
     }
-    
+
     // If only 2s and 5s were factors, d should now be 1
     return d == BigInt.one;
   }
@@ -406,30 +403,30 @@ class Rational implements Comparable<Rational> {
 // BigInt gcdBinary(BigInt u, BigInt v) {
 //   if (u == _i0) return v;
 //   if (v == _i0) return u;
-  
+
 //   int shift = 0;
 //   while (((u | v) & _i1) == _i0) {
 //     u = u >> 1;
 //     v = v >> 1;
 //     shift++;
 //   }
-  
+
 //   while ((u & _i1) == _i0) {
 //     u = u >> 1;
 //   }
-  
+
 //   do {
 //     while ((v & _i1) == _i0) {
 //       v = v >> 1;
 //     }
-    
+
 //     if (u > v) {
 //       final t = v;
 //       v = u;
 //       u = t;
 //     }
 //     v = v - u;
-    
+
 //     // Add missing factor removal after subtraction
 //     while ((v & _i1) == _i0 && v != _i0) {
 //       v = v >> 1;
@@ -556,7 +553,7 @@ class Rational implements Comparable<Rational> {
 //     if (value is BigInt) return Rational._fromCanonicalForm(value, _i1);
 //     if (value is Decimal) return value._rational;
 //     if (value is String) return Rational.parse(value);
-    
+
 //     throw ArgumentError('Cannot convert ${value.runtimeType} to Rational');
 //   }
 
@@ -569,7 +566,7 @@ class Rational implements Comparable<Rational> {
 //     // Handle null values
 //     numerator ??= 0;
 //     denominator ??= 1;
-    
+
 //     // Handle special cases
 //     if (numerator is double) {
 //       if (numerator.isNaN) return Rational.nan;
@@ -577,37 +574,37 @@ class Rational implements Comparable<Rational> {
 //         return numerator.isNegative ? Rational.negativeInfinity : Rational.infinity;
 //       }
 //     }
-    
+
 //     // Special case: if both are null or 0, return zero
-//     if ((numerator == 0 || numerator == _i0) && 
+//     if ((numerator == 0 || numerator == _i0) &&
 //         (denominator == 1 || denominator == _i1)) {
 //       return Rational._fromCanonicalForm(_i0, _i1);
 //     }
-    
+
 //     // Convert both numerator and denominator to BigInt if needed
 //     BigInt? numBigInt;
 //     BigInt? denBigInt;
-    
+
 //     try {
 //       // Handle numerator
 //       if (numerator is BigInt) {
 //         numBigInt = numerator;
 //       } else if (numerator is Rational) {
 //         final numRational = numerator;
-        
+
 //         // Handle special values
 //         if (numRational.isNaN) return Rational.nan;
 //         if (numRational.isInfinite) {
-//           return numRational.isNegativeInfinity ? 
+//           return numRational.isNegativeInfinity ?
 //               Rational.negativeInfinity : Rational.infinity;
 //         }
-        
+
 //         // If denominator is also provided, handle the division of rationals
 //         if (denominator != null && denominator != 1) {
 //           Rational denRational;
 //           if (denominator is Rational) {
 //             denRational = denominator;
-            
+
 //             // Handle special cases in denominator
 //             if (denRational.isNaN) return Rational.nan;
 //             if (denRational.isInfinite) {
@@ -619,17 +616,17 @@ class Rational implements Comparable<Rational> {
 //             if (denRational.numerator == _i0) {
 //               // Any number / 0 = Infinity with appropriate sign
 //               if (numRational.numerator == _i0) return Rational.nan; // 0/0 = NaN
-//               return numRational._isNegative != denRational._isNegative ? 
+//               return numRational._isNegative != denRational._isNegative ?
 //                   Rational.negativeInfinity : Rational.infinity;
 //             }
 //           } else {
 //             denRational = _fromAny(denominator);
 //           }
-          
+
 //           // Division of rationals: (a/b) / (c/d) = (a*d) / (b*c)
 //           numBigInt = numRational.numerator * denRational.denominator;
 //           denBigInt = numRational.denominator * denRational.numerator;
-          
+
 //           // Simplify and return
 //           if (denBigInt == _i0) {
 //             if (numBigInt == _i0) return Rational.nan; // 0/0 = NaN
@@ -640,30 +637,30 @@ class Rational implements Comparable<Rational> {
 //             numBigInt = -numBigInt;
 //             denBigInt = -denBigInt;
 //           }
-          
+
 //           final gcd = _gcd(numBigInt.abs(), denBigInt.abs());
 //           return Rational._fromCanonicalForm(numBigInt ~/ gcd, denBigInt ~/ gcd);
 //         }
-        
+
 //         return numRational;
 //       } else {
 //         // Convert numerator to Rational
 //         final numRational = _fromAny(numerator);
-        
+
 //         // Handle special values
 //         if (numRational.isNaN) return Rational.nan;
 //         if (numRational.isInfinite) {
-//           return numRational.isNegativeInfinity ? 
+//           return numRational.isNegativeInfinity ?
 //               Rational.negativeInfinity : Rational.infinity;
 //         }
-        
+
 //         numBigInt = numRational.numerator;
 //         denBigInt = numRational.denominator;
-        
+
 //         // If denominator is also provided, we need to divide
 //         if (denominator != null && denominator != 1) {
 //           final denRational = _fromAny(denominator);
-          
+
 //           // Handle special cases in denominator
 //           if (denRational.isNaN) return Rational.nan;
 //           if (denRational.isInfinite) return Rational.zero; // finite / infinity = 0
@@ -673,11 +670,11 @@ class Rational implements Comparable<Rational> {
 //             final isNegative = (numBigInt.isNegative != denRational.numerator.isNegative);
 //             return isNegative ? Rational.negativeInfinity : Rational.infinity;
 //           }
-          
+
 //           // Division: (a/b) / (c/d) = (a*d) / (b*c)
 //           numBigInt = numBigInt * denRational.denominator;
 //           denBigInt = denBigInt * denRational.numerator;
-          
+
 //           // Simplify and return
 //           if (denBigInt == _i0) {
 //             if (numBigInt == _i0) return Rational.nan; // 0/0 = NaN
@@ -688,21 +685,21 @@ class Rational implements Comparable<Rational> {
 //             numBigInt = -numBigInt;
 //             denBigInt = -denBigInt;
 //           }
-          
+
 //           final gcd = _gcd(numBigInt.abs(), denBigInt.abs());
 //           return Rational._fromCanonicalForm(numBigInt ~/ gcd, denBigInt ~/ gcd);
 //         }
-        
+
 //         return Rational._fromCanonicalForm(numBigInt, denBigInt);
 //       }
-      
+
 //       // Handle denominator if not already set
 //       if (denominator is BigInt) {
 //         denBigInt = denominator;
 //       } else {
 //         // Convert denominator to Rational
 //         final denRational = _fromAny(denominator);
-        
+
 //         // Handle special cases in denominator
 //         if (denRational.isNaN) return Rational.nan;
 //         if (denRational.isInfinite) return Rational.zero; // finite / infinity = 0
@@ -712,14 +709,14 @@ class Rational implements Comparable<Rational> {
 //           final isNegative = (numBigInt.isNegative != denRational.numerator.isNegative);
 //           return isNegative ? Rational.negativeInfinity : Rational.infinity;
 //         }
-        
+
 //         numBigInt = numBigInt * denRational.denominator;
 //         denBigInt = denRational.numerator;
 //       }
 //     } catch (e) {
 //       throw ArgumentError('Cannot convert arguments to Rational: $e');
 //     }
-    
+
 //     // Standard validation and normalization
 //     if (denBigInt == _i0) {
 //       if (numBigInt == _i0) return Rational.nan; // 0/0 = NaN
@@ -730,9 +727,9 @@ class Rational implements Comparable<Rational> {
 //       numBigInt = -numBigInt;
 //       denBigInt = -denBigInt;
 //     }
-    
+
 //     final gcd = _gcd(numBigInt.abs(), denBigInt.abs());
-//      return Rational._fromCanonicalForm(numBigInt ~/ gcd, denBigInt ~/ gcd, 
+//      return Rational._fromCanonicalForm(numBigInt ~/ gcd, denBigInt ~/ gcd,
 //       originalNumerator: numerator is! BigInt ? BigInt.from(num.parse(numerator.toString())): numerator,
 //       originalDenominator: denominator is! BigInt ?BigInt.from(num.parse(denominator.toString())) : denominator);
 //   }
@@ -759,35 +756,35 @@ class Rational implements Comparable<Rational> {
 //     if (value.isInfinite || value.isNaN) {
 //       throw ArgumentError('Cannot convert $value to Rational');
 //     }
-    
+
 //     // Handle special cases
 //     if (value == 0.0) return Rational.zero;
 //     if (value == 1.0) return Rational.one;
-    
+
 //     // Handle negative values
 //     bool isNegative = value < 0;
 //     double absValue = value.abs();
-    
+
 //     // Extract integer and fractional parts
 //     int intPart = absValue.truncate();
 //     double fractionalPart = absValue - intPart;
-    
+
 //     if (fractionalPart == 0.0) {
 //       // It's an integer
 //       return Rational.fromInt(isNegative ? -intPart : intPart);
 //     }
-    
+
 //     // Convert fractional part to rational
 //     // Use a power of 10 based on precision
 //     BigInt scaleFactor = BigInt.from(10).pow(precision);
 //     BigInt scaledValue = BigInt.from((fractionalPart * (10.pow(precision)) as num).round());
-    
+
 //     // Create the rational for the fractional part
 //     Rational fractionalRational = Rational(scaledValue, scaleFactor);
-    
+
 //     // Add the integer part
 //     Rational result = Rational.fromInt(intPart) + fractionalRational;
-    
+
 //     return isNegative ? -result : result;
 //   }
 
@@ -917,7 +914,7 @@ class Rational implements Comparable<Rational> {
 //     if (other is Rational) {
 //       return numerator == other.numerator && denominator == other.denominator;
 //     }
-    
+
 //     try {
 //       final rational = _fromAny(other);
 //       return numerator == rational.numerator && denominator == rational.denominator;
@@ -927,10 +924,10 @@ class Rational implements Comparable<Rational> {
 //   }
 
 //   /// Returns a string representation of this rational number.
-//   /// 
+//   ///
 //   /// If [useOriginalForm] is true and the original unsimplified form is available,
 //   /// it will return the original form. Otherwise, it returns the canonical form.
-//   /// 
+//   ///
 //   /// Special values like NaN and infinity are represented appropriately.
 //   @override
 //   String toString({bool useOriginalForm = false}) {
@@ -938,7 +935,7 @@ class Rational implements Comparable<Rational> {
 //     if (_isNaN) return 'NaN';
 //     if (_isPositiveInfinity) return 'Infinity';
 //     if (_isNegativeInfinity) return '-Infinity';
-    
+
 //     // Use original form if requested and available
 //     if (useOriginalForm && hasOriginalForm) {
 //       if (originalNumerator == _i0) return '0';
@@ -948,7 +945,7 @@ class Rational implements Comparable<Rational> {
 //         return '$originalNumerator/$originalDenominator';
 //       }
 //     }
-    
+
 //     // Use canonical form
 //     if (numerator == _i0) return '0';
 //     if (isInteger) {
@@ -957,10 +954,10 @@ class Rational implements Comparable<Rational> {
 //       return '$numerator/$denominator';
 //     }
 //   }
-  
+
 //   /// Returns a string representation using the original unsimplified form if available
 //   String toOriginalString() => toString(useOriginalForm: true);
-  
+
 //   @override
 //   int compareTo(Rational other) {
 //     // Handle special values
@@ -973,7 +970,7 @@ class Rational implements Comparable<Rational> {
 //     }
 //     if (other._isPositiveInfinity) return -1;
 //     if (other._isNegativeInfinity) return 1;
-    
+
 //     // Normal comparison for finite values
 //     return (numerator * other.denominator).compareTo(other.numerator * denominator);
 //   }
@@ -991,14 +988,14 @@ class Rational implements Comparable<Rational> {
 //       }
 //       if (other._isPositiveInfinity) return Rational.infinity;
 //       if (other._isNegativeInfinity) return Rational.negativeInfinity;
-      
+
 //       // Normal addition for finite values
 //       return Rational(
 //         numerator * other.denominator + other.numerator * denominator,
 //         denominator * other.denominator,
 //       );
 //     }
-    
+
 //     try {
 //       return this + _fromAny(other);
 //     } catch (e) {
@@ -1019,13 +1016,13 @@ class Rational implements Comparable<Rational> {
 //       }
 //       if (other._isPositiveInfinity) return Rational.negativeInfinity;
 //       if (other._isNegativeInfinity) return Rational.infinity;
-      
+
 //       // Normal subtraction for finite values
 //       return Rational(
 //         numerator * other.denominator - other.numerator * denominator,
 //         denominator * other.denominator,
 //       );
-//     } 
+//     }
 //     try {
 //       return this - _fromAny(other);
 //     } catch (e) {
@@ -1038,15 +1035,15 @@ class Rational implements Comparable<Rational> {
 //     if (other is Rational) {
 //       // Handle special values
 //       if (_isNaN || other._isNaN) return Rational.nan;
-      
+
 //       // Handle zero cases
-//       if ((numerator == _i0 && !_isNaN && !isInfinite) || 
+//       if ((numerator == _i0 && !_isNaN && !isInfinite) ||
 //           (other.numerator == _i0 && !other._isNaN && !other.isInfinite)) {
 //         // Special case: 0 * ±∞ = NaN
 //         if (isInfinite || other.isInfinite) return Rational.nan;
 //         return Rational.zero;
 //       }
-      
+
 //       // Handle infinity cases
 //       if (_isPositiveInfinity) {
 //         return other._isNegative ? Rational.negativeInfinity : Rational.infinity;
@@ -1060,13 +1057,13 @@ class Rational implements Comparable<Rational> {
 //       if (other._isNegativeInfinity) {
 //         return _isNegative ? Rational.infinity : Rational.negativeInfinity;
 //       }
-      
+
 //       // Normal multiplication for finite values
 //       return Rational(
 //         numerator * other.numerator,
 //         denominator * other.denominator,
 //       );
-//     } 
+//     }
 //     try {
 //       return this * _fromAny(other);
 //     } catch (e) {
@@ -1079,13 +1076,13 @@ class Rational implements Comparable<Rational> {
 //     if (other is Rational) {
 //       // Handle special values
 //       if (_isNaN || other._isNaN) return Rational.nan;
-      
+
 //       // Handle division by zero
 //       if (other.numerator == _i0 && !other.isInfinite) {
 //         if (numerator == _i0 && !isInfinite) return Rational.nan; // 0/0 = NaN
 //         return _isNegative ? Rational.negativeInfinity : Rational.infinity;
 //       }
-      
+
 //       // Handle infinity cases
 //       if (_isPositiveInfinity) {
 //         if (other.isInfinite) return Rational.nan; // ∞/∞ = NaN
@@ -1098,13 +1095,13 @@ class Rational implements Comparable<Rational> {
 //       if (other._isPositiveInfinity || other._isNegativeInfinity) {
 //         return Rational.zero; // finite/∞ = 0
 //       }
-      
+
 //       // Normal division for finite values
 //       return Rational(
 //         numerator * other.denominator,
 //         denominator * other.numerator,
 //       );
-//     } 
+//     }
 //     try {
 //       return this / _fromAny(other);
 //     } catch (e) {
@@ -1120,12 +1117,12 @@ class Rational implements Comparable<Rational> {
 //       if (isInfinite) return Rational.nan; // ∞ % anything = NaN
 //       if (other.isInfinite) return this; // finite % ∞ = finite
 //       if (other.numerator == _i0) return Rational.nan; // anything % 0 = NaN
-      
+
 //       // Normal modulo for finite values
 //       final remainder = this.remainder(other);
 //       if (remainder == _r0) return _r0;
 //       return remainder + (_isNegative && remainder != _r0 ? other.abs() : _r0);
-//     } 
+//     }
 //     try {
 //       return this % _fromAny(other);
 //     } catch (e) {
@@ -1145,10 +1142,10 @@ class Rational implements Comparable<Rational> {
 //         if (numerator == _i0) return Rational.nan; // 0 ~/ 0 = NaN
 //         return _isNegative ? Rational.negativeInfinity : Rational.infinity;
 //       }
-      
+
 //       // Normal truncating division for finite values
 //       return (numerator * other.denominator) ~/ (denominator * other.numerator);
-//     } 
+//     }
 //     try {
 //       return this ~/ _fromAny(other);
 //     } catch (e) {
@@ -1171,7 +1168,7 @@ class Rational implements Comparable<Rational> {
 //     if (isInfinite) return Rational.nan;
 //     if (other.isInfinite) return this;
 //     if (other.numerator == _i0) return Rational.nan;
-    
+
 //     // Normal remainder for finite values
 //     return this - Rational(this ~/ other) * other;
 //   }
@@ -1180,7 +1177,7 @@ class Rational implements Comparable<Rational> {
 //   bool operator <(dynamic other) {
 //     if (other is Rational) {
 //       return compareTo(other) < 0;
-//     } 
+//     }
 //     try {
 //       return this < _fromAny(other);
 //     } catch (e) {
@@ -1188,12 +1185,11 @@ class Rational implements Comparable<Rational> {
 //     }
 //   }
 
-
 //   /// Whether this number is numerically smaller than or equal to [other].
 //   bool operator <=(dynamic other) {
 //     if (other is Rational) {
 //       return compareTo(other) <= 0;
-//     } 
+//     }
 //     try {
 //       return this <= _fromAny(other);
 //     } catch (e) {
@@ -1205,7 +1201,7 @@ class Rational implements Comparable<Rational> {
 //   bool operator >(dynamic other) {
 //     if (other is Rational) {
 //       return compareTo(other) > 0;
-//     } 
+//     }
 //     try {
 //       return this > _fromAny(other);
 //     } catch (e) {
@@ -1217,7 +1213,7 @@ class Rational implements Comparable<Rational> {
 //   bool operator >=(dynamic other) {
 //     if (other is Rational) {
 //       return compareTo(other) >= 0;
-//     } 
+//     }
 
 //     try {
 //       return this >= _fromAny(other);
@@ -1240,7 +1236,6 @@ class Rational implements Comparable<Rational> {
 //     if (v > 0) return 1;
 //     return 0;
 //   }
-
 
 //   /// Checks if the fraction is a whole number.
 //   bool isWhole() {
@@ -1314,18 +1309,18 @@ class Rational implements Comparable<Rational> {
 //     if (_isNaN) return double.nan;
 //     if (_isPositiveInfinity) return double.infinity;
 //     if (_isNegativeInfinity) return double.negativeInfinity;
-    
+
 //     // Handle special cases to avoid precision loss
 //     if (numerator == _i0) return 0.0;
 //     if (denominator == _i1) return numerator.toDouble();
-    
+
 //     // For large numbers, calculate with care to avoid overflow
-//     if (numerator.abs() > BigInt.from(1 << 53) || 
+//     if (numerator.abs() > BigInt.from(1 << 53) ||
 //         denominator > BigInt.from(1 << 53)) {
 //       // Use logarithmic division for very large numbers
 //       final numDigits = numerator.abs().toString().length;
 //       final denDigits = denominator.toString().length;
-      
+
 //       if (numDigits > 15 || denDigits > 15) {
 //         // Scale down to avoid precision loss
 //         final scale = BigInt.from(10).pow(numDigits - 1);
@@ -1334,7 +1329,7 @@ class Rational implements Comparable<Rational> {
 //         return result * (numerator.isNegative ? -1 : 1);
 //       }
 //     }
-    
+
 //     return numerator.toDouble() / denominator.toDouble();
 //   }
 
@@ -1353,17 +1348,17 @@ class Rational implements Comparable<Rational> {
 //   /// The [decimalPlaces] parameter specifies the number of digits after the decimal point.
 //   String toDecimalString(int decimalPlaces) {
 //     assert(decimalPlaces >= 0, 'Decimal places must be non-negative');
-    
+
 //     if (isInteger) return numerator.toString();
-    
+
 //     final scaleFactor = BigInt.from(10).pow(decimalPlaces);
 //     final scaledValue = (numerator * scaleFactor) ~/ denominator;
 //     final intPart = scaledValue ~/ scaleFactor;
 //     final fracPart = scaledValue.abs() % scaleFactor;
-    
+
 //     // Format the fractional part with leading zeros
 //     final fracString = fracPart.toString().padLeft(decimalPlaces, '0');
-    
+
 //     return '$intPart.$fracString';
 //   }
 
@@ -1387,10 +1382,10 @@ class Rational implements Comparable<Rational> {
 //   /// its denominator, when expressed in lowest form, has only 2 and 5 as prime factors.
 //   bool get hasFinitePrecision {
 //     if (isInteger) return true;
-    
+
 //     // Handle infinite values before factorization check
 //     if (_isPositiveInfinity || _isNegativeInfinity) return false;
-    
+
 //     var d = denominator;
 //     // Factor out all 2s and 5s from denominator
 //     for (final factor in [BigInt.two, BigInt.from(5)]) {
@@ -1406,10 +1401,10 @@ class Rational implements Comparable<Rational> {
 //   /// Returns null if this [Rational] does not have a finite decimal representation.
 //   int? get detDecimalPrecision {
 //     if (!hasFinitePrecision) return null;
-    
+
 //     var den = denominator;
 //     int count = 0;
-    
+
 //     // Find the maximum power of 10 that divides the denominator
 //     while (den != _i1) {
 //       if (den % BigInt.from(2) == _i0) {
@@ -1423,11 +1418,10 @@ class Rational implements Comparable<Rational> {
 //         return null;
 //       }
 //     }
-    
+
 //     return count;
 //   }
 // }
-
 
 // extension NumToRationalExtension on num {
 //   // /// Converts this [num] to a [Rational].
@@ -1436,22 +1430,22 @@ class Rational implements Comparable<Rational> {
 //     if (isInfinite) return this < 0 ? Rational.negativeInfinity : Rational.infinity;
 //     return Rational.fromNum(this);
 //   }
-  
+
 //   /// Adds this [num] to a [Rational].
 //   Rational operator +(Rational other) => Rational(this) + other ;
-  
+
 //   /// Subtracts a [Rational] from this [num].
 //   Rational operator -(Rational other) => Rational(this) - other;
-  
+
 //   /// Multiplies this [num] by a [Rational].
 //   Rational operator *(Rational other) => Rational(this) * other;
-  
+
 //   /// Divides this [num] by a [Rational].
 //   Rational operator /(Rational other) => Rational(this) / other;
-  
+
 //   /// Returns the remainder when this [num] is divided by a [Rational].
 //   Rational operator %(Rational other) => Rational(this) % other;
-  
+
 //   /// Performs integer division of this [num] by a [Rational].
 //   BigInt operator ~/(Rational other) => Rational(this) ~/ other;
 // }

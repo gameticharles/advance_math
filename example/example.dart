@@ -1,14 +1,37 @@
 import 'package:advance_math/advance_math.dart';
 
 void main() {
-  print([1, 2, 4, 4.5, Complex(1,5), 9.7].sum()) ;// Returns Complex(12.7, 5)
-  print([1, 2, 3].sum()); // Returns 6 (num)
-  print([Complex(1,1), Complex(2,2)].sum()); // Returns Complex(3, 3)
+  // Example of using memoized functions
 
+  // Benchmark comparison
+  final stopwatch = Stopwatch()..start();
+
+  // Regular method
+  for (int i = 0; i < 10; i++) {
+    var res = time(() => pow); // Computes the sum
+    print('Result: ${res.result}, Time: ${res.elapsed.inMicroseconds} μs');
+  }
+  print('Regular exp: ${stopwatch.elapsedMicroseconds} μs');
+
+  stopwatch.reset();
+
+  // Memoized method
+  final memoizedPow = pow.memoize();
+  for (int i = 0; i < 10; i++) {
+    var res = time(() => memoizedPow); // Computes the sum
+    print('Result: ${res.result}, Time: ${res.elapsed.inMicroseconds} μs');
+  }
+  print('Memoized exp: ${stopwatch.elapsedMicroseconds} μs');
+
+  print([1, 2, 4, 4.5, Complex(1, 5), 9.7].sum()); // Returns Complex(12.7, 5)
+  print([1, 2, 3].sum()); // Returns 6 (num)
+  print([Complex(1, 1), Complex(2, 2)].sum()); // Returns Complex(3, 3)
 
   int number = 35;
   print('Prime factors of $num are: ${primeFactors(number)}');
   print('Factors of $num are: ${factors(number)}');
+
+  printLine();
 
   double functionToEvaluate(double x) {
     return x * x; // Example function: f(x) = x^2

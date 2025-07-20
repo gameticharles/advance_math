@@ -76,8 +76,8 @@ void main() {
         expect(Imaginary(0) + Precision('5.5'), Precision('5.5'));
         expect(Imaginary(0) + Precision('5.5'), isA<Precision>());
         expect(Imaginary(1.1) + Precision('5.5'), Complex(5.5, 1.1));
-        expect(
-            (Imaginary(1.1) + Precision('5.5') as Complex).real, isA<Precision>());
+        expect((Imaginary(1.1) + Precision('5.5') as Complex).real,
+            isA<Precision>());
         expect(Imaginary(-1.1) + Precision('5.5'), Complex(5.5, -1.1));
       });
     });
@@ -139,8 +139,8 @@ void main() {
         expect(Imaginary(0) - Precision('5.5'), Precision('-5.5'));
         expect(Imaginary(0) - Precision('5.5'), isA<Precision>());
         expect(Imaginary(1.1) - Precision('5.5'), Complex(-5.5, 1.1));
-        expect(
-            (Imaginary(1.1) - Precision('5.5') as Complex).real, isA<Precision>());
+        expect((Imaginary(1.1) - Precision('5.5') as Complex).real,
+            isA<Precision>());
         expect(Imaginary(-1.1) - Precision('5.5'), Complex(-5.5, -1.1));
       });
     });
@@ -296,7 +296,8 @@ void main() {
         expect(imag2 * Precision('2.2'), Imaginary(12.32));
         expect((imag2 * Precision('-5.5') as Imaginary).value.toDouble(),
             closeTo(-30.8, 1e-12));
-        expect((imag2 * Precision('-5.5') as Imaginary).value, isA<Precision>());
+        expect(
+            (imag2 * Precision('-5.5') as Imaginary).value, isA<Precision>());
         expect(imag3 * Precision('1.1'), Imaginary(-9.9));
         expect(imag3 * Precision('2.2'), Imaginary(-19.8));
         expect(imag3 * Precision('-5.5'), Imaginary(49.5));

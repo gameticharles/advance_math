@@ -19,8 +19,7 @@ class Cubic extends Polynomial {
   }) : super([a, b, c, d]);
 
   /// Constructs a quadratic equation with coefficients [a], [b], and [c].
-  Cubic.num({num a = 1, num b = 0, num c = 0, num d = 0})
-      : super([a, b, c, d]);
+  Cubic.num({num a = 1, num b = 0, num c = 0, num d = 0}) : super([a, b, c, d]);
 
   Cubic.fromList(List<dynamic> coefficients) : super(coefficients) {
     if (coefficients.length != 4) {

@@ -41,31 +41,34 @@ extension PrecisionChecks on double {
 /// {@endtemplate}
 extension NumComplexExtension on num {
   /// Adds a complex number to this number.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// 5 + Complex(3, 4)  // 8.0 + 4.0i
   /// ```
-  Complex operator +(Complex other) => Complex(this + other.real, other.imaginary);
-  
+  Complex operator +(Complex other) =>
+      Complex(this + other.real, other.imaginary);
+
   /// Subtracts a complex number from this number.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// 5 - Complex(3, 4)  // 2.0 - 4.0i
   /// ```
-  Complex operator -(Complex other) => Complex(this - other.real, -other.imaginary);
-  
+  Complex operator -(Complex other) =>
+      Complex(this - other.real, -other.imaginary);
+
   /// Multiplies this number by a complex number.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// 3 * Complex(1, 2)  // 3.0 + 6.0i
   /// ```
-  Complex operator *(Complex other) => Complex(this * other.real, this * other.imaginary);
-  
+  Complex operator *(Complex other) =>
+      Complex(this * other.real, this * other.imaginary);
+
   /// Divides this number by a complex number.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// 15 / Complex(3, 4)  // 1.8 - 2.4i
@@ -76,17 +79,18 @@ extension NumComplexExtension on num {
     if (other.isZero) return Complex.infinity();
     if (this == 0) return Complex.zero();
     if (other.isInfinite) return Complex.zero();
-    
+
     // Normal case - use the formula (a)/(c+di) = (ac)/(c²+d²) - (ad)/(c²+d²)i
-    final denominator = other.real * other.real + other.imaginary * other.imaginary;
+    final denominator =
+        other.real * other.real + other.imaginary * other.imaginary;
     return Complex(
       (this * other.real) / denominator,
       (-this * other.imaginary) / denominator,
     );
   }
-  
+
   /// Raises this number to the power of a complex number.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// 2 ^ Complex(3, 0)  // 8.0 + 0.0i
@@ -96,15 +100,15 @@ extension NumComplexExtension on num {
     return Complex(this).pow(other);
   }
 
-    /// Compares this number with a complex number (magnitude comparison)
+  /// Compares this number with a complex number (magnitude comparison)
   bool operator >(Complex other) => abs() > other.abs();
-  
+
   /// Compares this number with a complex number (magnitude comparison)
   bool operator >=(Complex other) => abs() >= other.abs();
-  
+
   /// Compares this number with a complex number (magnitude comparison)
   bool operator <(Complex other) => abs() < other.abs();
-  
+
   /// Compares this number with a complex number (magnitude comparison)
   bool operator <=(Complex other) => abs() <= other.abs();
 
@@ -122,10 +126,10 @@ extension NumComplexExtension on num {
   /// {@macro ComplexerX_imag}
   Complex get im => Complex(0, this);
 
-   /// Enables syntax like: 3i or 4i
+  /// Enables syntax like: 3i or 4i
   /// Returns a new imaginary number with this number as coefficient
   Complex get i => Complex(0, this);
-  
+
   /// Enables syntax like: 3j or 4j
   /// Returns a new imaginary number with this number as coefficient
   Complex get j => Complex(0, this);

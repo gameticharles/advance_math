@@ -1062,15 +1062,15 @@ extension MatrixOperationExtension on Matrix {
   /// Example:
   /// ```dart
   /// var matrix = Matrix([[1, 2], [3, 4]]);
-  /// 
+  ///
   /// // Calculate Frobenius norm (default)
   /// var frobeniusNorm = matrix.norm();
   /// print(frobeniusNorm);  // Output: 5.477225575051661
-  /// 
+  ///
   /// // Calculate Manhattan norm
   /// var manhattanNorm = matrix.norm(Norm.manhattan);
   /// print(manhattanNorm);  // Output: 6.0
-  /// 
+  ///
   /// // Calculate Infinity norm
   /// var infinityNorm = matrix.norm(Norm.chebyshev);
   /// print(infinityNorm);  // Output: 7.0
@@ -1723,11 +1723,10 @@ extension MatrixOperationExtension on Matrix {
   /// // └  1.5 -0.5 ┘
   /// ```
   Matrix inverse({double conditionThreshold = 1e-3}) {
-    
     // For non-square matrices, compute the pseudo-inverse directly
     if (!isSquareMatrix()) {
       return pseudoInverse();
-    } 
+    }
     try {
       // First attempt: Try LU decomposition for efficiency (works for most well-conditioned matrices)
       var lu = decomposition.luDecompositionDoolittle();
@@ -1740,13 +1739,13 @@ extension MatrixOperationExtension on Matrix {
     // Second attempt: Use SVD which is more robust for ill-conditioned matrices
     try {
       var svd = decomposition.singularValueDecomposition();
-      
+
       // Check condition number to determine if the matrix is numerically invertible
       if (svd.conditionNumber > Complex(conditionThreshold)) {
         // Matrix is ill-conditioned but we can still compute a regularized inverse
         return _computeRegularizedInverse(svd, conditionThreshold);
       }
-      
+
       // Standard SVD-based inverse
       var identity = Matrix.eye(rowCount);
       return svd.solve(identity);
@@ -1757,12 +1756,13 @@ extension MatrixOperationExtension on Matrix {
   }
 
   // Helper method for computing regularized inverse for ill-conditioned matrices
-  Matrix _computeRegularizedInverse(SingularValueDecomposition svd, double threshold) {
+  Matrix _computeRegularizedInverse(
+      SingularValueDecomposition svd, double threshold) {
     // Use Tikhonov regularization to handle ill-conditioning
     Matrix U = svd.U;
     Matrix S = svd.S;
     Matrix V = svd.V;
-    
+
     // Create regularized S^(-1) by filtering small singular values
     Matrix sInv = Matrix.zeros(columnCount, rowCount);
     for (int i = 0; i < math.min(rowCount, columnCount); i++) {
@@ -1774,7 +1774,7 @@ extension MatrixOperationExtension on Matrix {
         sInv[i][i] = s / (s * s + threshold);
       }
     }
-    
+
     // Compute V·S^(-1)·U^T
     return V * sInv * U.transpose();
   }
@@ -1828,7 +1828,7 @@ extension MatrixOperationExtension on Matrix {
   Matrix pseudoInverse() {
     Matrix a = copy();
     Matrix aTranspose = a.transpose();
-    
+
     if (rowCount >= columnCount) {
       // Overdetermined system (more rows than columns)
       // Pseudo-inverse = (A^T·A)^(-1)·A^T
@@ -1839,7 +1839,6 @@ extension MatrixOperationExtension on Matrix {
       return aTranspose * (a * aTranspose).inverse();
     }
   }
-
 
   /// Calculates the dot product of two matrices.
   ///
@@ -2116,7 +2115,8 @@ extension MatrixOperationExtension on Matrix {
     }
     // Convert matrix to a numerical matrix.
     Matrix A = _Utils.toNumMatrix(this);
-    Matrix qH = Matrix(); // Will hold the orthogonal transformation from Hessenberg reduction.
+    Matrix qH =
+        Matrix(); // Will hold the orthogonal transformation from Hessenberg reduction.
 
     // If the matrix is not symmetric (within tolerance), reduce to Hessenberg form.
     if (!isSymmetricMatrix(tolerance: tolerance)) {

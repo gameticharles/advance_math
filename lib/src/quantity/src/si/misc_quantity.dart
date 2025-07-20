@@ -20,11 +20,15 @@ class MiscQuantity extends Quantity {
   /// This constructor sets the [value], [dim]ensions and relative
   /// uncertainty.
   /// [value] may be a num or Number object.
-  MiscQuantity([super.value, Dimensions super.dim = Scalar.scalarDimensions, super.uncert])
+  MiscQuantity(
+      [super.value,
+      Dimensions super.dim = Scalar.scalarDimensions,
+      super.uncert])
       : super.misc();
 
   /// Constructs a constant MiscQuantity.
-  const MiscQuantity.constant(Number valueSI, Dimensions dim, {Units? units, double uncert = 0.0})
+  const MiscQuantity.constant(Number valueSI, Dimensions dim,
+      {Units? units, double uncert = 0.0})
       : super.constant(valueSI, dim, units, uncert);
 
   ///  Gets this quantity's value in [units].
@@ -36,11 +40,13 @@ class MiscQuantity extends Quantity {
   ///   value is stored internally in arbitrary precision.
   Number getValue(Units units) {
     if (dimensions != (units as Quantity).dimensions) {
-      throw DimensionsException('The units provided do not have proper dimensions for this Quantity.');
+      throw DimensionsException(
+          'The units provided do not have proper dimensions for this Quantity.');
     }
     return super.valueInUnits(units);
   }
 
   /// Attempts to construct a typed quantity from this miscellaneous quantity.
-  Quantity toTypedQuantity() => dimensions.toQuantity(valueSI, null, relativeUncertainty);
+  Quantity toTypedQuantity() =>
+      dimensions.toQuantity(valueSI, null, relativeUncertainty);
 }

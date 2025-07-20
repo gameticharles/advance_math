@@ -35,7 +35,6 @@ class Quadratic extends Polynomial {
       throw ArgumentError('The input list must contain exactly 3 elements.');
     }
   }
-  
 
   /// The first coefficient of the equation in the form
   /// _f(x) = ax^2 + bx + c = 0_

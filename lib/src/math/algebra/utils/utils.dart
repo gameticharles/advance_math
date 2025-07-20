@@ -35,8 +35,7 @@ class _Utils {
   ///Converts numbers and strings to Complex, preserves other types like boolean
   static List<List<dynamic>> toNumList(List<List<dynamic>> input) {
     return input
-        .map((row) => row
-            .map((value) {
+        .map((row) => row.map((value) {
               if (value is Complex) return value;
               if (value is num || value is String) {
                 try {
@@ -46,8 +45,7 @@ class _Utils {
                 }
               }
               return value; // Preserve other types (boolean, etc.)
-            })
-            .toList())
+            }).toList())
         .toList();
   }
 

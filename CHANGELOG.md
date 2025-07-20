@@ -1,3 +1,8 @@
+# 5.3.3
+
+* **[BUG_FIX]** Fixed error from `Package conflict after update` as from issues [#8](https://github.com/gameticharles/advance_math/issues/8)
+* **[IMPROVEMENT]** Clean code
+
 # 5.3.2
 
 * **[IMPROVEMENT]** Added detailed documentations

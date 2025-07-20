@@ -25,7 +25,8 @@ class LU {
   /// - [_m] column dimension.
   /// - [_n] row dimension.
   /// - [_pivsign] pivot sign.
-  int _m = 0, _n = 0;  dynamic _pivsign = Complex.one();
+  int _m = 0, _n = 0;
+  dynamic _pivsign = Complex.one();
 
   /// Internal storage of pivot vector.
   /// - [_piv] pivot vector.

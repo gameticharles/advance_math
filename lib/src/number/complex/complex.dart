@@ -16,7 +16,7 @@ part 'imaginary.dart';
 ///
 /// Complex numbers are numbers that can be expressed in the form a + bi, where
 /// a and b are real numbers, and i is the imaginary unit, satisfying i² = −1.
-/// 
+///
 /// If called as `Complex()`, defaults to 0 + 0i.
 ///
 /// This class provides:
@@ -41,7 +41,7 @@ part 'imaginary.dart';
 /// print(z1.toPolarString());  // Shows polar form
 /// print(z1.toExponentialString());  // Shows exponential form
 /// ```
-class Complex implements Comparable<dynamic>{
+class Complex implements Comparable<dynamic> {
   /// The real part of the complex number
   final num real;
 
@@ -55,7 +55,7 @@ class Complex implements Comparable<dynamic>{
   ///
   /// The [realValue] represents the real part and [imaginaryValue] represents
   /// the coefficient of the imaginary part (defaults to 0).
-  /// 
+  ///
   /// If called as `Complex()`, defaults to 0 + 0i.
   ///
   /// Both parameters can be:
@@ -87,8 +87,8 @@ class Complex implements Comparable<dynamic>{
       return parsed.real;
     }
     final realPart = real is Complex ? real.real : real as num;
-    final imagImag = imag is Complex 
-        ? imag.imaginary 
+    final imagImag = imag is Complex
+        ? imag.imaginary
         : (imag is String ? _parseComponent(imag).imaginary : 0);
     return realPart - imagImag;
   }
@@ -107,13 +107,13 @@ class Complex implements Comparable<dynamic>{
       return parsed.imaginary;
     }
     final realImag = real is Complex ? real.imaginary : 0;
-    final imagPart = imag is Complex 
-        ? imag.real 
+    final imagPart = imag is Complex
+        ? imag.real
         : (imag is String ? _parseComponent(imag).real : imag as num);
     return realImag + imagPart;
   }
 
-   /// Parses a complex number from the given string.
+  /// Parses a complex number from the given string.
   ///
   /// The string must be in the format "a + bi" or "a - bi", where
   /// a is the real part and b is the imaginary part.
@@ -155,13 +155,13 @@ class Complex implements Comparable<dynamic>{
       second = x;
     }
 
-    if (first ==  Complex.zero()) {
+    if (first == Complex.zero()) {
       return second;
     }
 
     final t = second / first;
 
-    return first * ( Complex(1,0) + (t * t));
+    return first * (Complex(1, 0) + (t * t));
   }
 
   static Complex _parseComponent(String s) {
@@ -174,7 +174,8 @@ class Complex implements Comparable<dynamic>{
           final coef = m.group(1)?.isEmpty ?? true ? '1' : m.group(1)!;
           return (double.parse(coef) * math.pi).toString();
         })
-        .replaceAllMapped(RegExp(r'(?<![\d.])e(?!\d)'), (m) => math.e.toString())
+        .replaceAllMapped(
+            RegExp(r'(?<![\d.])e(?!\d)'), (m) => math.e.toString())
         // Handle square roots
         .replaceAllMapped(RegExp(r'√(\d+(?:\.\d+)?)'), (match) {
           final number = double.parse(match.group(1)!);
@@ -221,7 +222,8 @@ class Complex implements Comparable<dynamic>{
     }
 
     // Handle scientific notation with optional sign after 'e'
-    final scientificMatch = RegExp(r'^([+-]?\d*\.?\d+)(?:[eE]([+-]?\d+))?$').firstMatch(s);
+    final scientificMatch =
+        RegExp(r'^([+-]?\d*\.?\d+)(?:[eE]([+-]?\d+))?$').firstMatch(s);
     if (scientificMatch != null) {
       final base = double.parse(scientificMatch.group(1)!);
       final exp = scientificMatch.group(2);
@@ -268,15 +270,15 @@ class Complex implements Comparable<dynamic>{
   /// var z = Complex.random();  // Random complex number in unit square
   /// var z2 = Complex.random(minReal: 0, maxReal: 10);  // Custom bounds
   /// ```
-  factory Complex.random({num minReal = -1, num maxReal = 1, 
-                        num minImag = -1, num maxImag = 1}) {
+  factory Complex.random(
+      {num minReal = -1, num maxReal = 1, num minImag = -1, num maxImag = 1}) {
     final random = math.Random();
     final real = minReal + (maxReal - minReal) * random.nextDouble();
     final imag = minImag + (maxImag - minImag) * random.nextDouble();
     return Complex(real, imag);
   }
 
-    /// Creates a complex number from a 2x2 matrix
+  /// Creates a complex number from a 2x2 matrix
   factory Complex.fromMatrix(List<List<num>> matrix) {
     if (matrix.length != 2 || matrix[0].length != 2) {
       throw ArgumentError('Matrix must be 2x2');
@@ -286,7 +288,6 @@ class Complex implements Comparable<dynamic>{
     }
     return Complex(matrix[0][0], matrix[1][0]);
   }
-
 
   /// Constructs a complex number that represents zero.
   Complex.zero()
@@ -317,7 +318,7 @@ class Complex implements Comparable<dynamic>{
   Complex.negativeInfinity()
       : real = double.negativeInfinity,
         imaginary = double.negativeInfinity;
-  
+
   /// Constructs a complex number that represents positive infinity on the real axis.
   Complex.realInfinity()
       : real = double.infinity,
@@ -428,7 +429,6 @@ class Complex implements Comparable<dynamic>{
   bool equals(Complex other, {double tolerance = 1e-10}) =>
       (real - other.real).abs() < tolerance &&
       (imaginary - other.imaginary).abs() < tolerance;
-      
 
   @override
   bool operator ==(Object other) {
@@ -442,7 +442,7 @@ class Complex implements Comparable<dynamic>{
     }
 
     if (other is Complex || other is Imaginary) {
-      Complex nx = other is Imaginary? other.toComplex(): other as Complex;
+      Complex nx = other is Imaginary ? other.toComplex() : other as Complex;
       // Special handling for NaN cases
       if (isNaN && nx.isNaN) return true;
 
@@ -467,17 +467,17 @@ class Complex implements Comparable<dynamic>{
     // Handle special cases first
     if (isNaN) return 7;
     if (isInfinite) return 11;
-    
+
     // Normalize -0.0 to 0.0 for consistent hashing
     final r = (real == -0.0) ? 0.0 : real;
     final i = (imaginary == -0.0) ? 0.0 : imaginary;
-    
+
     // Handle pure real numbers
     if (i == 0) return 23 * r.hashCode;
-    
+
     // Handle pure imaginary numbers
     if (r == 0) return 31 * i.hashCode;
-    
+
     // For full complex numbers, use a combination of both parts
     // Use prime numbers for better hash distribution
     return 37 * (r.hashCode + 17 * i.hashCode);
@@ -511,14 +511,15 @@ class Complex implements Comparable<dynamic>{
       otherAbs = other.abs();
     } else if (other is num) {
       // Convert num to Complex and get its magnitude
-      otherAbs = Complex(other).abs(); 
+      otherAbs = Complex(other).abs();
     } else if (other is String) {
       try {
         // Parse String to Complex and get its magnitude
         final otherComplex = Complex.parse(other);
         otherAbs = otherComplex.abs();
       } on FormatException catch (e) {
-        throw ArgumentError('Cannot compare Complex with invalid String format: "$other" - ${e.message}');
+        throw ArgumentError(
+            'Cannot compare Complex with invalid String format: "$other" - ${e.message}');
       }
     } else {
       throw ArgumentError('Cannot compare Complex with ${other.runtimeType}');
@@ -538,12 +539,12 @@ class Complex implements Comparable<dynamic>{
   num get modulus => abs();
 
   /// Returns the sign of the complex number.
-  /// 
+  ///
   /// For a complex number z = r * e^(iθ), returns:
   /// - If r = 0: returns 0
   /// - If r > 0: returns 1
   /// - If r < 0: returns -1
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// print(Complex(3, 4).sign);     // 1
@@ -560,11 +561,11 @@ class Complex implements Comparable<dynamic>{
   bool get isNegative => real < 0;
 
   /// Returns true if this complex number represents an integer value.
-  /// 
+  ///
   /// A complex number is considered an integer if:
   /// 1. Its imaginary part is zero
   /// 2. Its real part is a whole number
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// Complex(2, 0).isInteger      // true
@@ -635,7 +636,7 @@ class Complex implements Comparable<dynamic>{
   // Operations with Complex and num types
   Complex operator +(dynamic other) {
     if (isNaN) return Complex.nan();
-    
+
     if (other is Complex) {
       if (other.isNaN) return Complex.nan();
       return Complex(real + other.real, imaginary + other.imaginary);
@@ -649,7 +650,7 @@ class Complex implements Comparable<dynamic>{
 
   Complex operator -(dynamic other) {
     if (isNaN) return Complex.nan();
-    
+
     if (other is Complex) {
       if (other.isNaN) return Complex.nan();
       return Complex(real - other.real, imaginary - other.imaginary);
@@ -720,7 +721,7 @@ class Complex implements Comparable<dynamic>{
       // Normal case - use the formula (a+bi)/(c+di) = ((ac+bd)/(c²+d²)) + ((bc-ad)/(c²+d²))i
       final c = other.real;
       final d = other.imaginary;
-      
+
       // Use a more numerically stable algorithm based on the magnitudes of c and d
       if (c.abs() < d.abs()) {
         final q = c / d;
@@ -757,10 +758,10 @@ class Complex implements Comparable<dynamic>{
   }
 
   /// Integer division operator
-  /// 
+  ///
   /// Performs integer division between complex numbers.
   /// Returns the quotient of the division with the fractional part truncated.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// Complex(5, 3) ~/ Complex(2, 1)  // Returns the integer part of the division
@@ -768,7 +769,7 @@ class Complex implements Comparable<dynamic>{
   Complex operator ~/(dynamic divisor) {
     // Special cases handling
     if (isNaN) return Complex.nan();
-    
+
     if (divisor is Complex) {
       // Special cases for NaN and infinity
       if (divisor.isNaN) return Complex.nan();
@@ -781,15 +782,13 @@ class Complex implements Comparable<dynamic>{
       if (divisor.isInfinite) return Complex.zero();
 
       // Use the optimized division algorithm from the existing implementation
-       // (a + bi) / (c + di) = (ac + bd) / (c^2 + d^2) + i * (bc - ad) / (c^2 + d^2)
+      // (a + bi) / (c + di) = (ac + bd) / (c^2 + d^2) + i * (bc - ad) / (c^2 + d^2)
       final c = divisor.real;
       final d = divisor.imaginary;
       final c2d2 = (c * c) + (d * d);
-      
-      return Complex(
-        ((real * c + imaginary * d) / c2d2).truncate(),
-        ((imaginary * c - real * d) / c2d2).truncate()
-      );
+
+      return Complex(((real * c + imaginary * d) / c2d2).truncate(),
+          ((imaginary * c - real * d) / c2d2).truncate());
     } else if (divisor is num) {
       // Special cases
       if (divisor.isNaN) return Complex.nan();
@@ -801,10 +800,12 @@ class Complex implements Comparable<dynamic>{
       if (divisor.isInfinite) return Complex.zero();
 
       // Normal integer division
-      return Complex((real / divisor).truncate(), (imaginary / divisor).truncate());
+      return Complex(
+          (real / divisor).truncate(), (imaginary / divisor).truncate());
     }
-    
-    throw ArgumentError('Invalid type for integer division: ${divisor.runtimeType}');
+
+    throw ArgumentError(
+        'Invalid type for integer division: ${divisor.runtimeType}');
   }
 
   /// The modulo operator (not supported).
@@ -911,7 +912,7 @@ class Complex implements Comparable<dynamic>{
   /// Computes the n-th roots of the complex number represented by this object.
   ///
   /// By default, returns the principal n-th root (the one with the smallest positive argument).
-  /// If [allRoots] is set to true, returns a list containing all n complex numbers 
+  /// If [allRoots] is set to true, returns a list containing all n complex numbers
   /// that are the n-th roots of this complex number.
   ///
   /// The method handles:
@@ -940,15 +941,15 @@ class Complex implements Comparable<dynamic>{
   /// // Get all square roots of -1
   /// var bothRoots = Complex(-1, 0).nthRoot(2, allRoots: true);
   /// print(bothRoots); // Output: [0 + 1i, 0 - 1i]
-  /// 
+  ///
   /// // Get the reciprocal of the square root (negative exponent)
   /// var recipRoot = Complex(4, 0).nthRoot(-2);
   /// print(recipRoot); // Output: 0.5 + 0i
-  /// 
+  ///
   /// // Handle zero case
   /// var zeroRoot = Complex(0, 0).nthRoot(3);
   /// print(zeroRoot); // Output: 0 + 0i
-  /// 
+  ///
   /// // Handle n = 0 case
   /// var zeroExponent = Complex(5, 5).nthRoot(0);
   /// print(zeroExponent); // Output: 1 + 0i
@@ -981,28 +982,29 @@ class Complex implements Comparable<dynamic>{
 
     // Compute the magnitude of the result
     final nthRootOfAbs = math.pow(abs(), 1.0 / absN);
-    
+
     // Compute the argument (phase) for the principal root
     final baseAngle = argument;
-    final normalizedAngle = baseAngle < 0 ? baseAngle + (2 * math.pi) : baseAngle;
+    final normalizedAngle =
+        baseAngle < 0 ? baseAngle + (2 * math.pi) : baseAngle;
     final nthPhi = normalizedAngle / absN;
-    
+
     // For all roots, we need to compute each root with a different angle
     if (allRoots) {
       final slice = 2 * math.pi / absN;
       var roots = List<Complex>.generate(absN, (k) {
         final angle = nthPhi + k * slice;
         final root = Complex.polar(nthRootOfAbs, angle);
-        
+
         // If n is negative, return the reciprocal
         return isNegativeN ? ~root : root;
       });
-      
+
       return roots;
     } else {
       // Return only the principal root
       final principalRoot = Complex.polar(nthRootOfAbs, nthPhi);
-      
+
       // If n is negative, return the reciprocal
       return isNegativeN ? ~principalRoot : principalRoot;
     }
@@ -1019,7 +1021,7 @@ class Complex implements Comparable<dynamic>{
   /// print(z_power); // Output: -5 + 12i
   /// ```
   Complex power(dynamic exponent) => pow(exponent);
-  
+
   /// Returns a new complex number representing this number raised to the power of [exponent].
   ///
   /// Example:1
@@ -1136,7 +1138,6 @@ class Complex implements Comparable<dynamic>{
     }
   }
 
-
   /// Calculates the natural logarithm of the complex number.
   ///
   /// Implements the formula:
@@ -1193,10 +1194,9 @@ class Complex implements Comparable<dynamic>{
   /// Returns a Complex number whose real portion has been clamped to within [lowerLimit] and
   /// [upperLimit] and whose imaginary portion is the same as the imaginary value in this Complex number.
   dynamic clamp(dynamic lowerLimit, dynamic upperLimit) {
-    return Complex(
-      real.clamp( lowerLimit, upperLimit),
-      imaginary.clamp(lowerLimit, upperLimit)
-    ).simplify();
+    return Complex(real.clamp(lowerLimit, upperLimit),
+            imaginary.clamp(lowerLimit, upperLimit))
+        .simplify();
   }
 
   /// Returns the floor of the real portion of this complex number.
@@ -1226,15 +1226,14 @@ class Complex implements Comparable<dynamic>{
     return real.round();
   }
 
-
   /// Returns the rounded value of this complex number.
-  /// 
+  ///
   /// When called without parameters, returns the integer closest to the real portion,
   /// simplifying to a num if possible.
-  /// 
-  /// When called with [decimals], returns a new complex number with both parts 
+  ///
+  /// When called with [decimals], returns a new complex number with both parts
   /// rounded to the specified number of decimal places, simplifying if possible.
-  /// 
+  ///
   /// Examples:
   /// ```dart
   /// Complex(3.7, 0).roundTo()         // returns 4 (int)
@@ -1245,27 +1244,38 @@ class Complex implements Comparable<dynamic>{
     if (decimals == null) {
       // Handle special cases for real part
       if (real.isNaN || real.isInfinite) {
-        return asComplex ? Complex(real, imaginary.isNaN || imaginary.isInfinite ? imaginary : imaginary.round()) : real;
+        return asComplex
+            ? Complex(
+                real,
+                imaginary.isNaN || imaginary.isInfinite
+                    ? imaginary
+                    : imaginary.round())
+            : real;
       }
-      
+
       // Handle special cases for imaginary part
       if (imaginary.isNaN || imaginary.isInfinite) {
         return Complex(real.round(), imaginary);
       }
-      
+
       // Round both parts to integers
       // Return simplified version (num or Complex)
-      return asComplex ? Complex(real.round(), imaginary.round()).simplify() : real.round();
+      return asComplex
+          ? Complex(real.round(), imaginary.round()).simplify()
+          : real.round();
     }
-    
+
     final factor = math.pow(10, decimals);
-    
+
     // Handle special cases
-    final roundedReal = real.isNaN || real.isInfinite ? real : (real * factor).round() / factor;
-    final roundedImag = imaginary.isNaN || imaginary.isInfinite ? imaginary : (imaginary * factor).round() / factor;
-    
+    final roundedReal =
+        real.isNaN || real.isInfinite ? real : (real * factor).round() / factor;
+    final roundedImag = imaginary.isNaN || imaginary.isInfinite
+        ? imaginary
+        : (imaginary * factor).round() / factor;
+
     final roundedComplex = Complex(roundedReal, roundedImag);
-    
+
     // Return simplified version (num or Complex)
     return roundedComplex.simplify();
   }
@@ -1290,7 +1300,6 @@ class Complex implements Comparable<dynamic>{
 
   /// The remainder method operates on the real portion of this Complex number only.
   num remainder(dynamic divisor) => real.remainder(divisor);
-
 
   /// Returns the distance between this complex number and another in the complex plane.
   ///
@@ -1390,7 +1399,7 @@ class Complex implements Comparable<dynamic>{
   /// Returns `true` if both the real and imaginary parts of this complex number are finite.
   bool get isFinite => !isNaN && real.isFinite && imaginary.isFinite;
 
-   /// Returns `true` if both the real and imaginary parts of this complex number are zero.
+  /// Returns `true` if both the real and imaginary parts of this complex number are zero.
   bool get isZero {
     // Normalize -0.0 to 0.0 for consistent comparison
     final r = (real == -0.0 || real == 0.0) ? 0.0 : real;
@@ -1400,14 +1409,15 @@ class Complex implements Comparable<dynamic>{
 
   // Method to check if this complex number can be simplified to a basic number
   // bool get isSimplifiable => (imaginary.abs() < 1e-15) && !real.isNaN;
-  bool isSimplifiable({double relTol = 1e-9, double absTol = 1e-15}) => math.isClose(imaginary.toDouble(), 0.0, relTol: 1e-9, absTol: 1e-15) && 
+  bool isSimplifiable({double relTol = 1e-9, double absTol = 1e-15}) =>
+      math.isClose(imaginary.toDouble(), 0.0, relTol: 1e-9, absTol: 1e-15) &&
       !real.isNaN;
 
   /// Returns the simplified value of this complex number.
-  /// 
+  ///
   /// If the complex number can be simplified to a real number (negligible imaginary part),
   /// returns that number as an int or double. Otherwise, returns the complex number itself.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// Complex(3, 0).value      // returns 3 (int)
@@ -1417,9 +1427,9 @@ class Complex implements Comparable<dynamic>{
   dynamic get value => simplify();
 
   /// Returns `true` if this complex number has a zero imaginary part.
-  /// 
+  ///
   /// A complex number is considered real if its imaginary component is exactly zero.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// Complex(3, 0).isReal     // true
@@ -1428,9 +1438,9 @@ class Complex implements Comparable<dynamic>{
   bool get isReal => imaginary == 0;
 
   /// Returns `true` if this complex number has a zero real part.
-  /// 
+  ///
   /// A complex number is considered purely imaginary if its real component is exactly zero.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// Complex(0, 4).isImaginary    // true
@@ -1438,7 +1448,7 @@ class Complex implements Comparable<dynamic>{
   /// ```
   bool get isImaginary => real == 0;
 
-   /// Returns the complex number with the same phase but unit magnitude.
+  /// Returns the complex number with the same phase but unit magnitude.
   ///
   /// Example:
   /// ```dart
@@ -1470,18 +1480,18 @@ class Complex implements Comparable<dynamic>{
   /// ```
   bool isApproximatelyEqualTo(Complex other, {double tolerance = 1e-10}) {
     return (real - other.real).abs() < tolerance &&
-           (imaginary - other.imaginary).abs() < tolerance;
+        (imaginary - other.imaginary).abs() < tolerance;
   }
 
   /// Simplifies this complex number to its most basic form.
-  /// 
+  ///
   /// Returns:
   /// - A `num` (int or double) if the complex number can be simplified to a real number
   /// - The original `Complex` object if it cannot be simplified
-  /// 
+  ///
   /// Uses [isClose] for more robust floating-point comparisons.
   /// [relTol] and [absTol] control the tolerance for considering values as zero.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// Complex(3, 0).simplify()        // returns 3 (int)
@@ -1537,10 +1547,10 @@ class Complex implements Comparable<dynamic>{
   }
 
   /// Converts this complex number to a double.
-  /// 
+  ///
   /// Throws a StateError if the imaginary part is not negligible.
   /// Uses [isClose] for more robust floating-point comparisons.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// Complex(3.5, 0).toDouble()      // returns 3.5
@@ -1548,20 +1558,21 @@ class Complex implements Comparable<dynamic>{
   /// Complex(3, 4).toDouble()        // throws StateError
   /// ```
   double toDouble({double relTol = 1e-9, double absTol = 1e-15}) {
-    if (!math.isClose(imaginary.toDouble(), 0.0, relTol: relTol, absTol: absTol)) {
+    if (!math.isClose(imaginary.toDouble(), 0.0,
+        relTol: relTol, absTol: absTol)) {
       throw StateError('Complex number has non-negligible imaginary part');
     }
     return real.toDouble();
   }
 
   /// Converts this complex number to an integer.
-  /// 
+  ///
   /// Throws a StateError if:
   /// - The imaginary part is not negligible
   /// - The real part is not close to an integer value
-  /// 
+  ///
   /// Uses [isClose] for more robust floating-point comparisons.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// Complex(3, 0).toInt()           // returns 3
@@ -1570,25 +1581,26 @@ class Complex implements Comparable<dynamic>{
   /// Complex(3, 4).toInt()           // throws StateError (non-negligible imaginary part)
   /// ```
   int toInt({double relTol = 1e-9, double absTol = 1e-15}) {
-    if (!math.isClose(imaginary.toDouble(), 0.0, relTol: relTol, absTol: absTol)) {
+    if (!math.isClose(imaginary.toDouble(), 0.0,
+        relTol: relTol, absTol: absTol)) {
       throw StateError('Complex number has non-negligible imaginary part');
     }
-    
+
     return real.round();
   }
 
   /// Attempts to convert this complex number to its simplest numeric form.
-  /// 
+  ///
   /// Returns:
   /// - An `int` if the complex number can be simplified to an integer
   /// - A `double` if the complex number can be simplified to a decimal
   /// - The original `Complex` object if it cannot be simplified
-  /// 
+  ///
   /// For complex numbers with non-zero imaginary parts, this method uses the following strategy:
   /// - If imaginary part is negligible, returns the real part
   /// - If real part is negligible, returns the imaginary part
   /// - Otherwise, returns the magnitude with the sign of the real part
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// Complex(3, 0).toNum()        // returns 3 (int)
@@ -1602,16 +1614,17 @@ class Complex implements Comparable<dynamic>{
     if (isSimplifiable(relTol: relTol, absTol: absTol)) {
       return simplify(relTol: relTol, absTol: absTol);
     }
-    
+
     // If imaginary part is negligible, return the real part
-    if (math.isClose(imaginary.toDouble(), 0.0, relTol: relTol, absTol: absTol)) {
+    if (math.isClose(imaginary.toDouble(), 0.0,
+        relTol: relTol, absTol: absTol)) {
       // Convert to int if it's a whole number
       if (_isExactInteger(real)) {
         return real.toInt();
       }
       return real;
     }
-    
+
     // If real part is negligible, treat as pure imaginary and return the imaginary part
     if (math.isClose(real.toDouble(), 0.0, relTol: relTol, absTol: absTol)) {
       // Convert to int if it's a whole number
@@ -1620,12 +1633,12 @@ class Complex implements Comparable<dynamic>{
       }
       return imaginary;
     }
-    
+
     // Otherwise, for a full complex number,
     // compute the magnitude and return it with the sign of the real part
     final magnitude = abs();
     final result = real < 0 ? -magnitude : magnitude;
-    
+
     // Convert to int if it's a whole number
     if (_isExactInteger(result)) {
       return result.toInt();
@@ -1641,7 +1654,6 @@ class Complex implements Comparable<dynamic>{
         real ?? this.real,
         imaginary ?? this.imaginary,
       );
-
 
   /// When a value is a whole number, it's printed without the fractional part.
   /// For example, `_fixZero(5.0)` returns `"5"`.
@@ -1714,12 +1726,12 @@ class Complex implements Comparable<dynamic>{
     // Normalize -0.0 to 0.0
     final r = (real == -0.0 || real == 0.0) ? 0.0 : real;
     final i = (imaginary == -0.0 || imaginary == 0.0) ? 0.0 : imaginary;
-    
+
     // Special case for zero
     if (r == 0 && i == 0) {
       return '0';
     }
-    
+
     final realPart = _formatComponent(r,
         isImaginary: false,
         asFraction: asFraction,
@@ -1738,39 +1750,43 @@ class Complex implements Comparable<dynamic>{
     return '$realPart $sign ${imagPart.replaceFirst('-', '')}';
   }
 
-   String _formatComplexNumber({bool asFraction = false, int? fractionDigits}) {
+  String _formatComplexNumber({bool asFraction = false, int? fractionDigits}) {
     // Normalize -0.0 to 0.0 for consistent string representation
     final r = (real == -0.0 || real == 0.0) ? 0.0 : real;
     final i = (imaginary == -0.0 || imaginary == 0.0) ? 0.0 : imaginary;
-    
+
     // Special case for zero
     if (r == 0 && i == 0) {
       return '0';
     }
-    
+
     // Special case for purely real numbers
     if (i == 0) {
       if (r.isInfinite) return r.isNegative ? '-Infinity' : 'Infinity';
       if (r.isNaN) return 'NaN';
-      return _formatValue(r, asFraction: asFraction, fractionDigits: fractionDigits);
+      return _formatValue(r,
+          asFraction: asFraction, fractionDigits: fractionDigits);
     }
-    
+
     // Special case for purely imaginary numbers
     if (r == 0) {
       if (i.isInfinite) return i.isNegative ? '-Infinityi' : 'Infinityi';
       if (i.isNaN) return 'NaNi';
       if (i == 1) return 'i';
       if (i == -1) return '-i';
-      return i > 0 
+      return i > 0
           ? '${_formatValue(i, asFraction: asFraction, fractionDigits: fractionDigits)}i'
           : '-${_formatValue(i.abs(), asFraction: asFraction, fractionDigits: fractionDigits)}i';
     }
-    
+
     // Handle complex numbers with both parts
-    final realFormatted = r.isInfinite 
+    final realFormatted = r.isInfinite
         ? (r.isNegative ? '-Infinity' : 'Infinity')
-        : (r.isNaN ? 'NaN' : _formatValue(r, asFraction: asFraction, fractionDigits: fractionDigits));
-    
+        : (r.isNaN
+            ? 'NaN'
+            : _formatValue(r,
+                asFraction: asFraction, fractionDigits: fractionDigits));
+
     String imagFormatted;
     if (i.isInfinite) {
       imagFormatted = i.isNegative ? '-Infinityi' : 'Infinityi';
@@ -1778,7 +1794,9 @@ class Complex implements Comparable<dynamic>{
       imagFormatted = 'NaNi';
     } else {
       final imagValue = i.abs();
-      imagFormatted = imagValue == 1 ? 'i' : '${_formatValue(imagValue, asFraction: asFraction, fractionDigits: fractionDigits)}i';
+      imagFormatted = imagValue == 1
+          ? 'i'
+          : '${_formatValue(imagValue, asFraction: asFraction, fractionDigits: fractionDigits)}i';
     }
 
     final sign = i < 0 ? '-' : '+';
@@ -1786,7 +1804,7 @@ class Complex implements Comparable<dynamic>{
     if (i.isInfinite || i.isNaN) {
       return '$realFormatted $sign ${imagFormatted.replaceFirst('-', '')}';
     }
-    
+
     return '$realFormatted $sign $imagFormatted';
   }
 
@@ -1888,7 +1906,6 @@ class Complex implements Comparable<dynamic>{
 
 class DivisionByZeroError extends Error {}
 
-
 /// Extension providing memoized versions of computationally expensive Complex operations
 extension ComplexMemoizedX<T extends Complex> on T {
   // Static memoized functions using the Memoize utility
@@ -1896,50 +1913,50 @@ extension ComplexMemoizedX<T extends Complex> on T {
     (z) => z.exp(),
     options: MemoizeOptions.mediumLRU,
   );
-  
+
   static final _logMemoized = Memoize.function1<Complex, Complex>(
     (z) => z.log(),
     options: MemoizeOptions.mediumLRU,
   );
-  
+
   static final _sinMemoized = Memoize.function1<Complex, Complex>(
     (z) => z.sin(),
     options: MemoizeOptions.mediumLRU,
   );
-  
+
   static final _cosMemoized = Memoize.function1<Complex, Complex>(
     (z) => z.cos(),
     options: MemoizeOptions.mediumLRU,
   );
-  
+
   static final _tanMemoized = Memoize.function1<Complex, Complex>(
     (z) => z.tan(),
     options: MemoizeOptions.mediumLRU,
   );
-  
+
   static final _powMemoized = Memoize.function2<Complex, dynamic, Complex>(
     (z, exp) => z.pow(exp),
     options: MemoizeOptions.mediumLRU,
   );
-  
+
   /// Memoized version of the exponential function
   Complex memoizedExp() => _expMemoized(this);
-  
+
   /// Memoized version of the natural logarithm
   Complex memoizedLog() => _logMemoized(this);
-  
+
   /// Memoized version of the sine function
   Complex memoizedSin() => _sinMemoized(this);
-  
+
   /// Memoized version of the cosine function
   Complex memoizedCos() => _cosMemoized(this);
-  
+
   /// Memoized version of the tangent function
   Complex memoizedTan() => _tanMemoized(this);
-  
+
   /// Memoized version of the power function
   Complex memoizedPow(dynamic exponent) => _powMemoized(this, exponent);
-  
+
   /// Memoized version of the nth root function
   dynamic memoizedRoot(num n, {bool allRoots = false}) {
     // Use a static memoized function
@@ -1947,7 +1964,7 @@ extension ComplexMemoizedX<T extends Complex> on T {
       (z, n, allRoots) => z.nthRoot(n, allRoots: allRoots),
       options: MemoizeOptions.mediumLRU,
     );
-    
+
     return rootMemoized(this, n, allRoots);
   }
 }

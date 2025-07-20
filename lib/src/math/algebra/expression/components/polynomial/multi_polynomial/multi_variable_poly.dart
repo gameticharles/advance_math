@@ -127,16 +127,15 @@ class MultiVariablePolynomial extends Expression {
         for (int i = 0; i < resultTerms.length; i++) {
           if (_mapEquals(resultTerms[i].variables, term.variables)) {
             var newCoefficient = resultTerms[i].coefficient + term.coefficient;
-            resultTerms[i] = Term(newCoefficient,
-                Map.from(resultTerms[i].variables));
+            resultTerms[i] =
+                Term(newCoefficient, Map.from(resultTerms[i].variables));
             found = true;
             break;
           }
         }
 
         if (!found) {
-          resultTerms.add(
-              Term(term.coefficient, Map.from(term.variables)));
+          resultTerms.add(Term(term.coefficient, Map.from(term.variables)));
         }
       }
 
@@ -156,15 +155,14 @@ class MultiVariablePolynomial extends Expression {
         for (int i = 0; i < resultTerms.length; i++) {
           if (_mapEquals(resultTerms[i].variables, term.variables)) {
             var newCoefficient = resultTerms[i].coefficient - term.coefficient;
-            resultTerms[i] = Term(newCoefficient,
-                Map.from(resultTerms[i].variables));
+            resultTerms[i] =
+                Term(newCoefficient, Map.from(resultTerms[i].variables));
             found = true;
             break;
           }
         }
         if (!found) {
-          resultTerms.add(
-              Term(-term.coefficient, Map.from(term.variables)));
+          resultTerms.add(Term(-term.coefficient, Map.from(term.variables)));
         }
       }
 
@@ -191,8 +189,7 @@ class MultiVariablePolynomial extends Expression {
             }
           }
 
-          resultTerms
-              .add(Term(newCoefficient, Map.from(newVariables)));
+          resultTerms.add(Term(newCoefficient, Map.from(newVariables)));
         }
       }
 

@@ -276,7 +276,7 @@ class MatrixFactory {
             if (i == j) {
               final value = isDouble
                   ? random.nextDouble() * (max - min) + min
-                  :random.nextInt(max.toInt() - min.toInt()) + min.toInt();
+                  : random.nextInt(max.toInt() - min.toInt()) + min.toInt();
               data[i][j] = value;
             } else {
               final realPart = isDouble
