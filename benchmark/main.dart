@@ -5,6 +5,7 @@ import 'matrix/matrix_from_list.dart';
 import 'matrix/matrix_from_rows.dart';
 
 import 'vector/list_addition.dart';
+import 'expression/expression_creation_benchmark.dart';
 
 void main() {
   // Matrix benchmarks
@@ -16,4 +17,13 @@ void main() {
 
   //Vector benchmarks
   RegularListsAdditionBenchmark.main();
+
+  // Expression benchmarks
+  print('\n=== Expression Creation Benchmarks ===');
+  LiteralCreationBenchmark.main();
+  ExtensionCreationBenchmark.main();
+  HelperCreationBenchmark.main();
+  LiteralComplexExpressionBenchmark.main();
+  ExtensionComplexExpressionBenchmark.main();
+  HelperComplexExpressionBenchmark.main();
 }

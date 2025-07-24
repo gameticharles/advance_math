@@ -1,4 +1,4 @@
-part of '/advance_math.dart';
+part of advance_math;
 
 extension ExtString on String {
   /// Checks if the string is a valid email format.

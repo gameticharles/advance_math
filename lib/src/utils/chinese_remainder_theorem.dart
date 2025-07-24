@@ -1,4 +1,4 @@
-part of '/advance_math.dart';
+part of advance_math;
 
 /// Utility class to solve a set of congruence equations using the Chinese Remainder Theorem (CRT).
 ///

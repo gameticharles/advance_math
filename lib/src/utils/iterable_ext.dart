@@ -1,4 +1,4 @@
-part of '/advance_math.dart';
+part of advance_math;
 
 extension GroupingExtension<T> on Iterable<T> {
   /// Groups the elements of the iterable by a key extracted using the provided [keyExtractor] function.

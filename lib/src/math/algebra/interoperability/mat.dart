@@ -308,14 +308,14 @@ class FileNotFoundException implements Exception {
   FileNotFoundException(this.message);
 }
 
-void main(List<String> args) async {
-  // Read the file as a list of bytes
-  var filePath = 'assets/data/simple_struct.mat';
+// void main(List<String> args) async {
+//   // Read the file as a list of bytes
+//   var filePath = 'assets/data/simple_struct.mat';
 
-  var mat = MatFile(filePath);
-  mat.read();
-  print('Header description: ${mat.header.description}');
-  print('Version: ${mat.header.version}');
-  print('Endian indicator: ${mat.header.endianIndicator}');
-  print(mat.matStruct.fields.toString());
-}
+//   var mat = MatFile(filePath);
+//   mat.read();
+//   print('Header description: ${mat.header.description}');
+//   print('Version: ${mat.header.version}');
+//   print('Endian indicator: ${mat.header.endianIndicator}');
+//   print(mat.matStruct.fields.toString());
+// }

@@ -3,9 +3,11 @@ library expression;
 import '../../../../advance_math.dart' hide Complex, Number, Integer, Double;
 import '../../../number/complex/complex.dart';
 import 'package:petitparser/petitparser.dart';
+import '../../../../advance_math.dart' as math;
 
 part 'parser.dart';
 part 'utils.dart';
+part 'exceptions.dart';
 
 part 'components/binary_unary_operation/binary_expression.dart';
 part 'components/binary_unary_operation/binary_operations_expression.dart';
@@ -34,6 +36,8 @@ part 'components/functions/trig/trig_expression.dart';
 part 'components/functions/rational.dart';
 part 'components/functions/abs.dart';
 part 'components/functions/ln.dart';
+part 'components/functions/exp.dart';
+part 'components/functions/log.dart';
 
 part 'components/polynomial/constant.dart';
 part 'components/polynomial/cubic.dart';

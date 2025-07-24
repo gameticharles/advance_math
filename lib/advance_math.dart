@@ -7,6 +7,7 @@ import 'dart:async';
 
 import 'src/math/basic/math.dart' as math;
 import 'src/number/complex/complex.dart';
+import 'src/math/algebra/expression/expression.dart';
 
 export 'src/number/complex/complex.dart';
 export 'src/math/basic/math.dart';

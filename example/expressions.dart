@@ -261,117 +261,101 @@ void multiPolynomial() {
 void expressionMath() {
   printLine("Expressions Math");
   Variable x = Variable('x'), y = Variable('y');
-  var one = Literal(1);
-  var two = Literal(2);
-  var expr = Add(Pow(x, two), one);
-  print(expr);
-  print(expr.integrate());
-  print(Expression.parse('(x^2) + 1').integrate().simplify()); // 16
 
-  print(Add(Multiply(Literal(6), Variable('x')), Literal(4)).integrate());
-  print(Expression.parse('6 * x + 4').integrate());
+  // Demonstrate all three expression creation approaches
+  printLine("Expression Creation Methods");
 
-  print(Expression.parse('6 * x + 4').evaluate({'x': 2})); // 16
+  // Method 1: Explicit Literal objects (traditional approach)
+  var expr1 = Add(Pow(x, Literal(2)), Literal(1));
+  print('Method 1 (Explicit Literal): $expr1');
 
-  Pow xSquare = Pow(x, Literal(2));
-  var yCos = Trigonometric('cos', y);
-  Literal three = Literal(3);
-  Expression exp = (xSquare + yCos) / three;
-  print(exp);
+  // Method 2: Using toExpression() extension method
+  var expr2 = (x ^ 2.toExpression()) + 1.toExpression();
+  print('Method 2 (toExpression): $expr2');
 
-  print(Ln(Add(xSquare, Literal(1))).differentiate());
+  // Method 3: Using ex() helper function
+  var expr3 = (x ^ ex(2)) + ex(1);
+  print('Method 3 (ex helper): $expr3');
 
-  print((Cos(x) + Sin(x)).integrate());
+  // All three methods produce equivalent results
+  var context = {'x': 3.0};
+  print('All evaluate to same result:');
+  print('  Method 1: ${expr1.evaluate(context)}');
+  print('  Method 2: ${expr2.evaluate(context)}');
+  print('  Method 3: ${expr3.evaluate(context)}');
 
-  print(Csc(x).integrate()); // csc(x)  = ln|tan(x/2 )|+ C
-  print(Pow(Csc(x), Literal(2)).integrate()); // csc(x)  = ln|tan(x/2 )|+ C
-  print(
-    Csc(Multiply(Literal(2), x)).integrate(),
-  ); // csc(2x)  = 1/2 ln|tan(x)|+ C
+  printLine("Complex Expression Examples");
 
-  print(
-    Csc(Multiply(Literal(3), x)).integrate(),
-  ); // csc(3x)  = 1/3 ln|tan(3x/2)|+ C
+  // Complex polynomial using mixed approaches
+  var polynomial = 3.toExpression() * (x ^ ex(3)) -
+      2.toExpression() * (x ^ ex(2)) +
+      5.toExpression() * x -
+      Literal(7);
+  print('Mixed polynomial: $polynomial');
+  print('Evaluated at x=2: ${polynomial.evaluate({'x': 2})}');
 
-  print(
-    Csc(Add(Multiply(Literal(4), x), Literal(1))).integrate(),
-  ); // csc(4x + 1) =  1/4 ln|tan((4x + 1)/2)|+ C
+  // Multivariate expression with all three methods
+  var multivar =
+      ex(2) * x * y + 3.toExpression() * (x ^ ex(2)) - Literal(4) * y + ex(1);
+  print('Multivariate: $multivar');
+  print('Evaluated: ${multivar.evaluate({'x': 2, 'y': 3})}');
 
-  print(Csc(x, n: 2).differentiate());
+  // Rational expression
+  var numerator = (x ^ 2.toExpression()) + ex(1);
+  var denominator = x - ex(1);
+  var rational = numerator / denominator;
+  print('Rational: $rational');
+  print('Evaluated at x=3: ${rational.evaluate({'x': 3})}');
 
-  print(
-    Add(Multiply(Literal(2), x),
-            Add(Add(Literal(5), x), Multiply(Literal(2), x)))
-        .simplify(),
-  );
+  printLine("Calculus Operations");
 
-  print(
-    Add(Multiply(Literal(8), y), Multiply(Literal(2), x))
-        .simplify()
-        .evaluate({'x': 1}),
-  );
+  // Integration examples with enhanced methods
+  var integrand = 6.toExpression() * x + ex(4);
+  print('Integrand: $integrand');
+  print('Integral: ${integrand.integrate()}');
 
-  print(
-    Add(
-      Multiply(Literal(8), y),
-      Multiply(Literal(2), x),
-    ).simplify().evaluate({'x': 1, 'y': 2}),
-  );
+  // Differentiation examples
+  var func = (x ^ ex(3)) + 2.toExpression() * (x ^ ex(2)) - ex(5) * x + ex(7);
+  print('Function: $func');
+  print('Derivative: ${func.differentiate()}');
 
-  exp = Add(
-    Add(Multiply(Literal(2), xSquare), Multiply(Literal(3), xSquare)),
-    Add(Literal(4) * Multiply(x, y), Literal(2) * Multiply(x, y)),
-  ).simplify();
-  print(exp.getVariables());
-  print(exp.getVariableTerms());
+  printLine("Trigonometric Functions");
 
-  exp = Subtract(Multiply(Literal(1), x), Literal(-5));
-  print(exp); // ((x * 1.0) - (-5.0))
-  print(exp.simplify()); // (x + 5.0)
-  print(Pow(Add(x, y), Literal(2)));
-  print(Pow(Pow(Literal(3), Literal(3)), Literal(2)).evaluate()); // 729
-  print(Pow(Literal(3), Pow(Literal(3), Literal(2))).evaluate()); // 19683
-  print(Expression.parse(r'3^(3^(2))').evaluate());
-  print(Expression.parse('10^2').evaluate());
-  print(Pow(Literal(10), Literal(2)).evaluate());
+  // Trigonometric expressions with enhanced literals
+  var trigExpr = Sin(2.toExpression() * x) + Cos(ex(3) * x);
+  print('Trig expression: $trigExpr');
 
-  // Example expression: 2x^2 + 3y + sin(x)
-  x = Variable('x');
-  final expr1 = E(2) + x; // num + Expression
-  final expr2 = x + 2; // Expression + num
+  // Integration of trigonometric functions
+  print('Sin(x) integral: ${Sin(x).integrate()}');
+  print('Cos(x) integral: ${Cos(x).integrate()}');
 
-  print('Expression 1: $expr1');
-  print('Expression 2: $expr2');
+  printLine("Advanced Examples");
 
-  final expr3 = E(3) * (x ^ 2) - E(4) / x;
-  print('Expression 3: $expr3');
-}
+  // Logarithmic expressions
+  var logExpr = Ln((x ^ ex(2)) + ex(1));
+  print('Log expression: $logExpr');
+  print('Log derivative: ${logExpr.differentiate()}');
 
-/// Extension methods for num to allow for operator overloading
-/// with Expressions and other nums to create expressions.
-///
-/// Example usage:
-/// ```dart
-/// final x = Variable('x');
-/// final expr1 = E(2) + x; // num + Expression
-/// final expr2 = x + 2; // Expression + num
-///
-/// print('Expression 1: $expr1');
-/// print('Expression 2: $expr2');
-///
-/// final expr3 = E(3) * (x ^ 2) - E(4) / x;
-/// print('Expression 3: $expr3');
-/// ```
-extension E on num {
-  Expression operator +(Expression other) => Literal(this) + other;
+  // Complex nested expressions
+  var nested =
+      ((2.toExpression() * x + ex(1)) ^ ex(2)) * (ex(3) * x - Literal(2));
+  print('Nested expression: $nested');
+  print('Simplified: ${nested.simplify()}');
 
-  Expression operator -(Expression other) => Literal(this) - other;
+  // Demonstrate operator precedence with enhanced methods
+  var precedence = 2.toExpression() + ex(3) * x - Literal(4) / x;
+  print('Precedence example: $precedence');
+  print('Evaluated at x=2: ${precedence.evaluate({'x': 2})}');
 
-  Expression operator *(Expression other) => Literal(this) * other;
+  printLine("Performance Comparison");
 
-  Expression operator /(Expression other) => Literal(this) / other;
+  // Show that all methods produce identical Expression objects
+  var literal = Literal(5) * x;
+  var extension = 5.toExpression() * x;
+  var helper = ex(5) * x;
 
-  Expression operator ^(Expression other) => Literal(this) ^ other;
-
-  Expression operator -() => -Literal(this);
+  print('All methods create equivalent expressions:');
+  print('  Literal result: ${literal.evaluate({'x': 2})}');
+  print('  Extension result: ${extension.evaluate({'x': 2})}');
+  print('  Helper result: ${helper.evaluate({'x': 2})}');
 }

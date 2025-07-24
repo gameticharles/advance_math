@@ -1,4 +1,4 @@
-part of '/advance_math.dart';
+part of advance_math;
 
 void printLine([String s = '']) {
   var l = '--- ' * 10;

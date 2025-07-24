@@ -138,6 +138,3 @@ class FastFourierTransform {
   }
 }
 
-void main() {
-  FastFourierTransform.main();
-}

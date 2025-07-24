@@ -1,4 +1,4 @@
-part of '/advance_math.dart';
+part of advance_math;
 
 /// Status of a memoized computation.
 enum MemoizedStatus { notComputed, computed, expired }

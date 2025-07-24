@@ -23,33 +23,104 @@ abstract class Expression {
 
   // Basic operations.
   /// Converts a `num` to a `Literal` if necessary.
+  ///
+  /// This method provides enhanced error handling and validation for expression creation.
+  /// It supports conversion from num and Expression types, and provides detailed
+  /// error messages with suggestions for unsupported types.
+  ///
+  /// Supported types:
+  /// - [Expression]: Returns the expression as-is
+  /// - [num] (int, double): Converts to [Literal] expression
+  ///
+  /// Throws [ExpressionTypeConversionException] for unsupported types with
+  /// helpful suggestions for resolution.
   static Expression _toExpression(dynamic value) {
     if (value is Expression) {
       return value;
     } else if (value is num) {
+      // Validate numeric values
+      if (value.isNaN) {
+        throw ExpressionValidationException(
+          'invalid_numeric_value',
+          'Cannot create expression from NaN (Not a Number). Use a valid numeric value.',
+          value,
+        );
+      }
+      if (value.isInfinite) {
+        throw ExpressionValidationException(
+          'invalid_numeric_value',
+          'Cannot create expression from infinite value: $value. Use a finite numeric value.',
+          value,
+        );
+      }
       return Literal(value);
     } else {
-      throw ArgumentError('Unsupported type for Expression operations: $value');
+      throw ExpressionTypeConversionException(value);
     }
   }
 
   /// Add operator. Creates an [Add] expression.
-  Expression operator +(dynamic other) => Add(this, _toExpression(other));
+  ///
+  /// Throws [ExpressionOperationException] if the operand cannot be converted to an Expression.
+  Expression operator +(dynamic other) {
+    try {
+      return Add(this, _toExpression(other));
+    } on ExpressionTypeConversionException catch (e) {
+      throw ExpressionOperationException.withConversionContext(
+          '+', this, other, e);
+    }
+  }
 
   /// Subtract operator. Creates a [Subtract] expression.
-  Expression operator -(dynamic other) => Subtract(this, _toExpression(other));
+  ///
+  /// Throws [ExpressionOperationException] if the operand cannot be converted to an Expression.
+  Expression operator -(dynamic other) {
+    try {
+      return Subtract(this, _toExpression(other));
+    } on ExpressionTypeConversionException catch (e) {
+      throw ExpressionOperationException.withConversionContext(
+          '-', this, other, e);
+    }
+  }
 
   /// Multiply operator. Creates a [Multiply] expression.
-  Expression operator *(dynamic other) => Multiply(this, _toExpression(other));
+  ///
+  /// Throws [ExpressionOperationException] if the operand cannot be converted to an Expression.
+  Expression operator *(dynamic other) {
+    try {
+      return Multiply(this, _toExpression(other));
+    } on ExpressionTypeConversionException catch (e) {
+      throw ExpressionOperationException.withConversionContext(
+          '*', this, other, e);
+    }
+  }
 
   /// Divide operator. Creates a [Divide] expression.
-  Expression operator /(dynamic other) => Divide(this, _toExpression(other));
+  ///
+  /// Throws [ExpressionOperationException] if the operand cannot be converted to an Expression.
+  Expression operator /(dynamic other) {
+    try {
+      return Divide(this, _toExpression(other));
+    } on ExpressionTypeConversionException catch (e) {
+      throw ExpressionOperationException.withConversionContext(
+          '/', this, other, e);
+    }
+  }
 
   /// Modulo operator. Creates a [Modulo] expression.
   // Expression operator %(dynamic other) => Modulo(this, _toExpression(other));
 
   /// Power operator. Creates a [Pow] expression.
-  Expression operator ^(dynamic other) => Pow(this, _toExpression(other));
+  ///
+  /// Throws [ExpressionOperationException] if the operand cannot be converted to an Expression.
+  Expression operator ^(dynamic other) {
+    try {
+      return Pow(this, _toExpression(other));
+    } on ExpressionTypeConversionException catch (e) {
+      throw ExpressionOperationException.withConversionContext(
+          '^', this, other, e);
+    }
+  }
 
   /// Unary minus operator. Creates a [Negate] expression.
   Expression operator -() => Negate(this);

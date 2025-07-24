@@ -48,6 +48,7 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
   - Eigen values and vectors.
 - Supports vectors, complex numbers and complex vectors with most of the basic functionalities and operations.
 - Supports math expressions with context and functions.
+- Enhanced expression creation with multiple approaches: explicit Literal objects, toExpression() extension method, and ex() helper function.
 
 ## Todo
 
@@ -2884,6 +2885,10 @@ This module demonstrates the usage of mathematical expressions in Dart. It inclu
 
 ## Features in expression library
 
+- **Enhanced Expression Creation**: Three intuitive approaches for creating expressions with numeric literals
+  - Explicit Literal objects (traditional approach)
+  - Extension method `toExpression()` for fluent APIs
+  - Helper function `ex()` for concise syntax
 - Examples
   - Positional and Named Arguments
   - Average Function
@@ -3245,15 +3250,83 @@ print(Expression.parse('10^2').evaluate());
 print(Pow(Literal(10), Literal(2)).evaluate());
 
 x = Variable('x');
-final expr1 = E(2) + x;
-final expr2 = x + 2;
+final expr1 = 2.toExpression() + x; // num + Expression
+final expr2 = x + 2; // Expression + num
 
 print('Expression 1: $expr1');
 print('Expression 2: $expr2');
 
-final expr3 = E(3) * (x ^ 2) - E(4) / x;
+final expr3 = ex(3) * (x ^ ex(2)) - ex(4) / x;
 print('Expression 3: $expr3');
 ```
+
+### Enhanced Expression Creation
+
+The library provides three intuitive approaches for creating expressions with numeric literals, solving common type inference issues:
+
+#### Method 1: Explicit Literal Objects (Traditional)
+
+```dart
+final x = Variable('x');
+final expr = Literal(2) * x + Literal(3);
+print('Result: ${expr.evaluate({'x': 5})}'); // 13
+```
+
+#### Method 2: Extension Method (toExpression)
+
+```dart
+final x = Variable('x');
+final expr = 2.toExpression() * x + 3.toExpression();
+print('Result: ${expr.evaluate({'x': 5})}'); // 13
+```
+
+#### Method 3: Helper Function (ex)
+
+```dart
+final x = Variable('x');
+final expr = ex(2) * x + ex(3);
+print('Result: ${expr.evaluate({'x': 5})}'); // 13
+```
+
+#### Complex Expression Example
+
+```dart
+final x = Variable('x');
+final y = Variable('y');
+
+// Polynomial: 3x² + 2xy - 5y + 7
+final polynomial = ex(3) * (x ^ ex(2)) + 
+                   2.toExpression() * x * y - 
+                   ex(5) * y + 
+                   Literal(7);
+
+print('P(2,3) = ${polynomial.evaluate({'x': 2, 'y': 3})}');
+```
+
+#### Calculus Operations
+
+```dart
+// Differentiation
+final func = (x ^ ex(3)) + 2.toExpression() * (x ^ ex(2)) - ex(5) * x + ex(7);
+print('f\'(x) = ${func.differentiate()}');
+
+// Integration
+final integrand = 6.toExpression() * (x ^ ex(2)) + 4.toExpression() * x - ex(3);
+print('∫f(x)dx = ${integrand.integrate()}');
+```
+
+All three methods produce equivalent results and can be mixed within the same expression. Choose the approach that best fits your coding style:
+
+- **Use `ex()` for simple expressions**: `ex(2) * x + ex(3)`
+- **Use `toExpression()` for fluent APIs**: `2.toExpression() * x + 3.toExpression()`
+- **Use `Literal()` for explicit control**: `Literal(2) * x + Literal(3)`
+- **Mix approaches for complex expressions**: `2.toExpression() * x + ex(3) * y - Literal(1)`
+
+For comprehensive examples and troubleshooting, see:
+- `example/enhanced_expression_creation.dart`
+- `doc/enhanced_expression_creation.md`
+- `doc/expression_troubleshooting.md`
+- `doc/expression_migration_guide.md`
 
 ## Extension Methods
 

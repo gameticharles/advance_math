@@ -5,6 +5,7 @@ final defaultContext = {
   // Constants
   'pi': pi,
   'e': e,
+  'ex': ex,
   'tau': tau,
   'ln2': ln2,
   'ln10': ln10,

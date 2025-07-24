@@ -1,4 +1,4 @@
-part of '/advance_math.dart';
+part of advance_math;
 
 /// Extension methods on functions returning type [V] to enable easy creation of [Memoized] instances.
 extension FunctionExt<V> on V Function() {
