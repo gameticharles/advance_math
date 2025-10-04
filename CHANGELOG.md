@@ -1,11 +1,11 @@
 # 5.3.5
 
 * **[FEATURE]** Add num to expression conversion extension
-  * Add NumToExpressionExtension with toExpression() and operator overloads
-  * Create global helper function ex() for concise expression creation
-  * Add unit tests for all new functionality
-  * Update examples to demonstrate new expression creation methods
-  * Add documentation for enhanced expression creation approaches
+* **[FEATURE]** Add NumToExpressionExtension with toExpression() and operator overloads
+* **[FEATURE]** Create global helper function ex() for concise expression creation
+* **[IMPROVEMENT]** Add unit tests for all new functionality
+* **[IMPROVEMENT]** Update examples to demonstrate new expression creation methods
+* **[IMPROVEMENT]** Add documentation for enhanced expression creation approaches
 
 # 5.3.4
 
