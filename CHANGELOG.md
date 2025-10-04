@@ -6,6 +6,7 @@
 * **[IMPROVEMENT]** Add unit tests for all new functionality
 * **[IMPROVEMENT]** Update examples to demonstrate new expression creation methods
 * **[IMPROVEMENT]** Add documentation for enhanced expression creation approaches
+* **[FEATURE]** Extend Inverse Hyperbolic Functions to Support Complex Numbers (`asinh`, `acosh`, `atanh`, `asech`, `acsch`, and `acoth`) to support `Complex` number inputs.
 
 # 5.3.4
 
