@@ -386,77 +386,145 @@ dynamic coth(dynamic x) {
 
 /// Returns the inverse hyperbolic sine (asinh) of the number.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(asinh(1));  // Output: 0.881373587019543
 /// ```
-double asinh(num x) => log(x + sqrt(x * x + 1));
+///
+/// Example 2:
+/// ```dart
+/// print(asinh(Complex(1, 2))); // Output: 1.469351744312242 + 1.0634400235775333i
+/// ```
+dynamic asinh(dynamic x) {
+  if (x is num) {
+    return log(x + sqrt(x * x + 1));
+  } else if (x is Complex) {
+    return log(x + (x * x + 1).sqrt());
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
+}
 
 /// Returns the inverse hyperbolic cosine (acosh) of the number.
 ///
 /// Throws an [ArgumentError] if the input is less than 1.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(acosh(1));  // Output: 0.0
 /// ```
-double acosh(num x) {
-  if (x < 1) {
-    throw ArgumentError('Invalid input for acosh: input must be >= 1');
+///
+/// Example 2:
+/// ```dart
+/// print(acosh(Complex(1, 2))); // Output: 1.4436354751788103 + 1.0172219678978514i
+/// ```
+dynamic acosh(dynamic x) {
+  if (x is num) {
+    if (x < 1) {
+      throw ArgumentError('Invalid input for acosh: input must be >= 1');
+    }
+    return log(x + sqrt(x * x - 1));
+  } else if (x is Complex) {
+    return log(x + (x * x - 1).sqrt());
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
   }
-  return log(x + sqrt(x * x - 1));
 }
 
 /// Returns the inverse hyperbolic tangent (atanh) of the number.
 ///
 /// Throws an [ArgumentError] if the input is less than or equal to -1 or greater than or equal to 1.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(atanh(0.5));  // Output: 0.5493061443340549
 /// ```
-double atanh(num x) {
-  if (x <= -1 || x >= 1) {
-    throw ArgumentError('Invalid input for atanh: input must be in (-1, 1)');
+///
+/// Example 2:
+/// ```dart
+/// print(atanh(Complex(1, 2))); // Output: 0.2290726832688049 + 1.1780972450961724i
+/// ```
+dynamic atanh(dynamic x) {
+  if (x is num) {
+    if (x <= -1 || x >= 1) {
+      throw ArgumentError('Invalid input for atanh: input must be in (-1, 1)');
+    }
+    return 0.5 * log((1 + x) / (1 - x));
+  } else if (x is Complex) {
+    return (log((Complex(1) + x) / (Complex(1) - x))) * 0.5;
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
   }
-  return 0.5 * log((1 + x) / (1 - x));
 }
 
 /// Returns the inverse hyperbolic secant (asech) of `x`.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(asech(0.5)); // prints: 1.3169578969248166
 /// ```
-double asech(num x) {
-  if (x <= 0 || x > 1) {
-    throw ArgumentError('Invalid input for asech: input must be in (0, 1]');
+///
+/// Example 2:
+/// ```dart
+/// print(asech(Complex(1, 2))); // Output: 0.2222134255743621 - 1.153432321521422i
+/// ```
+dynamic asech(dynamic x) {
+  if (x is num) {
+    if (x <= 0 || x > 1) {
+      throw ArgumentError('Invalid input for asech: input must be in (0, 1]');
+    }
+    return math.log((1 + math.sqrt(1 - x * x)) / x);
+  } else if (x is Complex) {
+    return acosh(Complex(1, 0) / x);
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
   }
-  return math.log((1 + math.sqrt(1 - x * x)) / x);
 }
 
 /// Returns the inverse hyperbolic cosecant (acsch) of `x`.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(acsch(1)); // prints: 0.881373587019543
 /// ```
-double acsch(num x) {
-  return math.log(1 / x + math.sqrt(1 / (x * x) + 1));
+///
+/// Example 2:
+/// ```dart
+/// print(acsch(Complex(1, 2))); // Output: 0.21798993831344444 - 0.4522784461536737i
+/// ```
+dynamic acsch(dynamic x) {
+  if (x is num) {
+    return math.log(1 / x + math.sqrt(1 / (x * x) + 1));
+  } else if (x is Complex) {
+    return asinh(Complex(1, 0) / x);
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Returns the inverse hyperbolic cotangent (acoth) of `x`.
 ///
-/// Example:
+/// Example 1:
 /// ```dart
 /// print(acoth(2)); // prints: 0.5493061443340549
 /// ```
-double acoth(num x) {
-  if (x.abs() <= 1) {
-    throw ArgumentError(
-        'Invalid input for acoth: absolute value of input must be > 1');
+///
+/// Example 2:
+/// ```dart
+/// print(acoth(Complex(1, 2))); // Output: 0.2290726832688049 - 0.39269908169872414i
+/// ```
+dynamic acoth(dynamic x) {
+  if (x is num) {
+    if (x.abs() <= 1) {
+      throw ArgumentError(
+          'Invalid input for acoth: absolute value of input must be > 1');
+    }
+    return 0.5 * log((x + 1) / (x - 1));
+  } else if (x is Complex) {
+    return atanh(Complex(1, 0) / x);
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
   }
-  return 0.5 * log((x + 1) / (x - 1));
 }
 
 /// Versine function
