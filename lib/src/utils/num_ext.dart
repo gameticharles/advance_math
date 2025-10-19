@@ -90,15 +90,15 @@ extension NumExtension on num {
 }
 
 /// A helper function to convert a number to an [Expression].
-/// 
+///
 /// This function provides a concise way to convert a number to an [Expression]
 /// when the extension method cannot be used due to type inference limitations.
-/// 
+///
 /// Example:
-/// 
+///
 /// var x = Variable('x');
 /// var expr = ex(2) * x + ex(3);
-/// 
+///
 Expression ex(num value) => Literal(value);
 
 /// Extension to provide Expression conversion capabilities for numeric types.
@@ -106,56 +106,56 @@ Expression ex(num value) => Literal(value);
 /// and provides operator overloads for num + Expression operations.
 extension NumToExpressionExtension on num {
   /// Converts this number to a Literal expression.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final expr = 5.toExpression(); // Creates Literal(5)
   /// ```
   Expression toExpression() => Literal(this);
-  
+
   /// Addition operator for num + Expression operations.
   /// Converts this number to a Literal and performs addition.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final x = Variable('x');
   /// final expr = 2 + x; // Creates Add(Literal(2), x)
   /// ```
   Expression operator +(Expression other) => Literal(this) + other;
-  
+
   /// Subtraction operator for num - Expression operations.
   /// Converts this number to a Literal and performs subtraction.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final x = Variable('x');
   /// final expr = 5 - x; // Creates Subtract(Literal(5), x)
   /// ```
   Expression operator -(Expression other) => Literal(this) - other;
-  
+
   /// Multiplication operator for num * Expression operations.
   /// Converts this number to a Literal and performs multiplication.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final x = Variable('x');
   /// final expr = 3 * x; // Creates Multiply(Literal(3), x)
   /// ```
   Expression operator *(Expression other) => Literal(this) * other;
-  
+
   /// Division operator for num / Expression operations.
   /// Converts this number to a Literal and performs division.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final x = Variable('x');
   /// final expr = 10 / x; // Creates Divide(Literal(10), x)
   /// ```
   Expression operator /(Expression other) => Literal(this) / other;
-  
+
   /// Power operator for num ^ Expression operations.
   /// Converts this number to a Literal and performs exponentiation.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final x = Variable('x');

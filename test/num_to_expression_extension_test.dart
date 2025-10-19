@@ -487,7 +487,7 @@ void main() {
     group('Complex expressions', () {
       test('should work with multiple operators', () {
         // (2 + x) * (3 - y)
-        final expr = (ex(2)+ x) * (ex(3)- y);
+        final expr = (ex(2) + x) * (ex(3) - y);
         expect(expr, isA<Multiply>());
         final result = expr.evaluate({'x': 1, 'y': 1});
         expect(result, equals(6)); // (2 + 1) * (3 - 1) = 3 * 2 = 6
@@ -495,7 +495,7 @@ void main() {
 
       test('should work with nested expressions', () {
         // 2 * (x + (3 * y))
-        final expr = ex(2) * (x + (ex(3)* y));
+        final expr = ex(2) * (x + (ex(3) * y));
         expect(expr, isA<Multiply>());
         final result = expr.evaluate({'x': 1, 'y': 2});
         expect(result, equals(14)); // 2 * (1 + (3 * 2)) = 2 * 7 = 14
@@ -503,7 +503,8 @@ void main() {
 
       test('should work with polynomial-like expressions', () {
         // 2*x^2 + 3*x + 1
-        final expr = (ex(2)* (x ^ 2.toExpression())) + (ex(3)* x) + 1.toExpression();
+        final expr =
+            (ex(2) * (x ^ 2.toExpression())) + (ex(3) * x) + 1.toExpression();
         expect(expr, isA<Add>());
         final result = expr.evaluate({'x': 2});
         expect(result, equals(15)); // 2*4 + 3*2 + 1 = 8 + 6 + 1 = 15
@@ -550,15 +551,15 @@ void main() {
         final testValue = {'x': 4};
 
         // Test all operators with both approaches
-        expect((ex(2)+ x).evaluate(testValue),
+        expect((ex(2) + x).evaluate(testValue),
             equals((Literal(2) + x).evaluate(testValue)));
-        expect((ex(2)- x).evaluate(testValue),
+        expect((ex(2) - x).evaluate(testValue),
             equals((Literal(2) - x).evaluate(testValue)));
-        expect((ex(2)* x).evaluate(testValue),
+        expect((ex(2) * x).evaluate(testValue),
             equals((Literal(2) * x).evaluate(testValue)));
-        expect((ex(2)/ x).evaluate(testValue),
+        expect((ex(2) / x).evaluate(testValue),
             equals((Literal(2) / x).evaluate(testValue)));
-        expect((ex(2)^ x).evaluate(testValue),
+        expect((ex(2) ^ x).evaluate(testValue),
             equals((Literal(2) ^ x).evaluate(testValue)));
       });
     });

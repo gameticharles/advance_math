@@ -137,4 +137,3 @@ class FastFourierTransform {
     print(result);
   }
 }
-
