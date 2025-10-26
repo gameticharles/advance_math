@@ -59,12 +59,12 @@ BigInt hyperop(BigInt a, int b, int level) {
 }
 
 /// ===== Utility Wrappers =====
-BigInt add(BigInt a, BigInt b) => hyperop(a, b.toIntOrLimit(), 1);
-BigInt mul(BigInt a, BigInt b) => hyperop(a, b.toIntOrLimit(), 2);
+BigInt addition(BigInt a, BigInt b) => hyperop(a, b.toIntOrLimit(), 1);
+BigInt multiplication(BigInt a, BigInt b) => hyperop(a, b.toIntOrLimit(), 2);
 BigInt expInt(BigInt a, BigInt b) => hyperop(a, b.toIntOrLimit(), 3);
-BigInt tet(BigInt a, int b) => hyperop(a, b, 4);
-BigInt pent(BigInt a, int b) => hyperop(a, b, 5);
-BigInt hex(BigInt a, int b) => hyperop(a, b, 6);
+BigInt tetration(BigInt a, int b) => hyperop(a, b, 4);
+BigInt pentation(BigInt a, int b) => hyperop(a, b, 5);
+BigInt hexation(BigInt a, int b) => hyperop(a, b, 6);
 
 /// ===== Mixed-Type Convenience Wrappers =====
 double expDouble(double a, double b) => pow(a, b).toDouble();

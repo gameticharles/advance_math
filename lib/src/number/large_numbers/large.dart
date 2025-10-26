@@ -25,10 +25,13 @@ void main() {
   ComputeConfig.verboseMode = true;
 
   print('\n=== CONCRETE COMPUTATIONS ===');
-  print('add(5, 7) = ${add(BigInt.from(5), BigInt.from(7))}');
-  print('mul(5, 7) = ${mul(BigInt.from(5), BigInt.from(7))}');
+  print('addition(5, 7) = ${addition(BigInt.from(5), BigInt.from(7))}');
+  print(
+      'multiplication(5, 7) = ${multiplication(BigInt.from(5), BigInt.from(7))}');
   print('expInt(2, 10) = ${expInt(BigInt.from(2), BigInt.from(10))}');
-  print('tet(3, 3) = ${tet(BigInt.from(3), 3)}');
+  print('tetration(3, 3) = ${tetration(BigInt.from(3), 3)}');
+  print('pentation(2, 4) = ${pentation(BigInt.from(2), 4)}');
+  print('hyperop(2, 3, 4) = ${hyperop(BigInt.from(2), 3, 4)}');
 
   print('\n=== SYMBOLIC EXPRESSIONS ===');
   final expr1 = Symbolic.tet(Symbolic.num(3), Symbolic.num(4));

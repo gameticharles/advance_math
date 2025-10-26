@@ -50,7 +50,7 @@ class GrowthComparison {
     print('For n = 3:\n');
     print('Polynomial:      n³ = ${pow(3, 3)}');
     print('Exponential:     3³ = ${expDouble(3, 3)}');
-    print('Tetration:       3^^3 = ${tet(BigInt.from(3), 3)}');
+    print('Tetration:       3^^3 = ${tetration(BigInt.from(3), 3)}');
     print('Ackermann:       ${Ackermann.describe(3, 3)}');
     print('Graham g(1):     3↑↑↑↑3 = [incomputable]');
     print("Graham's G:      g(64) = [incomprehensible]");
