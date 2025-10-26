@@ -17,6 +17,7 @@ export 'number/number_exception.dart';
 export 'number/real.dart';
 
 // export 'complex/complex.dart';
+export 'large_numbers/large.dart';
 
 export 'util/converters.dart';
 export 'util/erf.dart';

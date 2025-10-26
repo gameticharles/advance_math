@@ -6,6 +6,8 @@
         "dfactorial",
         "EGCD",
         "ggcf",
+        "HYPEROPERATION",
+        "Hyperoperations",
         "Lehmer",
         "llcm",
         "Madhava",
@@ -17,6 +19,7 @@
         "Quattuordecillion",
         "Quindecillion",
         "Septendecillion",
+        "tetration",
         "Undecillion"
     ]
 }

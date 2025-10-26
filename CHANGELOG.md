@@ -1,3 +1,7 @@
+# 5.3.6
+
+* **[FEATURE]** Added some large value computations 
+
 # 5.3.5
 
 * **[FEATURE]** Add num to expression conversion extension
