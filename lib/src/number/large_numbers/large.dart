@@ -30,8 +30,6 @@ void main() {
       'multiplication(5, 7) = ${multiplication(BigInt.from(5), BigInt.from(7))}');
   print('expInt(2, 10) = ${expInt(BigInt.from(2), BigInt.from(10))}');
   print('tetration(3, 3) = ${tetration(BigInt.from(3), 3)}');
-  print('pentation(2, 4) = ${pentation(BigInt.from(2), 4)}');
-  print('hyperop(2, 3, 4) = ${hyperop(BigInt.from(2), 3, 4)}');
 
   print('\n=== SYMBOLIC EXPRESSIONS ===');
   final expr1 = Symbolic.tet(Symbolic.num(3), Symbolic.num(4));
