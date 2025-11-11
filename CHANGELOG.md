@@ -2,6 +2,7 @@
 
 * **[FEATURE]** Added some large value computations
 * **[IMPROVEMENT]** Updated dependencies
+* **[IMPROVEMENT]** Clean code
 
 # 5.3.5
 

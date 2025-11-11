@@ -40,7 +40,7 @@ class ExpressionTypeConversionException extends ExpressionException {
 
   static List<String> _getSuggestions(dynamic value) {
     final suggestions = <String>[];
-    final valueType = value.runtimeType;
+    // final valueType = value.runtimeType;
 
     if (value is String) {
       suggestions.add(
@@ -166,9 +166,8 @@ class ExpressionValidationException extends ExpressionException {
   final String validationRule;
 
   ExpressionValidationException(
-      String validationRule, String message, dynamic value)
-      : validationRule = validationRule,
-        super(message, value);
+      this.validationRule, String message, dynamic value)
+      : super(message, value);
 
   ExpressionValidationException.divisionByZero(dynamic divisor)
       : this(

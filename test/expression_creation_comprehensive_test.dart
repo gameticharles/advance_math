@@ -95,7 +95,7 @@ void main() {
         final intExtension = 42.toExpression();
         final intHelper = ex(42);
 
-        expect((intLiteral as Literal).value, isA<int>());
+        expect((intLiteral).value, isA<int>());
         expect((intExtension as Literal).value, isA<int>());
         expect((intHelper as Literal).value, isA<int>());
 
@@ -104,7 +104,7 @@ void main() {
         final doubleExtension = 3.14.toExpression();
         final doubleHelper = ex(3.14);
 
-        expect((doubleLiteral as Literal).value, isA<double>());
+        expect((doubleLiteral).value, isA<double>());
         expect((doubleExtension as Literal).value, isA<double>());
         expect((doubleHelper as Literal).value, isA<double>());
       });
@@ -209,7 +209,7 @@ void main() {
         expect(helperStopwatch.elapsedMilliseconds, lessThan(1000));
 
         // Print performance comparison for manual inspection
-        print('Performance Comparison (${iterations} iterations):');
+        print('Performance Comparison ($iterations iterations):');
         print('Literal constructor: ${literalStopwatch.elapsedMicroseconds}μs');
         print(
             'toExpression() method: ${extensionStopwatch.elapsedMicroseconds}μs');
@@ -253,7 +253,7 @@ void main() {
         expect(extensionStopwatch.elapsedMilliseconds, lessThan(100));
         expect(helperStopwatch.elapsedMilliseconds, lessThan(100));
 
-        print('Evaluation Performance Comparison (${iterations} iterations):');
+        print('Evaluation Performance Comparison ($iterations iterations):');
         print('Literal-created: ${literalStopwatch.elapsedMicroseconds}μs');
         print('Extension-created: ${extensionStopwatch.elapsedMicroseconds}μs');
         print('Helper-created: ${helperStopwatch.elapsedMicroseconds}μs');
@@ -323,7 +323,7 @@ void main() {
         helperStopwatch.stop();
 
         print(
-            'Complex Expression Creation Performance (${iterations} iterations):');
+            'Complex Expression Creation Performance ($iterations iterations):');
         print('Literal approach: ${literalStopwatch.elapsedMicroseconds}μs');
         print(
             'Extension approach: ${extensionStopwatch.elapsedMicroseconds}μs');
@@ -456,7 +456,7 @@ void main() {
           final extensionExpr = value.toExpression();
           final helperExpr = ex(value);
 
-          expect((literalExpr as Literal).value, equals(value));
+          expect((literalExpr).value, equals(value));
           expect((extensionExpr as Literal).value, equals(value));
           expect((helperExpr as Literal).value, equals(value));
 
@@ -483,7 +483,7 @@ void main() {
           final extensionExpr = value.toExpression();
           final helperExpr = ex(value);
 
-          expect((literalExpr as Literal).value, equals(value));
+          expect((literalExpr).value, equals(value));
           expect((extensionExpr as Literal).value, equals(value));
           expect((helperExpr as Literal).value, equals(value));
         }
@@ -559,9 +559,9 @@ void main() {
 
         expect(intLiteral.runtimeType, equals(intExtension.runtimeType));
         expect(intLiteral.runtimeType, equals(intHelper.runtimeType));
-        expect((intLiteral as Literal).value.runtimeType,
+        expect((intLiteral).value.runtimeType,
             equals((intExtension as Literal).value.runtimeType));
-        expect((intLiteral as Literal).value.runtimeType,
+        expect((intLiteral).value.runtimeType,
             equals((intHelper as Literal).value.runtimeType));
 
         // Test double consistency
@@ -571,9 +571,9 @@ void main() {
 
         expect(doubleLiteral.runtimeType, equals(doubleExtension.runtimeType));
         expect(doubleLiteral.runtimeType, equals(doubleHelper.runtimeType));
-        expect((doubleLiteral as Literal).value.runtimeType,
+        expect((doubleLiteral).value.runtimeType,
             equals((doubleExtension as Literal).value.runtimeType));
-        expect((doubleLiteral as Literal).value.runtimeType,
+        expect((doubleLiteral).value.runtimeType,
             equals((doubleHelper as Literal).value.runtimeType));
       });
 

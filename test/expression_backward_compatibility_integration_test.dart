@@ -271,8 +271,8 @@ void main() {
         final intLiteral = Literal(42);
         final doubleLiteral = Literal(3.14);
 
-        expect((intLiteral as Literal).value, isA<int>());
-        expect((doubleLiteral as Literal).value, isA<double>());
+        expect((intLiteral).value, isA<int>());
+        expect((doubleLiteral).value, isA<double>());
 
         expect(intLiteral.evaluate(), isA<int>());
         expect(doubleLiteral.evaluate(), isA<double>());
@@ -401,9 +401,9 @@ void main() {
         expect(newTime2, lessThan(oldTime * 2));
 
         print('Performance comparison ($iterations evaluations):');
-        print('Old Literal method: ${oldTime}μs');
-        print('New extension method: ${newTime1}μs');
-        print('New helper method: ${newTime2}μs');
+        print('Old Literal method: $oldTime μs');
+        print('New extension method: $newTime1 μs');
+        print('New helper method: $newTime2 μs');
       });
     });
 

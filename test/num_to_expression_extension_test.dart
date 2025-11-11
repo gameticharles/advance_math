@@ -159,14 +159,14 @@ void main() {
         final expr = ex(42);
         expect(expr, isA<Literal>());
         expect((expr as Literal).value, equals(42));
-        expect((expr as Literal).value, isA<int>());
+        expect((expr).value, isA<int>());
       });
 
       test('should work with double literals', () {
         final expr = ex(42.5);
         expect(expr, isA<Literal>());
         expect((expr as Literal).value, equals(42.5));
-        expect((expr as Literal).value, isA<double>());
+        expect((expr).value, isA<double>());
       });
 
       test('should preserve numeric type in evaluation', () {
@@ -269,8 +269,7 @@ void main() {
 
           expect(exExpr.toString(), equals(literalExpr.toString()));
           expect(exExpr.evaluate(), equals(literalExpr.evaluate()));
-          expect((exExpr as Literal).value,
-              equals((literalExpr as Literal).value));
+          expect((exExpr as Literal).value, equals((literalExpr).value));
         }
       });
 

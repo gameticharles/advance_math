@@ -1,4 +1,4 @@
-part of advance_math;
+part of '../../advance_math.dart';
 
 /// A callback type used for functions that handle both positional and named arguments.
 ///

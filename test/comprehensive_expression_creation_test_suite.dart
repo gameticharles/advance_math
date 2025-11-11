@@ -95,7 +95,7 @@ void main() {
         final intExtension = 42.toExpression();
         final intHelper = ex(42);
 
-        expect((intLiteral as Literal).value, isA<int>());
+        expect((intLiteral).value, isA<int>());
         expect((intExtension as Literal).value, isA<int>());
         expect((intHelper as Literal).value, isA<int>());
 
@@ -104,7 +104,7 @@ void main() {
         final doubleExtension = 3.14.toExpression();
         final doubleHelper = ex(3.14);
 
-        expect((doubleLiteral as Literal).value, isA<double>());
+        expect((doubleLiteral).value, isA<double>());
         expect((doubleExtension as Literal).value, isA<double>());
         expect((doubleHelper as Literal).value, isA<double>());
       });

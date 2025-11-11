@@ -220,8 +220,7 @@ void main() {
     group('Direct _toExpression method validation', () {
       test('should handle valid Expression objects', () {
         final expr = Literal(5);
-        final result = Expression.parse('x')
-            .runtimeType; // Access _toExpression indirectly
+        //final result = Expression.parse('x').runtimeType; // Access _toExpression indirectly
         expect(expr, isA<Expression>());
       });
 

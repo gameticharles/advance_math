@@ -17,7 +17,7 @@ void main() {
     print('ex() works: ${expr2.runtimeType}');
 
     // Test if Variable is Expression
-    print('Variable is Expression: ${x is Expression}');
+    print('Variable is Expression: $x');
 
     // Try the extension operator
     try {

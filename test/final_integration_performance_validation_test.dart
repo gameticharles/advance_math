@@ -596,12 +596,12 @@ void main() {
         // Test complex mathematical scenarios using enhanced expression creation
 
         // 1. Taylor series approximation for e^x: 1 + x + x²/2! + x³/3! + ...
-        final x_val = ex(0.5);
+        final xVal = ex(0.5);
         final taylorSeries = ex(1) +
-            x_val +
-            (x_val ^ ex(2)) / ex(2) +
-            (x_val ^ ex(3)) / ex(6) +
-            (x_val ^ ex(4)) / ex(24);
+            xVal +
+            (xVal ^ ex(2)) / ex(2) +
+            (xVal ^ ex(3)) / ex(6) +
+            (xVal ^ ex(4)) / ex(24);
 
         final taylorResult = taylorSeries.evaluate({});
         final actualExp = math.exp(0.5);

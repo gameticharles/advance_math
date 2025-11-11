@@ -1,4 +1,4 @@
-part of advance_math;
+part of '../../advance_math.dart';
 
 /// A class that implements a compressed prime sieve using bit manipulation.
 /// Each bit represents a boolean value indicating whether a number is prime or not.
