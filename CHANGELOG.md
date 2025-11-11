@@ -1,6 +1,7 @@
 # 5.3.6
 
-* **[FEATURE]** Added some large value computations 
+* **[FEATURE]** Added some large value computations
+* **[IMPROVEMENT]** Updated dependencies
 
 # 5.3.5
 
