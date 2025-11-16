@@ -69,12 +69,12 @@ class Decimal implements Comparable<Decimal> {
     decimalPrecision = precision;
   }
 
-  /// Internal constructor that creates a Decimal directly from a Rational
-  /// without additional validation to avoid infinite recursion
-  Decimal._fromRational(Rational rational, {int? precision})
-      : _rational = rational {
-    setPrecision(precision ?? decimalPrecision);
-  }
+  // /// Internal constructor that creates a Decimal directly from a Rational
+  // /// without additional validation to avoid infinite recursion
+  // Decimal._fromRational(Rational rational, {int? precision})
+  //     : _rational = rational {
+  //   setPrecision(precision ?? decimalPrecision);
+  // }
 
   /// Creates a new [Decimal] instance from the provided [BigInt] value.
   ///

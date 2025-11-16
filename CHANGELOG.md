@@ -1,6 +1,7 @@
 # 5.3.7
 
 * **[IMPROVEMENT]** Updated dependencies
+* **[IMPROVEMENT]** Clean code
 
 # 5.3.6
 

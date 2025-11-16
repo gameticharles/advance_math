@@ -114,16 +114,14 @@ class Scientific {
     if (Settings.SCIENTIFIC_IGNORE_ZERO_EXPONENTS &&
         exponent == 0 &&
         decp < n) {
-      if (decp == 0) {
-        retVal = wholes;
-      } else {
-        retVal = coeff;
-      }
+      retVal = (decp == 0) ? wholes : coeff;
     } else {
-      var coeff = n == 'undefined'
-          ? this.coeff
-          : Scientific.roundTo(this.coeff, min(n, (decp | 1)));
-      retVal = exponent == 0 ? coeff : '${coeff}e$exponent';
+      // Use the minimum of n and decp (or 1 if decp is 0)
+      int decimalPlaces = decp == 0 ? 1 : decp;
+      // Use bitwise OR to default decp to 1 if it's 0
+      var roundedCoeff =
+          Scientific.roundTo(coeff, n < decimalPlaces ? n : decimalPlaces);
+      retVal = exponent == 0 ? roundedCoeff : '${roundedCoeff}e$exponent';
     }
 
     return (sign == -1 ? '-' : '') + retVal;
