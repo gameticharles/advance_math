@@ -10,7 +10,7 @@ class ColumnMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var column = Column([1, 2, 3]);
+  /// var column = ColumnMatrix([1, 2, 3]);
   /// print(column);
   /// // Output:
   /// // 1
@@ -27,7 +27,7 @@ class ColumnMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var col = Column([1, 2, 3]);
+  /// var col = ColumnMatrix([1, 2, 3]);
   /// print(col.getValueAt(1)); // Output: 2
   /// ```
   dynamic getValueAt(int rowIndex) {
@@ -46,7 +46,7 @@ class ColumnMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var col = Column([1, 2, 3]);
+  /// var col = ColumnMatrix([1, 2, 3]);
   /// col.setValueAt(1, 5);
   /// print(col); // Output: [1, 5, 3]
   /// ```
@@ -66,7 +66,7 @@ class ColumnMatrix extends Matrix {
   ///
   /// Returns a new Column object with the specified number of rows filled with the specified value.
   ///```dart
-  /// Column filledRow = Column.fill(5, 3);
+  /// ColumnMatrix filledRow = ColumnMatrix.fill(5, 3);
   /// print(filledRow);
   /// ```
   ///
@@ -142,7 +142,7 @@ class ColumnMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var column = Column([1, 2, 3]);
+  /// var column = ColumnMatrix([1, 2, 3]);
   /// print(column.first); // Output: 1
   /// ```
   dynamic get firstItem => _data[0][0];
@@ -151,7 +151,7 @@ class ColumnMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var column = Column([1, 2, 3]);
+  /// var column = ColumnMatrix([1, 2, 3]);
   /// print(column.last); // Output: 3
   /// ```
   dynamic get lastItem => _data[_data.length - 1][0];
@@ -160,7 +160,7 @@ class ColumnMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var column = Column([1, 2, 3]);
+  /// var column = ColumnMatrix([1, 2, 3]);
   /// print(column.sum); // Output: 6
   /// ```
   dynamic get sum =>
@@ -170,7 +170,7 @@ class ColumnMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var column = Column([1, 2, 3]);
+  /// var column = ColumnMatrix([1, 2, 3]);
   /// print(column.average); // Output: 2.0
   /// ```
   dynamic get average => sum / _data.length;
@@ -179,7 +179,7 @@ class ColumnMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var column = Column([1, 2, 3]);
+  /// var column = ColumnMatrix([1, 2, 3]);
   /// print(column.toDiagonal);
   /// // 1 0 0
   /// // 0 2 0

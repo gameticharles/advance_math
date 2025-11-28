@@ -181,7 +181,7 @@ extension ExtString on String {
   /// ```
   bool isAlpha() => math.isAlpha(this);
 
-  /// Checks if the provided character [input] is alphanumeric (A-Z, a-z, 0-9).
+  /// Checks if the provided character `input` is alphanumeric (A-Z, a-z, 0-9).
   ///
   /// ```dart
   /// print('a'.isAlphaNumeric()); // true

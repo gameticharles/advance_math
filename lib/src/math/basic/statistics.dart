@@ -435,7 +435,7 @@ num gcd(List<num> numbers) {
 
 /// Extended Euclidean algorithm to find gcd and coefficients of Bezel identity for a list of numbers.
 ///
-/// Returns a list of lists where each sublist contains [d, x, y] for each pair of consecutive numbers
+/// Returns a list of lists where each sublist contains `[d, x, y]` for each pair of consecutive numbers
 /// in the input list such that:
 ///
 /// `d = gcd(numbers[i], numbers[i+1]), numbers[i] * x + numbers[i+1] * y = d`

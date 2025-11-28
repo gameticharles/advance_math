@@ -496,10 +496,10 @@ num getLeapSeconds(double tai, {bool pre1972LeapSeconds = false}) {
 /// Because Delta T depends on measured values of the Earth's rotation that
 /// result from irregular and complex tidal forces for which accurate predictive
 /// models do not exist, the future values of Delta T are crudely estimated.  For
-/// times in the future relative to the last data point in the _deltaT array,
+/// times in the future relative to the last data point in the internal delta T data array,
 /// the last delta T value is returned (no reliable predictive models are available
 /// and a 'flat line' prediction is as valid as any other.  This method will
-/// continue to work if additional data is added directly to the _deltaT array.
+/// continue to work if additional data is added directly to the internal delta T data array.
 double getDeltaT(TimeInstant time) {
   final dt = time.nearestDateTime;
   final year = dt.year;

@@ -161,14 +161,14 @@ class Annulus extends PlaneGeometry {
   /// If insufficient or invalid parameters are provided, an [ArgumentError] will be thrown.
   ///
   /// Parameters:
-  /// - [innerRadius]: The inner radius of the annulus.
-  /// - [outerRadius]: The outer radius of the annulus.
-  /// - [sectorInteriorCircumference]: The interior circumference of the sector.
-  /// - [sectorExteriorCircumference]: The exterior circumference of the sector.
-  /// - [sectorPerimeter]: The perimeter of the sector.
-  /// - [areaOfSector]: The area of the sector.
-  /// - [exteriorCircumference]: The exterior circumference of the annulus.
-  /// - [interiorCircumference]: The interior circumference of the annulus.
+  /// - `innerRadius`: The inner radius of the annulus.
+  /// - `outerRadius`: The outer radius of the annulus.
+  /// - `sectorInteriorCircumference`: The interior circumference of the sector.
+  /// - `sectorExteriorCircumference`: The exterior circumference of the sector.
+  /// - `sectorPerimeter`: The perimeter of the sector.
+  /// - `areaOfSector`: The area of the sector.
+  /// - `exteriorCircumference`: The exterior circumference of the annulus.
+  /// - `interiorCircumference`: The interior circumference of the annulus.
   ///
   /// Returns:
   /// The computed central angle of the sector in radians.
@@ -235,14 +235,14 @@ class Annulus extends PlaneGeometry {
   /// If sufficient and valid parameters are provided, the function will return the computed inner radius. If the provided parameters are insufficient or invalid, it will throw an [ArgumentError].
   ///
   /// Parameters:
-  /// - [outerRadius]: The outer radius of the annulus.
-  /// - [sectorInteriorCircumference]: The interior circumference of a sector of the annulus.
-  /// - [sectorPerimeter]: The perimeter of a sector of the annulus.
-  /// - [areaOfSector]: The area of a sector of the annulus.
-  /// - [interiorCircumference]: The interior circumference of the annulus.
-  /// - [centralAngle]: The central angle of the annulus.
-  /// - [area]: The total area of the annulus.
-  /// - [perimeter]: The total perimeter of the annulus.
+  /// - `outerRadius`: The outer radius of the annulus.
+  /// - `sectorInteriorCircumference`: The interior circumference of a sector of the annulus.
+  /// - `sectorPerimeter`: The perimeter of a sector of the annulus.
+  /// - `areaOfSector`: The area of a sector of the annulus.
+  /// - `interiorCircumference`: The interior circumference of the annulus.
+  /// - `centralAngle`: The central angle of the annulus.
+  /// - `area`: The total area of the annulus.
+  /// - `perimeter`: The total perimeter of the annulus.
   ///
   /// Returns:
   /// The computed inner radius of the annulus.

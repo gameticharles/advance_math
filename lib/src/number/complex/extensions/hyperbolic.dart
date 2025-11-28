@@ -14,7 +14,7 @@ extension ComplexHyperbolicX<T extends Complex> on T {
   /// where the (real) functions on the right-hand side are
   /// [math.sin], [math.cos], [math.cosh] and [math.sinh].
   ///
-  /// Returns [nan] if either real or imaginary part of the
+  /// Returns [Complex.nan] if either real or imaginary part of the
   /// input argument is `NaN`.
   ///
   /// Infinite values in real or imaginary parts of the input may result in
@@ -53,7 +53,7 @@ extension ComplexHyperbolicX<T extends Complex> on T {
   /// where the (real) functions on the right-hand side are
   /// [math.sin], [math.cos], [math.cosh] and [math.sinh].
   ///
-  /// Returns [nan] if either real or imaginary part of the
+  /// Returns [Complex.nan] if either real or imaginary part of the
   /// input argument is `NaN`.
   ///
   /// Infinite values in real or imaginary parts of the input may result in
@@ -63,7 +63,7 @@ extension ComplexHyperbolicX<T extends Complex> on T {
   ///
   ///     cosh(1 ± INFINITY i) = NaN + NaN i
   ///     cosh(±INFINITY + i) = INFINITY ± INFINITY i
-  ///     cosh±INFINITY &plusmn; INFINITY i) = NaN + NaN i
+  ///     cosh(±INFINITY ± INFINITY i) = NaN + NaN i
   ///
   /// Code:
   /// ```dart
@@ -94,7 +94,7 @@ extension ComplexHyperbolicX<T extends Complex> on T {
   /// where the (real) functions on the right-hand side are
   /// [math.sin], [math.cos], [math.cosh] and [math.sinh].
   ///
-  /// Returns [nan] if either real or imaginary part of the
+  /// Returns [Complex.nan] if either real or imaginary part of the
   /// input argument is `NaN`.
   ///
   /// Infinite values in real or imaginary parts of the input may result in

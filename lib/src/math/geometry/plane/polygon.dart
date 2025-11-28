@@ -409,7 +409,7 @@ class Polygon {
   /// Returns:
   /// --------
   /// `List<List<double>>`
-  ///     The bounding box of the polygon as a list of four points, each represented by [x, y] coordinates.
+  ///     The bounding box of the polygon as a list of four points, each represented by `[x, y]` coordinates.
   ///
   /// Example:
   /// --------
@@ -445,7 +445,7 @@ class Polygon {
   /// when its vertices are known. It is particularly well-suited for planar polygons with ordered vertices.
   ///
   /// formula:
-  /// A = (1/2) * |Σ(i=1 to n-1)[(xi * yi+1) + (xn * y1)] - Σ(i=1 to n-1)[(xi+1 * yi) + (x1 * yn)]|
+  /// A = (1/2) * |Σ(i=1 to n-1)`[(xi * yi+1) + (xn * y1)]` - Σ(i=1 to n-1)`[(xi+1 * yi) + (x1 * yn)]`|
   ///
   /// Returns:
   /// --------
@@ -482,7 +482,7 @@ class Polygon {
   /// used to compute the area by considering the vertices of the polygon.
   ///
   /// formula:
-  /// A = (1/2) * |Σ(i=1 to n-1)[(xi * dyi+1) - (xi+1 * dyi)] + (xn * dy1) - (x1 * dyn)|
+  /// A = (1/2) * |Σ(i=1 to n-1)`[(xi * dyi+1) - (xi+1 * dyi)]` + (xn * dy1) - (x1 * dyn)|
   ///
   /// Returns:
   /// --------
@@ -580,7 +580,7 @@ class Polygon {
   ///
   /// For a polygon with vertices (x1, y1), (x2, y2), ..., (xn, yn) sorted in counter-clockwise order,
   /// the area can be approximated as:
-  /// A = (1/2) * Σ(i=1 to n-1)[(xi + xi+1) * (yi+1 - yi)] + (1/2) * (xn + x1) * (y1 - yn)
+  /// A = (1/2) * Σ(i=1 to n-1)`[(xi + xi+1) * (yi+1 - yi)]` + (1/2) * (xn + x1) * (y1 - yn)
   ///
   /// Returns:
   /// --------

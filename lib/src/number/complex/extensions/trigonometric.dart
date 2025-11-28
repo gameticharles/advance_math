@@ -14,7 +14,7 @@ extension ComplexTrigonometricX<T extends Complex> on T {
   /// where the (real) functions on the right-hand side are
   /// [math.sin], [math.cos], [math.cosh] and [math.sinh].
   ///
-  /// Returns [nan] if either real or imaginary part of the
+  /// Returns [Complex.nan] if either real or imaginary part of the
   /// input argument is `NaN`.
   ///
   /// Infinite values in real or imaginary parts of the input may result in
@@ -46,7 +46,7 @@ extension ComplexTrigonometricX<T extends Complex> on T {
   /// where the (real) functions on the right-hand side are
   /// [math.sin], [math.cos], [math.cosh] and [math.sinh].
   ///
-  /// Returns [nan] if either real or imaginary part of the
+  /// Returns [Complex.nan] if either real or imaginary part of the
   /// input argument is `NaN`.
   ///
   /// Infinite values in real or imaginary parts of the input may result in
@@ -77,7 +77,7 @@ extension ComplexTrigonometricX<T extends Complex> on T {
   /// where the (real) functions on the right-hand side are
   /// [math.sin], [math.cos], [math.cosh] and [math.sinh].
   ///
-  /// Returns [nan] if either real or imaginary part of the
+  /// Returns [Complex.nan] if either real or imaginary part of the
   /// input argument is `NaN`.
   ///
   /// Infinite (or critical) values in real or imaginary parts of the input may
@@ -116,7 +116,7 @@ extension ComplexTrigonometricX<T extends Complex> on T {
   ///
   ///     asin(z) = -i (log(sqrt(1 - z^2) + iz))
   ///
-  /// Returns [nan] if either real or imaginary part of the
+  /// Returns [Complex.nan] if either real or imaginary part of the
   /// input argument is `NaN` or infinite.
   Complex acos() {
     if (isNaN) return Complex.nan();
@@ -132,7 +132,7 @@ extension ComplexTrigonometricX<T extends Complex> on T {
   ///
   ///     acos(z) = -i (log(z + i (sqrt(1 - z^2))))
   ///
-  /// Returns [nan] if either real or imaginary part of the
+  /// Returns [Complex.nan] if either real or imaginary part of the
   /// input argument is `NaN` or infinite.
   Complex asin() {
     if (isNaN) return Complex.nan();
@@ -148,7 +148,7 @@ extension ComplexTrigonometricX<T extends Complex> on T {
   ///
   ///     atan(z) = (i/2) log((i + z)/(i - z))
   ///
-  /// Returns [nan] if either real or imaginary part of the
+  /// Returns [Complex.nan] if either real or imaginary part of the
   /// input argument is `NaN` or infinite.
   Complex atan() {
     if (isNaN) return Complex.nan();

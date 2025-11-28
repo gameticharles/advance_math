@@ -23,8 +23,8 @@ part of '../algebra.dart';
 ///   [0, -1, 1],
 /// ]);
 ///
-/// var B = Column([0, 0, 0, -0.015, 0.102, 0.097]);
-/// var W = Diagonal([1 / 5, 1 / 10, 1 / 7, 1 / 7, 1 / 12, 1 / 9]);
+/// var B = ColumnMatrix([0, 0, 0, -0.015, 0.102, 0.097]);
+/// var W = DiagonalMatrix([1 / 5, 1 / 10, 1 / 7, 1 / 7, 1 / 12, 1 / 9]);
 ///
 /// var lsq = LeastSquares(A, B, W: W, method: EquationMethod.linear);
 /// lsq.fit();
@@ -95,7 +95,7 @@ class LeastSquares extends BaseLeastSquares {
 /// Example:
 /// ```dart
 /// var A = Matrix.fromList([[1, 2], [3, 4], [5, 6]]);
-/// var b = Column.fromList([7, 8, 9]);
+/// var b = ColumnMatrix([7, 8, 9]);
 /// var ols = OrdinaryLeastSquares(A, b);
 /// ols.fit();
 /// print(ols.beta);  // Prints the coefficients of the regression model
@@ -122,8 +122,8 @@ class OrdinaryLeastSquares extends BaseLeastSquares {
 /// Example:
 /// ```dart
 /// var A = Matrix.fromList([[1, 2], [3, 4], [5, 6]]);
-/// var b = Column.fromList([7, 8, 9]);
-/// var W = Diagonal.fromList([0.5, 0.3, 0.2]);
+/// var b = ColumnMatrix([7, 8, 9]);
+/// var W = DiagonalMatrix([0.5, 0.3, 0.2]);
 /// var wls = WeightedLeastSquares(A, b, W);
 /// wls.fit();
 /// print(wls.beta);  // Prints the coefficients of the regression model
@@ -163,8 +163,8 @@ class WeightedLeastSquares extends BaseLeastSquares {
 /// Example:
 /// ```dart
 /// var A = Matrix.fromList([[1, 2], [3, 4], [5, 6]]);
-/// var b = Column.fromList([7, 8, 9]);
-/// var W = Diagonal.fromList([0.5, 0.3, 0.2]);
+/// var b = ColumnMatrix([7, 8, 9]);
+/// var W = DiagonalMatrix([0.5, 0.3, 0.2]);
 /// var gls = GeneralizedLeastSquares(A, b, W);
 /// gls.fit();
 /// print(gls.beta);  // Prints the coefficients of the regression model
@@ -272,7 +272,7 @@ class TotalLeastSquares extends BaseLeastSquares {
 /// ```dart
 /// // Example usage:
 /// var A = Matrix.fromList([[1, 2], [3, 4], [5, 6]]);
-/// var b = Matrix.column([7, 8, 9]);
+/// var b = ColumnMatrix([7, 8, 9]);
 /// var alpha = 0.1;
 /// var ridge = RidgeRegression(A, b, alpha);
 ///
@@ -321,7 +321,7 @@ class RidgeRegression extends BaseLeastSquares {
 /// ```dart
 /// // Example usage:
 /// var A = Matrix.fromList([[1, 2], [3, 4], [5, 6]]);
-/// var b = Matrix.column([7, 8, 9]);
+/// var b = ColumnMatrix([7, 8, 9]);
 /// var alpha = 0.1;
 /// var lasso = LassoRegression(A, b, alpha);
 ///
@@ -359,7 +359,7 @@ class LassoRegression extends BaseLeastSquares {
 /// ```dart
 /// // Example usage:
 /// var A = Matrix.fromList([[1, 2], [3, 4], [5, 6]]);
-/// var b = Matrix.column([7, 8, 9]);
+/// var b = ColumnMatrix([7, 8, 9]);
 /// var alpha = 0.1;
 /// var l1Ratio = 0.5;
 /// var elasticNet = ElasticNetRegression(A, b, alpha, l1Ratio);
@@ -394,7 +394,7 @@ class ElasticNetRegression extends BaseLeastSquares {
 /// ```dart
 /// // Example usage:
 /// var A = Matrix.fromList([[1, 2], [3, 4], [5, 6]]);
-/// var b = Matrix.column([7, 8, 9]);
+/// var b = ColumnMatrix([7, 8, 9]);
 /// var robustLS = RobustLeastSquares(A, b);
 ///
 /// robustLS.fit();

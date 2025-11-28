@@ -4,8 +4,8 @@ part of 'geometry.dart';
 
 /// Specifies the algorithm to use when calculating the value of pi.
 ///
-/// The [gaussLegendre] method uses the Gauss-Legendre algorithm to compute the value of pi.
-/// The [chudnovsky] method uses the Chudnovsky algorithm to compute the value of pi.
+/// The `gaussLegendre` method uses the Gauss-Legendre algorithm to compute the value of pi.
+/// The `chudnovsky` method uses the Chudnovsky algorithm to compute the value of pi.
 enum PiCalcAlgorithm {
   /// Calculates the value of pi using the Chudnovsky algorithm.
   GaussLegendre,
@@ -117,8 +117,8 @@ class PI extends Decimal {
   /// The Chudnovsky algorithm is a method for calculating the digits of pi.
   /// This function is a helper for the main Chudnovsky algorithm implementation.
   ///
-  /// The function recursively splits the range [a, b] in half until the
-  /// base case of [a, a+1] is reached. It then calculates the values of P, Q, and R for that small range and combines them to get the values for the original range.
+  /// The function recursively splits the range `[a, b]` in half until the
+  /// base case of `[a, a+1]` is reached. It then calculates the values of P, Q, and R for that small range and combines them to get the values for the original range.
   ///
   /// Source://https://en.wikipedia.org/wiki/Chudnovsky_algorithm
   /// Parameters:

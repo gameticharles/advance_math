@@ -10,7 +10,7 @@ class RowMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var row = Row([1, 2, 3]);
+  /// var row = RowMatrix([1, 2, 3]);
   /// print(row);
   /// // Output: 1 2 3
   /// ```
@@ -24,7 +24,7 @@ class RowMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var row = Row([1, 2, 3]);
+  /// var row = RowMatrix([1, 2, 3]);
   /// print(row.getValueAt(1)); // Output: 2
   /// ```
   dynamic getValueAt(int colIndex) {
@@ -43,7 +43,7 @@ class RowMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var row = Row([1, 2, 3]);
+  /// var row = RowMatrix([1, 2, 3]);
   /// row.setValueAt(1, 5);
   /// print(row); // Output: [1, 5, 3]
   /// ```
@@ -63,7 +63,7 @@ class RowMatrix extends Matrix {
   ///
   /// Returns a new Row object with the specified number of columns filled with the specified value.
   ///```dart
-  /// Row filledRow = Row.fill(5, 3);
+  /// RowMatrix filledRow = RowMatrix.fill(5, 3);
   /// print(filledRow);
   /// ```
   ///
@@ -139,7 +139,7 @@ class RowMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var row = Row([1, 2, 3]);
+  /// var row = RowMatrix([1, 2, 3]);
   /// print(row.first); // Output: 1
   /// ```
   dynamic get firstItem => _data[0][0];
@@ -148,7 +148,7 @@ class RowMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var row = Row([1, 2, 3]);
+  /// var row = RowMatrix([1, 2, 3]);
   /// print(row.last); // Output: 3
   /// ```
   dynamic get lastItem => _data[0][columnCount - 1];
@@ -157,7 +157,7 @@ class RowMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var row = Row([1, 2, 3]);
+  /// var row = RowMatrix([1, 2, 3]);
   /// print(row.sum); // Output: 6
   /// ```
   double get sum => _data[0].reduce((value, element) => value + element);
@@ -166,7 +166,7 @@ class RowMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var row = Row([1, 2, 3]);
+  /// var row = RowMatrix([1, 2, 3]);
   /// print(row.average); // Output: 2.0
   /// ```
   double get average => sum / columnCount;
@@ -175,7 +175,7 @@ class RowMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var row = Row([1, 2, 3]);
+  /// var row = RowMatrix([1, 2, 3]);
   /// print(row.toDiagonal);
   /// // 1 0 0
   /// // 0 2 0

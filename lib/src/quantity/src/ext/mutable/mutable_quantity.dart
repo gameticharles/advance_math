@@ -126,7 +126,7 @@ class MutableQuantity implements Quantity {
   /// standard MKS (or meter-kilogram-second) units.
   /// - Throws an ImmutableQuantityException if this Quantity has been made immutable.
   ///
-  /// See [set mks(double)].
+  /// See `mks`.
   set cgs(Number value) {
     if (!mutable) throw ImmutableQuantityException(q: this);
 

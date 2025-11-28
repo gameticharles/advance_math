@@ -153,7 +153,7 @@ dynamic pow(dynamic x, dynamic exponent) {
 ///
 /// [x] is the input value.
 ///
-/// Specification: [http://mathworld.wolfram.com/HeavisideStepFunction.html]
+/// Specification: `http://mathworld.wolfram.com/HeavisideStepFunction.html`
 /// If x > 0, returns 1.
 /// If x == 0, returns 1/2.
 /// If x < 0, returns 0.
@@ -172,7 +172,7 @@ double step(double x) {
 ///
 /// [x] is the input value.
 ///
-/// Specification: [http://mathworld.wolfram.com/RectangleFunction.html]
+/// Specification: `http://mathworld.wolfram.com/RectangleFunction.html`
 /// If |x| > 1/2, returns 0.
 /// If |x| == 1/2, returns 1/2.
 /// If |x| < 1/2, returns 1.
@@ -192,7 +192,7 @@ dynamic rect(double x) {
 ///
 /// [x] is the input value.
 ///
-/// Specification: [http://mathworld.wolfram.com/SincFunction.html]
+/// Specification: `http://mathworld.wolfram.com/SincFunction.html`
 /// If x == 0, returns 1.
 /// Otherwise, returns sin(x)/x.
 ///
@@ -1109,7 +1109,7 @@ double simpson(Function f, double a, double b, [double step = 0.0001]) {
 /// It is similar to the `floor` function for positive numbers and the
 /// `ceil` function for negative numbers.
 ///
-/// Reference: [http://mathworld.wolfram.com/IntegerPart.html]
+/// Reference: `http://mathworld.wolfram.com/IntegerPart.html`
 ///
 /// Example:
 /// ```dart
@@ -1129,7 +1129,7 @@ int integerPart(double x) {
 /// [tol] is the tolerance (default is 1e-9).
 /// [maxDepth] is the maximum depth for recursion (default is 45).
 ///
-/// Reference: [https://github.com/scijs/integrate-adaptive-simpson]
+/// Reference: `https://github.com/scijs/integrate-adaptive-simpson`
 ///
 /// Returns the approximate value of the integral of [f] from [a] to [b].
 ///

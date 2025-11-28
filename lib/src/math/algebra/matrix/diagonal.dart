@@ -6,7 +6,7 @@ part of '../algebra.dart';
 /// Example:
 ///
 /// ```
-/// final diagonal = Diagonal([1, 2, 3]);
+/// final diagonal = DiagonalMatrix([1, 2, 3]);
 /// print(diagonal);
 /// ```
 ///
@@ -37,7 +37,7 @@ class DiagonalMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var diag = Diagonal([1, 2, 3]);
+  /// var diag = DiagonalMatrix([1, 2, 3]);
   /// print(diag.first); // Output: 1
   /// ```
   dynamic get firstItem => _data[0][0];
@@ -46,7 +46,7 @@ class DiagonalMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var diag = Diagonal([1, 2, 3]);
+  /// var diag = DiagonalMatrix([1, 2, 3]);
   /// print(diag.last); // Output: 3
   /// ```
   dynamic get lastItem => _data[_data.length - 1][_data.length - 1];
@@ -59,7 +59,7 @@ class DiagonalMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var diag = Diagonal([1, 2, 3]);
+  /// var diag = DiagonalMatrix([1, 2, 3]);
   /// print(diag.getValueAt(1)); // Output: 2
   /// ```
   dynamic getValueAt(int index) {
@@ -78,7 +78,7 @@ class DiagonalMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var diag = Diagonal([1, 2, 3]);
+  /// var diag = DiagonalMatrix([1, 2, 3]);
   /// diag.setValueAt(1, 5);
   /// print(diag); // Output: [1, 5, 3]
   /// ```
@@ -93,7 +93,7 @@ class DiagonalMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var diag = Diagonal([1, 2, 3]);
+  /// var diag = DiagonalMatrix([1, 2, 3]);
   /// print(diag.sum); // Output: 6
   /// ```
   dynamic get sum => _data
@@ -104,7 +104,7 @@ class DiagonalMatrix extends Matrix {
   ///
   /// Example:
   /// ```dart
-  /// var diag = Diagonal([1, 2, 3]);
+  /// var diag = DiagonalMatrix([1, 2, 3]);
   /// print(diag.average); // Output: 2.0
   /// ```
   dynamic get average => sum / _data.length;

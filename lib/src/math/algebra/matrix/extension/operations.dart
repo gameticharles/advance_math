@@ -424,7 +424,7 @@ extension MatrixOperationExtension on Matrix {
 
   /// Divides this matrix by a scalar value.
   ///
-  /// [divisor]: The scalar value to divide this matrix by.
+  /// [other]: The scalar value to divide this matrix by.
   ///
   /// Returns a new matrix containing the result of the scalar division.
   ///
@@ -1247,7 +1247,7 @@ extension MatrixOperationExtension on Matrix {
   /// based on the specified distance type.
   ///
   /// [other]: The other matrix to which the distance will be calculated.
-  /// [distanceType]: The type of distance measure to be used. Default is Frobenius norm.
+  /// [distance]: The type of distance measure to be used. Default is Frobenius norm.
   ///
   /// Returns the distance as a double.
   ///
@@ -1930,7 +1930,7 @@ extension MatrixOperationExtension on Matrix {
 
   /// Rounds each element in the matrix to the specified number of decimal places.
   ///
-  /// [decimalPlaces]: The number of decimal places to round to.
+  /// [`decimals`]: The number of decimal places to round to.
   ///
   /// Returns a new matrix with the rounded elements.
   ///

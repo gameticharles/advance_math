@@ -15,12 +15,12 @@ class Eigen {
   /// M = S.J.S^-1
   ///
   /// where S is a matrix of the eigenvectors in row-major order
-  /// s = [
+  /// s = `[
   /// v1.transpose(),
   /// v2.transpose(),
   /// v3.transpose(),
   /// ...
-  /// ]
+  /// ]`
   ///
   /// J = Diagonal(eigenvalues)
   Matrix get check {

@@ -2,7 +2,7 @@ part of '../../geometry.dart';
 
 enum AreaMethod {
   /// Requires the lengths of all three sides of the triangle.
-  /// The formula is √[s(s - a)(s - b)(s - c)],
+  /// The formula is √`[s(s - a)(s - b)(s - c)]`,
   /// where s is the semi-perimeter of the triangle (a + b + c) / 2,
   /// and a, b, and c are the lengths of the sides.
   heron,
@@ -18,6 +18,6 @@ enum AreaMethod {
 
   /// If you know the coordinates of the triangle vertices,
   /// you can calculate the area as well.
-  /// Formula: 0.5 * abs[(x1*(y2-y3) + x2*(y3-y1) + x3*(y1-y2))]
+  /// Formula: `0.5 * abs[(x1*(y2-y3) + x2*(y3-y1) + x3*(y1-y2))]`
   coordinates
 }

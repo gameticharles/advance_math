@@ -98,7 +98,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// Returns the number of columns in the matrix.
   int get columnCount => _data.isEmpty ? 0 : _data[0].length;
 
-  /// Returns the dimensions of the matrix as a `List<int>` in the format [rowCount, columnCount].
+  /// Returns the dimensions of the matrix as a `List<int>` in the format `[rowCount, columnCount]`.
   List<int> get shape => [rowCount, columnCount];
 
   /// Assigns the value to the specified row index of the matrix.
@@ -238,9 +238,9 @@ class Matrix extends IterableMixin<List<dynamic>> {
   ///
   /// Example:
   /// ```dart
-  /// var col1 = Column([1, 2, 3]);
-  /// var col2 = Column([4, 5, 6]);
-  /// var col3 = Column([7, 8, 9]);
+  /// var col1 = ColumnMatrix([1, 2, 3]);
+  /// var col2 = ColumnMatrix([4, 5, 6]);
+  /// var col3 = ColumnMatrix([7, 8, 9]);
   /// var matrix = Matrix.fromColumns([col1, col2, col3]);
   /// print(matrix);
   /// ```
@@ -276,9 +276,9 @@ class Matrix extends IterableMixin<List<dynamic>> {
   ///
   /// Example:
   /// ```dart
-  /// var row1 = Row([1, 2, 3]);
-  /// var row2 = Row([4, 5, 6]);
-  /// var row3 = Row([7, 8, 9]);
+  /// var row1 = RowMatrix([1, 2, 3]);
+  /// var row2 = RowMatrix([4, 5, 6]);
+  /// var row3 = RowMatrix([7, 8, 9]);
   /// var matrix = Matrix.fromRows([row1, row2, row3]);
   /// print(matrix);
   /// ```
@@ -804,7 +804,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
   ///
   /// [m1]: The first matrix.
   /// [m2]: The second matrix.
-  /// [distanceType]: The type of matrix distance to compute. Default is `DistanceType.frobenius`.
+  /// [distance]: The type of matrix distance to compute. Default is `DistanceType.frobenius`.
   ///
   /// Throws an `Exception` if an invalid distance type is provided.
   ///

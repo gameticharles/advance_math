@@ -119,7 +119,7 @@ abstract class Number implements Comparable<dynamic> {
   /// rounds to the nearest integer, and then shifts the decimal point back to the
   /// left by the same amount. The default value of [decimalPlaces] is `0`.
   ///
-  /// Returns the rounded [value].
+  /// Returns the rounded value.
   Number roundTo([int decimalPlaces = 0]) {
     if (decimalPlaces == 0) {
       return round();

@@ -1,6 +1,6 @@
 part of '../../expression.dart';
 
-/// Concrete implementation of [Algebraic] that represents a constant value
+/// Concrete implementation of `Algebraic` that represents a constant value
 /// `a`. It can be either real or complex.
 ///
 /// For example:

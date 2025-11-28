@@ -25,9 +25,9 @@ class NumWords {
   /// var converter = NumOrWords();
   /// ```
   ///
-  /// [languages] is a map of supported languages and their configurations. By default, only English is supported.
-  /// [defaultCurrency] provides a default currency configuration for the conversion.
-  /// [fractionalSeparator] specifies the default separator for fractional parts.
+  /// `languages` is a map of supported languages and their configurations. By default, only English is supported.
+  /// `defaultCurrency` provides a default currency configuration for the conversion.
+
   NumWords({
     Map<String, LanguageConfig>? languages,
     this.defaultCurrency,
@@ -35,12 +35,12 @@ class NumWords {
 
   /// Converts a given [value] to its word representation.
   ///
-  /// - [value]: The numerical value to be converted.
-  /// - [lang]: The language in which the conversion should be made. Default is 'en'.
-  /// - [conjunction]: The word to use before the last item in a list. If not provided, the default conjunction of the language will be used.
-  /// - [currency]: The currency configuration to be used in the conversion.
-  /// - [decimalPlaces]: Number of decimal places to consider in the conversion. Default is 2.
-  /// - [useOrdinal]: Whether to return the ordinal representation of the number. Default is false.
+  /// - `value`: The numerical value to be converted.
+  /// - `lang`: The language in which the conversion should be made. Default is 'en'.
+  /// - `conjunction`: The word to use before the last item in a list. If not provided, the default conjunction of the language will be used.
+  /// - `currency`: The currency configuration to be used in the conversion.
+  /// - `decimalPlaces`: Number of decimal places to consider in the conversion. Default is 2.
+  /// - `useOrdinal`: Whether to return the ordinal representation of the number. Default is false.
   ///
   /// Returns the word representation of the provided number.
   ///
@@ -229,11 +229,11 @@ class NumWords {
 
   /// Converts a given [value] to its cardinal word representation.
   ///
-  /// [value]: The numerical value to be converted.
-  /// [config]: The language configuration to be used in the conversion.
-  /// [conjunction]: The word to use before the last item in a list.
-  /// [currency]: The currency configuration to be used in the conversion.
-  /// [decimalPlaces]: Number of decimal places to consider in the conversion.
+  /// `value`: The numerical value to be converted.
+  /// `config`: The language configuration to be used in the conversion.
+  /// `conjunction`: The word to use before the last item in a list.
+  /// `currency`: The currency configuration to be used in the conversion.
+  /// `decimalPlaces`: Number of decimal places to consider in the conversion.
   ///
   /// Returns the cardinal word representation of the provided number.
   ///
@@ -299,10 +299,10 @@ class NumWords {
     return combined.trim();
   }
 
-  /// Converts a given [value] to its ordinal word representation.
+  /// Converts a given `value` to its ordinal word representation.
   ///
-  /// [value]: The numerical value to be converted.
-  /// [config]: The language configuration to be used in the conversion.
+  /// `value`: The numerical value to be converted.
+  /// `config`: The language configuration to be used in the conversion.
   ///
   /// Returns the ordinal word representation of the provided number.
   ///

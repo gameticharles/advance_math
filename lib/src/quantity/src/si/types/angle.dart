@@ -40,7 +40,7 @@ const double twoPi = 2.0 * math.pi;
 ///     var diff = ang2 - ang;
 ///
 ///     // Display the result in degrees.
-///     print(diff.valueInUnits(Angle.degrees));
+///     print(diff.valueInUnits(AngleUnits.degrees));
 ///
 /// See the [Wikipedia entry for Angle](https://en.wikipedia.org/wiki/Angle)
 /// for more information.

@@ -34,7 +34,7 @@ class MatrixDecomposition {
   /// Checks if the Cholesky Decomposition is accurate within a given tolerance.
   ///
   /// [A]: The original matrix
-  /// [chol]: The CholeskyDecomposition object
+  /// [cholesky]: The CholeskyDecomposition object
   /// Returns `true` if the decomposition is accurate, `false` otherwise.
   static bool checkCholeskyDecomposition(
       Matrix A, CholeskyDecomposition cholesky) {

@@ -12,16 +12,16 @@ const double tau = twoPi;
 
 // Top level SI units.
 
-/// A terse version of [Angle.radians].
+/// A terse version of `AngleUnits.radians`.
 final AngleUnits radians = AngleUnits.radians;
 
-/// A terse version of [Angle.degrees].
+/// A terse version of `AngleUnits.degrees`.
 final AngleUnits degrees = AngleUnits.degrees;
 
-/// A terse version of [Angle.minutesArc].
+/// A terse version of `AngleUnits.minutesArc`.
 final AngleUnits minutesArc = AngleUnits.minutesArc;
 
-/// A terse version of [Angle.secondsArc].
+/// A terse version of `AngleUnits.secondsArc`.
 final AngleUnits secondsArc = AngleUnits.secondsArc;
 
 /// A unit of one thousandth of a radian.

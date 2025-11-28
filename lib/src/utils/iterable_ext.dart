@@ -154,15 +154,15 @@ extension IterableExt<E> on Iterable<E> {
   /// Returns the sum of all elements in this iterable.
   ///
   /// For numeric types, this adds all elements together.
-  /// Example: [1, 2, 3].sum() => 6
+  /// Example: `[1, 2, 3]`.sum() => 6
   ///
   /// For non-numeric types, you must provide a [selector] function to extract
   /// a numeric value from each element.
-  /// Example: ['a', 'aa', 'aaa'].sum((s) => s.length) => 6
+  /// Example: `['a', 'aa', 'aaa']`.sum((s) => s.length) => 6
   ///
   /// If any element is a Complex number, all elements will be converted to Complex
   /// and the result will be Complex.
-  /// Example: [1, 2, Complex(1,5), 9.7] => Complex(12.7, 5)
+  /// Example: `[1, 2, Complex(1,5), 9.7]` => Complex(12.7, 5)
   dynamic sum([Function(E)? selector]) {
     if (selector != null) {
       return fold<dynamic>(0, (sum, element) => sum + selector(element));

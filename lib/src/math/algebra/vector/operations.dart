@@ -288,7 +288,7 @@ extension VectorOperations on Vector {
   /// 5.0
   /// ```
   /// Explanation:
-  /// The vector [3, 4] has a norm of 5 because sqrt(3*3 + 4*4) = sqrt(9 + 16) = sqrt(25) = 5.
+  /// The vector `[3, 4]` has a norm of 5 because sqrt(3*3 + 4*4) = sqrt(9 + 16) = sqrt(25) = 5.
   dynamic norm([Norm normType = Norm.frobenius]) {
     switch (normType) {
       case Norm.frobenius:
@@ -334,7 +334,7 @@ extension VectorOperations on Vector {
   /// [0.6, 0.8]
   /// ```
   /// Explanation:
-  /// The vector [3, 4] gets normalized to [0.6, 0.8] because 3/5 = 0.6 and 4/5 = 0.8,
+  /// The vector `[3, 4]` gets normalized to `[0.6, 0.8]` because 3/5 = 0.6 and 4/5 = 0.8,
   /// where 5 is the norm of the original vector.
   Vector normalize([Norm normType = Norm.frobenius]) {
     num normValue = norm(normType);

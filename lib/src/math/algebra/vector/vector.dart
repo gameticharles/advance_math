@@ -140,7 +140,7 @@ class Vector extends IterableMixin<dynamic> {
   ///
   /// [end]: End value (exclusive).
   /// [start]: Start value. Default is 0.
-  /// [steps]: Step size. Default is 1.
+  /// [step]: Step size. Default is 1.
   ///
   /// Example:
   /// ```dart
@@ -382,10 +382,10 @@ class Vector extends IterableMixin<dynamic> {
 
   /// Converts the Vector from Cartesian to Spherical coordinates.
   ///
-  /// Returns a list of doubles [r, theta, phi] where:
+  /// Returns a list of doubles `[r, theta, phi]` where:
   /// - r is the radius (distance from origin)
-  /// - theta is the inclination (angle from the z-axis, in range [0, pi])
-  /// - phi is the azimuth (angle from the x-axis in the xy-plane, in range [0, 2*pi])
+  /// - theta is the inclination (angle from the z-axis, in range `[0, pi]`)
+  /// - phi is the azimuth (angle from the x-axis in the xy-plane, in range `[0, 2*pi]`)
   ///
   /// Example:
   /// ```dart
@@ -409,9 +409,9 @@ class Vector extends IterableMixin<dynamic> {
 
   /// Converts the Vector from Cartesian to Cylindrical coordinates.
   ///
-  /// Returns a list of doubles [rho, phi, z] where:
+  /// Returns a list of doubles `[rho, phi, z]` where:
   /// - rho is the radial distance from the z-axis
-  /// - phi is the azimuth (angle from the x-axis in the xy-plane, in range [0, 2*pi])
+  /// - phi is the azimuth (angle from the x-axis in the xy-plane, in range `[0, 2*pi]`)
   /// - z is the height along the z-axis
   ///
   /// Example:
@@ -438,9 +438,9 @@ class Vector extends IterableMixin<dynamic> {
   /// This function assumes the vector is 2D.
   /// Throws an exception if the vector has more than two components.
   ///
-  /// Returns a list of doubles [r, theta] where:
+  /// Returns a list of doubles `[r, theta]` where:
   /// - r is the radius (distance from origin)
-  /// - theta is the angle from the positive x-axis, in range [0, 2*pi])
+  /// - theta is the angle from the positive x-axis, in range `[0, 2*pi]`)
   ///
   /// Example:
   /// ```dart
@@ -486,8 +486,8 @@ class Vector extends IterableMixin<dynamic> {
   /// representing the desired components for the new Vector. The [mapping] and the Vector must
   /// have the same number of components.
   ///
-  /// For example, if the current Vector is a [Vector3] with values [1, 2, 3] and the provided
-  /// mapping is ['x', 'x', 'y'], the resulting Vector will be a [Vector3] with values [1, 1, 2].
+  /// For example, if the current Vector is a [Vector3] with values `[1, 2, 3]` and the provided
+  /// mapping is `['x', 'x', 'y']`, the resulting Vector will be a [Vector3] with values `[1, 1, 2]`.
   ///
   /// If a 'z' or 'w' component is requested from a [Vector2], or if a 'w' component is requested
   /// from a [Vector3], the function will throw an Exception as these components do not exist in
@@ -643,7 +643,7 @@ class Vector extends IterableMixin<dynamic> {
   /// Positive [shift] values shift elements to the right, and negative values
   /// shift elements to the left.
   ///
-  /// [list] is the original list, and [shift] is the number of positions
+  /// The vector is the original list, and [shift] is the number of positions
   /// to shift the elements.
   Vector roll(dynamic shift) {
     if (_data.isEmpty) return this;

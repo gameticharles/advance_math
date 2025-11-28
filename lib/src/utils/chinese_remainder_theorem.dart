@@ -3,10 +3,10 @@ part of '../../advance_math.dart';
 /// Utility class to solve a set of congruence equations using the Chinese Remainder Theorem (CRT).
 ///
 /// The Chinese Remainder Theorem is applied to solve a system of congruences:
-/// x ≡ a[0] (mod m[0])
-/// x ≡ a[1] (mod m[1])
+/// x ≡ `a[0]` (mod `m[0]`)
+/// x ≡ `a[1]` (mod `m[1]`)
 /// ...
-/// x ≡ a[n-1] (mod m[n-1])
+/// x ≡ `a[n-1]` (mod `m[n-1]`)
 ///
 /// The methods provided in this class help to eliminate coefficients, reduce the equations to
 /// pairwise co-prime moduli, and finally apply the CRT to find a unique solution modulo M, where
@@ -24,8 +24,8 @@ part of '../../advance_math.dart';
 class ChineseRemainderTheorem {
   /// Eliminates the coefficient from an equation of the form cx ≡ a (mod m).
   ///
-  /// Returns [null] if the coefficient cannot be eliminated (no solution exists),
-  /// otherwise returns [a_new] and [m_new] such that x ≡ a_new (mod m_new).
+  /// Returns `null` if the coefficient cannot be eliminated (no solution exists),
+  /// otherwise returns `a_new` and `m_new` such that x ≡ a_new (mod m_new).
   static List<num>? eliminateCoefficient(num c, num a, num m) {
     List<num> result = math.egcd([c, m]).first;
     num d = result[0];
@@ -100,7 +100,7 @@ class ChineseRemainderTheorem {
   /// Applies the Chinese Remainder Theorem (CRT) to solve a set of congruence equations.
   ///
   /// Assumes all pairs of moduli are pairwise co-prime.
-  /// Returns [x] such that x ≡ a[0] (mod m[0]), x ≡ a[1] (mod m[1]), ..., x ≡ a[n-1] (mod m[n-1]).
+  /// Returns `x` such that x ≡ `a[0]` (mod `m[0]`), x ≡ `a[1]` (mod `m[1]`), ..., x ≡ `a[n-1]` (mod `m[n-1]`).
   static List<int> crt(List<int> a, List<int> m) {
     int M = 1;
     for (int i = 0; i < m.length; i++) {

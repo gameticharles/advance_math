@@ -10,7 +10,7 @@ part of '../../expression.dart';
 /// on the value of the discriminant.
 ///
 /// The solutions of the equation are given by the formula:
-/// _x = [-b ± sqrt(b^2 - 4ac)] / 2a_
+/// _x = `[-b ± sqrt(b^2 - 4ac)]` / 2a_
 ///
 /// Example:
 /// ```dart

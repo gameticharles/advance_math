@@ -114,16 +114,16 @@ extension NumComplexExtension on num {
 
   Complex get c => Complex(this, 0);
 
-  /// {@macro ComplexerX_real}
+  /// {@macro ComplexX_real}
   Complex get real => Complex(this);
 
-  /// {@macro ComplexerX_real}
+  /// {@macro ComplexX_real}
   Complex get re => Complex(this);
 
-  /// {@macro ComplexerX_imag}
+  /// {@macro ComplexX_imag}
   Complex get imag => Complex(0, this);
 
-  /// {@macro ComplexerX_imag}
+  /// {@macro ComplexX_imag}
   Complex get im => Complex(0, this);
 
   /// Enables syntax like: 3i or 4i

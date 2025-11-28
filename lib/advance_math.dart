@@ -1,6 +1,6 @@
 /// Dart package for matrix or list operations
 /// The library was developed, documented, and published by
-/// [Charles Gameti]
+/// `Charles Gameti`
 library advance_math;
 
 import 'dart:async';

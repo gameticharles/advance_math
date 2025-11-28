@@ -2,7 +2,7 @@ part of '../../advance_math.dart';
 
 extension NumExtension on num {
   /// Generates a range from this number to [end] (inclusive).
-  /// Example: 1.to(5) => [1, 2, 3, 4, 5]
+  /// Example: 1.to(5) => `[1, 2, 3, 4, 5]`
   Iterable<num> to(num end, {num step = 1}) sync* {
     if (step == 0) throw ArgumentError('Step cannot be zero');
     if ((step > 0 && this > end) || (step < 0 && this < end)) {
@@ -75,7 +75,7 @@ extension NumExtension on num {
   /// rounds to the nearest integer, and then shifts the decimal point back to the
   /// left by the same amount. The default value of [decimalPlaces] is `0`.
   ///
-  /// Returns the rounded [value].
+  /// Returns the rounded `value`.
   num roundTo([int decimalPlaces = 0]) {
     if (decimalPlaces == 0) {
       return round();
