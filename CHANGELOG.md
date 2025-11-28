@@ -1,8 +1,10 @@
 # 5.3.8
 
+- **[IMPROVEMENT]** Updated dependencies
 - **[REFACTOR]** Simplify conditional logic and improve readability in `Scientific` class
 - **[STYLE]** Format code for consistency in `num` extension and tests
 - **[IMPROVEMENT]** Fixed documentation comments in `AngleUnits`, `NumWords`, and `Units` classes
+- **[FEATURE]** Implemented methods in `MultiVariablePolynomial`: `depth`, `size`, `getVariableTerms`, `simplify`, `expand`, `differentiate`, `integrate`, `isIndeterminate`, and `isInfinity`
 
 # 5.3.7
 

@@ -4,7 +4,6 @@
 [![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
 [![Likes](https://img.shields.io/pub/likes/advance_math)](https://pub.dartlang.org/packages/advance_math/score)
 [![Points](https://img.shields.io/pub/points/advance_math)](https://pub.dartlang.org/packages/advance_math/score)
-[![Popularity](https://img.shields.io/pub/popularity/advance_math)](https://pub.dartlang.org/packages/advance_math/score)
 [![SDK Version](https://badgen.net/pub/sdk-version/advance_math)](https://pub.dartlang.org/packages/advance_math)
 
 [![Last Commits](https://img.shields.io/github/last-commit/gameticharles/advance_math?ogo=github&logoColor=white)](https://github.com/gameticharles/advance_math/commits/master)
@@ -39,7 +38,7 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
   - Statistical methods: Methods for calculating statistical properties of the matrix, such as min, max, sum, mean, median, mode, skewness, standard deviation, and variance.
   - Element-wise operations: Methods for performing element-wise operations on the matrix, such as applying a function to each element or filtering elements based on a condition.
   - Solving linear systems of equations (Using Inverse Matrix, LU Decomposition,Gauss-Jordan Elimination, Ridge Regression, Gauss Elimination, Least Squares, Jacobi, Successive Over-Relaxation (SOR), Gauss-Seidel method, Gram Schmidt, Conjugate Gradient, Montante's Method (Bareiss algorithm) and Cramers Rule)
-  - Solve matrix decompositions like LU decomposition, QR decomposition, LQ decomposition, Cholesky, Singular Value Decomposition (SVD)  with different algorithms Crout's, Doolittle, Gauss Elimination Method, Gram Schmidt, Householder, Partial and Complete Pivoting, etc.
+  - Solve matrix decompositions like LU decomposition, QR decomposition, LQ decomposition, Cholesky, Singular Value Decomposition (SVD) with different algorithms Crout's, Doolittle, Gauss Elimination Method, Gram Schmidt, Householder, Partial and Complete Pivoting, etc.
   - Matrix slicing and partitioning: Methods for extracting sub-Matrices or slices from the matrix.
   - Matrix concatenation and stacking: Methods for concatenating or stacking matrices horizontally or vertically.
   - Matrix norms: Methods for calculating matrix norms, such as L1 (Marathan), L2 (Euclidean), and infinity norms.
@@ -156,7 +155,7 @@ void main() {
 // Encoding input: Enable logging for debugging
 // Encoded: . -. .- -... .-.. . / .-.. --- --. --. .. -. --. / ..-. --- .-. / -.. . -... ..- --. --. .. -. --.
 // Decoded: ENABLE LOGGING FOR DEBUGGING
-// 
+//
 // Decoded directly
 // Decoded: HI THERE HOW ARE YOU?
 ```
@@ -934,7 +933,7 @@ Results:
 
 ```txt
 
-Polygon( 
+Polygon(
 num_sides=5,
 side_length=null,
 vertices=[Point(1613.26, 2418.11), Point(1806.71, 2523.16), Point(1942.17, 2366.84), Point(1901.89, 2203.18), Point(1652.08, 2259.26)])
@@ -968,7 +967,7 @@ Translated by (1.0, 1.0): [Point(1614.2600000000002, 2419.11), Point(1807.71, 25
 
 Nearest point on the polygon to (1920.17, 2200.18): Point(1920.17, 2200.18)
 
---- --- --- --- --- --- --- --- --- --- Regular Polygon --- --- --- --- --- --- --- --- --- --- 
+--- --- --- --- --- --- --- --- --- --- Regular Polygon --- --- --- --- --- --- --- --- --- ---
 
 Area: 27.52763840942347
 Perimeter: 20.0
@@ -1072,7 +1071,7 @@ This is a general polynomial implementation that uses the Durand-Kerner method t
 DurandKerner dk = DurandKerner.num([1, 5, 1, 4, 0, 3, 2]);
 print(dk.degree); // 6
 print(dk); // x⁶ + 5x⁵ + x⁴ + 4x³ + 3x + 2
-print(dk.roots()); 
+print(dk.roots());
 // [-0.34289017575006814 + 0.9530107213799093i, -0.34289017581899034 - 0.9530107213040406i, 0.5696766117867249 + 0.6923844884012686i, -4.9651242864231895, 0.5696766117855657 - 0.6923844884824355i, -0.4884485856011231]
 ```
 
@@ -1122,7 +1121,7 @@ A Dart class designed to provide efficient conversions between Roman numerals an
 ### Instantiation
 
 ```dart
-RomanNumerals romanFive = RomanNumerals(5); 
+RomanNumerals romanFive = RomanNumerals(5);
 print(romanFive) // V
 print(RomanNumerals(69)); // LXIX
 print(RomanNumerals(8785)); // (VIII)DCCLXXXV
@@ -1362,7 +1361,7 @@ print(randomMatrix);
 // └ 4  9  1  3 ┘
 ```
 
-Create a specific random matrix from the  matrix factory
+Create a specific random matrix from the matrix factory
 
 ```dart
 var randomMatrix = Matrix.factory
@@ -1634,7 +1633,7 @@ print(matrixFromFile);
 
 Write to a csv file
 
-``` dart
+````dart
 String csv = matrix.toCSV(outputFilePath: 'output.csv');
 print(csv);
 
@@ -1644,7 +1643,7 @@ print(csv);
 // 4.0,5.0,6.0
 // 7.0,8.0,9.0
 // ```
-```
+````
 
 ### to<->from Binary Data
 
@@ -2334,9 +2333,9 @@ Roll elements along a given axis. Elements that roll beyond the last position ar
 This function work exactly like the NumPy's roll.
 
 - shift : int or tuple of ints
-    The number of places by which elements are shifted. If a tuple, then axis must be a tuple of the same size, and each of the given axes is shifted by the corresponding number. If an int while axis is a tuple of ints, then the same value is used for all given axes.
+  The number of places by which elements are shifted. If a tuple, then axis must be a tuple of the same size, and each of the given axes is shifted by the corresponding number. If an int while axis is a tuple of ints, then the same value is used for all given axes.
 - axis : int or tuple of ints or null
-    Axis or axes along which elements are shifted. By default, the array is flattened before shifting, after which the original shape is restored.
+  Axis or axes along which elements are shifted. By default, the array is flattened before shifting, after which the original shape is restored.
 
 ```dart
 Matrix x2 = Matrix([
@@ -3295,9 +3294,9 @@ final x = Variable('x');
 final y = Variable('y');
 
 // Polynomial: 3x² + 2xy - 5y + 7
-final polynomial = ex(3) * (x ^ ex(2)) + 
-                   2.toExpression() * x * y - 
-                   ex(5) * y + 
+final polynomial = ex(3) * (x ^ ex(2)) +
+                   2.toExpression() * x * y -
+                   ex(5) * y +
                    Literal(7);
 
 print('P(2,3) = ${polynomial.evaluate({'x': 2, 'y': 3})}');
@@ -3323,6 +3322,7 @@ All three methods produce equivalent results and can be mixed within the same ex
 - **Mix approaches for complex expressions**: `2.toExpression() * x + ex(3) * y - Literal(1)`
 
 For comprehensive examples and troubleshooting, see:
+
 - `example/enhanced_expression_creation.dart`
 - `doc/enhanced_expression_creation.md`
 - `doc/expression_troubleshooting.md`

@@ -14,10 +14,7 @@ void main() {
     group('Multivariate Expression Creation', () {
       test('should create multivariate expressions using toExpression()', () {
         // Create expression: 2xy + 3x - y + 5
-        final expr = 2.toExpression() * x * y +
-            3.toExpression() * x -
-            y +
-            5.toExpression();
+        final expr = ex(2) * x * y + ex(3) * x - y + ex(5);
 
         expect(expr, isA<Expression>());
 
@@ -30,11 +27,8 @@ void main() {
 
       test('should create multivariate expressions using ex() helper', () {
         // Create expression: 3x^2y - 2xy^2 + x - y + 1
-        final expr = ex(3) * (x ^ 2.toExpression()) * y -
-            ex(2) * x * (y ^ 2.toExpression()) +
-            x -
-            y +
-            ex(1);
+        final expr =
+            ex(3) * (x ^ ex(2)) * y - ex(2) * x * (y ^ ex(2)) + x - y + ex(1);
 
         expect(expr, isA<Expression>());
 
@@ -47,12 +41,11 @@ void main() {
 
       test('should create multivariate expressions using mixed methods', () {
         // Create expression: 4x^2y^2 - 3xy + 2x - y + 7
-        final expr =
-            4.toExpression() * (x ^ 2.toExpression()) * (y ^ 2.toExpression()) -
-                ex(3) * x * y +
-                2.toExpression() * x -
-                y +
-                Literal(7);
+        final expr = 4.toExpression() * (x ^ ex(2)) * (y ^ ex(2)) -
+            ex(3) * x * y +
+            ex(2) * x -
+            y +
+            Literal(7);
 
         expect(expr, isA<Expression>());
 
@@ -68,10 +61,10 @@ void main() {
       test('should create three-variable expressions with enhanced literals',
           () {
         // Create expression: 2xyz + x^2y - 3xz^2 + 4y^2z - 5
-        final expr = 2.toExpression() * x * y * z +
-            (x ^ 2.toExpression()) * y -
-            ex(3) * x * (z ^ 2.toExpression()) +
-            4.toExpression() * (y ^ 2.toExpression()) * z -
+        final expr = ex(2) * x * y * z +
+            (x ^ ex(2)) * y -
+            ex(3) * x * (z ^ ex(2)) +
+            4.toExpression() * (y ^ ex(2)) * z -
             Literal(5);
 
         expect(expr, isA<Expression>());
@@ -85,7 +78,7 @@ void main() {
 
       test('should handle complex three-variable polynomial operations', () {
         // Create two three-variable expressions
-        final expr1 = x * y * z + 2.toExpression() * x;
+        final expr1 = x * y * z + ex(2) * x;
         final expr2 = ex(3) * y * z - Literal(1);
 
         final sum = expr1 + expr2;
@@ -112,10 +105,7 @@ void main() {
       test('should differentiate multivariate expressions with respect to x',
           () {
         // Create expression: x^2y + 3xy^2 - 2x + y
-        final expr = (x ^ 2.toExpression()) * y +
-            ex(3) * x * (y ^ 2.toExpression()) -
-            2.toExpression() * x +
-            y;
+        final expr = (x ^ ex(2)) * y + ex(3) * x * (y ^ ex(2)) - ex(2) * x + y;
 
         // Differentiate with respect to x
         final dxExpr = expr.differentiate();
@@ -128,9 +118,9 @@ void main() {
 
       test('should handle partial derivatives in multivariate expressions', () {
         // Create expression: 2x^3y^2 + xy - 3y^2 + 5
-        final expr = 2.toExpression() * (x ^ ex(3)) * (y ^ 2.toExpression()) +
+        final expr = ex(2) * (x ^ ex(3)) * (y ^ ex(2)) +
             x * y -
-            ex(3) * (y ^ 2.toExpression()) +
+            ex(3) * (y ^ ex(2)) +
             Literal(5);
 
         // Differentiate (this will be with respect to the default variable)
@@ -148,7 +138,7 @@ void main() {
         // Create nested expression: (x + y)^2 * (x - y)
         final sum = x + y;
         final diff = x - y;
-        final squared = sum ^ 2.toExpression();
+        final squared = sum ^ ex(2);
         final product = squared * diff;
 
         expect(product, isA<Expression>());
@@ -162,7 +152,7 @@ void main() {
 
       test('should handle rational multivariate expressions', () {
         // Create rational expression: (x^2 + y^2) / (x + y)
-        final numerator = (x ^ 2.toExpression()) + (y ^ 2.toExpression());
+        final numerator = (x ^ ex(2)) + (y ^ ex(2));
         final denominator = x + y;
         final rational = numerator / denominator;
 
@@ -209,7 +199,7 @@ void main() {
         final coeff = 3;
 
         // Create same multivariate expression using different methods
-        final expr1 = coeff.toExpression() * x * y + 2.toExpression();
+        final expr1 = ex(coeff) * x * y + ex(2);
         final expr2 = ex(coeff) * x * y + ex(2);
         final expr3 = Literal(coeff) * x * y + Literal(2);
 
@@ -226,21 +216,21 @@ void main() {
 
       test('should handle edge cases in multivariate expressions', () {
         // Test with zero coefficients
-        final zeroExpr = 0.toExpression() * x * y + ex(0) * x;
+        final zeroExpr = ex(0) * x * y + ex(0) * x;
         expect(zeroExpr, isA<Expression>());
 
         final result = zeroExpr.evaluate({'x': 5, 'y': 3});
         expect(result, equals(0));
 
         // Test with negative coefficients
-        final negExpr = (-2).toExpression() * x * y + ex(-3) * x;
+        final negExpr = ex(-2) * x * y + ex(-3) * x;
         expect(negExpr, isA<Expression>());
 
         final negResult = negExpr.evaluate({'x': 1, 'y': 2});
         expect(negResult, equals(-7)); // -2*1*2 + (-3)*1 = -4 - 3 = -7
 
         // Test with decimal coefficients
-        final decimalExpr = 2.5.toExpression() * x * y + ex(1.5) * x;
+        final decimalExpr = ex(2.5) * x * y + ex(1.5) * x;
         expect(decimalExpr, isA<Expression>());
 
         final decimalResult = decimalExpr.evaluate({'x': 2, 'y': 2});
@@ -253,7 +243,7 @@ void main() {
       test('should work seamlessly with existing Variable system', () {
         // Test that enhanced literals work with existing Variable objects
         final existingVar = Variable('t');
-        final expr = 2.toExpression() * existingVar + ex(3);
+        final expr = ex(2) * existingVar + ex(3);
 
         expect(expr, isA<Expression>());
 
@@ -263,7 +253,7 @@ void main() {
 
       test('should maintain type safety with enhanced literals', () {
         // Test that type safety is maintained
-        final expr = 2.toExpression() * x + ex(3) * y;
+        final expr = ex(2) * x + ex(3) * y;
 
         expect(expr, isA<Expression>());
 
@@ -280,8 +270,7 @@ void main() {
       test('should handle complex nested multivariate scenarios', () {
         // Create a complex nested expression using all three methods
         final complex =
-            (2.toExpression() * x + ex(1)) * (y - 3.toExpression()) +
-                Literal(4) * (x ^ 2.toExpression()) * y;
+            (ex(2) * x + ex(1)) * (y - ex(3)) + Literal(4) * (x ^ ex(2)) * y;
 
         expect(complex, isA<Expression>());
 

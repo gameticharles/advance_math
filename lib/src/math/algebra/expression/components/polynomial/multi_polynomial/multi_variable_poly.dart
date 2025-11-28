@@ -266,54 +266,191 @@ class MultiVariablePolynomial extends Expression {
 
   @override
   int depth() {
-    // TODO: implement depth
-    throw UnimplementedError();
+    return 1; // Flat sum of terms
   }
 
   @override
   Expression differentiate() {
-    // TODO: implement differentiate
-    throw UnimplementedError("Differentiation has not been implemented yet");
+    // Determine the variable to differentiate with respect to
+    Set<String> allVars = {};
+    for (var term in terms) {
+      allVars.addAll(term.variables.keys);
+    }
+
+    String targetVar;
+    if (allVars.contains('x')) {
+      targetVar = 'x';
+    } else if (allVars.length == 1) {
+      targetVar = allVars.first;
+    } else {
+      throw ArgumentError(
+          "Ambiguous differentiation: Polynomial contains multiple variables ${allVars.toList()} and 'x' is not present. Please specify variable (not supported in this interface yet).");
+    }
+
+    List<Term> newTerms = [];
+    for (var term in terms) {
+      if (term.variables.containsKey(targetVar)) {
+        int power = term.variables[targetVar]!;
+        var newCoeff = term.coefficient * power;
+        var newVars = Map<String, int>.from(term.variables);
+
+        if (power == 1) {
+          newVars.remove(targetVar);
+        } else {
+          newVars[targetVar] = power - 1;
+        }
+
+        newTerms.add(Term(newCoeff, newVars));
+      }
+      // Constants (w.r.t targetVar) differentiate to 0, so we don't add them.
+    }
+
+    if (newTerms.isEmpty) {
+      return MultiVariablePolynomial([Term(0, {})]);
+    }
+
+    return MultiVariablePolynomial(newTerms);
   }
 
   @override
   Expression expand() {
-    // TODO: implement expand
-    throw UnimplementedError();
+    return this; // Already expanded
   }
 
   @override
   Set<Variable> getVariableTerms() {
-    // TODO: implement getVariableTerms
-    throw UnimplementedError();
+    Set<Variable> variables = {};
+    for (var term in terms) {
+      for (var variableName in term.variables.keys) {
+        variables.add(Variable(variableName));
+      }
+    }
+    return variables;
   }
 
   @override
   Expression integrate() {
-    // TODO: implement integrate
-    throw UnimplementedError();
+    // Determine the variable to integrate with respect to
+    Set<String> allVars = {};
+    for (var term in terms) {
+      allVars.addAll(term.variables.keys);
+    }
+
+    String targetVar;
+    if (allVars.contains('x')) {
+      targetVar = 'x';
+    } else if (allVars.length == 1) {
+      targetVar = allVars.first;
+    } else if (allVars.isEmpty) {
+      targetVar = 'x'; // Default to x for constants
+    } else {
+      throw ArgumentError(
+          "Ambiguous integration: Polynomial contains multiple variables ${allVars.toList()} and 'x' is not present. Please specify variable (not supported in this interface yet).");
+    }
+
+    List<Term> newTerms = [];
+    for (var term in terms) {
+      var newVars = Map<String, int>.from(term.variables);
+      num newCoeff;
+
+      if (newVars.containsKey(targetVar)) {
+        int power = newVars[targetVar]!;
+        newVars[targetVar] = power + 1;
+        newCoeff = term.coefficient / (power + 1);
+      } else {
+        newVars[targetVar] = 1;
+        newCoeff = term.coefficient; // * x^1 / 1
+      }
+      newTerms.add(Term(newCoeff, newVars));
+    }
+
+    return MultiVariablePolynomial(newTerms);
   }
 
   @override
   Expression simplify() {
-    // TODO: implement simplify
-    throw UnimplementedError();
+    List<Term> simplifiedTerms = [];
+
+    // Group terms by variables
+    for (var term in terms) {
+      bool found = false;
+      for (int i = 0; i < simplifiedTerms.length; i++) {
+        if (_mapEquals(simplifiedTerms[i].variables, term.variables)) {
+          var newCoefficient =
+              simplifiedTerms[i].coefficient + term.coefficient;
+          simplifiedTerms[i] =
+              Term(newCoefficient, Map.from(simplifiedTerms[i].variables));
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        simplifiedTerms.add(Term(term.coefficient, Map.from(term.variables)));
+      }
+    }
+
+    // Remove terms with zero coefficient (unless it's the only term, but even then 0 is fine)
+    simplifiedTerms
+        .removeWhere((term) => Complex(term.coefficient) == Complex.zero());
+
+    if (simplifiedTerms.isEmpty) {
+      return MultiVariablePolynomial([Term(0, {})]);
+    }
+
+    return MultiVariablePolynomial(simplifiedTerms);
   }
 
   @override
   int size() {
-    // TODO: implement size
-    throw UnimplementedError();
+    return terms.length;
   }
 
   @override
   bool isIndeterminate(num x) {
-    throw UnimplementedError();
+    // Check if univariate to use x
+    Set<String> allVars = {};
+    for (var term in terms) {
+      allVars.addAll(term.variables.keys);
+    }
+
+    if (allVars.length > 1) {
+      throw ArgumentError(
+          "isIndeterminate(num x) is only supported for univariate polynomials or constants. Found variables: $allVars");
+    }
+
+    String varName = allVars.isEmpty ? 'x' : allVars.first;
+    try {
+      var val = evaluate({varName: x});
+      if (val is Complex) {
+        return val.value.isNaN;
+      }
+      return (val as num).isNaN;
+    } catch (e) {
+      // If evaluation fails (e.g. division by zero), it is indeterminate.
+      // However, if it's a missing variable error, we should probably rethrow, but we checked vars above.
+      return true;
+    }
   }
 
   @override
   bool isInfinity(num x) {
-    throw UnimplementedError();
+    // Check if univariate to use x
+    Set<String> allVars = {};
+    for (var term in terms) {
+      allVars.addAll(term.variables.keys);
+    }
+
+    if (allVars.length > 1) {
+      throw ArgumentError(
+          "isInfinity(num x) is only supported for univariate polynomials or constants. Found variables: $allVars");
+    }
+
+    String varName = allVars.isEmpty ? 'x' : allVars.first;
+    var val = evaluate({varName: x});
+    if (val is Complex) {
+      return val.value.isInfinite;
+    }
+    return (val as num).isInfinite;
   }
 
   // ... (Other methods from the Expression class, like differentiate, evaluate, etc.)
