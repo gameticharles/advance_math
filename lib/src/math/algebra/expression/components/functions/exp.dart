@@ -31,9 +31,9 @@ class Exp extends Expression {
   }
 
   @override
-  Expression differentiate() {
-    // The derivative of e^f(x) is f'(x) * e^f(x).
-    return Multiply(operand.differentiate(), this);
+  Expression differentiate([Variable? v]) {
+    // Chain rule: d/dv[e^f(x)] = f'(x) * e^f(x)
+    return Multiply(operand.differentiate(v), this);
   }
 
   @override

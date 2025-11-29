@@ -55,11 +55,11 @@ class Multiply extends BinaryOperationsExpression {
   }
 
   @override
-  Expression differentiate() {
+  Expression differentiate([Variable? v]) {
     // Applying the product rule: (u * v)' = u' * v + u * v'
     // where u and v are functions of x.
-    var uPrime = left.differentiate();
-    var vPrime = right.differentiate();
+    var uPrime = left.differentiate(v);
+    var vPrime = right.differentiate(v);
 
     return Add(Multiply(uPrime, right), Multiply(left, vPrime));
   }
@@ -96,64 +96,76 @@ class Multiply extends BinaryOperationsExpression {
   }
 
   @override
-  Expression simplify() {
+  Expression simplifyBasic() {
+    var simpleLeft = left.simplifyBasic();
+    var simpleRight = right.simplifyBasic();
+
     // Basic simplification: if both operands are literals, evaluate and return a new Literal.
-    if (left is Literal && right is Literal) {
-      return Literal(left.evaluate() * right.evaluate());
+    if (simpleLeft is Literal && simpleRight is Literal) {
+      return Literal(simpleLeft.evaluate() * simpleRight.evaluate());
     }
 
     // Handle cases like x * 0 = 0, x * 1 = x
-    if (left is Literal && left.evaluate() == 0 ||
-        right is Literal && right.evaluate() == 0) {
+    if (simpleLeft is Literal && simpleLeft.evaluate() == 0 ||
+        simpleRight is Literal && simpleRight.evaluate() == 0) {
       return Literal(0);
     }
 
-    if (left is Literal && left.evaluate() == 1) {
-      return right;
+    if (simpleLeft is Literal && simpleLeft.evaluate() == 1) {
+      return simpleRight;
     }
-    if (right is Literal && right.evaluate() == 1) {
-      return left;
+    if (simpleRight is Literal && simpleRight.evaluate() == 1) {
+      return simpleLeft;
     }
 
     // Multiplication involving same base x * x = x^2
-    if (left.toString() == right.toString()) {
-      return Pow(left, Literal(2));
+    if (simpleLeft.toString() == simpleRight.toString()) {
+      return Pow(simpleLeft, Literal(2));
     }
 
     // Multiplication involving exponential functions
-    if (left is Pow && right is Pow) {
+    if (simpleLeft is Pow && simpleRight is Pow) {
       // a^m * a^n = a^(m+n)
-      if ((left as Pow).base.toString() == (right as Pow).base.toString()) {
+      if ((simpleLeft).base.toString() == (simpleRight).base.toString()) {
         var newExponent =
-            Add((left as Pow).exponent, (right as Pow).exponent).simplify();
-        return Pow((left as Pow).base, newExponent);
+            Add((simpleLeft).exponent, (simpleRight).exponent).simplify();
+        return Pow((simpleLeft).base, newExponent);
       }
       // a^m * b^m remains as is.
     }
 
+    // Associativity: c1 * (c2 * x) = (c1 * c2) * x
+    if (simpleLeft is Literal &&
+        simpleRight is Multiply &&
+        simpleRight.left is Literal) {
+      var c1 = simpleLeft.evaluate();
+      var c2 = (simpleRight.left as Literal).evaluate();
+      return Multiply(Literal(c1 * c2), simpleRight.right).simplifyBasic();
+    }
+
     // Multiplication of similar terms: ax * bx = abx^2
-    if (left is Multiply && right is Multiply) {
-      if ((left as Multiply).right.toString() ==
-              (right as Multiply).right.toString() &&
-          (left as Multiply).left is Literal &&
-          (right as Multiply).left is Literal) {
-        var newCoefficient = (left as Multiply).left.evaluate() *
-            (right as Multiply).left.evaluate();
-        var newBase = (left as Multiply).right;
+    if (simpleLeft is Multiply && simpleRight is Multiply) {
+      if ((simpleLeft).right.toString() == (simpleRight).right.toString() &&
+          (simpleLeft).left is Literal &&
+          (simpleRight).left is Literal) {
+        var newCoefficient =
+            (simpleLeft).left.evaluate() * (simpleRight).left.evaluate();
+        var newBase = (simpleLeft).right;
         return Multiply(Literal(newCoefficient), Pow(newBase, Literal(2)));
       }
     }
 
     // Associative and Commutative Property: For now, ensure multiplication is represented in a standard order
-    if (left is Variable && right is Literal) {
-      return Multiply(right, left); // make sure variable comes first
+    if (simpleLeft is Variable && simpleRight is Literal) {
+      return Multiply(
+          simpleRight, simpleLeft); // make sure variable comes first
     }
 
     // Special products
     // (a+b)^2 = a^2 + 2ab + b^2
-    if (left is Add && right.toString() == left.toString()) {
-      var a = (left as Add).left;
-      var b = (left as Add).right;
+    if (simpleLeft is Add && simpleRight.toString() == simpleLeft.toString()) {
+      var a = (simpleLeft).left;
+      var b = (simpleLeft).right;
       var aSquared = Pow(a, Literal(2));
       var bSquared = Pow(b, Literal(2));
       var twoAB = Multiply(Multiply(Literal(2), a), b);
@@ -161,26 +173,21 @@ class Multiply extends BinaryOperationsExpression {
     }
 
     // (a+b)(a-b) = a^2 - b^2
-    if (left is Add &&
-        right is Subtract &&
-        (left as Add).left.toString() == (right as Add).left.toString() &&
-        (left as Add).right.toString() == (right as Add).right.toString()) {
-      var a = (left as Add).left;
-      var b = (left as Add).right;
+    if (simpleLeft is Add &&
+        simpleRight is Subtract &&
+        simpleLeft.left.toString() == simpleRight.left.toString() &&
+        simpleLeft.right.toString() == simpleRight.right.toString()) {
+      var a = simpleLeft.left;
+      var b = simpleLeft.right;
       var aSquared = Pow(a, Literal(2));
       var bSquared = Pow(b, Literal(2));
       return Subtract(aSquared, bSquared);
     }
 
-    // // Multiplication involving exponential functions
-    // if (left is Exponential &&
-    //     right is Exponential &&
-    //     left.base == right.base) {
-    //   return Exponential(
-    //       left.base, Add(left.exponent, right.exponent).simplify());
-    // }
-
-    // Further simplifications can be added here.
+    // If operands changed but no rule matched, return new Multiply
+    if (simpleLeft != left || simpleRight != right) {
+      return Multiply(simpleLeft, simpleRight);
+    }
 
     return this; // If no simplifications apply, return the original expression.
   }

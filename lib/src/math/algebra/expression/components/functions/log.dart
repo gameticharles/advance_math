@@ -57,10 +57,10 @@ class Log extends Expression {
   }
 
   @override
-  Expression differentiate() {
-    // The derivative of log_a(f(x)) is f'(x) / (f(x) * ln(a))
+  Expression differentiate([Variable? v]) {
+    // Chain rule: d/dv[log_a(f(x))] = f'(x) / (f(x) * ln(a))
     final lnBase = Ln(base);
-    return Divide(operand.differentiate(), Multiply(operand, lnBase));
+    return Divide(operand.differentiate(v), Multiply(operand, lnBase));
   }
 
   @override

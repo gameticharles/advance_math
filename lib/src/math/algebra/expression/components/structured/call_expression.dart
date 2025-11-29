@@ -14,9 +14,9 @@ class CallExpression extends Expression {
   }
 
   @override
-  Expression differentiate() {
+  Expression differentiate([Variable? v]) {
     // The derivative of call is just the derivative.
-    return CallExpression(callee.differentiate(), arguments);
+    return CallExpression(callee.differentiate(v), arguments);
   }
 
   @override

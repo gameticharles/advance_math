@@ -381,10 +381,10 @@ class Polynomial extends Expression {
   /// Example:
   /// ```dart
   /// var quad = Polynomial([2, -3, -2]);
-  /// print(quad.differentiate()); // Output: 4x - 3
+  /// print(quad.differentiate(v)); // Output: 4x - 3
   /// ```
   @override
-  Polynomial differentiate() {
+  Expression differentiate([Variable? v]) {
     if (coefficients.length <= 1) {
       return Polynomial([Complex.zero()]);
     }

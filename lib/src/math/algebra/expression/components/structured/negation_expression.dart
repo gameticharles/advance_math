@@ -7,13 +7,13 @@ class Negate extends Expression {
 
   @override
   num evaluate([dynamic arg]) {
-    return -operand.evaluate();
+    return -operand.evaluate(arg);
   }
 
   @override
-  Expression differentiate() {
+  Expression differentiate([Variable? v]) {
     // The derivative of negation is just the negation of the derivative.
-    return Negate(operand.differentiate());
+    return Negate(operand.differentiate(v));
   }
 
   @override

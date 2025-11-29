@@ -19,13 +19,18 @@ class Cos extends TrigonometricExpression {
   }
 
   @override
-  num evaluate([dynamic arg]) {
-    return cos(operand.evaluate(arg));
+  dynamic evaluate([dynamic arg]) {
+    var eval = operand.evaluate(arg);
+    if (eval is num) {
+      return cos(eval);
+    }
+    return Cos(eval);
   }
 
   @override
-  Expression differentiate() {
-    return Negate(Multiply(operand.differentiate(), Sin(operand)));
+  Expression differentiate([Variable? v]) {
+    // Chain rule: d/dv(cos(f)) = -sin(f) * df/dv
+    return Negate(Multiply(operand.differentiate(v), Sin(operand)));
   }
 
   @override
@@ -39,7 +44,7 @@ class Cos extends TrigonometricExpression {
   }
 
   @override
-  Expression simplify() {
+  Expression simplifyBasic() {
     return this;
   }
 

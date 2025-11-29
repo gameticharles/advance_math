@@ -66,6 +66,9 @@ part 'vector/vector_matrix.dart';
 part 'vector/operations.dart';
 
 part 'nonlinear/nonlinear.dart';
+part 'nonlinear/root_finding.dart';
+part 'nonlinear/systems.dart';
+part 'nonlinear/optimization.dart';
 part 'linear/linear.dart';
 part 'least_squares/base_least_square.dart';
 part 'least_squares/special_least_square.dart';

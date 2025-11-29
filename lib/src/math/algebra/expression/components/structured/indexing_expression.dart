@@ -12,7 +12,7 @@ class IndexExpression extends Expression {
   }
 
   @override
-  Expression differentiate() {
+  Expression differentiate([Variable? v]) {
     // The derivative of index is just the negation of the derivative.
     return this;
   }

@@ -13,12 +13,12 @@ class ConditionalExpression extends Expression {
       condition.evaluate(arg) ? ifTrue.evaluate(arg) : ifFalse.evaluate(arg);
 
   @override
-  Expression differentiate() {
+  Expression differentiate([Variable? v]) {
     // The differentiation of a conditional is also conditional.
     return ConditionalExpression(
         condition: condition,
-        ifTrue: ifTrue.differentiate(),
-        ifFalse: ifFalse.differentiate());
+        ifTrue: ifTrue.differentiate(v),
+        ifFalse: ifFalse.differentiate(v));
   }
 
   @override

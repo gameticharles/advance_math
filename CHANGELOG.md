@@ -1,3 +1,75 @@
+# 5.4.0
+
+## Symbolic Calculus & Equation Solving
+
+- **[FEATURE]** Added comprehensive symbolic calculus module (`lib/src/math/algebra/calculus/`)
+  - `symbolic_calculus.dart`: Core symbolic calculus operations
+  - `symbolic_integration.dart`: Advanced integration strategies (power rule, trig, exponential, substitution, integration by parts)
+  - `differentiation.dart`: Enhanced differentiation with curl calculations and variable naming improvements
+  - `hybrid_calculus.dart`: Combined symbolic and numerical calculus approaches
+- **[FEATURE]** Implemented equation solver framework (`lib/src/math/algebra/solver/`)
+  - `equation_solver.dart`: Polynomial solving, variable isolation, factor solving, and identity handling
+  - Support for linear, quadratic, cubic equations
+  - Recursive solving for factored equations (e.g., `(x-1)*(x-2) = 0`)
+  - Power equation solving (e.g., `x^3 = 0`)
+  - Identity equation detection (e.g., `x - x = 0`)
+- **[FEATURE]** Added expression simplification framework (`lib/src/math/algebra/expression/simplifier/`)
+  - `simplifier.dart`: Core simplification strategies
+  - `trig_simplifier.dart`: Trigonometric simplification rules
+- **[FEATURE]** Added inverse trigonometric functions
+  - `asin.dart`: Inverse sine function
+  - `acos.dart`: Inverse cosine function
+  - `atan.dart`: Inverse tangent function
+- **[FEATURE]** Added nonlinear mathematics modules (`lib/src/math/algebra/nonlinear/`)
+  - `optimization.dart`: Optimization algorithms
+  - `root_finding.dart`: Root finding methods
+  - `systems.dart`: Nonlinear systems solving
+- **[FEATURE]** Added differential equations module (`lib/src/math/differential_equations/`)
+- **[FEATURE]** Added statistics module (`lib/src/math/statistics/`)
+
+## Parser Enhancements
+
+- **[FEATURE]** Enhanced expression parser with calculus operations
+  - Added `diff(expr, var)` parsing for differentiation
+  - Added `integrate(expr, var)` parsing for integration
+  - Added `solve(eq, var)` parsing for equation solving
+  - Improved simplification of parsed results
+- **[IMPROVEMENT]** Parser now handles complex nested expressions correctly
+
+## Expression System Refactoring
+
+- **[BREAKING]** Updated `differentiate()` signature to accept optional `Variable` parameter for partial differentiation support
+  - Updated in all expression classes: `Add`, `Subtract`, `Multiply`, `Divide`, `Pow`, `Sin`, `Cos`, `Tan`, `Sec`, `Csc`, `Cot`, `Exp`, `Ln`, `Log`, `Abs`, and all other expression types
+- **[IMPROVEMENT]** Refactored `simplify()` to `simplifyBasic()` in binary operations for better simplification control
+  - Updated: `Add`, `Subtract`, `Multiply`, `Power`
+- **[BUG_FIX]** Fixed `Add.simplifyBasic()` to correctly parse terms instead of creating invalid `Variable` objects
+- **[BUG_FIX]** Fixed `Subtract.simplifyBasic()` to handle nested additions and parse terms correctly
+- **[BUG_FIX]** Fixed `Multiply.simplifyBasic()` to implement associativity rules for coefficient combination (e.g., `(-1) * (2 * x)` → `(-2) * x`)
+- **[IMPROVEMENT]** Enhanced `Subtract` to flatten nested subtractions and additions
+- **[IMPROVEMENT]** Improved term parsing in algebraic operations
+
+## Additional Improvements
+
+- **[FEATURE]** Added comprehensive test suites
+  - `test/parser_calculus_test.dart`: 100 tests for differentiation, integration, and solving
+  - `test/calculus/`: Calculus module tests
+  - `test/solver/`: Equation solver tests
+  - `test/differential_equations/`: Differential equations tests
+  - `test/statistics/`: Statistics tests
+  - `test/nonlinear/`: Nonlinear mathematics tests
+- **[FEATURE]** Added example: `example/symbolic_calculus_example.dart`
+- **[IMPROVEMENT]** Enhanced `Limit` class with better limit calculation
+- **[IMPROVEMENT]** Updated expression exports in `advance_math.dart` and `algebra.dart`
+- **[IMPROVEMENT]** Code formatting improvements across multiple files
+- **[REFACTOR]** Variable naming consistency (e.g., `F1, F2, F3` → `f1, f2, f3` in curl calculations)
+- **[CLEANUP]** Removed `simple_export_test.dart`
+
+## Bug Fixes
+
+- **[BUG_FIX]** Fixed coefficient extraction in polynomial solver for correct quadratic detection
+- **[BUG_FIX]** Fixed identity equation handling (e.g., `solve(x-x, x)` now returns `[0]`)
+- **[BUG_FIX]** Fixed cancellation detection in subtraction (e.g., `x - x = 0`)
+
 # 5.3.8
 
 - **[IMPROVEMENT]** Updated dependencies

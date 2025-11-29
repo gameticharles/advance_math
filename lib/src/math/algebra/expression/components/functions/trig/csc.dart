@@ -61,15 +61,17 @@ class Csc extends TrigonometricExpression {
   ///
   /// The derivative of csc(x) is -csc(x)cot(x).
   @override
-  Expression differentiate() {
+  Expression differentiate([Variable? v]) {
     if (n == 1) {
-      return Multiply(Literal(-1), Multiply(this, Cot(operand)));
+      // Chain rule: d/dv(csc(f)) = -csc(f)*cot(f) * df/dv
+      return Multiply(Literal(-1),
+          Multiply(Multiply(this, Cot(operand)), operand.differentiate(v)));
     } else {
       // For higher powers, the derivative can be found using the chain rule and power rule.
       return Multiply(
           Literal(-n),
           Multiply(Pow(Csc(operand), Literal(n - 1)),
-              Multiply(Cot(operand), operand.differentiate())));
+              Multiply(Cot(operand), operand.differentiate(v))));
     }
   }
 

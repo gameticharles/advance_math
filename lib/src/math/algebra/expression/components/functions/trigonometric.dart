@@ -48,7 +48,7 @@ class Trigonometric extends Expression {
   }
 
   @override
-  Trigonometric differentiate() {
+  Expression differentiate([Variable? v]) {
     // Differentiation rules for trigonometric functions.
     switch (functionName) {
       case 'sin':

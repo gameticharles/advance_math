@@ -16,7 +16,7 @@ class Divide extends BinaryOperationsExpression {
     dynamic leftEval = left.evaluate(arg);
     dynamic rightEval = right.evaluate(arg);
 
-    if (leftEval == 0) {
+    if (rightEval == 0) {
       throw Exception('Division by zero!');
     }
 
@@ -55,11 +55,11 @@ class Divide extends BinaryOperationsExpression {
   }
 
   @override
-  Expression differentiate() {
+  Expression differentiate([Variable? v]) {
     // Applying the quotient rule: (u / v)' = (u' * v - u * v') / v^2
     // where u and v are functions of x.
-    var uPrime = left.differentiate();
-    var vPrime = right.differentiate();
+    var uPrime = left.differentiate(v);
+    var vPrime = right.differentiate(v);
     var vSquared = Multiply(right, right);
 
     return Divide(
@@ -170,10 +170,19 @@ class Divide extends BinaryOperationsExpression {
   }
 
   @override
-  Expression simplify() {
+  Expression simplifyBasic() {
     // Basic simplification: if both operands are literals, evaluate and return a new Literal.
     if (left is Literal && right is Literal) {
-      return Literal(left.evaluate() / right.evaluate());
+      var leftVal = left.evaluate();
+      var rightVal = right.evaluate();
+      if (leftVal is int && rightVal is int && leftVal % rightVal == 0) {
+        return Literal(leftVal / rightVal);
+      }
+      // Do not evaluate to double if we want symbolic fraction
+      // But if inputs were doubles, we might want to evaluate?
+      if (leftVal is double || rightVal is double) {
+        return Literal(leftVal / rightVal);
+      }
     }
     return this; // More complex simplification can be added later.
   }

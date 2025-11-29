@@ -137,13 +137,16 @@ abstract class Expression {
 
   /// Differentiates the expression with respect to a variable.
   ///
-  /// This method returns the derivative of the expression. For expressions
-  /// involving multiple variables, the differentiation is typically done
-  /// with respect to the main variable of the expression.
+  /// This method returns the derivative of the expression with respect to [v].
+  /// For partial differentiation, specify the variable to differentiate with respect to.
+  /// For single-variable expressions, the variable should be the main variable.
+  ///
+  /// Parameters:
+  ///   - [v]: The variable to differentiate with respect to (optional for backward compatibility)
   ///
   /// Returns:
   ///   - An `Expression` representing the derivative of the expression.
-  Expression differentiate();
+  Expression differentiate([Variable? v]);
 
   /// Integrates the expression with respect to a variable.
   ///
@@ -155,8 +158,11 @@ abstract class Expression {
   ///   - An `Expression` representing the integral of the expression.
   Expression integrate();
 
+  /// Performs basic simplification (arithmetic, combining like terms).
+  Expression simplifyBasic() => this;
+
   /// Simplifies the expression, if possible, and returns a new simplified expression.
-  Expression simplify();
+  Expression simplify() => Simplifier.simplify(this);
 
   /// Expands the expression, if applicable, and returns a new expanded expression.
   Expression expand();
@@ -272,7 +278,7 @@ class ExpressionEvaluatorException implements Exception {
 
 class ThisExpression extends Expression {
   @override
-  Expression differentiate() => this;
+  Expression differentiate([Variable? v]) => this;
 
   @override
   evaluate([arg]) {
@@ -287,7 +293,7 @@ class ThisExpression extends Expression {
   Expression integrate() => integrate();
 
   @override
-  Expression simplify() => simplify();
+  Expression simplify() => Simplifier.simplify(this);
 
   @override
   Expression substitute(Expression oldExpr, Expression newExpr) {

@@ -5,7 +5,7 @@ import '../../../number/complex/complex.dart';
 import 'package:petitparser/petitparser.dart';
 import '../../../../advance_math.dart' as math;
 
-part 'parser.dart';
+export 'parser.dart';
 part 'utils.dart';
 part 'exceptions.dart';
 
@@ -32,6 +32,9 @@ part 'components/functions/trig/tan.dart';
 part 'components/functions/trig/sec.dart';
 part 'components/functions/trig/csc.dart';
 part 'components/functions/trig/cot.dart';
+part 'components/functions/trig/asin.dart';
+part 'components/functions/trig/acos.dart';
+part 'components/functions/trig/atan.dart';
 part 'components/functions/trig/trig_expression.dart';
 part 'components/functions/rational.dart';
 part 'components/functions/abs.dart';
@@ -54,3 +57,6 @@ part 'components/structured/indexing_expression.dart';
 part 'components/structured/member_expression.dart';
 part 'components/structured/negation_expression.dart';
 part 'components/structured/unary_operator_expression.dart';
+
+part 'simplifier/simplifier.dart';
+part 'simplifier/trig_simplifier.dart';

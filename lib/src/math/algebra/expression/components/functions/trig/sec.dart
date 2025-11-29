@@ -9,8 +9,10 @@ class Sec extends TrigonometricExpression {
   }
 
   @override
-  Expression differentiate() {
-    return Multiply(Sec(operand), Tan(operand));
+  Expression differentiate([Variable? v]) {
+    // Chain rule: d/dv(sec(f)) = sec(f)*tan(f) * df/dv
+    return Multiply(
+        Multiply(Sec(operand), Tan(operand)), operand.differentiate(v));
   }
 
   @override

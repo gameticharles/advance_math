@@ -270,7 +270,7 @@ class MultiVariablePolynomial extends Expression {
   }
 
   @override
-  Expression differentiate() {
+  Expression differentiate([Variable? v]) {
     // Determine the variable to differentiate with respect to
     Set<String> allVars = {};
     for (var term in terms) {

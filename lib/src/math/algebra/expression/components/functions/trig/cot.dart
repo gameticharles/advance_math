@@ -15,9 +15,9 @@ class Cot extends TrigonometricExpression {
   }
 
   @override
-  Expression differentiate() {
-    // Derivative of cot(x) is -csc^2(x)
-    return Multiply(Literal(-1), Pow(Csc(operand), Literal(2)));
+  Expression differentiate([Variable? v]) {
+    // Chain rule: d/dv(cot(f)) = -csc^2(f) * df/dv
+    return Multiply(Multiply(Literal(-1), Pow(Csc(operand), Literal(2))), operand.differentiate(v));
   }
 
   @override

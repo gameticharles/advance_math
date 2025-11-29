@@ -1,4 +1,7 @@
-part of 'expression.dart';
+import 'package:petitparser/petitparser.dart';
+import 'expression.dart';
+import '../calculus/symbolic_integration.dart';
+import '../solver/equation_solver.dart';
 
 class ExpressionParser {
   ExpressionParser() {
@@ -164,8 +167,29 @@ class ExpressionParser {
           }
         }
         // elements = [leftOperand, operator, rightOperand, operator, rightOperand, ...]
+        if (elements.isEmpty) {
+          throw FormatException('Binary expression cannot be empty');
+        }
         if (elements.length == 1) {
           return elements[0]; // Only a single operand, return it directly
+        }
+
+        // Helper to create specific binary expressions
+        Expression createBinary(String op, Expression left, Expression right) {
+          switch (op) {
+            case '+':
+              return Add(left, right);
+            case '-':
+              return Subtract(left, right);
+            case '*':
+              return Multiply(left, right);
+            case '/':
+              return Divide(left, right);
+            case '^':
+              return Pow(left, right);
+            default:
+              return BinaryExpression(op, left, right);
+          }
         }
 
         // Handle right-associativity for the `^` operator
@@ -176,7 +200,7 @@ class ExpressionParser {
             var right = tokens.removeAt(index + 1);
             tokens.removeAt(index); // Remove operator
             var left = tokens.removeAt(index - 1);
-            tokens.insert(index - 1, BinaryExpression(operator, left, right));
+            tokens.insert(index - 1, createBinary(operator, left, right));
           }
           return tokens;
         }
@@ -203,7 +227,7 @@ class ExpressionParser {
           var right = stack[index + 1];
 
           stack.replaceRange(
-              index - 1, index + 2, [BinaryExpression(operator, left, right)]);
+              index - 1, index + 2, [createBinary(operator, left, right)]);
         }
 
         return stack[0];
@@ -215,35 +239,30 @@ class ExpressionParser {
 
   Parser<void> _lookahead(Parser parser) => parser.and();
   Parser<UnaryExpression> get unaryExpression {
-    // Operand parser: Matches numbers and booleans
-    final operandParser = (string('true').map((_) => Literal(true)) |
-            string('false').map((_) => Literal(false)) |
-            digit().plus().flatten().map((value) => Literal(int.parse(value))))
+    // Atom parser: Matches literals, variables, and groups
+    final atom = (literal | variable | groupOrIdentifier).trim();
+
+    // Prefix operators: +, -, !, ~
+    final prefixOps = _unaryOperations
+        .map((op) => string(op))
+        .reduce((a, b) => (a | b).cast<String>())
         .trim();
 
-    // Operator parser
-    final operatorParser = _unaryOperations
-        .map<Parser<String>>((op) {
-          // Special handling for factorial to avoid conflict with !=
-          if (op == '!') {
-            return string('!').seq(_lookahead(char('=').not())).map((_) => '!');
-          }
-          return string(op);
-        })
-        .reduce((a, b) => (a | b).cast())
-        .trim();
+    // Suffix operators: ! (factorial)
+    final suffixOps =
+        string('!').seq(_lookahead(char('=').not())).map((_) => '!').trim();
 
-    // Suffix unary parser
-    final suffixUnaryParser = operandParser.seq(operatorParser).map((parsed) {
-      final operand = parsed[0] as Expression; // Ensure it's an Expression
-      final operator = parsed[1] as String; // Operator is a string
+    // Suffix unary parser: Must use atom to avoid left recursion
+    final suffixUnaryParser = atom.seq(suffixOps).map((parsed) {
+      final operand = parsed[0] as Expression;
+      final operator = parsed[1] as String;
       return UnaryExpression(operator, operand, prefix: false);
     });
 
-    // Prefix unary parser
-    final prefixUnaryParser = operatorParser.seq(operandParser).map((parsed) {
-      final operator = parsed[0] as String; // Operator is a string
-      final operand = parsed[1] as Expression; // Ensure it's an Expression
+    // Prefix unary parser: Can use token because operator is consumed first
+    final prefixUnaryParser = prefixOps.seq(token).map((parsed) {
+      final operator = parsed[0] as String;
+      final operand = parsed[1] as Expression;
       return UnaryExpression(operator, operand, prefix: true);
     });
 
@@ -275,6 +294,10 @@ class ExpressionParser {
   // e.g. `foo`, `bar.baz`, `foo['bar'].baz`
   // It also gobbles function calls:
   // e.g. `Math.acos(obj.angle)`
+  // Gobble a non-literal variable name. This variable name may include properties
+  // e.g. `foo`, `bar.baz`, `foo['bar'].baz`
+  // It also gobbles function calls:
+  // e.g. `Math.acos(obj.angle)`
   Parser<Expression> get variable => groupOrIdentifier
           .seq((memberArgument.cast() | indexArgument | callArgument).star())
           .map((l) {
@@ -288,6 +311,61 @@ class ExpressionParser {
             return IndexExpression(object, argument);
           }
           if (argument is List<Expression>) {
+            // Handle function calls
+            if (object is Variable) {
+              final name = object.identifier.name;
+              final args = argument;
+
+              // Trigonometric functions
+              if (name == 'sin' && args.length == 1) return Sin(args[0]);
+              if (name == 'cos' && args.length == 1) return Cos(args[0]);
+              if (name == 'tan' && args.length == 1) return Tan(args[0]);
+              if (name == 'sec' && args.length == 1) return Sec(args[0]);
+              if (name == 'csc' && args.length == 1) return Csc(args[0]);
+              if (name == 'cot' && args.length == 1) return Cot(args[0]);
+
+              // Inverse Trigonometric functions
+              if (name == 'asin' && args.length == 1) return Asin(args[0]);
+              if (name == 'acos' && args.length == 1) return Acos(args[0]);
+              if (name == 'atan' && args.length == 1) return Atan(args[0]);
+
+              // Exponential / Logarithmic
+              if (name == 'exp' && args.length == 1) return Exp(args[0]);
+              if (name == 'abs' && args.length == 1) return Abs(args[0]);
+              if (name == 'ln' && args.length == 1) return Ln(args[0]);
+              if (name == 'log' && args.length == 1) {
+                return Log(args[0], Literal(10)); // Default base 10
+              }
+              if (name == 'log' && args.length == 2) {
+                return Log(args[0], args[1]);
+              }
+
+              // Calculus & Solver
+              if ((name == 'diff' || name == 'differentiate') &&
+                  args.length >= 2) {
+                // diff(expr, var)
+                if (args[1] is Variable) {
+                  return args[0].differentiate(args[1] as Variable).simplify();
+                }
+              }
+
+              if (name == 'integrate' && args.length >= 2) {
+                // integrate(expr, var)
+                if (args[1] is Variable) {
+                  return SymbolicIntegration.integrate(
+                      args[0], args[1] as Variable);
+                }
+              }
+
+              if (name == 'solve' && args.length >= 2) {
+                // solve(equation, var)
+                if (args[1] is Variable) {
+                  final solutions =
+                      ExpressionSolver.solve(args[0], args[1] as Variable);
+                  return Literal(solutions, solutions.toString());
+                }
+              }
+            }
             return CallExpression(object, argument);
           }
           throw ArgumentError('Invalid type ${argument.runtimeType}');
@@ -312,7 +390,13 @@ class ExpressionParser {
       (char('[') & expression.trim() & char(']')).pick(1).cast();
 
   Parser<List<Expression>> get callArgument =>
-      (char('(') & arguments.trim() & char(')')).pick(1).cast();
+      (char('(') & arguments.trim() & char(')'))
+          .pick(1)
+          .cast<List<Expression>>()
+          .map((l) {
+        // print('Call args parsed: $l');
+        return l;
+      });
 
   // Ternary expression: test ? consequent : alternate
   Parser<List<Expression>> get conditionArguments =>

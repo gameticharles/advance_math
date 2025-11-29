@@ -126,7 +126,7 @@ void main() {
           1.toExpression().evaluate()
         ]);
 
-        final derivative = poly.differentiate();
+        final derivative = poly.differentiate() as Polynomial;
         expect(derivative, isA<Polynomial>());
 
         // Derivative should be: 6x + 2
@@ -146,7 +146,7 @@ void main() {
           (ex(-1) as Literal).value
         ]);
 
-        final derivative = poly.differentiate();
+        final derivative = poly.differentiate() as Polynomial;
         expect(derivative, isA<Polynomial>());
 
         // Derivative should be: 12x^2 - 6x + 2

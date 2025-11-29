@@ -32,10 +32,10 @@ class RationalFunction extends Expression {
   }
 
   @override
-  Expression differentiate() {
+  Expression differentiate([Variable? v]) {
     // Apply quotient rule: (f/g)' = (f'g - fg')/g^2
-    Expression fPrime = numerator.differentiate();
-    Expression gPrime = denominator.differentiate();
+    Expression fPrime = numerator.differentiate(v);
+    Expression gPrime = denominator.differentiate(v);
     Expression gSquare = Multiply(denominator, denominator);
 
     return Divide(

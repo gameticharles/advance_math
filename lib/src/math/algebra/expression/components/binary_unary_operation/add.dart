@@ -45,9 +45,9 @@ class Add extends BinaryOperationsExpression {
   }
 
   @override
-  Expression differentiate() {
+  Expression differentiate([Variable? v]) {
     // The derivative of a sum is the sum of the derivatives.
-    return Add(left.differentiate(), right.differentiate());
+    return Add(left.differentiate(v), right.differentiate(v));
   }
 
   @override
@@ -57,7 +57,7 @@ class Add extends BinaryOperationsExpression {
   }
 
   @override
-  Expression simplify() {
+  Expression simplifyBasic() {
     Expression simplifiedLeft = left.simplify();
     Expression simplifiedRight = right.simplify();
 
@@ -68,11 +68,11 @@ class Add extends BinaryOperationsExpression {
 
     // Check if one of the operands is 0 (identity for addition).
     // Identity Element
-    if (simplifiedRight is Literal && simplifiedRight.evaluate() == 0) {
-      return simplifiedLeft;
+    if (simplifiedRight is Literal) {
+      if (simplifiedRight.evaluate() == 0) return simplifiedLeft;
     }
-    if (simplifiedLeft is Literal && simplifiedLeft.evaluate() == 0) {
-      return simplifiedRight;
+    if (simplifiedLeft is Literal) {
+      if (simplifiedLeft.evaluate() == 0) return simplifiedRight;
     }
 
     // Negation
@@ -89,10 +89,21 @@ class Add extends BinaryOperationsExpression {
       }
     }
     // Direct negation without multiplication
-    var leftValue = simplifiedLeft.evaluate();
-    var rightValue = simplifiedRight.evaluate();
-    if (leftValue != null && rightValue != null && leftValue == -rightValue) {
-      return Literal(0);
+    try {
+      if (simplifiedLeft is Literal || simplifiedRight is Literal) {
+        // If one is literal, we might want to evaluate to check for cancellation if the other evaluates to a number
+        // But generally, we shouldn't evaluate symbolic expressions here.
+      }
+
+      // Only evaluate if we are sure it won't crash or if we catch it.
+      // For now, let's skip this check for complex symbolic expressions that might crash evaluate()
+      var leftValue = simplifiedLeft.evaluate();
+      var rightValue = simplifiedRight.evaluate();
+      if (leftValue != null && rightValue != null && leftValue == -rightValue) {
+        return Literal(0);
+      }
+    } catch (e) {
+      // Ignore evaluation errors
     }
 
     // Flattening nested additions
@@ -110,32 +121,33 @@ class Add extends BinaryOperationsExpression {
 
     // Grouping like terms and constants
     Map<String, num> likeTerms = {};
+    Map<String, Expression> termExpressions = {}; // Store original expressions
     num constantTerm = 0;
+
     for (var term in terms) {
       if (term is Literal) {
         constantTerm += term.evaluate();
       } else if (term is Variable) {
-        likeTerms.update(
-          term.toString(),
-          (value) => value + 1,
-          ifAbsent: () => 1,
-        );
+        String key = term.toString();
+        likeTerms.update(key, (val) => val + 1, ifAbsent: () => 1);
+        termExpressions.putIfAbsent(key, () => term);
       } else if (term is Multiply && term.left is Literal) {
-        String variablePart = term.right.toString();
+        String key = term.right.toString();
         num coefficient = (term.left as Literal).evaluate();
-        likeTerms.update(
-          variablePart,
-          (value) => value + coefficient,
-          ifAbsent: () => coefficient,
-        );
+        likeTerms.update(key, (val) => val + coefficient,
+            ifAbsent: () => coefficient);
+        termExpressions.putIfAbsent(key, () => term.right);
       }
       // Handle terms of type x^2y, x^3, etc.
       else if (term is Multiply || term is Pow) {
-        likeTerms.update(
-          term.toString(),
-          (value) => value + 1,
-          ifAbsent: () => 1,
-        );
+        String key = term.toString();
+        likeTerms.update(key, (val) => val + 1, ifAbsent: () => 1);
+        termExpressions.putIfAbsent(key, () => term);
+      } else {
+        // Fallback for other types
+        String key = term.toString();
+        likeTerms.update(key, (val) => val + 1, ifAbsent: () => 1);
+        termExpressions.putIfAbsent(key, () => term);
       }
     }
 
@@ -147,10 +159,10 @@ class Add extends BinaryOperationsExpression {
 
     for (var entry in likeTerms.entries) {
       if (entry.value == 1) {
-        simplifiedTerms.add(Variable(entry.key));
+        simplifiedTerms.add(Expression.parse(entry.key));
       } else {
         simplifiedTerms
-            .add(Multiply(Literal(entry.value), Variable(entry.key)));
+            .add(Multiply(Literal(entry.value), Expression.parse(entry.key)));
       }
     }
 

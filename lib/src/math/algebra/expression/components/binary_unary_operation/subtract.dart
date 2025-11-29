@@ -43,9 +43,9 @@ class Subtract extends BinaryOperationsExpression {
   }
 
   @override
-  Expression differentiate() {
+  Expression differentiate([Variable? v]) {
     // The derivative of a difference is the difference of the derivatives.
-    return Subtract(left.differentiate(), right.differentiate());
+    return Subtract(left.differentiate(v), right.differentiate(v));
   }
 
   @override
@@ -55,7 +55,7 @@ class Subtract extends BinaryOperationsExpression {
   }
 
   @override
-  Expression simplify() {
+  Expression simplifyBasic() {
     Expression simplifiedLeft = left.simplify();
     Expression simplifiedRight = right.simplify();
 
@@ -74,24 +74,32 @@ class Subtract extends BinaryOperationsExpression {
     }
 
     // Negation
-    if (simplifiedLeft == simplifiedRight) {
+    if (simplifiedLeft.toString() == simplifiedRight.toString()) {
       return Literal(0);
     }
 
-    // Flattening nested subtractions
+    // Flattening nested subtractions and additions
     List<Expression> terms = [];
     if (simplifiedLeft is Subtract) {
       terms.addAll([
         simplifiedLeft.left,
         Multiply(Literal(-1), simplifiedLeft.right).simplify()
       ]);
+    } else if (simplifiedLeft is Add) {
+      terms.addAll([simplifiedLeft.left, simplifiedLeft.right]);
     } else {
       terms.add(simplifiedLeft);
     }
+
     if (simplifiedRight is Subtract) {
       terms.addAll([
         Multiply(Literal(-1), simplifiedRight.left).simplify(),
         simplifiedRight.right
+      ]);
+    } else if (simplifiedRight is Add) {
+      terms.addAll([
+        Multiply(Literal(-1), simplifiedRight.left).simplify(),
+        Multiply(Literal(-1), simplifiedRight.right).simplify()
       ]);
     } else {
       terms.add(Multiply(Literal(-1), simplifiedRight).simplify());
@@ -136,10 +144,10 @@ class Subtract extends BinaryOperationsExpression {
 
     for (var entry in likeTerms.entries) {
       if (entry.value == 1) {
-        simplifiedTerms.add(Variable(entry.key));
+        simplifiedTerms.add(Expression.parse(entry.key));
       } else {
         simplifiedTerms
-            .add(Multiply(Literal(entry.value), Variable(entry.key)));
+            .add(Multiply(Literal(entry.value), Expression.parse(entry.key)));
       }
     }
 

@@ -45,21 +45,32 @@ class Pow extends BinaryOperationsExpression {
   }
 
   @override
-  Expression differentiate() {
-    // Case: (x^n)' = n * x^(n-1)
-    if (base is Variable && exponent is Literal) {
+  Expression differentiate([Variable? v]) {
+    // Generalized power rule: d/dv(f^g) = f^g * (g' * ln(f) + g * f'/f)
+    // But we handle special cases for efficiency:
+
+    // Case 1: (x^n)' where x is the variable and n is constant = n * x^(n-1) * x'
+    if (exponent is Literal) {
       var n = exponent.evaluate();
-      return Multiply(Literal(n), Pow(base, Literal(n - 1)));
+      // Chain rule: n * base^(n-1) * base'
+      return Multiply(Multiply(Literal(n), Pow(base, Literal(n - 1))),
+          base.differentiate(v));
     }
 
-    // Case: (a^x)' where a is a constant
-    if (base is Literal && exponent is Variable) {
+    // Case 2: (a^x)' where a is constant and x is the variable = a^x * ln(a) * x'
+    if (base is Literal) {
       var a = base.evaluate();
-      return Multiply(Literal(log(a)), this);
+      // Chain rule: a^x * ln(a) * exponent'
+      return Multiply(
+          Multiply(Literal(log(a)), this), exponent.differentiate(v));
     }
 
-    // Placeholder for more complex cases
-    return this;
+    // Case 3: General case (f^g)' = f^g * (g' * ln(f) + g * f'/f)
+    // This uses logarithmic differentiation
+    return Multiply(
+        this,
+        Add(Multiply(exponent.differentiate(v), Ln(base)),
+            Divide(Multiply(exponent, base.differentiate(v)), base)));
   }
 
   @override
@@ -77,7 +88,7 @@ class Pow extends BinaryOperationsExpression {
   }
 
   @override
-  Expression simplify() {
+  Expression simplifyBasic() {
     if (exponent is Literal) {
       var exponentValue = exponent.evaluate();
       if (exponentValue == 0) return Literal(1);

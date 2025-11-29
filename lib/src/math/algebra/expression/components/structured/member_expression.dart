@@ -15,9 +15,9 @@ class MemberExpression extends Expression {
   }
 
   @override
-  Expression differentiate() {
+  Expression differentiate([Variable? v]) {
     // The derivative of call is just the derivative.
-    return MemberExpression(object.differentiate(), property);
+    return MemberExpression(object.differentiate(v), property);
   }
 
   @override

@@ -18,7 +18,7 @@ class PredefinedFunctionExpression extends Expression {
   }
 
   @override
-  Expression differentiate() {
+  Expression differentiate([Variable? v]) {
     // Placeholder for differentiation of predefined functions.
     throw Exception(
         'Differentiation not implemented for function: $functionName');

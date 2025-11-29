@@ -61,18 +61,18 @@ class BinaryExpression extends Expression {
   }
 
   @override
-  Expression differentiate() {
+  Expression differentiate([Variable? v]) {
     switch (operator) {
       case '^':
-        return Pow(left, right).differentiate();
+        return Pow(left, right).differentiate(v);
       case '+':
-        return Add(left, right).differentiate();
+        return Add(left, right).differentiate(v);
       case '-':
-        return Subtract(left, right).differentiate();
+        return Subtract(left, right).differentiate(v);
       case '*':
-        return Multiply(left, right).differentiate();
+        return Multiply(left, right).differentiate(v);
       case '/':
-        return Divide(left, right).differentiate();
+        return Divide(left, right).differentiate(v);
       default:
         throw Exception(
             'Differentiation with unsupported binary operator: $operator');

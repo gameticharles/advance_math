@@ -16,11 +16,11 @@ class FunctionExpression extends Expression {
   }
 
   @override
-  FunctionExpression differentiate() {
+  Expression differentiate([Variable? v]) {
     // Differentiating a function involves differentiating its body with respect to its parameters.
     // A complete implementation would be more complex and involve chain rules, etc.
     // For simplicity, let's differentiate the body for now.
-    return FunctionExpression(name, parameters, body.differentiate());
+    return FunctionExpression(name, parameters, body.differentiate(v));
   }
 
   @override

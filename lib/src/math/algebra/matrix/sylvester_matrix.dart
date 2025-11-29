@@ -29,7 +29,7 @@ class SylvesterMatrix extends Matrix {
   Matrix buildMatrix() {
     // Computing the derivative of the polynomial and the size of the matrix
     final coefficients = polynomial.coefficients;
-    final derivative = polynomial.differentiate().coefficients;
+    final derivative = (polynomial.differentiate() as Polynomial).coefficients;
     final size = (coefficients.length - 1) + (derivative.length - 1);
 
     // Building the matrix with FIXED length lists (optimization)

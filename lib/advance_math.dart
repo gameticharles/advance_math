@@ -13,6 +13,8 @@ export 'src/number/complex/complex.dart';
 export 'src/math/basic/math.dart';
 export 'src/math/geometry/geometry.dart';
 export 'src/math/algebra/algebra.dart';
+export 'src/math/differential_equations/differential_equations.dart';
+export 'src/math/statistics/statistics.dart';
 export 'src/quantity/quantity.dart' hide Complex, Imaginary;
 export 'src/interpolate/interpolate.dart';
 export 'src/code_translator/num_words/num_words.dart';

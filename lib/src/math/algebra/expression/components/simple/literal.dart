@@ -19,8 +19,8 @@ class Literal extends Expression {
   }
 
   @override
-  Expression differentiate() {
-    // The derivative of a constant is 0
+  Expression differentiate([Variable? v]) {
+    // The derivative of a constant is always 0
     return Literal(0);
   }
 

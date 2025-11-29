@@ -4,13 +4,18 @@ class Sin extends TrigonometricExpression {
   Sin(super.operand);
 
   @override
-  num evaluate([dynamic arg]) {
-    return sin(operand.evaluate(arg));
+  dynamic evaluate([dynamic arg]) {
+    var eval = operand.evaluate(arg);
+    if (eval is num) {
+      return sin(eval);
+    }
+    return Sin(eval);
   }
 
   @override
-  Expression differentiate() {
-    return Multiply(operand.differentiate(), Cos(operand));
+  Expression differentiate([Variable? v]) {
+    // Chain rule: d/dv(sin(f)) = cos(f) * df/dv
+    return Multiply(operand.differentiate(v), Cos(operand));
   }
 
   @override
@@ -24,7 +29,7 @@ class Sin extends TrigonometricExpression {
   }
 
   @override
-  Expression simplify() {
+  Expression simplifyBasic() {
     return this;
   }
 

@@ -11,9 +11,9 @@ class Ln extends Expression {
   }
 
   @override
-  Expression differentiate() {
-    // The derivative of ln(f(x)) is f'(x) / f(x).
-    return Divide(operand.differentiate(), operand);
+  Expression differentiate([Variable? v]) {
+    // Chain rule: d/dv[ln(f(x))] = f'(x) / f(x)
+    return Divide(operand.differentiate(v), operand);
   }
 
   @override

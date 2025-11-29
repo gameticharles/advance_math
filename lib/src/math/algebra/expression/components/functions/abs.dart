@@ -11,7 +11,7 @@ class Abs extends Expression {
   }
 
   @override
-  Expression differentiate() {
+  Expression differentiate([Variable? v]) {
     // The derivative of the absolute value function is a piecewise function.
     // For this simple implementation, we'll return a `Literal` indicating it's not directly differentiable.
     // In practice, you'd handle this with a conditional representation or using signum/sgn function.

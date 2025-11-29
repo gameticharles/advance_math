@@ -9,8 +9,9 @@ class Tan extends TrigonometricExpression {
   }
 
   @override
-  Expression differentiate() {
-    return Multiply(operand.differentiate(), Pow(Sec(operand), Literal(2)));
+  Expression differentiate([Variable? v]) {
+    // Chain rule: d/dv(tan(f)) = sec^2(f) * df/dv
+    return Multiply(operand.differentiate(v), Pow(Sec(operand), Literal(2)));
   }
 
   @override

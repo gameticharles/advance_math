@@ -46,11 +46,11 @@ class UnaryExpression extends Expression {
   }
 
   @override
-  Expression differentiate() {
+  Expression differentiate([Variable? v]) {
     // Differentiation logic for unary operations.
     switch (operator) {
       case '-':
-        return UnaryExpression('-', operand.differentiate());
+        return UnaryExpression('-', operand.differentiate(v));
       // For other unary operators, differentiation might need specific logic or might not be defined.
       default:
         throw Exception(

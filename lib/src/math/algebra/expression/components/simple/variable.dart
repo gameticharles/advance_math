@@ -45,11 +45,17 @@ class Variable extends Expression {
   /// Differentiates the variable.
   ///
   /// The derivative of a variable with respect to itself is 1.
+  /// The derivative of a variable with respect to a different variable is 0.
+  ///
+  /// Parameters:
+  ///   - [v]: The variable to differentiate with respect to (optional for backward compatibility)
   @override
-  Expression differentiate() {
-    // The derivative of a variable with respect to itself is 1.
-    // Assuming differentiation with respect to this variable.
-    return Literal(1);
+  Expression differentiate([Variable? v]) {
+    // If no variable specified, assume differentiation with respect to this variable
+    if (v == null) return Literal(1);
+    
+    // Partial derivative: dv/dv = 1, dx/dy = 0
+    return (this == v) ? Literal(1) : Literal(0);
   }
 
   /// Integrates the variable.
