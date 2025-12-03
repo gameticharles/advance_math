@@ -110,6 +110,55 @@
 - **[BUG_FIX]** Fixed identity equation handling (e.g., `solve(x-x, x)` now returns `[0]`)
 - **[BUG_FIX]** Fixed cancellation detection in subtraction (e.g., `x - x = 0`)
 
+## Geometry Enhancements
+
+### Plane Geometry
+
+- **[FEATURE]** Added geometric centers to `Triangle` class
+  - `centroid`: Intersection of medians (center of mass)
+  - `inCenter`: Intersection of angle bisectors (center of inscribed circle)
+  - `circumCenter`: Intersection of perpendicular bisectors (center of circumscribed circle)
+  - `orthocenter`: Intersection of altitudes
+- **[BUG_FIX]** Fixed `Polygon` class to extend `PlaneGeometry` correctly
+  - Implemented `area()` method using Shoelace formula for arbitrary polygons
+  - Implemented `perimeter()` method override
+- **[FEATURE]** Enhanced regular polygon classes (`Pentagon`, `Hexagon`, `Heptagon`, `Octagon`)
+  - Added `apothem` property (distance from center to midpoint of side)
+  - Added `sumInteriorAngles` property
+  - Added `shortDiagonal` property to `Pentagon`
+- **[FEATURE]** Added `boundingBox()` method to circle components
+  - `Sector`: Includes center, arc endpoints, and arc extremes
+  - `Segment`: Includes chord endpoints and arc extremes
+  - `Arc`: Includes endpoints and arc extremes
+- **[IMPROVEMENT]** Refactored `Sector`, `Segment`, and `Arc` classes
+  - Encapsulated fields with private accessors and validation
+  - Optimized `contains(Point)` method in `Sector` for better performance
+
+### Solid Geometry
+
+- **[FEATURE]** Implemented `Sphere` class (`lib/src/math/geometry/solid/sphere.dart`)
+  - Volume: `(4/3)πr³`
+  - Surface Area: `4πr²`
+  - Named constructors: `fromVolume()`, `fromSurfaceArea()`
+  - `contains(Point)` method to check if point is inside sphere
+- **[FEATURE]** Implemented `Cylinder` class (`lib/src/math/geometry/solid/cylinder.dart`)
+  - Volume: `πr²h`
+  - Surface Area: `2πr(r + h)`
+  - Lateral Surface Area: `2πrh`
+  - Named constructor: `fromVolumeAndRadius()`
+- **[FEATURE]** Implemented `Cone` class (`lib/src/math/geometry/solid/cone.dart`)
+  - Volume: `(1/3)πr²h`
+  - Surface Area: `πr(r + s)` where `s` is slant height
+  - Slant Height: `√(r² + h²)`
+  - Lateral Surface Area: `πrs`
+- **[FEATURE]** Implemented `RectangularPrism` class (`lib/src/math/geometry/solid/rectangular_prism.dart`)
+  - Volume: `l × w × h`
+  - Surface Area: `2(lw + lh + wh)`
+  - Space Diagonal: `√(l² + w² + h²)`
+  - `vertices()` method returns 8 corner points
+  - Factory constructor: `RectangularPrism.cube(side)` for creating cubes
+- **[FEATURE]** Created example: `example/solid_geometry_example.dart`
+
 # 5.3.8
 
 - **[IMPROVEMENT]** Updated dependencies

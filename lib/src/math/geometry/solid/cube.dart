@@ -113,4 +113,13 @@ class Cube extends SolidGeometry {
 
     return diagonals;
   }
+
+  @override
+  BoundingBox3D boundingBox() {
+    double halfSide = sideLength / 2;
+    return BoundingBox3D(
+      Point(center.x - halfSide, center.y - halfSide, center.z! - halfSide),
+      Point(center.x + halfSide, center.y + halfSide, center.z! + halfSide),
+    );
+  }
 }

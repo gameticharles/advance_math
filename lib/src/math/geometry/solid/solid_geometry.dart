@@ -41,6 +41,14 @@ abstract class SolidGeometry extends Geometry {
   /// the specific surface area calculation for the shape.
   double surfaceArea();
 
+  /// Calculates the axis-aligned bounding box (AABB) of the 3D shape.
+  ///
+  /// Returns a [BoundingBox3D] that fully contains the shape.
+  /// The bounding box is aligned with the coordinate axes.
+  ///
+  /// This method must be implemented by subclasses.
+  BoundingBox3D boundingBox();
+
   /// Calculates the perimeter of the 3D geometric shape.
   ///
   /// For solid geometries, this method is not applicable and will

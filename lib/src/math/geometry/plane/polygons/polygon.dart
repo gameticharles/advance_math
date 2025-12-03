@@ -1,4 +1,4 @@
-part of '../geometry.dart';
+part of '../../geometry.dart';
 
 /// A class representing a polygon, which can be used to compute various properties
 /// such as area, perimeter, interior and exterior angles, as well as to check
@@ -36,13 +36,13 @@ part of '../geometry.dart';
 /// Polygon polygon = Polygon(vertices: vertices);
 /// print("Number of sides: ${polygon.numSides}"); // 6
 /// ```
-class Polygon {
+class Polygon extends PlaneGeometry {
   List<Point>? vertices;
   List<num>? sides;
   int? numSides;
   double? sideLength;
 
-  Polygon({this.vertices, this.numSides, this.sideLength}) {
+  Polygon({this.vertices, this.numSides, this.sideLength}) : super('Polygon') {
     if (vertices != null) {
       numSides = vertices!.length;
     }
@@ -796,6 +796,24 @@ class Polygon {
   /// double area = polygon.areaPolygon();
   /// print("Area of the regular polygon: ${area.toStringAsFixed(6)}");
   /// ```
+  /// Calculates the area of the polygon.
+  ///
+  /// If vertices are defined, uses the Shoelace formula.
+  /// If it's a regular polygon (defined by numSides and sideLength), uses the regular polygon area formula.
+  /// Calculates the area of the polygon.
+  ///
+  /// If vertices are defined, uses the Shoelace formula.
+  /// If it's a regular polygon (defined by numSides and sideLength), uses the regular polygon area formula.
+  @override
+  double area() {
+    if (vertices != null && vertices!.isNotEmpty) {
+      return shoelace();
+    } else if (numSides != null && sideLength != null) {
+      return areaPolygon();
+    }
+    return 0.0;
+  }
+
   double areaPolygon() {
     if (numSides == null || sideLength == null) {
       throw Exception(
@@ -827,20 +845,20 @@ class Polygon {
   /// double perimeter = polygon.perimeter();
   /// print("Perimeter of the polygon: ${perimeter.toStringAsFixed(6)}");
   /// ```
+  @override
   num perimeter() {
-    num perimeter = 0;
-    if (vertices != null) {
-      for (int i = 0; i < numSides!; i++) {
-        perimeter += vertices![i].distanceTo(vertices![(i + 1) % numSides!]);
+    if (sides != null) {
+      return sides!.fold(0, (p, c) => p + c);
+    } else if (vertices != null) {
+      num p = 0;
+      for (int i = 0; i < vertices!.length; i++) {
+        p += vertices![i].distanceTo(vertices![(i + 1) % vertices!.length]);
       }
-    } else {
-      if (sides == null) {
-        throw Exception(
-            "Number of sides and side length are required for regular polygon perimeter calculation.");
-      }
-      perimeter = sides!.reduce((value, element) => value + element);
+      return p;
+    } else if (numSides != null && sideLength != null) {
+      return numSides! * sideLength!;
     }
-    return perimeter;
+    return 0;
   }
 
   /// Calculate the centroid of a polygon.

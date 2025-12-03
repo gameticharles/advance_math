@@ -414,6 +414,78 @@ class Triangle extends PlaneGeometry {
     }
   }
 
+  /// The centroid of the triangle (intersection of medians).
+  Point get centroid {
+    if (A == null || B == null || C == null) {
+      throw StateError("Vertices A, B, C must be known to calculate centroid.");
+    }
+    return Point(
+      (A!.x + B!.x + C!.x) / 3,
+      (A!.y + B!.y + C!.y) / 3,
+    );
+  }
+
+  /// The incenter of the triangle (intersection of angle bisectors).
+  Point get inCenter {
+    if (A == null ||
+        B == null ||
+        C == null ||
+        a == null ||
+        b == null ||
+        c == null) {
+      throw StateError(
+          "Vertices and sides must be known to calculate inCenter.");
+    }
+    double p = (a! + b! + c!).toDouble();
+    return Point(
+      (a! * A!.x + b! * B!.x + c! * C!.x) / p,
+      (a! * A!.y + b! * B!.y + c! * C!.y) / p,
+    );
+  }
+
+  /// The circumcenter of the triangle (intersection of perpendicular bisectors).
+  Point get circumCenter {
+    if (A == null || B == null || C == null) {
+      throw StateError(
+          "Vertices A, B, C must be known to calculate circumCenter.");
+    }
+    double d = (2 *
+            (A!.x * (B!.y - C!.y) +
+                B!.x * (C!.y - A!.y) +
+                C!.x * (A!.y - B!.y)))
+        .toDouble();
+    if (d == 0) {
+      // Collinear points, circumcenter is at infinity.
+      // Returning a point with Infinity coordinates.
+      return Point(double.infinity, double.infinity);
+    }
+    double ux = (((A!.x * A!.x + A!.y * A!.y) * (B!.y - C!.y) +
+                (B!.x * B!.x + B!.y * B!.y) * (C!.y - A!.y) +
+                (C!.x * C!.x + C!.y * C!.y) * (A!.y - B!.y)) /
+            d)
+        .toDouble();
+    double uy = (((A!.x * A!.x + A!.y * A!.y) * (C!.x - B!.x) +
+                (B!.x * B!.x + B!.y * B!.y) * (A!.x - C!.x) +
+                (C!.x * C!.x + C!.y * C!.y) * (B!.x - A!.x)) /
+            d)
+        .toDouble();
+    return Point(ux, uy);
+  }
+
+  /// The orthocenter of the triangle (intersection of altitudes).
+  Point get orthocenter {
+    // Euler line property: OH = 3 * OG - 2 * OC where G is centroid, C is circumcenter
+    Point g = centroid;
+    Point c = circumCenter;
+    if (c.x.isInfinite || c.y.isInfinite) {
+      return Point(double.infinity, double.infinity);
+    }
+    return Point(
+      3 * g.x - 2 * c.x,
+      3 * g.y - 2 * c.y,
+    );
+  }
+
   @override
   String toString() {
     return 'Triangle(a: $a, b: $b, c: $c, angleA: $angleA, angleB: $angleB, angleC: $angleC, A: $A, B: $B, C: $C)';

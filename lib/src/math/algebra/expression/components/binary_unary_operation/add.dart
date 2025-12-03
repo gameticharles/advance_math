@@ -109,16 +109,17 @@ class Add extends BinaryOperationsExpression {
 
     // Flattening nested additions
     List<Expression> terms = [];
-    if (simplifiedLeft is Add) {
-      terms.addAll([simplifiedLeft.left, simplifiedLeft.right]);
-    } else {
-      terms.add(simplifiedLeft);
+    void flatten(Expression expr) {
+      if (expr is Add) {
+        flatten(expr.left);
+        flatten(expr.right);
+      } else {
+        terms.add(expr);
+      }
     }
-    if (simplifiedRight is Add) {
-      terms.addAll([simplifiedRight.left, simplifiedRight.right]);
-    } else {
-      terms.add(simplifiedRight);
-    }
+
+    flatten(simplifiedLeft);
+    flatten(simplifiedRight);
 
     // Grouping like terms and constants
     Map<String, dynamic> likeTerms = {};
@@ -183,14 +184,20 @@ class Add extends BinaryOperationsExpression {
       if (term1 is Pow &&
           term1.exponent is Literal &&
           (term1.exponent as Literal).value == 2) {
+        // Unwrap GroupExpression
+        var base = term1.base;
+        while (base is GroupExpression) {
+          base = base.expression;
+        }
+
         // Check if base is Subtract(A, B) or Add(A, -B)
         Expression? A, B;
-        if (term1.base is Subtract) {
-          A = (term1.base as Subtract).left;
-          B = (term1.base as Subtract).right;
-        } else if (term1.base is Add) {
+        if (base is Subtract) {
+          A = base.left;
+          B = base.right;
+        } else if (base is Add) {
           // A + (-B)
-          var baseAdd = term1.base as Add;
+          var baseAdd = base;
           if (baseAdd.right is Multiply &&
               (baseAdd.right as Multiply).left is Literal &&
               (baseAdd.right as Multiply).left.evaluate() == -1) {
@@ -214,7 +221,14 @@ class Add extends BinaryOperationsExpression {
             // Let's construct 4*A*B and simplify it to compare
             var target4AB =
                 Multiply(Literal(4), Multiply(A, B)).simplifyBasic();
-            if (term2.toString() == target4AB.toString()) {
+            var target4BA =
+                Multiply(Literal(4), Multiply(B, A)).simplifyBasic();
+
+            print('DEBUG Add: term1=$term1, term2=$term2');
+            print('DEBUG Add: target4AB=$target4AB, target4BA=$target4BA');
+
+            if (term2.toString() == target4AB.toString() ||
+                term2.toString() == target4BA.toString()) {
               // Found it! Replace term1 and term2 with (A+B)^2
               simplifiedTerms.removeAt(max(i, j));
               simplifiedTerms.removeAt(min(i, j));

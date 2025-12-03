@@ -414,7 +414,8 @@ void main() {
               expect(parser.parse('solve(x^3, x)').toString(), contains('0')));
       test(
           'solve(x^2 - 2*x + 1, x)',
-          () => expect(parser.parse('solve(x^2 - 2*x + 1, x)').toString(),
+          () => expect(
+              parser.parse('solve(x^2 - 2*x + 1, x)').evaluate().toString(),
               contains('1')));
       test(
           'solve(x^2 + 2*x + 1 - 4, x)',

@@ -140,6 +140,10 @@ class Pow extends BinaryOperationsExpression {
 
   @override
   String toString() {
-    return "${base.toString()}^${exponent.toString()}";
+    var baseStr = base.toString();
+    if (base is Add || base is Subtract || base is Multiply || base is Divide) {
+      baseStr = '($baseStr)';
+    }
+    return "$baseStr^${exponent.toString()}";
   }
 }

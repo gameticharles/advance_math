@@ -81,30 +81,24 @@ class Subtract extends BinaryOperationsExpression {
 
     // Flattening nested subtractions and additions
     List<Expression> terms = [];
-    if (simplifiedLeft is Subtract) {
-      terms.addAll([
-        simplifiedLeft.left,
-        Multiply(Literal(-1), simplifiedLeft.right).simplify()
-      ]);
-    } else if (simplifiedLeft is Add) {
-      terms.addAll([simplifiedLeft.left, simplifiedLeft.right]);
-    } else {
-      terms.add(simplifiedLeft);
+    void flatten(Expression expr, bool negate) {
+      if (expr is Add) {
+        flatten(expr.left, negate);
+        flatten(expr.right, negate);
+      } else if (expr is Subtract) {
+        flatten(expr.left, negate);
+        flatten(expr.right, !negate);
+      } else {
+        if (negate) {
+          terms.add(Multiply(Literal(-1), expr).simplify());
+        } else {
+          terms.add(expr);
+        }
+      }
     }
 
-    if (simplifiedRight is Subtract) {
-      terms.addAll([
-        Multiply(Literal(-1), simplifiedRight.left).simplify(),
-        simplifiedRight.right
-      ]);
-    } else if (simplifiedRight is Add) {
-      terms.addAll([
-        Multiply(Literal(-1), simplifiedRight.left).simplify(),
-        Multiply(Literal(-1), simplifiedRight.right).simplify()
-      ]);
-    } else {
-      terms.add(Multiply(Literal(-1), simplifiedRight).simplify());
-    }
+    flatten(simplifiedLeft, false);
+    flatten(simplifiedRight, true);
 
     // Grouping like terms and constants
     Map<String, dynamic> likeTerms = {};

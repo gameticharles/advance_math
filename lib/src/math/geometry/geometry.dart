@@ -19,12 +19,20 @@ part 'plane/plane.dart';
 part 'plane/circles/circle.dart';
 part 'plane/circles/ellipse.dart';
 part 'plane/circles/annulus.dart';
+part 'plane/circles/sector.dart';
+part 'plane/circles/segment.dart';
+part 'plane/circles/arc.dart';
+part 'plane/circles/error_ellipse.dart';
 
-part 'plane/polygon.dart';
+part 'plane/polygons/polygon.dart';
 
 part 'plane/triangles/spherical_triangle.dart';
 part 'plane/triangles/triangle.dart';
 part 'plane/triangles/area_methods.dart';
+part 'plane/triangles/equilateral_triangle.dart';
+part 'plane/triangles/isosceles_triangle.dart';
+part 'plane/triangles/scalene_triangle.dart';
+part 'plane/triangles/right_triangle.dart';
 
 part 'plane/quadrilateral/square.dart';
 part 'plane/quadrilateral/rectangle.dart';
@@ -32,10 +40,29 @@ part 'plane/quadrilateral/trapezoid.dart';
 part 'plane/quadrilateral/parallelogram.dart';
 part 'plane/quadrilateral/rhombus.dart';
 
+part 'plane/polygons/pentagon.dart';
+part 'plane/polygons/hexagon.dart';
+part 'plane/polygons/heptagon.dart';
+part 'plane/polygons/octagon.dart';
+
 // Solid Geometry
+part 'solid/bounding_box_3d.dart';
 part 'solid/solid_geometry.dart';
 
 part 'solid/cube.dart';
+part 'solid/sphere.dart';
+part 'solid/cylinder.dart';
+part 'solid/cone.dart';
+part 'solid/rectangular_prism.dart';
+part 'solid/ellipsoid.dart';
+part 'solid/torus.dart';
+part 'solid/square_pyramid.dart';
+part 'solid/tetrahedron.dart';
+part 'solid/triangular_prism.dart';
+part 'solid/hexagonal_prism.dart';
+part 'solid/octahedron.dart';
+part 'solid/dodecahedron.dart';
+part 'solid/icosahedron.dart';
 
 /// An abstract class representing a general geometric shape.
 abstract class Geometry {

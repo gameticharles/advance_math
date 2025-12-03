@@ -128,6 +128,77 @@ class Circle extends PlaneGeometry {
   double get distanceFromCenterToChord =>
       radius.toDouble() * cos(centralAngle!.rad / 2);
 
+  /// Gets a Sector from this circle's radius and central angle.
+  ///
+  /// Returns a [Sector] object representing the pie-slice portion of this circle.
+  ///
+  /// [angle] - Optional angle (as num in radians or Angle object).
+  ///           If not provided, uses the circle's centralAngle.
+  ///
+  /// Throws [StateError] if neither angle is provided nor centralAngle is set.
+  Sector getSector({dynamic angle}) {
+    Angle effectiveAngle;
+
+    if (angle != null) {
+      effectiveAngle = angle is Angle ? angle : Angle(rad: angle as num);
+    } else if (centralAngle != null) {
+      effectiveAngle = centralAngle!;
+    } else {
+      throw StateError(
+          'Either provide an angle or set centralAngle on the circle');
+    }
+
+    return Sector(radius.toDouble(), effectiveAngle, center: center);
+  }
+
+  /// Gets a Segment from this circle's radius and central angle.
+  ///
+  /// Returns a [Segment] object representing the region between the chord and arc.
+  ///
+  /// [angle] - Optional angle (as num in radians or Angle object).
+  ///           If not provided, uses the circle's centralAngle.
+  ///
+  /// Throws [StateError] if neither angle is provided nor centralAngle is set.
+  Segment getSegment({dynamic angle}) {
+    Angle effectiveAngle;
+
+    if (angle != null) {
+      effectiveAngle = angle is Angle ? angle : Angle(rad: angle as num);
+    } else if (centralAngle != null) {
+      effectiveAngle = centralAngle!;
+    } else {
+      throw StateError(
+          'Either provide an angle or set centralAngle on the circle');
+    }
+
+    return Segment(radius.toDouble(), effectiveAngle, center: center);
+  }
+
+  /// Gets an Arc from this circle's radius and central angle.
+  ///
+  /// Returns an [Arc] object representing the curved portion.
+  ///
+  /// [angle] - Optional angle (as num in radians or Angle object).
+  ///           If not provided, uses the circle's centralAngle.
+  /// [startAngle] - The starting angle of the arc in radians (default: 0.0).
+  ///
+  /// Throws [StateError] if neither angle is provided nor centralAngle is set.
+  Arc getArc({dynamic angle, double startAngle = 0.0}) {
+    Angle effectiveAngle;
+
+    if (angle != null) {
+      effectiveAngle = angle is Angle ? angle : Angle(rad: angle as num);
+    } else if (centralAngle != null) {
+      effectiveAngle = centralAngle!;
+    } else {
+      throw StateError(
+          'Either provide an angle or set centralAngle on the circle');
+    }
+
+    return Arc(radius.toDouble(), effectiveAngle,
+        center: center, startAngle: startAngle);
+  }
+
   /// Calculates the central angle (in radians) given various parameters.
   ///
   /// Specify exactly one of the following parameters:

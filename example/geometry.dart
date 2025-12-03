@@ -82,17 +82,26 @@ main() {
   printLine("Triangle");
   triangle();
 
+  printLine("Specialized Triangles");
+  specializedTriangles();
+
   printLine("Rectangle");
   rectangle();
 
   printLine("Square");
   square();
 
+  printLine("Rhombus");
+  rhombus();
+
   printLine("Trapezoid");
   trapezoid();
 
   printLine("Parallelogram");
   parallelogram();
+
+  printLine("Regular Polygons");
+  regularPolygons();
 }
 
 void triangle() {
@@ -352,21 +361,138 @@ void parallelogram() {
   //     'Diagonals correlation verified: ${parallelogram3.verifyDiagonalsCorrelation()}');
   // print('');
 
-  // Example 4: Create a parallelogram using perimeter and side
-  var parallelogram4 = Parallelogram.from(perimeter: 16, side: 3, area: 15);
-  print('Parallelogram 4');
-  print('Base: ${parallelogram4.base}');
-  print('Side: ${parallelogram4.side}');
-  print('Area: ${parallelogram4.area()}');
-  print('Perimeter: ${parallelogram4.perimeter()}');
-  print('Height 1: ${parallelogram4.height1}');
-  print('Height 2: ${parallelogram4.height2}');
-  print('Diagonal 1: ${parallelogram4.diagonal1()}');
-  print('Diagonal 2: ${parallelogram4.diagonal2()}');
-  print(
-      'Angles between diagonals (radians): ${parallelogram4.anglesBetweenDiagonals()}');
-  print('Angles (radians): ${parallelogram4.angles()}');
-  print(
-      'Diagonals correlation verified: ${parallelogram4.verifyDiagonalsCorrelation()}');
+  // // Example 4: Create a parallelogram using perimeter and side
+  // var parallelogram4 = Parallelogram.from(perimeter: 16, side: 3, area: 15);
+  // print('Parallelogram 4');
+  // print('Base: ${parallelogram4.base}');
+  // print('Side: ${parallelogram4.side}');
+  // print('Area: ${parallelogram4.area()}');
+  // print('Perimeter: ${parallelogram4.perimeter()}');
+  // print('Height 1: ${parallelogram4.height1}');
+  // print('Height 2: ${parallelogram4.height2}');
+  // print('Diagonal 1: ${parallelogram4.diagonal1()}');
+  // print('Diagonal 2: ${parallelogram4.diagonal2()}');
+  // print(
+  //     'Angles between diagonals (radians): ${parallelogram4.anglesBetweenDiagonals()}');
+  // print('Angles (radians): ${parallelogram4.angles()}');
+  // print(
+  //     'Diagonals correlation verified: ${parallelogram4.verifyDiagonalsCorrelation()}');
+  // print('');
+}
+
+void specializedTriangles() {
+  // Equilateral Triangle
+  print('Equilateral Triangle:');
+  var equilateral = EquilateralTriangle.from(side: 6.0);
+  print('Side: ${equilateral.side}');
+  print('Area: ${equilateral.area()}');
+  print('Height: ${equilateral.height}');
+  print('Perimeter: ${equilateral.perimeter()}');
+  print('');
+
+  // Isosceles Triangle
+  print('Isosceles Triangle:');
+  var isosceles = IsoscelesTriangle.from(equalSide: 5.0, base: 6.0);
+  print('Equal Side: ${isosceles.equalSide}');
+  print('Base: ${isosceles.baseLength}');
+  print('Area: ${isosceles.area()}');
+  print('Height to Base: ${isosceles.heightToBase}');
+  print('Apex Angle: ${isosceles.apexAngle.deg}°');
+  print('Base Angle: ${isosceles.baseAngle.deg}°');
+  print('');
+
+  // Scalene Triangle
+  print('Scalene Triangle:');
+  var scalene = ScaleneTriangle.from(a: 3.0, b: 4.0, c: 5.0);
+  print('Sides: a=${scalene.a}, b=${scalene.b}, c=${scalene.c}');
+  print('Area: ${scalene.area()}');
+  print('Perimeter: ${scalene.perimeter()}');
+  print('Is Acute: ${scalene.isAcute()}');
+  print('Is Obtuse: ${scalene.isObtuse()}');
+  print('');
+
+  // Right Triangle
+  print('Right Triangle:');
+  var rightTri = RightTriangle.from(leg1: 3.0, leg2: 4.0);
+  print('Leg 1: ${rightTri.leg1}');
+  print('Leg 2: ${rightTri.leg2}');
+  print('Hypotenuse: ${rightTri.hypotenuse}');
+  print('Area: ${rightTri.area()}');
+  print('Perimeter: ${rightTri.perimeter()}');
+  print('Is Pythagorean Triple: ${rightTri.isPythagoreanTriple()}');
+  print('');
+}
+
+void rhombus() {
+  // Example 1: Create rhombus with side and angle
+  var rhombus1 = Rhombus.from(side: 5.0, angle: Angle(deg: 60));
+  print('Rhombus 1:');
+  print('Side: ${rhombus1.side}');
+  print('Angle 1: ${rhombus1.angle1?.deg}°');
+  print('Angle 2: ${rhombus1.angle2?.deg}°');
+  print('Diagonal 1: ${rhombus1.diagonal1}');
+  print('Diagonal 2: ${rhombus1.diagonal2}');
+  print('Area: ${rhombus1.area()}');
+  print('Perimeter: ${rhombus1.perimeter()}');
+  print('');
+
+  // Example 2: Create rhombus from diagonals
+  var rhombus2 = Rhombus.fromDiagonals(6.0, 8.0);
+  print('Rhombus 2 (from diagonals):');
+  print('Side: ${rhombus2.side}');
+  print('Diagonal 1: ${rhombus2.diagonal1}');
+  print('Diagonal 2: ${rhombus2.diagonal2}');
+  print('Area: ${rhombus2.area()}');
+  print('Perimeter: ${rhombus2.perimeter()}');
+  print('Is Square: ${rhombus2.isSquare()}');
+  print('');
+}
+
+void regularPolygons() {
+  // Pentagon
+  print('Pentagon:');
+  var pentagon = Pentagon.from(side: 4.0);
+  print('Side: ${pentagon.side}');
+  print('Number of Sides: ${pentagon.numSides}');
+  print('Interior Angle: ${pentagon.interiorAngle.deg}°');
+  print('Exterior Angle: ${pentagon.exteriorAngle.deg}°');
+  print('Area: ${pentagon.area()}');
+  print('Perimeter: ${pentagon.perimeter()}');
+  print('Circumradius: ${pentagon.circumRadius}');
+  print('Inradius: ${pentagon.inRadius}');
+  print('');
+
+  // Hexagon
+  print('Hexagon:');
+  var hexagon = Hexagon.from(side: 4.0);
+  print('Side: ${hexagon.side}');
+  print('Number of Sides: ${hexagon.numSides}');
+  print('Interior Angle: ${hexagon.interiorAngle.deg}°');
+  print('Exterior Angle: ${hexagon.exteriorAngle.deg}°');
+  print('Area: ${hexagon.area()}');
+  print('Perimeter: ${hexagon.perimeter()}');
+  print('Long Diagonal: ${hexagon.longDiagonal}');
+  print('Short Diagonal: ${hexagon.shortDiagonal}');
+  print('');
+
+  // Heptagon
+  print('Heptagon:');
+  var heptagon = Heptagon.from(side: 5.0);
+  print('Side: ${heptagon.side}');
+  print('Number of Sides: ${heptagon.numSides}');
+  print('Interior Angle: ${heptagon.interiorAngle.deg}°');
+  print('Area: ${heptagon.area()}');
+  print('Perimeter: ${heptagon.perimeter()}');
+  print('');
+
+  // Octagon
+  print('Octagon:');
+  var octagon = Octagon.from(side: 5.0);
+  print('Side: ${octagon.side}');
+  print('Number of Sides: ${octagon.numSides}');
+  print('Interior Angle: ${octagon.interiorAngle.deg}°');
+  print('Exterior Angle: ${octagon.exteriorAngle.deg}°');
+  print('Area: ${octagon.area()}');
+  print('Perimeter: ${octagon.perimeter()}');
   print('');
 }

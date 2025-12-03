@@ -42,6 +42,30 @@ class Rectangle extends PlaneGeometry {
                             'Insufficient parameters provided.')),
         super("Rectangle");
 
+  /// Creates a rectangle from area and aspect ratio.
+  ///
+  /// The aspect ratio is defined as length/width.
+  /// Calculates: length = √(area × aspectRatio), width = √(area / aspectRatio)
+  ///
+  /// Example:
+  /// ```dart
+  /// var rect = Rectangle.fromAreaAndAspectRatio(area: 100, aspectRatio: 2.0);
+  /// // Creates rectangle with area 100 and length:width ratio of 2:1
+  /// ```
+  ///
+  /// Throws [ArgumentError] if area or aspectRatio is not positive.
+  factory Rectangle.fromAreaAndAspectRatio({
+    required double area,
+    required double aspectRatio,
+  }) {
+    if (area <= 0) throw ArgumentError('Area must be positive');
+    if (aspectRatio <= 0) throw ArgumentError('Aspect ratio must be positive');
+
+    double length = sqrt(area * aspectRatio);
+    double width = sqrt(area / aspectRatio);
+    return Rectangle(length, width);
+  }
+
   @override
   num area() {
     return length * width;
