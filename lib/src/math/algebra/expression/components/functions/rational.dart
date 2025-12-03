@@ -63,6 +63,9 @@ class RationalFunction extends Expression {
   }
 
   @override
+  bool isPoly([bool strict = false]) => false;
+
+  @override
   Expression simplify() {
     return this;
   }

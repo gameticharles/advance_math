@@ -66,6 +66,9 @@ class Ln extends Expression {
     throw UnimplementedError();
   }
 
+  @override
+  bool isPoly([bool strict = false]) => false;
+
   // Calculating the depth
   @override
   int depth() {

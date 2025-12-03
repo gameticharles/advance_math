@@ -13,6 +13,7 @@ part 'components/binary_unary_operation/binary_expression.dart';
 part 'components/binary_unary_operation/binary_operations_expression.dart';
 part 'components/binary_unary_operation/subtract.dart';
 part 'components/binary_unary_operation/division.dart';
+part 'components/binary_unary_operation/modulo.dart';
 part 'components/binary_unary_operation/multiply.dart';
 part 'components/binary_unary_operation/power.dart';
 part 'components/binary_unary_operation/add.dart';
@@ -57,6 +58,9 @@ part 'components/structured/indexing_expression.dart';
 part 'components/structured/member_expression.dart';
 part 'components/structured/negation_expression.dart';
 part 'components/structured/unary_operator_expression.dart';
+part 'components/structured/group_expression.dart';
 
 part 'simplifier/simplifier.dart';
 part 'simplifier/trig_simplifier.dart';
+
+part 'solver/equation_solver.dart';

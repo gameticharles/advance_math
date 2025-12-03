@@ -38,4 +38,25 @@ abstract class BinaryOperationsExpression extends Expression {
   int size() {
     return 1 + left.size() + right.size();
   }
+
+  @override
+  bool isPoly([bool strict = false]) {
+    if (this is Add || this is Subtract || this is Multiply) {
+      return left.isPoly(strict) && right.isPoly(strict);
+    }
+    if (this is Divide) {
+      if (right is Literal) return left.isPoly(strict);
+      return false;
+    }
+    if (this is Pow) {
+      if (!left.isPoly(strict)) return false;
+      if (right is Literal) {
+        final val = (right as Literal).value;
+        if (val is int && val >= 0) return true;
+        if (val is double && val == val.toInt() && val >= 0) return true;
+      }
+      return false;
+    }
+    return false;
+  }
 }

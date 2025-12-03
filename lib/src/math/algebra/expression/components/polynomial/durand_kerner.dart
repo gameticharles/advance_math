@@ -99,7 +99,8 @@ final class DurandKerner extends Polynomial {
     this.initialGuess = const [],
     this.precision = 1.0e-10,
     this.maxSteps = 2000,
-  });
+    Variable? variable,
+  }) : super(variable: variable);
 
   /// Creates a new object that finds all the roots of a polynomial equation
   /// using the Durand-Kerner algorithm. The polynomial can only have real
@@ -129,7 +130,9 @@ final class DurandKerner extends Polynomial {
     this.initialGuess = const [],
     this.precision = 1.0e-10,
     this.maxSteps = 2000,
-  }) : super(coefficients.map((e) => Complex(e)).toList());
+    Variable? variable,
+  }) : super(coefficients.map((e) => Literal(Complex(e))).toList(),
+            variable: variable);
 
   @override
   bool operator ==(Object other) {
@@ -209,12 +212,24 @@ final class DurandKerner extends Polynomial {
     final reversedCoeffs = coefficients.reversed.toList(growable: false);
 
     // Buffers for numerators and denominators or real and complex parts.
-    final realBuffer = reversedCoeffs.map((e) => e.simply()).toList(
-          growable: false,
-        );
-    final imaginaryBuffer = reversedCoeffs.map((e) => e.simply()).toList(
-          growable: false,
-        );
+    // Buffers for numerators and denominators or real and complex parts.
+    final realBuffer = reversedCoeffs.map((e) {
+      if (e is Literal && e.value is Complex) {
+        return (e.value as Complex).real;
+      } else if (e is Literal && e.value is num) {
+        return (e.value as num).toDouble();
+      }
+      throw Exception('DurandKerner requires numeric coefficients. Found: $e');
+    }).toList(growable: false);
+
+    final imaginaryBuffer = reversedCoeffs.map((e) {
+      if (e is Literal && e.value is Complex) {
+        return (e.value as Complex).imaginary;
+      } else if (e is Literal && e.value is num) {
+        return 0.0;
+      }
+      throw Exception('DurandKerner requires numeric coefficients. Found: $e');
+    }).toList(growable: false);
 
     // Scaling the various coefficients.
     var upperReal = realBuffer[coefficientsLength - 1];
@@ -244,12 +259,16 @@ final class DurandKerner extends Polynomial {
     // Using default values to compute the solutions. If they aren't provided,
     // we will generate default ones.
     if (initialGuess.isNotEmpty) {
-      final real = initialGuess.map((e) => e.simply()).toList(
-            growable: false,
-          );
-      final complex = initialGuess.map((e) => e.simply()).toList(
-            growable: false,
-          );
+      final real = initialGuess.map((e) {
+        if (e is Complex) return e.real;
+        if (e is num) return e.toDouble();
+        return 0.0;
+      }).toList(growable: false);
+
+      final complex = initialGuess.map((e) {
+        if (e is Complex) return e.imaginary;
+        return 0.0;
+      }).toList(growable: false);
 
       return _solve(
         realValues: real,
@@ -294,16 +313,18 @@ final class DurandKerner extends Polynomial {
   }
 
   DurandKerner copyWith({
-    List<Complex>? coefficients,
+    List<Expression>? coefficients,
     List<Complex>? initialGuess,
     double? precision,
     int? maxSteps,
+    Variable? variable,
   }) =>
       DurandKerner(
-        coefficients ?? List<Complex>.from(this.coefficients),
+        coefficients ?? List<Expression>.from(this.coefficients),
         initialGuess: initialGuess ?? List<Complex>.from(this.initialGuess),
         precision: precision ?? this.precision,
         maxSteps: maxSteps ?? this.maxSteps,
+        variable: variable ?? this.variable,
       );
 
   /// Determines whether subsequent points are close enough (where "enough" is

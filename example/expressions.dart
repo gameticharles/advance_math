@@ -67,11 +67,12 @@ void main(List<String> args) {
   simpleMath();
   complexMath();
   conditionMath();
-  polynomial();
-  multiPolynomial();
+
   logicMath();
   stringMath();
   dateTimeMath();
+  polynomial();
+  multiPolynomial();
   expressionMath();
 }
 
@@ -219,7 +220,7 @@ void polynomial() {
   // Define P(x) and Q(x)
   Polynomial P = Polynomial.fromString("x^4 + 6x^2 + 4");
   print(P);
-  Polynomial Q = Polynomial.fromString('(x-2) - 9');
+  Polynomial Q = Polynomial.fromString('x-2 - 9');
   print(Q);
 
   print(Expression.parse('(x-2)^2 - 9').expand());

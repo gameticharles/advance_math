@@ -2,9 +2,9 @@ import '../../math/basic/math.dart' as math;
 import '../number.dart';
 
 /// The default precision of a `Precision`.
-/// The default value is 50.
+/// The default value is 25.
 /// This can be changed by setting the global variable `decimalPrecision`.
-int decimalPrecision = 50;
+int decimalPrecision = 25;
 
 /// The abstract base class for all Number types.
 abstract class Number implements Comparable<dynamic> {

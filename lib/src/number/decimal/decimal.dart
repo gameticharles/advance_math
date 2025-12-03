@@ -178,14 +178,10 @@ class Decimal implements Comparable<Decimal> {
   @override
   int compareTo(Decimal other) => _rational.compareTo(other._rational);
 
-  Decimal operator +(Decimal other) =>
-      (_rational + other._rational).toDecimal();
-  Decimal operator -(Decimal other) =>
-      (_rational - other._rational).toDecimal();
-  Decimal operator *(Decimal other) =>
-      (_rational * other._rational).toDecimal();
-  Decimal operator %(Decimal other) =>
-      (_rational % other._rational).toDecimal();
+  Decimal operator +(Decimal other) => Decimal(_rational + other._rational);
+  Decimal operator -(Decimal other) => Decimal(_rational - other._rational);
+  Decimal operator *(Decimal other) => Decimal(_rational * other._rational);
+  Decimal operator %(Decimal other) => Decimal(_rational % other._rational);
   Rational operator /(Decimal other) => _rational / other._rational;
 
   BigInt operator ~/(Decimal other) => _rational ~/ other._rational;
@@ -278,6 +274,12 @@ class Decimal implements Comparable<Decimal> {
   /// The reciprocal is calculated using the underlying [Rational] representation of the [Decimal] value.
   Rational reciprocal() => inverse;
 
+  /// Truncates precision of internal rational to avoid explosion during infinite series
+  Decimal _limitPrecision([int? extraGuardDigits]) {
+    return _rational.toDecimal(
+        precision: decimalPrecision + (extraGuardDigits ?? 5));
+  }
+
   /// Calculates the square root of the current [Decimal] value.
   ///
   /// If the current [Decimal] value is negative, an [ArgumentError] is thrown as the square root
@@ -303,9 +305,9 @@ class Decimal implements Comparable<Decimal> {
 
     while ((guess - prevGuess).abs() > tolerance) {
       prevGuess = guess;
-      guess = (guess + (_rational / guess))
-              .toDecimal(precision: decimalPrecision + 10) /
-          Decimal.fromInt(2);
+      guess =
+          Decimal(guess + (_rational / guess), sigDigits: decimalPrecision) /
+              Decimal.fromInt(2);
     }
 
     return guess.toDecimal(precision: decimalPrecision);
@@ -321,7 +323,6 @@ class Decimal implements Comparable<Decimal> {
     // if (_rational.isNegativeInfinity) return Decimal.zero;
     // if (_rational.isInfinite) return Decimal.infinity;
     // if (_rational.isNaN) return Decimal.nan;
-
     final x = this;
 
     // Inner function to compute a range using binary splitting
@@ -358,62 +359,118 @@ class Decimal implements Comparable<Decimal> {
   /// precision specified by the [decimalPrecision] field.
   ///
   /// Returns the natural logarithm of the current [Decimal] value.
+  /// Calculates the natural logarithm (ln) of the current [Decimal] value.
   Decimal ln() {
-    if (this <= Decimal.zero) {
+    if (this <= zero) {
       throw ArgumentError('ln(x) is undefined for x <= 0');
     }
-    // if (_rational.isInfinite) return Decimal.infinity;
-    // if (_rational.isNaN) return Decimal.nan;
-    if (this == Decimal.one) return Decimal.zero;
+    if (this == one) return zero;
 
-    // Dynamically compute ln(2) to the desired precision
-    Rational computeLn2(int precision) {
-      Rational t = Rational.parse('1/3'); // Use t = 1/3 for faster convergence
-      Rational term = t;
-      Rational sum = Rational.zero;
-      int n = 1;
-
-      while (term.abs() > Rational.parse('1e-$decimalPrecision')) {
-        sum += term / Rational.fromInt(n);
-        term *= t * t;
-        n += 2;
-      }
-
-      return sum * Rational.fromInt(2);
+    // 1. Get ln(2)
+    // For standard precision, use a constant to speed things up significantly.
+    // If user requested very high precision (>30), calculate it dynamically.
+    Decimal ln2;
+    if (decimalPrecision <= 30) {
+      ln2 = Decimal.parse("0.69314718055994530941723212145817656807550013436026"
+          .substring(0, decimalPrecision + 2));
+    } else {
+      // Use the _lnRaw helper from the previous solution
+      ln2 = Decimal.parse("2")._lnRaw();
     }
 
-    // Dynamically compute ln(2)
-    final ln2 = computeLn2(decimalPrecision + 10);
+    // 2. Range Reduction: x = m * 2^k
+    // We reduce 'x' to the range [1, 2) by dividing/multiplying by 2
+    // This makes the series converge much faster.
+    Rational xRat = _rational;
+    int k = 0;
 
-    Rational x = _rational;
-    int exponent = 0;
-
-    // Normalize x to the range [1, 2)
-    while (x >= Rational.fromInt(2)) {
-      x /= Rational.fromInt(2);
-      exponent++;
+    // Fast reduction using Rational math
+    while (xRat >= Rational.fromInt(2)) {
+      xRat /= Rational.fromInt(2);
+      k++;
     }
-    while (x < Rational.one) {
-      x *= Rational.fromInt(2);
-      exponent--;
+    while (xRat < Rational.one) {
+      xRat *= Rational.fromInt(2);
+      k--;
     }
 
-    // Use the series ln((1 + t) / (1 - t)) = 2 * (t + t^3 / 3 + t^5 / 5 + ...)
-    Rational t = (x - Rational.one) / (x + Rational.one);
-    Rational term = t;
-    Rational sum = Rational.zero;
+    // 3. Series Expansion: ln(x) = ln((1+y)/(1-y)) where y = (x-1)/(x+1)
+    // This series converges faster than standard Taylor series.
+    // xRat is now in [1, 2), so y will be small.
+    Decimal xNormalized = Decimal(xRat);
+    Decimal y = ((xNormalized - one) / (xNormalized + one))
+        .toDecimal(precision: decimalPrecision + 2);
+    Decimal y2 = (y * y)._limitPrecision(); // Rounding prevents explosion
+
+    Decimal sum = zero;
+    Decimal term = y; // First term (numerator part)
+    Decimal num = y; // Keeps track of y^1, y^3, y^5...
     int n = 1;
 
-    // Calculate the series with better convergence
-    while (term.abs() > Rational.parse('1e-$decimalPrecision')) {
-      sum += term / Rational.fromInt(n);
-      term *= t * t;
+    // Limit based on precision
+    final limit =
+        Rational(BigInt.one, BigInt.from(10).pow(decimalPrecision + 2));
+
+    while (term.abs().toRational() > limit) {
+      // term = num / n
+      term =
+          (num / Decimal.fromInt(n)).toDecimal(precision: decimalPrecision + 2);
+      sum += term;
+
+      // Prepare next numerator: num * y^2
+      // CRITICAL: We limit precision here. If we don't, Rational size explodes.
+      num = (num * y2)._limitPrecision(0);
       n += 2;
+
+      // Safety break
+      if (n > decimalPrecision * 100) break;
     }
 
-    // Combine the results
-    return (Rational.fromInt(exponent) * ln2 + sum * Rational.fromInt(2))
-        .toDecimal(precision: decimalPrecision);
+    // Result = 2 * sum + k * ln(2)
+    Decimal result = (sum * Decimal.fromInt(2)) + (Decimal.fromInt(k) * ln2);
+
+    return result._limitPrecision(0);
+  }
+
+  // Raw LN computation without range reduction
+  // Uses the series: ln(x) = 2 * (y + y^3/3 + y^5/5 + ...) where y = (x-1)/(x+1)
+  Decimal _lnRaw() {
+    if (this <= zero) throw ArgumentError('ln(x) undefined for x <= 0');
+    if (this == one) return zero;
+
+    // y = (x - 1) / (x + 1)
+    Decimal y = ((this - one) / (this + one))
+        .toDecimal(precision: decimalPrecision + 2);
+
+    // We limit precision on y2 to prevent explosion in the loop
+    Decimal y2 = (y * y)._limitPrecision();
+
+    Decimal sum = zero;
+    Decimal num = y; // Represents y^(odd)
+    Decimal term = y; // Represents term to add
+    int n = 1; // 1, 3, 5, 7...
+
+    // Convergence limit: 10^(-precision - 2) for extra safety buffer
+    final limit =
+        Rational(BigInt.one, BigInt.from(10).pow(decimalPrecision + 2));
+
+    while (term.abs().toRational() > limit) {
+      // term = numerator / n
+      term =
+          (num / Decimal.fromInt(n)).toDecimal(precision: decimalPrecision + 2);
+      sum += term;
+
+      // Prepare for next iteration
+      // num = num * y^2 (advances power by 2: y^1 -> y^3 -> y^5)
+      // CRITICAL: Rounding here prevents the Rational denominator from exploding
+      num = (num * y2)._limitPrecision();
+      n += 2;
+
+      // Safety break to prevent infinite loops on extremely high precision requests
+      if (n > decimalPrecision * 100) break;
+    }
+
+    return (sum * Decimal.fromInt(2))._limitPrecision(0);
   }
 
   /// Calculates the power of the current [Decimal] value raised to the given exponent.
@@ -453,11 +510,9 @@ class Decimal implements Comparable<Decimal> {
 
       return result.toDecimal(precision: decimalPrecision);
     } else {
+      // 2. General Case: x^y = exp(y * ln(x))
       var expValue = exponent is Decimal ? exponent : Decimal(exponent);
-      return (expValue * ln())
-          .exp()
-          ._rational
-          .toDecimal(precision: decimalPrecision);
+      return (expValue * ln()).exp()._limitPrecision(0);
     }
   }
 
@@ -622,7 +677,7 @@ class Decimal implements Comparable<Decimal> {
 
   Decimal _scaleAndApply(int scale, BigInt Function(Rational) f) {
     final scaleFactor = ten.pow(scale.toDecimal()).toRational();
-    return (f(_rational * scaleFactor).toRational() / scaleFactor).toDecimal();
+    return Decimal(f(_rational * scaleFactor).toRational() / scaleFactor);
   }
 
   /// Truncates the current [Decimal] value to the specified [scale].
@@ -762,7 +817,44 @@ extension IntExt on int {
   Rational toRational() => Rational.fromInt(this);
 }
 
-//     /// Calculates the arc sine (inverse sine) of the current [Decimal] value.
+extension RationalExt on Rational {
+  /// Robust conversion to Decimal
+  Decimal toDecimal({int? precision, BigInt Function(Rational)? toBigInt}) {
+    // 1. Handle special values immediately
+    if (isNaN) return Decimal.nan;
+    if (isInfinite) {
+      return isPositiveInfinity ? Decimal.infinity : Decimal.negInfinity;
+    }
+
+    // 2. Exact representation check
+    // If the number terminates (e.g. 0.5), convert directly without approximation logic.
+    if (hasFinitePrecision) {
+      return Decimal(this);
+    }
+
+    // 3. Approximation Logic
+    // We scale the number up, round it to an integer, and scale it back down.
+    var prec = precision ?? decimalPrecision;
+
+    // Calculate the scale factor (10^precision)
+    // We use BigInt here directly for the denominator to avoid intermediate object creation
+    final scaleFactorBigInt = BigInt.from(10).pow(prec);
+    final scaleFactorRational = Rational(scaleFactorBigInt);
+
+    // Default rounding strategy is standard rounding
+    toBigInt ??= (value) => value.round();
+
+    // Calculate numerator: (Rational * 10^p).round()
+    final bigIntNumerator = toBigInt(this * scaleFactorRational);
+
+    // 4. Construct the result
+    // Instead of doing Decimal / Decimal (which returns Rational),
+    // we construct the final Rational (numerator/denominator) and wrap it in Decimal.
+    return Decimal(Rational(bigIntNumerator, scaleFactorBigInt));
+  }
+}
+
+//   /// Calculates the arc sine (inverse sine) of the current [Decimal] value.
 //   ///
 //   /// The result is in radians and will be in the range [-π/2, π/2].
 //   /// Throws an [ArgumentError] if the value is outside the range [-1, 1].

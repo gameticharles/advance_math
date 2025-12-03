@@ -10,7 +10,17 @@ class CallExpression extends Expression {
   dynamic evaluate([dynamic arg]) {
     var evCallee = callee.evaluate(arg);
     var aevArguments = arguments.map((e) => e.evaluate(arg)).toList();
-    return Function.apply(evCallee, aevArguments);
+    try {
+      return Function.apply(evCallee, aevArguments);
+    } catch (e) {
+      // If the function expects a single List argument (varargs style),
+      // try passing the arguments as a list.
+      try {
+        return Function.apply(evCallee, [aevArguments]);
+      } catch (_) {
+        rethrow;
+      }
+    }
   }
 
   @override
@@ -56,6 +66,9 @@ class CallExpression extends Expression {
   bool isInfinity(num x) {
     throw UnimplementedError();
   }
+
+  @override
+  bool isPoly([bool strict = false]) => false;
 
   @override
   int depth() {

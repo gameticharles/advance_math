@@ -808,7 +808,7 @@ class Complex implements Comparable<dynamic> {
         'Invalid type for integer division: ${divisor.runtimeType}');
   }
 
-  /// The modulo operator (not supported).
+  /// The modulo operator
   Complex operator %(dynamic divisor) {
     var modulus = magnitude;
     if (divisor is num) {
@@ -820,14 +820,12 @@ class Complex implements Comparable<dynamic> {
       return Complex.polar(remainder, phase);
     }
     return this % divisor;
-
-    // throw const NumberException(
-    //       'The number library does not support raising a complex number to an imaginary power');
   }
 
+  /// The negation operator
   Complex operator -() => Complex(-real, -imaginary);
 
-  // Reciprocal operator
+  /// Reciprocal operator
   Complex operator ~() {
     if (real == 0 && imaginary == 0) {
       return Complex(double.infinity, double.infinity);

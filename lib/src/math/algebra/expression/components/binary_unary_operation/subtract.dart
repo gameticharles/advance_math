@@ -29,7 +29,8 @@ class Subtract extends BinaryOperationsExpression {
     }
 
     // Default return (should ideally never reach this point)
-    throw Exception('Unsupported evaluation scenario in Subtract.evaluate');
+    // throw Exception('Unsupported evaluation scenario in Subtract.evaluate');
+    return simplify();
   }
 
 // Helper method to check if an expression contains a Variable
@@ -70,7 +71,7 @@ class Subtract extends BinaryOperationsExpression {
       return simplifiedLeft;
     }
     if (simplifiedLeft is Literal && simplifiedLeft.evaluate() == 0) {
-      return simplifiedRight;
+      return Multiply(Literal(-1), simplifiedRight).simplify();
     }
 
     // Negation
@@ -106,11 +107,16 @@ class Subtract extends BinaryOperationsExpression {
     }
 
     // Grouping like terms and constants
-    Map<String, num> likeTerms = {};
-    num constantTerm = 0;
+    Map<String, dynamic> likeTerms = {};
+    dynamic constantTerm = 0;
     for (var term in terms) {
       if (term is Literal) {
-        constantTerm += term.evaluate();
+        var val = term.evaluate();
+        if (constantTerm is num && val is Complex) {
+          constantTerm = val + constantTerm;
+        } else {
+          constantTerm += val;
+        }
       } else if (term is Variable) {
         likeTerms.update(
           term.toString(),
@@ -119,10 +125,15 @@ class Subtract extends BinaryOperationsExpression {
         );
       } else if (term is Multiply && term.left is Literal) {
         String variablePart = term.right.toString();
-        num coefficient = (term.left as Literal).evaluate();
+        dynamic coefficient = (term.left as Literal).evaluate();
         likeTerms.update(
           variablePart,
-          (value) => value + coefficient,
+          (value) {
+            if (value is num && coefficient is Complex) {
+              return coefficient + value;
+            }
+            return value + coefficient;
+          },
           ifAbsent: () => coefficient,
         );
       }
@@ -172,8 +183,7 @@ class Subtract extends BinaryOperationsExpression {
 
   @override
   Expression expand() {
-    // Subtraction doesn't have a more expanded form, return as-is.
-    return this;
+    return Subtract(left.expand(), right.expand());
   }
 
   @override
@@ -186,6 +196,16 @@ class Subtract extends BinaryOperationsExpression {
 
   @override
   String toString() {
-    return "(${left.toString()} - ${right.toString()})";
+    var leftStr = left.toString();
+    var rightStr = right.toString();
+
+    // If right is Add or Subtract, wrap in parens (subtraction is not associative)
+    // a - (b + c) != a - b + c
+    // a - (b - c) != a - b - c
+    if (right is Add || right is Subtract) {
+      rightStr = '($rightStr)';
+    }
+
+    return "$leftStr-$rightStr";
   }
 }

@@ -217,7 +217,7 @@ void main() {
       });
 
       test('by parts structure verification', () {
-        expect(SymbolicIntegration.strategies.length, equals(7));
+        expect(SymbolicIntegration.strategies.length, equals(8));
       });
     });
 

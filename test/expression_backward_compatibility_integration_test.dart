@@ -230,9 +230,7 @@ void main() {
         // Test that division by zero handling works
         final expr = x / Literal(0);
 
-        final result = expr.evaluate({'x': 5});
-        // Division by zero may return infinity rather than throwing
-        expect(result.isInfinite || result.isNaN, isTrue);
+        expect(() => expr.evaluate({'x': 5}), throwsException);
       });
 
       test('should handle invalid operations appropriately', () {

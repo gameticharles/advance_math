@@ -31,7 +31,8 @@ class Pow extends BinaryOperationsExpression {
     }
 
     // Default return (should ideally never reach this point)
-    throw Exception('Unsupported evaluation scenario in Pow.evaluate');
+    // throw Exception('Unsupported evaluation scenario in Pow.evaluate');
+    return simplify();
   }
 
 // Helper method to check if an expression contains a Variable
@@ -89,20 +90,38 @@ class Pow extends BinaryOperationsExpression {
 
   @override
   Expression simplifyBasic() {
-    if (exponent is Literal) {
-      var exponentValue = exponent.evaluate();
+    var simplifiedBase = base.simplify();
+    var simplifiedExponent = exponent.simplify();
+
+    if (simplifiedExponent is Literal) {
+      var exponentValue = simplifiedExponent.evaluate();
       if (exponentValue == 0) return Literal(1);
-      if (exponentValue == 1) return base;
+      if (exponentValue == 1) return simplifiedBase;
     }
 
-    if (base is Literal && base.evaluate() == 0) {
-      if (exponent is Literal && exponent.evaluate() > 0) {
+    if (simplifiedBase is Literal && simplifiedBase.evaluate() == 0) {
+      if (simplifiedExponent is Literal && simplifiedExponent.evaluate() > 0) {
         return Literal(0);
       }
       throw Exception('0 raised to a non-positive power is undefined.');
     }
 
-    return this;
+    if (simplifiedBase is Literal && simplifiedExponent is Literal) {
+      var b = simplifiedBase.value;
+      var e = simplifiedExponent.value;
+      if (b is num && e is num) {
+        return Literal(pow(b, e));
+      }
+    }
+
+    // (x^a)^b = x^(a*b)
+    if (simplifiedBase is Pow) {
+      var newExponent =
+          Multiply(simplifiedBase.exponent, simplifiedExponent).simplifyBasic();
+      return Pow(simplifiedBase.base, newExponent).simplifyBasic();
+    }
+
+    return Pow(simplifiedBase, simplifiedExponent);
   }
 
   @override
@@ -121,6 +140,6 @@ class Pow extends BinaryOperationsExpression {
 
   @override
   String toString() {
-    return "(${base.toString()}^${exponent.toString()})";
+    return "${base.toString()}^${exponent.toString()}";
   }
 }

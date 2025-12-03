@@ -30,7 +30,7 @@ void main() {
         final expr = ex(-7);
         expect(expr, isA<Literal>());
         expect((expr as Literal).value, equals(-7));
-        expect(expr.toString(), equals('(-7)'));
+        expect(expr.toString(), equals('-7'));
       });
 
       test('should convert zero to Literal expression', () {
@@ -71,7 +71,7 @@ void main() {
       test('should work in addition with variables', () {
         final expr = ex(2) + x;
         expect(expr, isA<Add>());
-        expect(expr.toString(), equals('(2 + x)'));
+        expect(expr.toString(), equals('2+x'));
         final result = expr.evaluate({'x': 3});
         expect(result, equals(5));
       });
@@ -79,7 +79,7 @@ void main() {
       test('should work in subtraction with variables', () {
         final expr = ex(10) - x;
         expect(expr, isA<Subtract>());
-        expect(expr.toString(), equals('(10 - x)'));
+        expect(expr.toString(), equals('10-x'));
         final result = expr.evaluate({'x': 3});
         expect(result, equals(7));
       });
@@ -87,7 +87,7 @@ void main() {
       test('should work in multiplication with variables', () {
         final expr = ex(3) * x;
         expect(expr, isA<Multiply>());
-        expect(expr.toString(), equals('(3 * x)'));
+        expect(expr.toString(), equals('3*x'));
         final result = expr.evaluate({'x': 4});
         expect(result, equals(12));
       });
@@ -95,7 +95,7 @@ void main() {
       test('should work in division with variables', () {
         final expr = ex(12) / x;
         expect(expr, isA<Divide>());
-        expect(expr.toString(), equals('(12 / x)'));
+        expect(expr.toString(), equals('12/x'));
         final result = expr.evaluate({'x': 3});
         expect(result, equals(4));
       });
@@ -103,7 +103,7 @@ void main() {
       test('should work in power operations with variables', () {
         final expr = ex(2) ^ x;
         expect(expr, isA<Pow>());
-        expect(expr.toString(), equals('(2^x)'));
+        expect(expr.toString(), equals('2^x'));
         final result = expr.evaluate({'x': 3});
         expect(result, equals(8));
       });
@@ -299,7 +299,7 @@ void main() {
         // Example from the documentation comment
         final expr = ex(2) * x + ex(3);
         expect(expr, isA<Add>());
-        expect(expr.toString(), equals('((2 * x) + 3)'));
+        expect(expr.toString(), equals('2*x+3'));
 
         final result = expr.evaluate({'x': 5});
         expect(result, equals(13)); // 2*5 + 3 = 13

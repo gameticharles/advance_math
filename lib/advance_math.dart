@@ -4,6 +4,7 @@
 library advance_math;
 
 import 'dart:async';
+import 'dart:collection';
 
 import 'src/math/basic/math.dart' as math;
 import 'src/number/complex/complex.dart';

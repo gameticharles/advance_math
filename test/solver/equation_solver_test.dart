@@ -1,6 +1,5 @@
 import 'package:advance_math/advance_math.dart';
 import 'package:test/test.dart';
-import 'package:advance_math/src/math/algebra/solver/equation_solver.dart';
 
 void main() {
   group('Equation Solver Tests', () {

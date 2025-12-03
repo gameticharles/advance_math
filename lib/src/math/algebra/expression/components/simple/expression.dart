@@ -108,7 +108,7 @@ abstract class Expression {
   }
 
   /// Modulo operator. Creates a [Modulo] expression.
-  // Expression operator %(dynamic other) => Modulo(this, _toExpression(other));
+  Expression operator %(dynamic other) => Modulo(this, _toExpression(other));
 
   /// Power operator. Creates a [Pow] expression.
   ///
@@ -237,6 +237,11 @@ abstract class Expression {
   bool isIndeterminate(num x);
   bool isInfinity(num x);
 
+  /// Checks if the expression is a polynomial.
+  ///
+  /// [strict] If true, requires strict polynomial form (no division by variables, non-negative integer exponents).
+  bool isPoly([bool strict = false]);
+
   /// Returns the string representation of the expression.
   ///
   /// This method should provide a human-readable format of the expression,
@@ -305,6 +310,9 @@ class ThisExpression extends Expression {
 
   @override
   bool isInfinity(num x) => isInfinity(x);
+
+  @override
+  bool isPoly([bool strict = false]) => isPoly(strict);
 
   @override
   int depth() => depth();

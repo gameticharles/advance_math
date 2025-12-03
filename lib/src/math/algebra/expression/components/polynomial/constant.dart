@@ -15,13 +15,15 @@ final class Constant extends Polynomial {
   /// number [a].
   Constant({
     dynamic a = 0,
-  }) : super([a]);
+    Variable? variable,
+  }) : super([a], variable: variable);
 
   /// The only coefficient of the polynomial is represented by a [double]
   /// (real) number [a].
   Constant.num({
     num a = 1,
-  }) : super([a]);
+    Variable? variable,
+  }) : super([a], variable: variable);
 
   @override
   dynamic discriminant() => Complex(double.nan, double.nan);
@@ -32,7 +34,8 @@ final class Constant extends Polynomial {
   /// The constant coefficient.
   dynamic get a => coefficients.first.simplify();
 
-  Constant copyWith({Complex? a}) => Constant(a: a ?? this.a);
+  Constant copyWith({Complex? a, Variable? variable}) =>
+      Constant(a: a ?? this.a, variable: variable ?? this.variable);
 
   @override
   Expression expand() {

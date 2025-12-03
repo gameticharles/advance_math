@@ -17,8 +17,11 @@ abstract class TrigonometricExpression extends Expression {
 
   @override
   bool isInfinity(num x) {
-    throw UnimplementedError();
+    return evaluate(x).isInfinite;
   }
+
+  @override
+  bool isPoly([bool strict = false]) => false;
 
   @override
   int depth() {

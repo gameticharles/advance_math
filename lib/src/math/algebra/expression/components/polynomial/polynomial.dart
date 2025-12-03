@@ -2,12 +2,21 @@ part of '../../expression.dart';
 
 /// A class representing a Polynomial of arbitrary degree.
 class Polynomial extends Expression {
-  final List<dynamic> coefficients;
+  final List<Expression> coefficients;
+  final Variable variable;
 
-  Polynomial(List<dynamic> coefficients)
-      : coefficients = coefficients
-            .map((e) => e is num ? Complex(e) : Complex.parse(e.toString()))
-            .toList();
+  Polynomial(List<dynamic> coefficients, {Variable? variable})
+      : coefficients = coefficients.map((e) {
+          if (e is Expression) return e;
+          if (e is Complex) return Literal(e);
+          if (e is num) return Literal(Complex(e));
+          try {
+            return Literal(Complex.parse(e.toString()));
+          } catch (_) {
+            return Expression.parse(e.toString());
+          }
+        }).toList(),
+        variable = variable ?? Variable('x');
 
   late Polynomial polynomial;
 
@@ -15,27 +24,38 @@ class Polynomial extends Expression {
   ///
   /// The coefficients should be provided in decreasing order of degree,
   /// i.e., from the coefficient of the highest-degree term to the constant term.
-  static Polynomial fromList(List<dynamic> coefficientList) {
+  static Polynomial fromList(List<dynamic> coefficientList,
+      {Variable? variable}) {
     {
-      List<dynamic> coefficients = coefficientList
-          .map((e) => e is num ? Complex(e) : Complex.parse(e.toString()))
-          .toList();
+      List<Expression> coefficients = coefficientList.map((e) {
+        if (e is Expression) return e;
+        if (e is Complex) return Literal(e);
+        if (e is num) return Literal(Complex(e));
+        try {
+          return Literal(Complex.parse(e.toString()));
+        } catch (_) {
+          return Expression.parse(e.toString());
+        }
+      }).toList();
       // side effects if 'coefficients' is altered
       switch (coefficients.length) {
         case 1:
           return Constant(
             a: coefficients.first,
+            variable: variable,
           );
         case 2:
           return Linear(
             a: coefficients.first,
             b: coefficients[1],
+            variable: variable,
           );
         case 3:
           return Quadratic(
             a: coefficients.first,
             b: coefficients[1],
             c: coefficients[2],
+            variable: variable,
           );
         case 4:
           return Cubic(
@@ -43,6 +63,7 @@ class Polynomial extends Expression {
             b: coefficients[1],
             c: coefficients[2],
             d: coefficients[3],
+            variable: variable,
           );
         case 5:
           return Quartic(
@@ -51,9 +72,10 @@ class Polynomial extends Expression {
             c: coefficients[2],
             d: coefficients[3],
             e: coefficients[4],
+            variable: variable,
           );
         default:
-          return DurandKerner(coefficients);
+          return DurandKerner(coefficients, variable: variable);
       }
     }
   }
@@ -87,8 +109,17 @@ class Polynomial extends Expression {
   /// var polynomial3 = Polynomial.fromString("-1 + 2x + x^4");
   /// print(polynomial3); // Expected output: x⁴ + 2x - 1
   /// ```
-  factory Polynomial.fromString(String source) {
+  factory Polynomial.fromString(String source, {Variable? variable}) {
+    // print('DEBUG: Polynomial.fromString source: $source variable: $variable');
     try {
+      // Use provided variable or default to 'x'
+      final varName = variable?.identifier.name ?? 'x';
+
+      // If the variable is not 'x', replace it with 'x' for parsing
+      // if (varName != 'x') {
+      //   source = source.replaceAll(varName, 'x');
+      // }
+
       // Convert superscripts to normal digits
       final superscripts = {
         '¹': '1',
@@ -121,8 +152,29 @@ class Polynomial extends Expression {
         },
       );
 
-      final RegExp expPattern =
-          RegExp(r"([+-]?\s*\d*x(\^\d+)?)|([+-]?\s*\d+)|(\s*x(\^\d+)?)");
+      // Regex to match terms:
+      // Group 1: Term with variable (e.g., 3x^2, -x, 0.5x, a*x, -a*c*x)
+      // Group 2: Constant term
+      // We need to be more permissive with coefficients to allow variables
+      // But we must ensure we don't consume the variable itself if it's part of the coefficient?
+      // No, the coefficient is everything BEFORE the variable.
+      // So we match `(.*?)` before `varName`.
+      // But we need to be careful about splitting terms.
+      // Terms are split by + or - (unless inside parentheses, but Polynomials are usually expanded).
+      // A safer approach might be to split by `+` and `-` first, then parse each term?
+      // But `+` and `-` can be unary.
+
+      // Let's try to broaden the existing regex to allow identifiers in coefficient.
+      // Old: `([+-]?(?:\d+(?:\.\d+)?|\.\d+)?\*?`
+      // New: `([+-]?(?:[a-zA-Z0-9_.]+(?:\*[a-zA-Z0-9_.]+)*)?\*?`
+      // This is getting complicated.
+      // Maybe we can match the variable part `x^n` and capture everything before it?
+
+      final RegExp expPattern = RegExp(
+          r"([+-]?(?:(?:[a-zA-Z0-9_.]+(?:\*[a-zA-Z0-9_.]+)*)?\*?)?" +
+              RegExp.escape(varName) +
+              r"(?:\^\d+)?)|([+-]?(?:[a-zA-Z0-9_.]+(?:\*[a-zA-Z0-9_.]+)*))");
+
       var matches = expPattern.allMatches(source).toList();
 
       if (matches.isEmpty) {
@@ -130,56 +182,97 @@ class Polynomial extends Expression {
             "Input does not contain any valid Polynomial terms");
       }
 
-      var degree = matches
-          .map((m) => m.group(2) != null
-              ? int.parse(m.group(2)!.substring(1))
-              : m.group(1)?.contains('x') ?? false
-                  ? 1
-                  : m.group(4)?.contains('x') ?? false
-                      ? m.group(5) != null
-                          ? int.parse(m.group(5)!.substring(1))
-                          : 1
-                      : 0)
-          .reduce(max);
-
-      var coefficients = List<dynamic>.filled(degree + 1, Complex.zero());
-
-      for (var match in matches) {
-        dynamic coefficient;
-        int exponent;
-        if (match.group(1) != null) {
-          // term with 'x'
-          var group = match.group(1)!;
-          var value = group.split('x')[0].trim();
-          value = value.isEmpty ? '1' : value.replaceAll(RegExp(r'[+\s]'), '');
-          if ((value.contains('+') || value.contains('-')) &&
-              (value.length == 1)) {
-            value = value.contains('+') ? '1' : '-1';
-          }
-          coefficient = group.contains('x')
-              ? (value.isEmpty ? Complex.one() : Complex.parse(value))
-              : Complex.parse(group.replaceAll(RegExp(r'[+\s]'), ''));
-          exponent = match.group(2) != null
-              ? int.parse(match.group(2)!.substring(1))
-              : (group.contains('x') ? 1 : 0);
-        } else if (match.group(4) != null) {
-          // term with 'x' but no coefficient
-          coefficient = Complex.one();
-          exponent = match.group(5) != null
-              ? int.parse(match.group(5)!.substring(1))
-              : 1;
-        } else {
-          // constant term
-          coefficient = Complex.parse(match.group(3)!.replaceAll(' ', ''));
-          exponent = 0;
-        }
-
-        coefficients[degree - exponent] = Complex(coefficient);
+      // Strict check: Ensure all characters are consumed by matches
+      // Check if all content was matched
+      String matchedStr = matches.map((m) => m.group(0)).join('');
+      if (matchedStr.length != source.length) {
+        // print('DEBUG: Polynomial.fromString mismatch. Source: $source, Matched: $matchedStr');
+        throw FormatException('Invalid polynomial format: $source');
       }
 
-      return Polynomial(coefficients);
+      var terms = <int, Expression>{};
+      int maxDegree = 0;
+
+      for (var match in matches) {
+        String term = match.group(0)!;
+
+        // Check if it's a variable term or constant
+        if (match.group(1) != null) {
+          // Term with variable
+          String varTerm = match.group(1)!;
+
+          // Extract coefficient and exponent
+          String coeffStr;
+          String expStr;
+
+          if (varTerm.contains('^')) {
+            var parts = varTerm.split('^');
+            expStr = parts[1];
+            coeffStr = parts[0].substring(
+                0, parts[0].length - varName.length); // Remove variable
+          } else {
+            expStr = '1';
+            coeffStr = varTerm.substring(
+                0, varTerm.length - varName.length); // Remove variable
+          }
+
+          // Strip trailing * if present
+          if (coeffStr.endsWith('*')) {
+            coeffStr = coeffStr.substring(0, coeffStr.length - 1);
+          }
+
+          // Handle implicit 1 or -1
+          if (coeffStr.isEmpty || coeffStr == '+') {
+            coeffStr = '1';
+          } else if (coeffStr == '-') {
+            coeffStr = '-1';
+          }
+
+          // Parse coefficient as Expression
+          Expression coeff;
+          try {
+            coeff = Literal(Complex.parse(coeffStr));
+          } catch (_) {
+            // If not a number, parse as Expression
+            coeff = Expression.parse(coeffStr);
+          }
+
+          int degree = int.parse(expStr);
+
+          // Add to existing coefficient
+          if (terms.containsKey(degree)) {
+            terms[degree] = Add(terms[degree]!, coeff).simplifyBasic();
+          } else {
+            terms[degree] = coeff;
+          }
+
+          if (degree > maxDegree) maxDegree = degree;
+        } else {
+          // Constant term
+          Expression coeff;
+          try {
+            coeff = Literal(Complex.parse(term));
+          } catch (_) {
+            coeff = Expression.parse(term);
+          }
+
+          if (terms.containsKey(0)) {
+            terms[0] = Add(terms[0]!, coeff).simplifyBasic();
+          } else {
+            terms[0] = coeff;
+          }
+        }
+      }
+
+      var coefficients = List<dynamic>.filled(maxDegree + 1, Literal(0));
+      for (var i = 0; i <= maxDegree; i++) {
+        coefficients[maxDegree - i] = terms[i] ?? Literal(0);
+      }
+
+      return Polynomial(coefficients, variable: variable);
     } catch (e) {
       // Handle exceptions and rethrow a formatted exception message
+      // print('DEBUG: Polynomial.fromString throwing exception: $e');
       throw FormatException("Failed to parse Polynomial: $e");
     }
   }
@@ -194,17 +287,17 @@ class Polynomial extends Expression {
   Expression operator +(dynamic other) {
     if (other is Polynomial) {
       int maxDegree = max(coefficients.length, other.coefficients.length);
-      List<dynamic> result =
-          List<dynamic>.generate(maxDegree, (index) => Complex(0.0));
+      List<Expression> result =
+          List<Expression>.generate(maxDegree, (index) => Literal(0));
 
       for (var i = 0; i < maxDegree; i++) {
-        dynamic a = i < coefficients.length ? coefficients[i] : Complex(0.0);
-        dynamic b = i < other.coefficients.length
-            ? other.coefficients[i]
-            : Complex(0.0);
-        result[i] = a + b;
+        Expression a = i < coefficients.length ? coefficients[i] : Literal(0);
+        Expression b =
+            i < other.coefficients.length ? other.coefficients[i] : Literal(0);
+        // Use simplifyBasic to combine literals if possible
+        result[i] = Add(a, b).simplifyBasic();
       }
-      return Polynomial(result);
+      return Polynomial(result, variable: variable);
     }
     return Add(this, other);
   }
@@ -214,17 +307,16 @@ class Polynomial extends Expression {
   Expression operator -(dynamic other) {
     if (other is Polynomial) {
       int maxDegree = max(coefficients.length, other.coefficients.length);
-      List<dynamic> result =
-          List<dynamic>.generate(maxDegree, (index) => Complex(0.0));
+      List<Expression> result =
+          List<Expression>.generate(maxDegree, (index) => Literal(0));
 
       for (var i = 0; i < maxDegree; i++) {
-        dynamic a = i < coefficients.length ? coefficients[i] : Complex(0.0);
-        dynamic b = i < other.coefficients.length
-            ? other.coefficients[i]
-            : Complex(0.0);
-        result[i] = a - b;
+        Expression a = i < coefficients.length ? coefficients[i] : Literal(0);
+        Expression b =
+            i < other.coefficients.length ? other.coefficients[i] : Literal(0);
+        result[i] = Subtract(a, b).simplifyBasic();
       }
-      return Polynomial(result);
+      return Polynomial(result, variable: variable);
     }
     return Subtract(this, other);
   }
@@ -234,15 +326,18 @@ class Polynomial extends Expression {
   Expression operator *(dynamic other) {
     if (other is Polynomial) {
       int resultDegree = coefficients.length + other.coefficients.length - 2;
-      List<dynamic> result =
-          List<dynamic>.generate(resultDegree + 1, (index) => Complex(0.0));
+      List<Expression> result =
+          List<Expression>.generate(resultDegree + 1, (index) => Literal(0));
 
       for (var i = 0; i < coefficients.length; i++) {
         for (var j = 0; j < other.coefficients.length; j++) {
-          result[i + j] += coefficients[i] * other.coefficients[j];
+          // result[i+j] += coeff[i] * other[j]
+          result[i + j] = Add(result[i + j],
+                  Multiply(coefficients[i], other.coefficients[j]))
+              .simplifyBasic();
         }
       }
-      return Polynomial(result);
+      return Polynomial(result, variable: variable);
     }
     return Multiply(this, other);
   }
@@ -272,58 +367,170 @@ class Polynomial extends Expression {
 
       // They must have the same runtime type AND all items must be equal.
       return runtimeType == other.runtimeType &&
-          equalsCount == coefficients.length;
+          equalsCount == coefficients.length &&
+          variable == other.variable;
     } else {
       return false;
     }
   }
 
   @override
-  int get hashCode => Object.hashAll(coefficients);
+  int get hashCode => Object.hash(Object.hashAll(coefficients), variable);
 
   @override
   Expression operator /(dynamic other) {
     if (other is Polynomial) {
-      if (other.coefficients.first == Complex.zero()) {
+      // Check for zero polynomial
+      if (other.coefficients.isEmpty ||
+          (other.coefficients.first is Literal &&
+              (other.coefficients.first as Literal).value == Complex.zero())) {
         throw Exception('Division by zero polynomial.');
       }
 
-      List<dynamic> dividendCoeffs = _trimLeadingZeros(coefficients);
-      List<dynamic> divisorCoeffs = _trimLeadingZeros(other.coefficients);
+      List<Expression> dividendCoeffs = _trimLeadingZeros(coefficients);
+      List<Expression> divisorCoeffs = _trimLeadingZeros(other.coefficients);
 
       int dividendDegree = dividendCoeffs.length - 1;
       int divisorDegree = divisorCoeffs.length - 1;
 
       if (divisorDegree > dividendDegree) {
-        return Add(Polynomial([Complex.zero()]), RationalFunction(this, other));
+        return Add(Polynomial([Literal(0)]), RationalFunction(this, other));
       }
 
-      List<dynamic> quotientCoeffs =
-          List.filled(dividendDegree - divisorDegree + 1, Complex.zero());
+      List<Expression> quotientCoeffs =
+          List.filled(dividendDegree - divisorDegree + 1, Literal(0));
 
       for (int k = 0; k <= dividendDegree - divisorDegree; k++) {
-        quotientCoeffs[k] = dividendCoeffs[k] / divisorCoeffs[0];
+        // quotient[k] = dividend[k] / divisor[0]
+        quotientCoeffs[k] =
+            Divide(dividendCoeffs[k], divisorCoeffs[0]).simplifyBasic();
         for (int j = 0; j <= divisorDegree; j++) {
-          dividendCoeffs[k + j] -= quotientCoeffs[k] * divisorCoeffs[j];
+          // dividend[k+j] -= quotient[k] * divisor[j]
+          dividendCoeffs[k + j] = Subtract(dividendCoeffs[k + j],
+                  Multiply(quotientCoeffs[k], divisorCoeffs[j]))
+              .simplifyBasic();
         }
       }
 
       // Correcting the range of indices for the remainder coefficients
-      List<dynamic> remainderCoeffs =
+      List<Expression> remainderCoeffs =
           dividendCoeffs.sublist(dividendDegree - divisorDegree + 1);
 
       return Add(
-        Polynomial(_trimLeadingZeros(quotientCoeffs)),
-        RationalFunction(Polynomial(_trimLeadingZeros(remainderCoeffs)), other),
+        Polynomial(_trimLeadingZeros(quotientCoeffs), variable: variable),
+        RationalFunction(
+            Polynomial(_trimLeadingZeros(remainderCoeffs), variable: variable),
+            other),
       );
     }
     return Divide(this, other);
   }
 
+  @override
+  Expression operator %(dynamic other) {
+    if (other is Polynomial) {
+      if (other.coefficients.isEmpty ||
+          (other.coefficients.first is Literal &&
+              (other.coefficients.first as Literal).value == Complex.zero())) {
+        throw Exception('Division by zero polynomial.');
+      }
+
+      List<Expression> dividendCoeffs = _trimLeadingZeros(coefficients);
+      List<Expression> divisorCoeffs = _trimLeadingZeros(other.coefficients);
+
+      int dividendDegree = dividendCoeffs.length - 1;
+      int divisorDegree = divisorCoeffs.length - 1;
+
+      if (divisorDegree > dividendDegree) {
+        return this;
+      }
+
+      List<Expression> quotientCoeffs =
+          List.filled(dividendDegree - divisorDegree + 1, Literal(0));
+
+      for (int k = 0; k <= dividendDegree - divisorDegree; k++) {
+        quotientCoeffs[k] =
+            Divide(dividendCoeffs[k], divisorCoeffs[0]).simplifyBasic();
+        for (int j = 0; j <= divisorDegree; j++) {
+          dividendCoeffs[k + j] = Subtract(dividendCoeffs[k + j],
+                  Multiply(quotientCoeffs[k], divisorCoeffs[j]))
+              .simplifyBasic();
+        }
+      }
+
+      // The remainder is what's left in dividendCoeffs (after the subtraction loops)
+      // We need to trim it again to be sure
+      return Polynomial(
+          _trimLeadingZeros(
+              dividendCoeffs.sublist(dividendDegree - divisorDegree + 1)),
+          variable: variable);
+    }
+    return Modulo(this, other);
+  }
+
+  /// Calculates the Greatest Common Divisor of two polynomials.
+  Polynomial gcd(Polynomial other) {
+    Polynomial a = this;
+    Polynomial b = other;
+
+    while (b.coefficients.length > 1 ||
+        (b.coefficients.isNotEmpty &&
+            b.coefficients[0] is Literal &&
+            (b.coefficients[0] as Literal).value != Complex.zero())) {
+      Polynomial temp = b;
+      Expression remainder = a % b;
+      if (remainder is! Polynomial) {
+        // Should not happen if both are polynomials
+        throw Exception('Remainder is not a polynomial');
+      }
+      b = remainder;
+      a = temp;
+    }
+
+    // Normalize result (make leading coefficient 1)
+    if (a.coefficients.isNotEmpty &&
+        a.coefficients[0] is Literal &&
+        (a.coefficients[0] as Literal).value != Complex.zero()) {
+      var leading = a.coefficients[0];
+      var newCoeffs = a.coefficients
+          .map((c) => Divide(c, leading).simplifyBasic())
+          .toList();
+      return Polynomial(newCoeffs, variable: variable);
+    }
+    return a;
+  }
+
+  /// Calculates the Least Common Multiple of two polynomials.
+  Polynomial lcm(Polynomial other) {
+    if ((coefficients.length == 1 &&
+            coefficients[0] is Literal &&
+            (coefficients[0] as Literal).value == Complex.zero()) ||
+        (other.coefficients.length == 1 &&
+            other.coefficients[0] is Literal &&
+            (other.coefficients[0] as Literal).value == Complex.zero())) {
+      return Polynomial([Literal(0)], variable: variable);
+    }
+
+    Polynomial product = (this * other) as Polynomial;
+    Polynomial divisor = gcd(other);
+
+    // We use the division logic but we know it should be exact
+    Expression result = product / divisor;
+    if (result is Polynomial) return result;
+    // If division returns Add(Poly, Rational), extract Poly
+    if (result is Add && result.left is Polynomial) {
+      return result.left as Polynomial;
+    }
+
+    return product; // Fallback
+  }
+
   /// Helper function to clean up the zeroes
-  List<dynamic> _trimLeadingZeros(List<dynamic> coeffs) {
+  List<Expression> _trimLeadingZeros(List<Expression> coeffs) {
     int i = 0;
-    while (i < coeffs.length && coeffs[i] == Complex.zero()) {
+    while (i < coeffs.length &&
+        coeffs[i] is Literal &&
+        (coeffs[i] as Literal).value == Complex.zero()) {
       i++;
     }
     return coeffs.sublist(i);
@@ -386,14 +593,17 @@ class Polynomial extends Expression {
   @override
   Expression differentiate([Variable? v]) {
     if (coefficients.length <= 1) {
-      return Polynomial([Complex.zero()]);
+      return Polynomial([Literal(0)], variable: variable);
     }
-    var newCoefficients = <dynamic>[];
+    var newCoefficients = <Expression>[];
     for (var i = 0; i < coefficients.length - 1; i++) {
-      newCoefficients.add(coefficients[i] * (coefficients.length - i - 1));
+      // newCoefficients.add(coefficients[i] * (coefficients.length - i - 1));
+      newCoefficients.add(
+          Multiply(coefficients[i], Literal(coefficients.length - i - 1))
+              .simplifyBasic());
     }
 
-    return Polynomial(newCoefficients);
+    return Polynomial(newCoefficients, variable: variable);
   }
 
   /// Returns the integral of the Polynomial equation from 0 to x.
@@ -408,25 +618,16 @@ class Polynomial extends Expression {
   /// Assuming indefinite integral, the constant of integration (C) is 0
   @override
   Expression integrate([dynamic start, dynamic end]) {
-    var newCoefficients = <dynamic>[Complex.zero()];
+    var newCoefficients = <Expression>[Literal(0)];
     for (var i = 0; i < coefficients.length; i++) {
-      newCoefficients.add(coefficients[i] / (coefficients.length - i));
+      // newCoefficients.add(coefficients[i] / (coefficients.length - i));
+      newCoefficients.add(
+          Divide(coefficients[i], Literal(coefficients.length - i))
+              .simplifyBasic());
     }
-    newCoefficients.add(Complex.zero()); // Adding the constant of integration
+    newCoefficients.add(Literal(0)); // Adding the constant of integration
 
-    return Polynomial(newCoefficients);
-
-    // if (start == null && end == null) {
-    //   // If no start and end provided, return the indefinite integral.
-    //   return integral;
-    // } else if (start != null && end == null) {
-    //   return integral.evaluate(start);
-    // } else if (start == null && end != null) {
-    //   return integral.evaluate(end);
-    // } else {
-    //   // Else, calculate the definite integral between start and end.
-    //   return integral.evaluate(end!) - integral.evaluate(start!);
-    // }
+    return Polynomial(newCoefficients, variable: variable);
   }
 
   @override
@@ -441,52 +642,27 @@ class Polynomial extends Expression {
     return evaluate(x).isInfinite;
   }
 
+  @override
+  bool isPoly([bool strict = false]) => true;
+
   /// Check if an expression is a polynomial
-  static bool isPolynomial(String expression) {
-    final superscripts = {
-      '1': '¹',
-      '2': '²',
-      '3': '³',
-      '4': '⁴',
-      '5': '⁵',
-      '6': '⁶',
-      '7': '⁷',
-      '8': '⁸',
-      '9': '⁹',
-      '0': '⁰',
-    };
-    expression = expression.replaceAllMapped(
-      RegExp(
-          r'x([\u2070-\u2079\u00B9\u00B2\u00B3]+)|([\u2070-\u2079\u00B9\u00B2\u00B3]+)'),
-      (match) {
-        if (match.group(1) != null) {
-          // This is the case when 'x' is followed by superscripts
-          return 'x^${match.group(1)!.split('').map((digit) => superscripts[digit]!).join()}';
-        } else {
-          // This is the case when only superscripts are matched
-          return match
-              .group(2)!
-              .split('')
-              .map((digit) => superscripts[digit]!)
-              .join();
-        }
-      },
-    );
+  static bool isPolynomial(String expression, {String varName = 'x'}) {
+    try {
+      // Basic check for unsupported functions
+      // Check for any non-polynomial functions (sin, cos, exp, etc.)
+      final RegExp nonPolyPattern =
+          RegExp(r"\b(sin|cos|tan|asin|acos|atan|exp|ln|log|sqrt)\b");
+      if (nonPolyPattern.hasMatch(expression)) {
+        return false;
+      }
 
-    // Check if any term has a negative or fractional exponent
-    final RegExp expPattern = RegExp(r"x\^-?\d+|x\^\d+/\d+");
-    if (expPattern.hasMatch(expression)) {
+      // Try to parse it using fromString
+      // This reuses the strict logic in fromString
+      Polynomial.fromString(expression, variable: Variable(varName));
+      return true;
+    } catch (e) {
       return false;
     }
-
-    // Check for any non-polynomial functions
-    final RegExp nonPolyPattern = RegExp(r"\w+\(x\)");
-    if (nonPolyPattern.hasMatch(expression)) {
-      return false;
-    }
-
-    // If the expression passed the above checks, it's a polynomial
-    return true;
   }
 
   @override
@@ -503,9 +679,6 @@ class Polynomial extends Expression {
       '9': '⁹',
       '0': '⁰',
     };
-    // if (coefficients.every((coeff) => coeff == Integer.zero)) {
-    //   return "0";
-    // }
 
     // Polynomial to convert an integer to its superscript representation
     String toSuperscript(dynamic number) {
@@ -519,30 +692,61 @@ class Polynomial extends Expression {
     var buffer = StringBuffer();
     for (var i = 0; i < coefficients.length; i++) {
       final coeff = coefficients[i];
-      if (coeff != Complex.zero()) {
-        final termDegree = degree - i;
-        if (i != 0 && buffer.isNotEmpty) {
-          // Not the first term
-          if (coeff > Complex.zero()) buffer.write(' + ');
-          if (coeff < Complex.zero()) buffer.write(' - ');
-        } else if (coeff < Complex.zero()) {
-          // For the first term
-          buffer.write('-');
-        }
-        final absCoeff = coeff.abs();
-        if (absCoeff != 1 || termDegree == 0) {
-          buffer.write(absCoeff);
-        }
-        if (termDegree > 0) buffer.write('x');
-        if (termDegree > 1) {
-          if (useUnicode) {
-            buffer.write(toSuperscript(termDegree));
-          } else {
-            buffer.write('^$termDegree');
+      if (coeff is Literal && coeff.value == Complex.zero()) {
+        continue;
+      }
+
+      final termDegree = degree - i;
+
+      // Determine sign and absolute value
+      bool isNegative = false;
+      Expression absCoeff = coeff;
+
+      if (coeff is Literal && coeff.value is Complex) {
+        Complex c = coeff.value as Complex;
+        if (c.imaginary == 0) {
+          if (c.real < 0) {
+            isNegative = true;
+            absCoeff = Literal(Complex(-c.real, 0));
           }
+        }
+      } else if (coeff is UnaryExpression && coeff.operator == '-') {
+        isNegative = true;
+        absCoeff = coeff.operand;
+      }
+
+      if (i != 0 && buffer.isNotEmpty) {
+        // Not the first term
+        if (isNegative) {
+          buffer.write(' - ');
+        } else {
+          buffer.write(' + ');
+        }
+      } else if (isNegative) {
+        // For the first term
+        buffer.write('-');
+      }
+
+      // Print coefficient
+      if (absCoeff is Literal &&
+          absCoeff.value == Complex.one() &&
+          termDegree != 0) {
+        // Don't print 1 if variable follows
+      } else {
+        buffer.write(absCoeff);
+      }
+
+      if (termDegree > 0) buffer.write(variable.identifier.name);
+      if (termDegree > 1) {
+        if (useUnicode) {
+          buffer.write(toSuperscript(termDegree));
+        } else {
+          buffer.write('^$termDegree');
         }
       }
     }
+
+    if (buffer.isEmpty) return '0';
 
     return buffer.toString();
   }
@@ -552,7 +756,10 @@ class Polynomial extends Expression {
   dynamic evaluate([dynamic x]) {
     dynamic result = Complex.zero();
     for (var i = 0; i < coefficients.length; i++) {
-      result += coefficients[i] * pow(x, coefficients.length - 1 - i);
+      // result += coefficients[i] * pow(x, coefficients.length - 1 - i);
+      var term = Multiply(coefficients[i],
+          Pow(Literal(x), Literal(coefficients.length - 1 - i)));
+      result = Add(Literal(result), term).evaluate();
     }
     return result;
   }
@@ -562,12 +769,43 @@ class Polynomial extends Expression {
   /// Return a new simplified Polynomial
   @override
   Polynomial simplify() {
-    dynamic gcdR = coefficients.reduce((value, element) =>
-        Complex(gcd([value.toDouble(), element.toDouble()])));
+    // Check if all coefficients are literals
+    bool allLiterals = coefficients.every((c) => c is Literal);
 
-    List<dynamic> newCoefficients = coefficients.map((c) => c ~/ gcdR).toList();
+    if (!allLiterals) {
+      // If any coefficient is symbolic, return as-is (or try to simplify expressions)
+      List<Expression> simplifiedCoeffs =
+          coefficients.map((c) => c.simplifyBasic()).toList();
+      return Polynomial(simplifiedCoeffs, variable: variable);
+    }
 
-    return Polynomial(newCoefficients);
+    // Extract real parts for GCD calculation
+    List<num> realParts = coefficients.map((c) {
+      Complex val = (c as Literal).value as Complex;
+      return val.real;
+    }).toList();
+
+    // Compute GCD of real parts (convert to int if possible)
+    num gcdValue = realParts.map((r) {
+      // If the real part is an integer, use it; otherwise, skip GCD simplification
+      if (r != r.truncateToDouble()) {
+        return 1.0; // Non-integer, can't simplify
+      }
+      return r.abs().toInt();
+    }).reduce((a, b) => math.gcd([a, b]));
+
+    // If GCD is 1 or 0, no simplification needed
+    if (gcdValue == 1 || gcdValue == 0) {
+      return this;
+    }
+
+    // Divide all coefficients by the GCD
+    List<Expression> newCoefficients = coefficients.map((c) {
+      Complex val = (c as Literal).value as Complex;
+      return Literal(Complex(val.real / gcdValue, val.imaginary / gcdValue));
+    }).toList();
+
+    return Polynomial(newCoefficients, variable: variable);
   }
 
   List<dynamic> roots() {
@@ -576,24 +814,27 @@ class Polynomial extends Expression {
     Polynomial simplified = simplify();
 
     if (simplified.coefficients.length == 1) {
-      // Constant values
-      return [simplified.coefficients[0]];
+      // Constant values - no roots unless 0 (infinite)
+      // For now return empty list
+      return [];
     } else if (simplified.coefficients.length == 2) {
       // linear
-      return Linear.fromList(simplified.coefficients).roots();
+      return Linear.fromList(simplified.coefficients, variable: variable)
+          .roots();
     } else if (simplified.coefficients.length == 3) {
       // quadratic
-      return Quadratic.fromList(simplified.coefficients).roots();
+      return Quadratic.fromList(simplified.coefficients, variable: variable)
+          .roots();
     } else if (simplified.coefficients.length == 4) {
       // cubic
-      return Cubic.fromList(simplified.coefficients).roots();
+      return Cubic.fromList(simplified.coefficients, variable: variable)
+          .roots();
     } else if (simplified.coefficients.length == 5) {
-      return Quartic.fromList(simplified.coefficients).roots();
+      return Quartic.fromList(simplified.coefficients, variable: variable)
+          .roots();
     } else {
       // 3. For higher degree Polynomials, use a numerical method like Durand-Kerner or NewtonsMethod
-      return DurandKerner(
-        simplified.coefficients,
-      ).roots();
+      return DurandKerner(simplified.coefficients, variable: variable).roots();
     }
   }
 
@@ -613,13 +854,16 @@ class Polynomial extends Expression {
     List<String> factors = [];
 
     // Add the leading coefficient if it's not 1
-    if (coefficients.first != Complex.one()) {
+    if (coefficients.isNotEmpty &&
+        (coefficients.first is! Literal ||
+            (coefficients.first as Literal).value != Complex.one())) {
       factors.add('${coefficients.first}');
     }
 
     for (var root in roots()) {
       if (root is Complex) {
-        String realPart = '(x ${root.real > 0 ? '-' : '+'} ${root.real.abs()}';
+        String realPart =
+            '(${variable.identifier.name} ${root.real > 0 ? '-' : '+'} ${root.real.abs()}';
         String imaginaryPart = '';
 
         if (root.imaginary != 0) {
@@ -628,8 +872,12 @@ class Polynomial extends Expression {
         }
 
         factors.add('$realPart$imaginaryPart)');
+      } else if (root is num) {
+        factors.add(
+            '(${variable.identifier.name} ${root > 0 ? '-' : '+'} ${root.abs()})');
       } else {
-        factors.add('(x ${root > 0 ? '-' : '+'} ${root.abs()})');
+        // Symbolic root
+        factors.add('(${variable.identifier.name} - ($root))');
       }
     }
 
@@ -652,13 +900,14 @@ class Polynomial extends Expression {
     List<Polynomial> factors = [];
 
     for (dynamic root in roots()) {
-      factors.add(Polynomial([1, -root]));
+      factors.add(Polynomial([1, -root], variable: variable));
     }
 
     // Add the leading coefficient if it's not 1
     if (coefficients.first != Complex.one()) {
       factors[0] = Polynomial(
-          factors[0].coefficients.map((e) => e * coefficients.first).toList());
+          factors[0].coefficients.map((e) => e * coefficients.first).toList(),
+          variable: variable);
     }
 
     return factors;
@@ -673,7 +922,7 @@ class Polynomial extends Expression {
 
   @override
   Set<Variable> getVariableTerms() {
-    return {Variable('x')};
+    return {variable};
   }
 
   @override

@@ -99,6 +99,9 @@ class Exp extends Expression {
   }
 
   @override
+  bool isPoly([bool strict = false]) => false;
+
+  @override
   Expression expand() {
     return Exp(operand.expand());
   }

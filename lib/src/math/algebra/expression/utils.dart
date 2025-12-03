@@ -121,8 +121,24 @@ final defaultContext = {
   'triangleWave': triangleWave,
 
   // Statistic functions
-  'max': max,
-  'min': min,
+  'max': (dynamic x, [dynamic y]) {
+    if (x is List) {
+      return x.reduce((a, b) => max(a, b));
+    }
+    if (y != null) {
+      return max(x, y);
+    }
+    return x;
+  },
+  'min': (dynamic x, [dynamic y]) {
+    if (x is List) {
+      return x.reduce((a, b) => min(a, b));
+    }
+    if (y != null) {
+      return min(x, y);
+    }
+    return x;
+  },
   'sum': (num x, num y) => x + y,
   'sumTo': (num x) => sumTo(x.toInt()),
   'nPr': (num n, int r) => permutations(n, r).length,

@@ -2,14 +2,19 @@ import 'package:advance_math/advance_math.dart';
 
 void main() {
   //decimalPrecision = 200;
+  Stopwatch stopwatch = Stopwatch()..start();
   print(Decimal('12'));
   print(Decimal('0.1234'));
   print(Decimal('-12.345'));
   print(Decimal('1.23456789e-6', sigDigits: 4));
   print(Decimal(-12));
   print(Decimal(12.123456789));
+  stopwatch.stop();
+  print('Time taken: ${stopwatch.elapsedMilliseconds} ms');
 
-  decimalPrecision = 20;
+  decimalPrecision = 25;
+  stopwatch.reset();
+  stopwatch.start();
   print(Decimal.parse('1').exp()); // Output: ~2.718281828459045235360287471
   print(Decimal.parse('2').exp()); // Output: ~7.389056098930650227230427461
 
@@ -17,8 +22,13 @@ void main() {
   print(Decimal.parse('0.5').sin()); // Output: ~0.4794255386042030002732879352
   print(Decimal.parse('0.5').tan()); // Output: ~0.5463024898437905
   print(Decimal.parse('0.5').exp()); // Output: ~1.648721270700128146848650781
+  print(Decimal.parse('0.5').sqrt()); // Output: ~0.7071067811865475244008443621
+  print(Decimal.parse('0.6').sqrt()); // Output: ~0.7745966692414833775452855686
   print(Decimal.parse('0.5')
       .ln()); // Output: ~-0.69314718055994530941723212145817656807550013436026
+  stopwatch.stop();
+  print('Time taken: ${stopwatch.elapsedMilliseconds} ms');
+
   print(Decimal.parse('2.1').pow(Decimal.parse(
       '5.21'))); // Output: ~47.72682295935301454674160047008481922823908643816666
   print(Decimal.parse('2.0').pow(Decimal.parse(
@@ -33,11 +43,11 @@ void main() {
   print(Rational.parse("0.75")); // 3/4
   print(Rational.parse("-3.14e2")); // -314
   print(Rational.parse("3.14e-2")); // 157/5000
-  // print(Rational(12.123456789));
-  // print(Rational(4,6)); // 2/3
-  // print(Rational(4)); // 4
-  // print(Rational(null,6)); // 2/3
-  // print(Rational(double.infinity,6)); // Infinity
+  print(Rational(12.123456789));
+  print(Rational(4, 6)); // 2/3
+  print(Rational(4)); // 4
+  print(Rational(null, 6)); // 0
+  print(Rational(double.infinity, 6)); // Infinity
 
   printLine('Compute PI Algorithm');
 

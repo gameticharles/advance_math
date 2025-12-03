@@ -16,77 +16,98 @@ class Cubic extends Polynomial {
     dynamic b = 0,
     dynamic c = 0,
     dynamic d = 0,
-  }) : super([a, b, c, d]);
+    Variable? variable,
+  }) : super([a, b, c, d], variable: variable);
 
   /// Constructs a quadratic equation with coefficients [a], [b], and [c].
-  Cubic.num({num a = 1, num b = 0, num c = 0, num d = 0}) : super([a, b, c, d]);
+  Cubic.num({
+    num a = 1,
+    num b = 0,
+    num c = 0,
+    num d = 0,
+    Variable? variable,
+  }) : super([
+          Literal(Complex(a)),
+          Literal(Complex(b)),
+          Literal(Complex(c)),
+          Literal(Complex(d))
+        ], variable: variable);
 
-  Cubic.fromList(List<dynamic> coefficients) : super(coefficients) {
+  Cubic.fromList(List<dynamic> coefficients, {Variable? variable})
+      : super(coefficients, variable: variable) {
     if (coefficients.length != 4) {
       throw ArgumentError('The input list must contain exactly 4 elements.');
     }
   }
 
   @override
-  dynamic discriminant() {
+  Expression discriminant() {
     final p1 = c * c * b * b;
-    final p2 = d * b * b * b * Complex.fromReal(4);
-    final p3 = c * c * c * a * Complex.fromReal(4);
-    final p4 = a * b * c * d * Complex.fromReal(18);
-    final p5 = d * d * a * a * Complex.fromReal(27);
+    final p2 = d * b * b * b * Literal(4);
+    final p3 = c * c * c * a * Literal(4);
+    final p4 = a * b * c * d * Literal(18);
+    final p5 = d * d * a * a * Literal(27);
 
     return p1 - p2 - p3 + p4 - p5;
   }
 
   @override
-  List<dynamic> roots() {
-    var two = Complex.fromReal(2);
-    var three = Complex.fromReal(3);
-    final sigma = Complex(-1 / 2, 1 / 2 * sqrt(3));
+  List<Expression> roots() {
+    var two = Literal(2);
+    var three = Literal(3);
+    // sigma = -1/2 + i*sqrt(3)/2
+    final sigma = Literal(Complex(-0.5, 0.5 * sqrt(3)));
 
     final d0 = b * b - a * c * three;
-    final d1 = (two * pow(b.toDouble(), 3)) -
-        (a * b * c * Complex.fromReal(9)) +
-        (a * a * d * Complex.fromReal(27));
-    final sqrtD = (discriminant() * a * a * Complex.fromReal(-27)).sqrt();
-    final C = ((d1 + sqrtD) / two).nthRoot(3);
-    final constTerm = Complex.fromReal(-1) / (a * three);
+    final d1 = (two * Pow(b, three)) -
+        (a * b * c * Literal(9)) +
+        (a * a * d * Literal(27));
 
-    return <dynamic>[
+    // sqrtD = sqrt(-27 * a^2 * discriminant)
+    final sqrtD = Pow(discriminant() * a * a * Literal(-27), Literal(0.5));
+
+    // C = ((d1 + sqrtD) / 2)^(1/3)
+    final C = Pow((d1 + sqrtD) / two, Literal(1.0 / 3.0));
+
+    final constTerm = Literal(-1) / (a * three);
+
+    return <Expression>[
       constTerm * (b + C + (d0 / C)),
       constTerm * (b + (C * sigma) + (d0 / (C * sigma))),
-      constTerm * (b + (C * sigma.pow(2)) + (d0 / (C * sigma.pow(2)))),
+      constTerm * (b + (C * Pow(sigma, two)) + (d0 / (C * Pow(sigma, two)))),
     ];
   }
 
   /// The first coefficient of the equation in the form
   /// _f(x) = ax^3 + bx^2 + cx + d = 0_
-  dynamic get a => coefficients.first.simplify();
+  Expression get a => coefficients.first;
 
   /// The second coefficient of the equation in the form
   /// _f(x) = ax^3 + bx^2 + cx + d = 0_
-  dynamic get b => coefficients[1].simplify();
+  Expression get b => coefficients[1];
 
   /// The third coefficient of the equation in the form
   /// _f(x) = ax^3 + bx^2 + cx + d = 0_
-  dynamic get c => coefficients[2].simplify();
+  Expression get c => coefficients[2];
 
   /// The fourth coefficient of the equation in the form
   /// _f(x) = ax^3 + bx^2 + cx + d = 0_
-  dynamic get d => coefficients[3].simplify();
+  Expression get d => coefficients[3];
 
   /// {@macro algebraic_deep_copy}
   Cubic copyWith({
-    dynamic a,
-    dynamic b,
-    dynamic c,
-    dynamic d,
+    Expression? a,
+    Expression? b,
+    Expression? c,
+    Expression? d,
+    Variable? variable,
   }) =>
       Cubic(
         a: a ?? this.a,
         b: b ?? this.b,
         c: c ?? this.c,
         d: d ?? this.d,
+        variable: variable ?? this.variable,
       );
 
   @override

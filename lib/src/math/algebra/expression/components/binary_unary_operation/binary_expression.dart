@@ -55,6 +55,32 @@ class BinaryExpression extends Expression {
         return left.evaluate(arg) * right.evaluate(arg);
       case '/':
         return left.evaluate(arg) / right.evaluate(arg);
+      case '%':
+        // Modulo operator
+        final leftVal = left.evaluate(arg);
+        final rightVal = right.evaluate(arg);
+        if (leftVal is num && rightVal is num) {
+          return leftVal % rightVal;
+        }
+        // For non-numeric types, delegate to Modulo expression
+        return Modulo(left, right).evaluate(arg);
+      case ':':
+        // Check for assignment: vector[index]:value
+        if (left is IndexExpression) {
+          var idxExpr = left as IndexExpression;
+          var obj = idxExpr.object.evaluate(arg);
+          var idx = idxExpr.index.evaluate(arg);
+          var val = right.evaluate(arg);
+
+          if (obj is List && idx is int) {
+            if (idx < 0) idx += obj.length;
+            if (idx >= 0 && idx < obj.length) {
+              obj[idx] = val;
+              return obj;
+            }
+          }
+        }
+        return Range(left.evaluate(arg), right.evaluate(arg));
       default:
         throw Exception('Unsupported binary operator: $operator');
     }
@@ -132,6 +158,37 @@ class BinaryExpression extends Expression {
   @override
   bool isInfinity(num x) {
     throw UnimplementedError();
+  }
+
+  @override
+  bool isPoly([bool strict = false]) {
+    switch (operator) {
+      case '+':
+      case '-':
+      case '*':
+        return left.isPoly(strict) && right.isPoly(strict);
+      case '/':
+        // Division is only allowed if dividing by a constant (or if strict is false?)
+        // Nerdamer says: isPoly(51/x) -> false
+        // isPoly(x^2+1/x) -> false
+        // So division by variable makes it not a poly.
+        // Division by constant is fine: x/2 = 0.5*x -> poly
+        if (right is Literal) return left.isPoly(strict);
+        // If strict is false, maybe we allow more? But definition of poly usually excludes division by variable.
+        return false;
+      case '^':
+        // Base must be poly
+        if (!left.isPoly(strict)) return false;
+        // Exponent must be non-negative integer
+        if (right is Literal) {
+          final val = (right as Literal).value;
+          if (val is int && val >= 0) return true;
+          if (val is double && val == val.toInt() && val >= 0) return true;
+        }
+        return false;
+      default:
+        return false;
+    }
   }
 
   @override

@@ -41,6 +41,9 @@ class Abs extends Expression {
   }
 
   @override
+  bool isPoly([bool strict = false]) => false;
+
+  @override
   Set<Variable> getVariableTerms() {
     return operand.getVariableTerms();
   }

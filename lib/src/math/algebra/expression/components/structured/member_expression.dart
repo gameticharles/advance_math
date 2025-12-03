@@ -67,6 +67,9 @@ class MemberExpression extends Expression {
   }
 
   @override
+  bool isPoly([bool strict = false]) => false;
+
+  @override
   int depth() {
     return 1 + object.depth();
   }

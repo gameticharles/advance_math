@@ -65,6 +65,9 @@ class ConditionalExpression extends Expression {
   }
 
   @override
+  bool isPoly([bool strict = false]) => false;
+
+  @override
   int depth() {
     return 1 + [condition.depth(), ifTrue.depth(), ifFalse.depth()].reduce(max);
   }

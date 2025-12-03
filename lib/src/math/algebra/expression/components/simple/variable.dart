@@ -31,15 +31,24 @@ class Variable extends Expression {
   /// Otherwise, it returns [arg].
   @override
   dynamic evaluate([dynamic arg]) {
-    if (arg == null) return this;
-
-    if (arg is Map<String, Object>) {
+    // 1. Check provided argument if it's a map
+    if (arg is Map) {
       if (arg.containsKey(identifier.name)) return arg[identifier.name];
-
-      return this;
     }
 
-    return arg;
+    // 2. Check default context for functions/constants
+    if (defaultContext.containsKey(identifier.name)) {
+      // print('DEBUG: Found ${identifier.name} in defaultContext: ${defaultContext[identifier.name]}');
+      return defaultContext[identifier.name];
+    }
+
+    // 3. Handle single value argument (implicit substitution)
+    if (arg != null && arg is! Map) {
+      return arg;
+    }
+
+    // 4. Not found, return self
+    return this;
   }
 
   /// Differentiates the variable.
@@ -53,7 +62,7 @@ class Variable extends Expression {
   Expression differentiate([Variable? v]) {
     // If no variable specified, assume differentiation with respect to this variable
     if (v == null) return Literal(1);
-    
+
     // Partial derivative: dv/dv = 1, dx/dy = 0
     return (this == v) ? Literal(1) : Literal(0);
   }
@@ -112,6 +121,9 @@ class Variable extends Expression {
   bool isInfinity(num x) {
     throw UnimplementedError();
   }
+
+  @override
+  bool isPoly([bool strict = false]) => true;
 
   @override
   int depth() {

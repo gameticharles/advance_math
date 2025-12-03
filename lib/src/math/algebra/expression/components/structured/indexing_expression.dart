@@ -8,7 +8,25 @@ class IndexExpression extends Expression {
 
   @override
   dynamic evaluate([dynamic arg]) {
-    return object.evaluate(arg)[index.evaluate(arg)];
+    var obj = object.evaluate(arg);
+    var idx = index.evaluate(arg);
+
+    if (obj is List) {
+      if (idx is int) {
+        if (idx < 0) {
+          idx += obj.length;
+        }
+        return obj[idx];
+      }
+      if (idx is Range) {
+        var indices = idx.toList();
+        return indices.map((i) {
+          if (i < 0) i += obj.length;
+          return obj[i.toInt()];
+        }).toList();
+      }
+    }
+    return obj[idx];
   }
 
   @override
@@ -54,6 +72,9 @@ class IndexExpression extends Expression {
   bool isInfinity(num x) {
     throw UnimplementedError();
   }
+
+  @override
+  bool isPoly([bool strict = false]) => false;
 
   @override
   int depth() {

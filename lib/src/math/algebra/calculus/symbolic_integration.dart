@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import '../expression/expression.dart';
 
 /// Strategy pattern for symbolic integration
@@ -19,6 +20,7 @@ class SymbolicIntegration {
     ConstantMultipleStrategy(),
     SubstitutionStrategy(),
     IntegrationByPartsStrategy(),
+    InverseTrigStrategy(),
     SumDifferenceStrategy(),
   ];
 
@@ -203,7 +205,162 @@ class BasicTrigStrategy implements IntegrationStrategy {
       }
     }
 
+    // ∫tan(x) dx = -ln|cos(x)| = ln|sec(x)|
+    if (expr is Tan && expr.operand is Variable) {
+      if ((expr.operand as Variable).identifier.name == v.identifier.name) {
+        return Ln(Sec(v));
+      }
+    }
+
+    // ∫cot(x) dx = ln|sin(x)|
+    if (expr is Cot && expr.operand is Variable) {
+      if ((expr.operand as Variable).identifier.name == v.identifier.name) {
+        return Ln(Sin(v));
+      }
+    }
+
+    // ∫sec(x) dx = ln|sec(x) + tan(x)|
+    if (expr is Sec && expr.operand is Variable) {
+      if ((expr.operand as Variable).identifier.name == v.identifier.name) {
+        return Ln(Add(Sec(v), Tan(v)));
+      }
+    }
+
+    // ∫csc(x) dx = -ln|csc(x) + cot(x)|
+    if (expr is Csc && expr.operand is Variable) {
+      if ((expr.operand as Variable).identifier.name == v.identifier.name) {
+        return Negate(Ln(Add(Csc(v), Cot(v))));
+      }
+    }
+
+    // Power Reduction: ∫sin²(x) dx = ∫(1 - cos(2x))/2 dx = x/2 - sin(2x)/4
+    if (expr is Pow && expr.base is Sin && expr.exponent is Literal) {
+      if ((expr.exponent as Literal).value == 2) {
+        final sinExpr = expr.base as Sin;
+        if (sinExpr.operand is Variable &&
+            (sinExpr.operand as Variable).identifier.name ==
+                v.identifier.name) {
+          // x/2 - sin(2x)/4
+          return Subtract(Divide(v, Literal(2)),
+              Divide(Sin(Multiply(Literal(2), v)), Literal(4)));
+        }
+      }
+    }
+
+    // Power Reduction: ∫cos²(x) dx = ∫(1 + cos(2x))/2 dx = x/2 + sin(2x)/4
+    if (expr is Pow && expr.base is Cos && expr.exponent is Literal) {
+      if ((expr.exponent as Literal).value == 2) {
+        final cosExpr = expr.base as Cos;
+        if (cosExpr.operand is Variable &&
+            (cosExpr.operand as Variable).identifier.name ==
+                v.identifier.name) {
+          // x/2 + sin(2x)/4
+          return Add(Divide(v, Literal(2)),
+              Divide(Sin(Multiply(Literal(2), v)), Literal(4)));
+        }
+      }
+    }
+
     return null;
+  }
+}
+
+/// Inverse Trigonometric integration: ∫1/(x²+a²) dx, ∫1/√(a²-x²) dx
+class InverseTrigStrategy implements IntegrationStrategy {
+  @override
+  String get name => 'Inverse Trigonometric';
+
+  @override
+  Expression? tryIntegrate(Expression expr, Variable v) {
+    if (expr is! Divide) return null;
+
+    // Check for 1/(...) or c/(...)
+    Expression numerator = expr.left;
+    Expression denominator = expr.right;
+
+    // Ensure numerator is constant w.r.t v
+    if (_containsVariable(numerator, v)) return null;
+
+    // Case 1: ∫1/(x² + a²) dx = (1/a) * atan(x/a)
+    // Denominator should be Add(Pow(x,2), a^2) or Add(a^2, Pow(x,2))
+    if (denominator is Add) {
+      Expression? xSquared;
+      Expression? aSquared;
+
+      if (_isXSquared(denominator.left, v)) {
+        xSquared = denominator.left;
+        aSquared = denominator.right;
+      } else if (_isXSquared(denominator.right, v)) {
+        xSquared = denominator.right;
+        aSquared = denominator.left;
+      }
+
+      if (xSquared != null &&
+          aSquared != null &&
+          !_containsVariable(aSquared, v)) {
+        // Found x^2 + a^2
+        // We need 'a'. If aSquared is Literal, we can sqrt it.
+        // If it's an expression, we represent it as sqrt(a^2)
+        Expression a = PredefinedFunctionExpression('sqrt', aSquared);
+        if (aSquared is Literal && (aSquared.value as num) > 0) {
+          a = Literal(math.sqrt((aSquared.value as num).toDouble()));
+        }
+
+        // Result: (numerator/a) * atan(x/a)
+        return Multiply(Divide(numerator, a), Atan(Divide(v, a)));
+      }
+    }
+
+    // Case 2: ∫1/√(a² - x²) dx = asin(x/a)
+    // Denominator is PredefinedFunctionExpression('sqrt', Subtract(a^2, x^2))
+    // or Pow(Subtract(a^2, x^2), 0.5)
+    Expression? inner;
+    if (denominator is PredefinedFunctionExpression &&
+        denominator.functionName == 'sqrt') {
+      inner = denominator.operand;
+    } else if (denominator is Pow &&
+        denominator.exponent is Literal &&
+        (denominator.exponent as Literal).value == 0.5) {
+      inner = denominator.base;
+    }
+
+    if (inner is Subtract) {
+      // Check for a^2 - x^2
+      if (!_containsVariable(inner.left, v) && _isXSquared(inner.right, v)) {
+        Expression aSquared = inner.left;
+        Expression a = PredefinedFunctionExpression('sqrt', aSquared);
+        if (aSquared is Literal && (aSquared.value as num) > 0) {
+          a = Literal(math.sqrt((aSquared.value as num).toDouble()));
+        }
+
+        // Result: numerator * asin(x/a)
+        return Multiply(numerator, Asin(Divide(v, a)));
+      }
+    }
+
+    return null;
+  }
+
+  bool _isXSquared(Expression expr, Variable v) {
+    if (expr is Pow) {
+      if (expr.base is Variable &&
+          (expr.base as Variable).identifier.name == v.identifier.name &&
+          expr.exponent is Literal &&
+          (expr.exponent as Literal).value == 2) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool _containsVariable(Expression expr, Variable v) {
+    try {
+      return expr
+          .getVariableTerms()
+          .any((variable) => variable.identifier.name == v.identifier.name);
+    } catch (e) {
+      return false;
+    }
   }
 }
 
@@ -464,24 +621,42 @@ class IntegrationByPartsStrategy implements IntegrationStrategy {
 
     // Try different u/dv assignments based on ILATE priority
 
-    // Pattern 1: ∫x·sin(x) dx or ∫x·cos(x) dx
+    // Pattern 1: ∫ln(x)·x^n dx (including ∫ln(x) dx where x^n = 1)
+    // u = ln(x), dv = x^n
+    if (_isLogarithmic(left) && _isPolynomial(right, v)) {
+      return _applyByParts(left, right, v);
+    }
+    if (_isPolynomial(left, v) && _isLogarithmic(right)) {
+      return _applyByParts(right, left, v);
+    }
+
+    // Pattern 2: ∫asin(x)·x^n dx
+    // u = asin(x), dv = x^n
+    if (_isInverseTrig(left) && _isPolynomial(right, v)) {
+      return _applyByParts(left, right, v);
+    }
+    if (_isPolynomial(left, v) && _isInverseTrig(right)) {
+      return _applyByParts(right, left, v);
+    }
+
+    // Pattern 3: ∫x·sin(x) dx or ∫x·cos(x) dx
     // u = x, dv = sin(x) or cos(x)
     if (_isPolynomial(left, v) && _isTrigonometric(right)) {
       return _applyByParts(left, right, v);
     }
 
-    // Pattern 2: ∫sin(x)·x dx (reverse)
+    // Pattern 4: ∫sin(x)·x dx (reverse)
     if (_isTrigonometric(left) && _isPolynomial(right, v)) {
       return _applyByParts(right, left, v);
     }
 
-    // Pattern 3: ∫x·e^x dx
+    // Pattern 5: ∫x·e^x dx
     // u = x, dv = e^x
     if (_isPolynomial(left, v) && _isExponential(right)) {
       return _applyByParts(left, right, v);
     }
 
-    // Pattern 4: ∫e^x·x dx (reverse)
+    // Pattern 6: ∫e^x·x dx (reverse)
     if (_isExponential(left) && _isPolynomial(right, v)) {
       return _applyByParts(right, left, v);
     }
@@ -518,6 +693,14 @@ class IntegrationByPartsStrategy implements IntegrationStrategy {
       return (expr.base as Variable).identifier.name == v.identifier.name;
     }
     return false;
+  }
+
+  bool _isLogarithmic(Expression expr) {
+    return expr is Ln || expr is Log;
+  }
+
+  bool _isInverseTrig(Expression expr) {
+    return expr is Asin || expr is Acos || expr is Atan;
   }
 
   bool _isTrigonometric(Expression expr) {

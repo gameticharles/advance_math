@@ -33,7 +33,47 @@
   - Added `diff(expr, var)` parsing for differentiation
   - Added `integrate(expr, var)` parsing for integration
   - Added `solve(eq, var)` parsing for equation solving
+  - Added `solveEquations(equations)` parsing for system of equations
+  - Added algebraic functions: `gcd(a, b)`, `lcm(a, b)`, `factor(poly)`, `deg(poly)`, `pfactor(n)`, `coeffs(poly, var)`, `line(p1, p2)`, `roots(poly)`, `sqcomp(poly)`
   - Improved simplification of parsed results
+
+## Polynomial Algebra Enhancements
+
+- **[FEATURE]** Polynomial modulo operator (`%`) for polynomial division remainder
+- **[FEATURE]** Polynomial GCD and LCM methods
+  - `gcd(other)`: Greatest Common Divisor using Euclidean algorithm
+  - `lcm(other)`: Least Common Multiple
+- **[FEATURE]** Added `Modulo` expression class for symbolic modulo operations
+- **[FEATURE]** Implemented `isPoly([strict])` method across all expression types for polynomial detection
+- **[BUG_FIX]** Fixed `Polynomial.simplify()` to correctly handle `Complex` coefficients by checking if coefficients are real before computing GCD
+
+## Equation Solving Enhancements
+
+- **[FEATURE]** System of equations solver (`solveEquations`)
+  - Supports linear and simple non-linear systems
+  - Uses substitution method for system solving
+  - Returns solutions in `[var, val, var, val, ...]` format
+
+## Symbolic Integration Enhancements
+
+- **[FEATURE]** Added `InverseTrigStrategy` for inverse trigonometric integrals
+  - Handles patterns like `1/(x^2 + a^2)` → `atan(x/a)`
+  - Handles patterns like `1/sqrt(a^2 - x^2)` → `asin(x/a)`
+- **[IMPROVEMENT]** Enhanced `BasicTrigStrategy` with trigonometric power reduction
+  - Power reduction for `sin^2(x)`, `cos^2(x)`, etc.
+- **[IMPROVEMENT]** Improved `IntegrationByPartsStrategy` to handle logarithmic and inverse trigonometric functions
+
+## Test Coverage Improvements
+
+- **[IMPROVEMENT]** Enabled and fixed tests in `algebra_spec_test.dart`
+  - Uncommented `isPoly` tests
+  - Uncommented simplification and factorization tests
+- **[IMPROVEMENT]** Enabled and adapted tests in `solve_spec_test.dart`
+  - Uncommented `solveEquations` tests
+  - Adapted test expectations for parser syntax
+- **[IMPROVEMENT]** Fixed tests in `core_spec_test.dart`
+  - Adjusted expectations for symbolic results (e.g., `11/4` instead of `2.75`)
+  - Enabled hyperbolic function tests
 - **[IMPROVEMENT]** Parser now handles complex nested expressions correctly
 
 ## Expression System Refactoring

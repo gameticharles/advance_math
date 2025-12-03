@@ -40,6 +40,19 @@ class UnaryExpression extends Expression {
         } else {
           throw Exception('Bitwise NOT is only valid for integers.');
         }
+      case '%':
+        if (!prefix) {
+          if (operandVal is num) {
+            return operandVal * 0.01;
+          }
+          // If operand is expression, return Multiply(operand, 0.01)?
+          // But evaluate returns dynamic (value).
+          // If operandVal is not num, we can't multiply.
+          // Unless we return an Expression?
+          // evaluate() usually returns num or Complex.
+          throw Exception('Percentage is only valid for numbers.');
+        }
+        throw Exception('Percentage operator % must be a suffix.');
       default:
         throw Exception('Unknown unary operator: $operator');
     }
@@ -100,6 +113,14 @@ class UnaryExpression extends Expression {
   }
 
   @override
+  bool isPoly([bool strict = false]) {
+    if (operator == '-' || operator == '+') {
+      return operand.isPoly(strict);
+    }
+    return false;
+  }
+
+  @override
   int depth() {
     return 1 + operand.depth();
   }
@@ -110,12 +131,41 @@ class UnaryExpression extends Expression {
   }
 
   @override
-  Expression simplify() {
+  Expression simplifyBasic() {
+    var simplifiedOperand = operand.simplifyBasic();
+
+    if (operator == '-' && prefix) {
+      if (simplifiedOperand is Literal) {
+        var val = simplifiedOperand.value;
+        if (val is num) {
+          return Literal(-val);
+        }
+      }
+    }
+    if (operator == '+' && prefix) {
+      return simplifiedOperand;
+    }
+
+    if (simplifiedOperand != operand) {
+      return UnaryExpression(operator, simplifiedOperand, prefix: prefix);
+    }
     return this;
   }
 
   @override
+  Expression simplify() {
+    return simplifyBasic();
+  }
+
+  @override
   String toString() {
-    return "$operator($operand)";
+    if (prefix) {
+      // Avoid parens if operand is simple
+      if (operand is Literal || operand is Variable) {
+        return "$operator$operand";
+      }
+      return "$operator($operand)";
+    }
+    return "$operand$operator";
   }
 }

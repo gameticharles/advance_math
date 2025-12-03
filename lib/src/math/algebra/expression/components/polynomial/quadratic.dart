@@ -24,13 +24,21 @@ class Quadratic extends Polynomial {
     dynamic a = 1,
     dynamic b = 0,
     dynamic c = 0,
-  }) : super([a, b, c]);
+    Variable? variable,
+  }) : super([a, b, c], variable: variable);
 
   /// Constructs a quadratic equation with coefficients [a], [b], and [c].
-  Quadratic.num({num a = 1, num b = 0, num c = 0})
-      : super([Complex(a), Complex(b), Complex(c)]);
+  /// Constructs a quadratic equation with coefficients [a], [b], and [c].
+  Quadratic.num({
+    num a = 1,
+    num b = 0,
+    num c = 0,
+    Variable? variable,
+  }) : super([Literal(Complex(a)), Literal(Complex(b)), Literal(Complex(c))],
+            variable: variable);
 
-  Quadratic.fromList(List<dynamic> coefficients) : super(coefficients) {
+  Quadratic.fromList(List<dynamic> coefficients, {Variable? variable})
+      : super(coefficients, variable: variable) {
     if (coefficients.length != 3) {
       throw ArgumentError('The input list must contain exactly 3 elements.');
     }
@@ -38,19 +46,19 @@ class Quadratic extends Polynomial {
 
   /// The first coefficient of the equation in the form
   /// _f(x) = ax^2 + bx + c = 0_
-  dynamic get a => coefficients.first;
+  Expression get a => coefficients.first;
 
   /// The second coefficient of the equation in the form
   /// _f(x) = ax^2 + bx + c = 0_
-  dynamic get b => coefficients[1];
+  Expression get b => coefficients[1];
 
   /// The third coefficient of the equation in the form
   /// _f(x) = ax^2 + bx + c = 0_
-  dynamic get c => coefficients[2];
+  Expression get c => coefficients[2];
 
   /// Returns the discriminant of the quadratic equation, which is b^2 - 4ac.
   @override
-  dynamic discriminant() => (b * b) - Complex.fromReal(4) * a * c;
+  Expression discriminant() => (b * b) - Literal(4) * a * c;
 
   /// Returns the roots of the quadratic equation as a list.
   ///
@@ -58,20 +66,31 @@ class Quadratic extends Polynomial {
   /// If the discriminant is zero, there is one real root, which is returned as a list with one number.
   /// If the discriminant is greater than zero, there are two real roots, which are returned as a list with two numbers.
   @override
-  List<dynamic> roots() {
-    final disc = discriminant();
-    final twoA = Complex.fromReal(2) * a;
+  List<Expression> roots() {
+    final disc = discriminant().simplify();
+    final twoA = Literal(2) * a;
+    final rootDisc = Pow(disc, Literal(0.5));
 
-    return <dynamic>[(-b + disc.sqrt()) / twoA, (-b - disc.sqrt()) / twoA];
+    return <Expression>[(-b + rootDisc) / twoA, (-b - rootDisc) / twoA];
   }
 
   /// Returns the vertex of the quadratic equation as a [Point].
   ///
   /// The vertex is the point that represents the minimum or maximum of the quadratic Polynomial.
-  Point vertex() {
-    var x = -b / (a * 2);
-    var y = c - b * b / (a * 4);
-    return Point(x.simplify(), y.simplify());
+  dynamic vertex() {
+    var x = -b / (a * Literal(2));
+    var y = c - b * b / (a * Literal(4));
+    var simpleX = x.simplifyBasic();
+    var simpleY = y.simplifyBasic();
+
+    if (simpleX is Literal &&
+        simpleX.value is num &&
+        simpleY is Literal &&
+        simpleY.value is num) {
+      return Point((simpleX.value as num), (simpleY.value as num));
+    }
+
+    return {'x': simpleX, 'y': simpleY};
   }
 
   @override
@@ -100,7 +119,7 @@ class Quadratic extends Polynomial {
   /// var quad = Quadratic(2, -3, -2);
   /// print(quad.sumOfRoots()); // Output: 1.5
   /// ```
-  dynamic sumOfRoots() {
+  Expression sumOfRoots() {
     return -b / a;
   }
 
@@ -111,7 +130,7 @@ class Quadratic extends Polynomial {
   /// var quad = Quadratic(2, -3, -2);
   /// print(quad.productOfRoots()); // Output: -1
   /// ```
-  dynamic productOfRoots() {
+  Expression productOfRoots() {
     return c / a;
   }
 
@@ -125,12 +144,14 @@ class Quadratic extends Polynomial {
   /// print(quad2.directionOfOpening()); // Output: "Downwards"
   /// ```
   String directionOfOpening() {
-    if (a > 0) {
-      return "Upwards";
-    } else if (a < 0) {
-      return "Downwards";
+    if (a is Literal && (a as Literal).value is num) {
+      if (((a as Literal).value as num) > 0) {
+        return "Upwards";
+      } else if (((a as Literal).value as num) < 0) {
+        return "Downwards";
+      }
     }
-    return "Not a parabola";
+    return "Unknown (Symbolic or Complex coefficient)";
   }
 
   @override

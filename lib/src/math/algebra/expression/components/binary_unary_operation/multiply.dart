@@ -41,7 +41,8 @@ class Multiply extends BinaryOperationsExpression {
     }
 
     // Default return (should ideally never reach this point)
-    throw Exception('Unsupported evaluation scenario in Multiply.evaluate');
+    // throw Exception('Unsupported evaluation scenario in Multiply.evaluate');
+    return simplify();
   }
 
 // Helper method to check if an expression contains a Variable
@@ -100,9 +101,68 @@ class Multiply extends BinaryOperationsExpression {
     var simpleLeft = left.simplifyBasic();
     var simpleRight = right.simplifyBasic();
 
+    // Normalize Negate(expr) or UnaryExpression('-', expr) to -1 * expr
+    bool isNegate(Expression e) {
+      return e is Negate || (e is UnaryExpression && e.operator == '-');
+    }
+
+    Expression getOperand(Expression e) {
+      if (e is Negate) return e.operand;
+      if (e is UnaryExpression) return e.operand;
+      throw Exception('Not a negation');
+    }
+
+    bool changed = false;
+    if (isNegate(simpleLeft)) {
+      simpleLeft = Multiply(Literal(-1), getOperand(simpleLeft));
+      changed = true;
+    }
+    if (isNegate(simpleRight)) {
+      simpleRight = Multiply(Literal(-1), getOperand(simpleRight));
+      changed = true;
+    }
+    if (changed) {
+      return Multiply(simpleLeft, simpleRight).simplifyBasic();
+    }
+
     // Basic simplification: if both operands are literals, evaluate and return a new Literal.
     if (simpleLeft is Literal && simpleRight is Literal) {
-      return Literal(simpleLeft.evaluate() * simpleRight.evaluate());
+      var leftVal = simpleLeft.evaluate();
+      var rightVal = simpleRight.evaluate();
+      if (leftVal is num && rightVal is Complex) {
+        return Literal(rightVal * leftVal);
+      }
+      return Literal(leftVal * rightVal);
+    }
+
+    // Enforce right-associativity: (A * B) * C -> A * (B * C)
+    if (simpleLeft is Multiply) {
+      return Multiply(simpleLeft.left, Multiply(simpleLeft.right, simpleRight))
+          .simplifyBasic();
+    }
+
+    // Distribute Literal over Add/Subtract
+    // c * (a + b) = ca + cb
+    if (simpleLeft is Literal && simpleRight is Add) {
+      return Add(Multiply(simpleLeft, simpleRight.left),
+              Multiply(simpleLeft, simpleRight.right))
+          .simplifyBasic();
+    }
+    if (simpleLeft is Literal && simpleRight is Subtract) {
+      return Subtract(Multiply(simpleLeft, simpleRight.left),
+              Multiply(simpleLeft, simpleRight.right))
+          .simplifyBasic();
+    }
+    // (a + b) * c = ac + bc
+    if (simpleRight is Literal && simpleLeft is Add) {
+      return Add(Multiply(simpleRight, simpleLeft.left),
+              Multiply(simpleRight, simpleLeft.right))
+          .simplifyBasic();
+    }
+    if (simpleRight is Literal && simpleLeft is Subtract) {
+      return Subtract(Multiply(simpleRight, simpleLeft.left),
+              Multiply(simpleRight, simpleLeft.right))
+          .simplifyBasic();
     }
 
     // Handle cases like x * 0 = 0, x * 1 = x
@@ -120,7 +180,7 @@ class Multiply extends BinaryOperationsExpression {
 
     // Multiplication involving same base x * x = x^2
     if (simpleLeft.toString() == simpleRight.toString()) {
-      return Pow(simpleLeft, Literal(2));
+      return Pow(simpleLeft, Literal(2)).simplifyBasic();
     }
 
     // Multiplication involving exponential functions
@@ -134,13 +194,60 @@ class Multiply extends BinaryOperationsExpression {
       // a^m * b^m remains as is.
     }
 
+    // Handle Variable * Pow (x * x^n = x^(n+1))
+    if (simpleLeft is Variable &&
+        simpleRight is Pow &&
+        simpleRight.base.toString() == simpleLeft.toString()) {
+      return Pow(simpleLeft, Add(simpleRight.exponent, Literal(1)).simplify())
+          .simplifyBasic();
+    }
+
+    // Handle Pow * Variable (x^n * x = x^(n+1))
+    if (simpleLeft is Pow &&
+        simpleRight is Variable &&
+        simpleLeft.base.toString() == simpleRight.toString()) {
+      return Pow(simpleRight, Add(simpleLeft.exponent, Literal(1)).simplify())
+          .simplifyBasic();
+    }
+
     // Associativity: c1 * (c2 * x) = (c1 * c2) * x
     if (simpleLeft is Literal &&
         simpleRight is Multiply &&
         simpleRight.left is Literal) {
       var c1 = simpleLeft.evaluate();
       var c2 = (simpleRight.left as Literal).evaluate();
-      return Multiply(Literal(c1 * c2), simpleRight.right).simplifyBasic();
+      var val = (c1 is num && c2 is Complex) ? c2 * c1 : c1 * c2;
+      return Multiply(Literal(val), simpleRight.right).simplifyBasic();
+    }
+
+    // Associativity: (c1 * x) * c2 = (c1 * c2) * x
+    if (simpleLeft is Multiply &&
+        simpleLeft.left is Literal &&
+        simpleRight is Literal) {
+      var c1 = (simpleLeft.left as Literal).evaluate();
+      var c2 = simpleRight.evaluate();
+      var val = (c1 is num && c2 is Complex) ? c2 * c1 : c1 * c2;
+      return Multiply(Literal(val), simpleLeft.right).simplifyBasic();
+    }
+
+    // Associativity: c1 * (x * c2) = (c1 * c2) * x
+    if (simpleLeft is Literal &&
+        simpleRight is Multiply &&
+        simpleRight.right is Literal) {
+      var c1 = simpleLeft.evaluate();
+      var c2 = (simpleRight.right as Literal).evaluate();
+      var val = (c1 is num && c2 is Complex) ? c2 * c1 : c1 * c2;
+      return Multiply(Literal(val), simpleRight.left).simplifyBasic();
+    }
+
+    // Associativity: (x * c1) * c2 = (c1 * c2) * x
+    if (simpleLeft is Multiply &&
+        simpleLeft.right is Literal &&
+        simpleRight is Literal) {
+      var c1 = (simpleLeft.right as Literal).evaluate();
+      var c2 = simpleRight.evaluate();
+      var val = (c1 is num && c2 is Complex) ? c2 * c1 : c1 * c2;
+      return Multiply(Literal(val), simpleLeft.left).simplifyBasic();
     }
 
     // Multiplication of similar terms: ax * bx = abx^2
@@ -148,17 +255,52 @@ class Multiply extends BinaryOperationsExpression {
       if ((simpleLeft).right.toString() == (simpleRight).right.toString() &&
           (simpleLeft).left is Literal &&
           (simpleRight).left is Literal) {
-        var newCoefficient =
-            (simpleLeft).left.evaluate() * (simpleRight).left.evaluate();
+        var c1 = (simpleLeft).left.evaluate();
+        var c2 = (simpleRight).left.evaluate();
+        var newCoefficient = (c1 is num && c2 is Complex) ? c2 * c1 : c1 * c2;
         var newBase = (simpleLeft).right;
         return Multiply(Literal(newCoefficient), Pow(newBase, Literal(2)));
       }
+    }
+
+    // Combine like terms: (A * B) * B = A * B^2
+    if (simpleLeft is Multiply &&
+        simpleLeft.right.toString() == simpleRight.toString()) {
+      return Multiply(simpleLeft.left, Pow(simpleRight, Literal(2)))
+          .simplifyBasic();
+    }
+    // Combine like terms: (A * B) * A = B * A^2
+    if (simpleLeft is Multiply &&
+        simpleLeft.left.toString() == simpleRight.toString()) {
+      return Multiply(simpleLeft.right, Pow(simpleRight, Literal(2)))
+          .simplifyBasic();
     }
 
     // Associative and Commutative Property: For now, ensure multiplication is represented in a standard order
     if (simpleLeft is Variable && simpleRight is Literal) {
       return Multiply(
           simpleRight, simpleLeft); // make sure variable comes first
+    }
+
+    // Sort variables alphabetically
+    if (simpleLeft is Variable && simpleRight is Variable) {
+      if (simpleLeft.identifier.name.compareTo(simpleRight.identifier.name) >
+          0) {
+        return Multiply(simpleRight, simpleLeft).simplifyBasic();
+      }
+    }
+
+    // Sort Variable * Multiply(Variable, ...)
+    if (simpleLeft is Variable &&
+        simpleRight is Multiply &&
+        simpleRight.left is Variable) {
+      if (simpleLeft.identifier.name
+              .compareTo((simpleRight.left as Variable).identifier.name) >
+          0) {
+        return Multiply(
+                simpleRight.left, Multiply(simpleLeft, simpleRight.right))
+            .simplifyBasic();
+      }
     }
 
     // Special products
@@ -194,35 +336,87 @@ class Multiply extends BinaryOperationsExpression {
 
   @override
   Expression expand() {
-    // Expansion for (a+b)(c+d) = ac + ad + bc + bd
-    if (left is Add && right is Add) {
-      return Add(
-          Add(Multiply((left as Add).left, (right as Add).left),
-              Multiply((left as Add).left, (right as Add).right)),
-          Add(Multiply((left as Add).right, (right as Add).left),
-              Multiply((left as Add).right, (right as Add).right)));
+    var expandedLeft = left.expand();
+    var expandedRight = right.expand();
+
+    // Helper to check if expression is Add or Subtract
+    bool isAddOrSub(Expression e) => e is Add || e is Subtract;
+
+    // Helper to get terms from Add or Subtract recursively
+    List<Expression> getTerms(Expression e) {
+      if (e is Add) {
+        return [...getTerms(e.left), ...getTerms(e.right)];
+      }
+      if (e is Subtract) {
+        return [
+          ...getTerms(e.left),
+          ...getTerms(Multiply(Literal(-1), e.right))
+        ];
+      }
+      return [e];
     }
 
-    // Expansion for a(b+c) = ab + ac
-    if (left is! Add && right is Add) {
-      return Add(Multiply(left, (right as Add).left),
-          Multiply(left, (right as Add).right));
+    if (isAddOrSub(expandedLeft) && isAddOrSub(expandedRight)) {
+      // (a+b)(c+d) = ac + ad + bc + bd
+      var leftTerms = getTerms(expandedLeft);
+      var rightTerms = getTerms(expandedRight);
+
+      Expression result = Literal(0);
+      bool first = true;
+
+      for (var l in leftTerms) {
+        for (var r in rightTerms) {
+          var term = Multiply(l, r);
+          if (first) {
+            result = term;
+            first = false;
+          } else {
+            result = Add(result, term);
+          }
+        }
+      }
+      return result;
     }
 
-    if (left is Add && right is! Add) {
-      return Add(Multiply((left as Add).left, right),
-          Multiply((left as Add).right, right));
+    if (isAddOrSub(expandedLeft) && !isAddOrSub(expandedRight)) {
+      // (a+b)c = ac + bc
+      var leftTerms = getTerms(expandedLeft);
+      Expression result = Literal(0);
+      bool first = true;
+      for (var l in leftTerms) {
+        var term = Multiply(l, expandedRight);
+        if (first) {
+          result = term;
+          first = false;
+        } else {
+          result = Add(result, term);
+        }
+      }
+      return result;
+    }
+
+    if (!isAddOrSub(expandedLeft) && isAddOrSub(expandedRight)) {
+      // a(b+c) = ab + ac
+      var rightTerms = getTerms(expandedRight);
+      Expression result = Literal(0);
+      bool first = true;
+      for (var r in rightTerms) {
+        var term = Multiply(expandedLeft, r);
+        if (first) {
+          result = term;
+          first = false;
+        } else {
+          result = Add(result, term);
+        }
+      }
+      return result;
     }
 
     // Expansion for (a+b)^2 = a^2 + 2ab + b^2
-    if (left is Add && left.toString() == right.toString()) {
-      var a = (left as Add).left;
-      var b = (left as Add).right;
-      return Add(Add(Multiply(a, a), Multiply(Multiply(Literal(2), a), b)),
-          Multiply(b, b));
-    }
+    // This is covered by the first case if we expand (a+b)*(a+b)
+    // But if it's Pow, that's handled in Pow.expand()
 
-    return this; // If no expansion rules apply, return the original expression.
+    return Multiply(expandedLeft, expandedRight);
   }
 
   Expression negate() {
@@ -239,6 +433,19 @@ class Multiply extends BinaryOperationsExpression {
 
   @override
   String toString() {
-    return "(${left.toString()} * ${right.toString()})";
+    // Avoid excessive parentheses
+    var leftStr = left.toString();
+    var rightStr = right.toString();
+
+    // If left is Add or Subtract, wrap in parens (precedence)
+    if (left is Add || left is Subtract) {
+      leftStr = '($leftStr)';
+    }
+    // If right is Add or Subtract, wrap in parens
+    if (right is Add || right is Subtract) {
+      rightStr = '($rightStr)';
+    }
+
+    return "$leftStr*$rightStr";
   }
 }

@@ -40,7 +40,8 @@ class Quartic extends Polynomial {
     dynamic c = 0,
     dynamic d = 0,
     dynamic e = 0,
-  }) : super([a, b, c, d, e]);
+    Variable? variable,
+  }) : super([a, b, c, d, e], variable: variable);
 
   /// This is an example of a quartic equations, where the coefficient with the
   /// highest degree goes first:
@@ -56,112 +57,123 @@ class Quartic extends Polynomial {
   ///
   /// If the coefficients of your polynomial contain complex numbers, consider
   /// using the [Quartic.new] constructor instead.
-  Quartic.num({num a = 1, num b = 0, num c = 0, num d = 0, num e = 0})
-      : super([a, b, c, d, e]);
+  /// If the coefficients of your polynomial contain complex numbers, consider
+  /// using the [Quartic.new] constructor instead.
+  Quartic.num({
+    num a = 1,
+    num b = 0,
+    num c = 0,
+    num d = 0,
+    num e = 0,
+    Variable? variable,
+  }) : super([
+          Literal(Complex(a)),
+          Literal(Complex(b)),
+          Literal(Complex(c)),
+          Literal(Complex(d)),
+          Literal(Complex(e))
+        ], variable: variable);
 
-  Quartic.fromList(List<dynamic> coefficients) : super(coefficients) {
+  Quartic.fromList(List<dynamic> coefficients, {Variable? variable})
+      : super(coefficients, variable: variable) {
     if (coefficients.length != 5) {
       throw ArgumentError('The input list must contain exactly 5 elements.');
     }
   }
 
   @override
-  dynamic discriminant() {
+  Expression discriminant() {
     final k = (b * b * c * c * d * d) -
-        (d * d * d * b * b * b * Complex.fromReal(4)) -
-        (d * d * c * c * c * a * Complex.fromReal(4)) +
-        (d * d * d * c * b * a * Complex.fromReal(18)) -
-        (d * d * d * d * a * a * Complex.fromReal(27)) +
-        (e * e * e * a * a * a * Complex.fromReal(256));
+        (d * d * d * b * b * b * Literal(4)) -
+        (d * d * c * c * c * a * Literal(4)) +
+        (d * d * d * c * b * a * Literal(18)) -
+        (d * d * d * d * a * a * Literal(27)) +
+        (e * e * e * a * a * a * Literal(256));
 
     final p = e *
-        ((c * c * c * b * b * Complex.fromReal(-4)) +
-            (b * b * b * c * d * Complex.fromReal(18)) +
-            (c * c * c * c * a * Complex.fromReal(16)) -
-            (d * c * c * b * a * Complex.fromReal(80)) -
-            (d * d * b * b * a * Complex.fromReal(6)) +
-            (d * d * a * a * c * Complex.fromReal(144)));
+        ((c * c * c * b * b * Literal(-4)) +
+            (b * b * b * c * d * Literal(18)) +
+            (c * c * c * c * a * Literal(16)) -
+            (d * c * c * b * a * Literal(80)) -
+            (d * d * b * b * a * Literal(6)) +
+            (d * d * a * a * c * Literal(144)));
 
     final r = (e * e) *
-        (b * b * b * b * Complex.fromReal(-27) +
-            b * b * c * a * Complex.fromReal(144) -
-            a * a * c * c * Complex.fromReal(128) -
-            d * b * a * a * Complex.fromReal(192));
+        (b * b * b * b * Literal(-27) +
+            b * b * c * a * Literal(144) -
+            a * a * c * c * Literal(128) -
+            d * b * a * a * Literal(192));
 
     return k + p + r;
   }
 
   @override
-  List<dynamic> roots() {
+  List<Expression> roots() {
     final fb = b / a;
     final fc = c / a;
     final fd = d / a;
     final fe = e / a;
 
-    final q1 = (fc * fc) -
-        (fb * fd * Complex.fromReal(3)) +
-        (fe * Complex.fromReal(12));
-    final q2 = (fc.pow(3) * Complex.fromReal(2)) -
-        (fb * fc * fd * Complex.fromReal(9)) +
-        (fd.pow(2) * Complex.fromReal(27)) +
-        (fb.pow(2) * fe * Complex.fromReal(27)) -
-        (fc * fe * Complex.fromReal(72));
-    final q3 = (fb * fc * Complex.fromReal(8)) -
-        (fd * Complex.fromReal(16)) -
-        (fb.pow(3) * Complex.fromReal(2));
-    final q4 = (fb.pow(2) * Complex.fromReal(3)) - (fc * Complex.fromReal(8));
+    final q1 = (fc * fc) - (fb * fd * Literal(3)) + (fe * Literal(12));
+    final q2 = (Pow(fc, Literal(3)) * Literal(2)) -
+        (fb * fc * fd * Literal(9)) +
+        (Pow(fd, Literal(2)) * Literal(27)) +
+        (Pow(fb, Literal(2)) * fe * Literal(27)) -
+        (fc * fe * Literal(72));
+    final q3 = (fb * fc * Literal(8)) -
+        (fd * Literal(16)) -
+        (Pow(fb, Literal(3)) * Literal(2));
+    final q4 = (Pow(fb, Literal(2)) * Literal(3)) - (fc * Literal(8));
 
-    var temp = (q2 * q2 / Complex.fromReal(4)) - (q1.pow(3));
-    final q5 = (temp.sqrt() + (q2 / Complex.fromReal(2))).pow(1.0 / 3.0);
-    final q6 = ((q1 / q5) + q5) / Complex.fromReal(3);
-    temp = (q4 / Complex.fromReal(12)) + q6;
-    final q7 = temp.sqrt() * Complex.fromReal(2);
-    temp = ((q4 * Complex.fromReal(4)) / Complex.fromReal(6)) -
-        (q6 * Complex.fromReal(4)) -
-        (q3 / q7);
+    var temp = (q2 * q2 / Literal(4)) - (Pow(q1, Literal(3)));
+    final q5 =
+        Pow(Pow(temp, Literal(0.5)) + (q2 / Literal(2)), Literal(1.0 / 3.0));
+    final q6 = ((q1 / q5) + q5) / Literal(3);
+    temp = (q4 / Literal(12)) + q6;
+    final q7 = Pow(temp, Literal(0.5)) * Literal(2);
+    temp = ((q4 * Literal(4)) / Literal(6)) - (q6 * Literal(4)) - (q3 / q7);
 
     final solutions = [
-      (-fb - q7 - temp.sqrt()) / Complex.fromReal(4),
-      (-fb - q7 + temp.sqrt()) / Complex.fromReal(4),
+      (-fb - q7 - Pow(temp, Literal(0.5))) / Literal(4),
+      (-fb - q7 + Pow(temp, Literal(0.5))) / Literal(4),
     ];
 
-    temp = ((q4 * Complex.fromReal(4)) / Complex.fromReal(6)) -
-        (q6 * Complex.fromReal(4)) +
-        (q3 / q7);
+    temp = ((q4 * Literal(4)) / Literal(6)) - (q6 * Literal(4)) + (q3 / q7);
 
     solutions
-      ..add((-fb + q7 - temp.sqrt()) / Complex.fromReal(4))
-      ..add((-fb + q7 + temp.sqrt()) / Complex.fromReal(4));
+      ..add((-fb + q7 - Pow(temp, Literal(0.5))) / Literal(4))
+      ..add((-fb + q7 + Pow(temp, Literal(0.5))) / Literal(4));
 
     return solutions;
   }
 
   /// The first coefficient of the equation in the form
   /// _f(x) = ax^4 + bx^3 + cx^2 + dx + e = 0_
-  dynamic get a => coefficients.first;
+  Expression get a => coefficients.first;
 
   /// The second coefficient of the equation in the form
   /// _f(x) = ax^4 + bx^3 + cx^2 + dx + e = 0_
-  dynamic get b => coefficients[1];
+  Expression get b => coefficients[1];
 
   /// The third coefficient of the equation in the form
   /// _f(x) = ax^4 + bx^3 + cx^2 + dx + e = 0_
-  dynamic get c => coefficients[2];
+  Expression get c => coefficients[2];
 
   /// The fourth coefficient of the equation in the form
   /// _f(x) = ax^4 + bx^3 + cx^2 + dx + e = 0_
-  dynamic get d => coefficients[3];
+  Expression get d => coefficients[3];
 
   /// The fifth coefficient of the equation in the form
   /// _f(x) = ax^4 + bx^3 + cx^2 + dx + e = 0_
-  dynamic get e => coefficients[4];
+  Expression get e => coefficients[4];
 
   Quartic copyWith({
-    dynamic a,
-    dynamic b,
-    dynamic c,
-    dynamic d,
-    dynamic e,
+    Expression? a,
+    Expression? b,
+    Expression? c,
+    Expression? d,
+    Expression? e,
+    Variable? variable,
   }) =>
       Quartic(
         a: a ?? this.a,
@@ -169,6 +181,7 @@ class Quartic extends Polynomial {
         c: c ?? this.c,
         d: d ?? this.d,
         e: e ?? this.e,
+        variable: variable ?? this.variable,
       );
 
   @override

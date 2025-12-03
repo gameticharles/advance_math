@@ -64,6 +64,9 @@ class PredefinedFunctionExpression extends Expression {
   }
 
   @override
+  bool isPoly([bool strict = false]) => false;
+
+  @override
   int depth() {
     return 1 + operand.depth();
   }

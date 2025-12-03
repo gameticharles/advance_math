@@ -10,10 +10,15 @@ class Literal extends Expression {
 
   @override
   dynamic evaluate([dynamic arg]) {
-    if (value is List) return value.map((e) => e.evaluate(arg)).toList();
+    if (value is List) {
+      return (value as List)
+          .map((e) => (e is Expression) ? e.evaluate(arg) : e)
+          .toList();
+    }
     if (value is Map) {
-      return value.map(
-          (key, value) => MapEntry(key.evaluate(arg), value.evaluate(arg)));
+      return (value as Map).map((key, value) => MapEntry(
+          (key is Expression) ? key.evaluate(arg) : key,
+          (value is Expression) ? value.evaluate(arg) : value));
     }
     return value;
   }
@@ -68,6 +73,9 @@ class Literal extends Expression {
   }
 
   @override
+  bool isPoly([bool strict = false]) => true;
+
+  @override
   int depth() {
     return 1;
   }
@@ -78,7 +86,7 @@ class Literal extends Expression {
   }
 
   @override
-  String toString() => (value is num && value < 0) ? '($raw)' : raw;
+  String toString() => raw;
 
   @override
   int get hashCode => value.hashCode;

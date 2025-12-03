@@ -453,5 +453,8 @@ class MultiVariablePolynomial extends Expression {
     return (val as num).isInfinite;
   }
 
+  @override
+  bool isPoly([bool strict = false]) => true;
+
   // ... (Other methods from the Expression class, like differentiate, evaluate, etc.)
 }

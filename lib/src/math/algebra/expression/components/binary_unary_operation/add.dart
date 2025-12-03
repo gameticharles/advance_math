@@ -31,7 +31,8 @@ class Add extends BinaryOperationsExpression {
     }
 
     // Default return (should ideally never reach this point)
-    throw Exception('Unsupported evaluation scenario in Add.evaluate');
+    // throw Exception('Unsupported evaluation scenario in Add.evaluate');
+    return simplify();
   }
 
 // Helper method to check if an expression contains a Variable
@@ -120,22 +121,31 @@ class Add extends BinaryOperationsExpression {
     }
 
     // Grouping like terms and constants
-    Map<String, num> likeTerms = {};
+    Map<String, dynamic> likeTerms = {};
     Map<String, Expression> termExpressions = {}; // Store original expressions
-    num constantTerm = 0;
+    dynamic constantTerm = 0;
 
     for (var term in terms) {
       if (term is Literal) {
-        constantTerm += term.evaluate();
+        var val = term.evaluate();
+        if (constantTerm is num && val is Complex) {
+          constantTerm = val + constantTerm;
+        } else {
+          constantTerm += val;
+        }
       } else if (term is Variable) {
         String key = term.toString();
         likeTerms.update(key, (val) => val + 1, ifAbsent: () => 1);
         termExpressions.putIfAbsent(key, () => term);
       } else if (term is Multiply && term.left is Literal) {
         String key = term.right.toString();
-        num coefficient = (term.left as Literal).evaluate();
-        likeTerms.update(key, (val) => val + coefficient,
-            ifAbsent: () => coefficient);
+        dynamic coefficient = (term.left as Literal).evaluate();
+        likeTerms.update(key, (val) {
+          if (val is num && coefficient is Complex) {
+            return coefficient + val;
+          }
+          return val + coefficient;
+        }, ifAbsent: () => coefficient);
         termExpressions.putIfAbsent(key, () => term.right);
       }
       // Handle terms of type x^2y, x^3, etc.
@@ -166,6 +176,62 @@ class Add extends BinaryOperationsExpression {
       }
     }
 
+    // Special simplification for quadratic discriminant pattern: (A-B)^2 + 4AB = (A+B)^2
+    // We look for Pow(..., 2) and other terms
+    for (var i = 0; i < simplifiedTerms.length; i++) {
+      var term1 = simplifiedTerms[i];
+      if (term1 is Pow &&
+          term1.exponent is Literal &&
+          (term1.exponent as Literal).value == 2) {
+        // Check if base is Subtract(A, B) or Add(A, -B)
+        Expression? A, B;
+        if (term1.base is Subtract) {
+          A = (term1.base as Subtract).left;
+          B = (term1.base as Subtract).right;
+        } else if (term1.base is Add) {
+          // A + (-B)
+          var baseAdd = term1.base as Add;
+          if (baseAdd.right is Multiply &&
+              (baseAdd.right as Multiply).left is Literal &&
+              (baseAdd.right as Multiply).left.evaluate() == -1) {
+            A = baseAdd.left;
+            B = (baseAdd.right as Multiply).right;
+          } else if (baseAdd.left is Multiply &&
+              (baseAdd.left as Multiply).left is Literal &&
+              (baseAdd.left as Multiply).left.evaluate() == -1) {
+            A = baseAdd.right;
+            B = (baseAdd.left as Multiply).right;
+          }
+        }
+
+        if (A != null && B != null) {
+          // Look for +4AB
+          for (var j = 0; j < simplifiedTerms.length; j++) {
+            if (i == j) continue;
+            var term2 = simplifiedTerms[j];
+            // term2 should be 4*A*B
+            // It might be simplified to 4*A*B or 4*B*A or 4*...
+            // Let's construct 4*A*B and simplify it to compare
+            var target4AB =
+                Multiply(Literal(4), Multiply(A, B)).simplifyBasic();
+            if (term2.toString() == target4AB.toString()) {
+              // Found it! Replace term1 and term2 with (A+B)^2
+              simplifiedTerms.removeAt(max(i, j));
+              simplifiedTerms.removeAt(min(i, j));
+              simplifiedTerms.add(Pow(Add(A, B), Literal(2)).simplifyBasic());
+              // Restart or break? Restart to be safe
+              return Add(
+                      simplifiedTerms[0],
+                      simplifiedTerms.length > 1
+                          ? simplifiedTerms[1]
+                          : Literal(0))
+                  .simplifyBasic(); // Recursive call to handle list reconstruction
+            }
+          }
+        }
+      }
+    }
+
     // If there's no term left after simplification, return 0.
     if (simplifiedTerms.isEmpty) {
       return Literal(0);
@@ -187,8 +253,7 @@ class Add extends BinaryOperationsExpression {
 
   @override
   Expression expand() {
-    // Addition doesn't have a more expanded form, return as-is.
-    return this;
+    return Add(left.expand(), right.expand());
   }
 
   @override
@@ -201,6 +266,13 @@ class Add extends BinaryOperationsExpression {
 
   @override
   String toString() {
-    return "(${left.toString()} + ${right.toString()})";
+    var leftStr = left.toString();
+    var rightStr = right.toString();
+
+    // If right starts with -, don't add +
+    if (rightStr.startsWith('-')) {
+      return "$leftStr$rightStr";
+    }
+    return "$leftStr+$rightStr";
   }
 }

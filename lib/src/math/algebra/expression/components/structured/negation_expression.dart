@@ -6,7 +6,7 @@ class Negate extends Expression {
   Negate(this.operand);
 
   @override
-  num evaluate([dynamic arg]) {
+  dynamic evaluate([dynamic arg]) {
     return -operand.evaluate(arg);
   }
 
@@ -26,9 +26,21 @@ class Negate extends Expression {
   Expression simplify() {
     // If operand is a literal, we can directly negate its value.
     if (operand is Literal) {
-      return Literal(-operand.evaluate());
+      var val = (operand as Literal).value;
+      if (val is num) {
+        return Literal(-val);
+      }
     }
-    return this;
+    // Also simplify the operand itself
+    var simplifiedOperand = operand.simplify();
+    if (simplifiedOperand is Literal) {
+      var val = simplifiedOperand.value;
+      if (val is num) {
+        return Literal(-val);
+      }
+    }
+
+    return Negate(simplifiedOperand);
   }
 
   @override
@@ -58,8 +70,11 @@ class Negate extends Expression {
 
   @override
   bool isInfinity(num x) {
-    throw UnimplementedError();
+    return operand.isInfinity(x);
   }
+
+  @override
+  bool isPoly([bool strict = false]) => operand.isPoly(strict);
 
   @override
   int depth() {

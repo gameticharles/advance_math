@@ -1,6 +1,85 @@
 import 'package:advance_math/advance_math.dart';
 
-void main() {
+void main() async {
+  printLine("Ranges");
+
+  // 1. Standard Integer Loop (Exclusive)
+  // Output: [0, 2, 4, 6, 8]
+  final r1 = Range(0, 10, 2);
+  print(r1.toList());
+
+  final r = Range.parse("0:10:2");
+  print(r.toList()); // [0, 2, 4, 6, 8]
+
+  // 2. Negative Doubles
+  // Output: [10, 9.5, 9.0, 8.5]
+  final r2 = Range(10, 8, -0.5);
+  print(r2.toList());
+
+  // 3. Linspace (Get 5 points between 0 and 1)
+  // Output: [0.0, 0.25, 0.5, 0.75, 1.0]
+  final r3 = Range.linspace(0, 1, 5);
+  print(r3.toList());
+
+  // 4. Efficient Checks (No loops involved)
+  final hugeRange = Range(0, 1000000000, 5);
+  print(hugeRange.length); // Instant calculation
+  print(hugeRange.contains(500)); // true (Instant)
+  print(hugeRange.contains(501)); // false (Instant)
+
+  // 5. Using Iterable features (map, where, reduce)
+  // Sum of even numbers between 0 and 10
+  final sum = Range(0, 10).where((n) => n % 2 == 0).reduce((a, b) => a + b);
+  print(sum);
+
+  final items = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+
+  // Requirement: "Give me the reversed list, skipping every 2nd item"
+  // Python: items[::-2]
+
+  // Create a Range bound to the length of 'items'
+  final indices = Range.bounds(items.length, "::-2");
+
+  print("Indices: $indices"); // Range(6, -1, step: -2)
+  print("Values: ${indices.map((i) => items[i.toInt()]).toList()}");
+  // Output: Values: [G, E, C, A]
+
+  // Use map to get values
+  final r4 = indices.map((i) => items[i.toInt()]).toList();
+  print(r4); // [G, E, C, A]
+
+  final huge = Range(0, 1000000000);
+  print(huge.sum);
+  print(huge.average);
+
+  final r5 = Range(0, 100, 5); // 0, 5, 10...
+  print(r5.random()); // Returns 45 (or 20, etc.)
+  // It will NEVER return 43, because 43 is not in the step sequence.
+
+  // Emits a number every 1 second (Countdown)
+  final countdown = Range(10, 0, -1);
+  await for (final n in countdown.toStream(interval: Duration(seconds: 1))) {
+    print("T-minus $n");
+  }
+  print("Liftoff!");
+
+  printLine("Domains");
+
+  // 1. Define your data bounds (e.g., Temperature from -10 to 40)
+  final dataDomain = Domain(-10, 40);
+
+  // 2. Define your screen size (e.g., 300 pixels wide)
+  final screenDomain = Domain(0, 300);
+
+  // 3. Map a value
+  double temperature = 15; // 15 degrees
+  double pixelX = dataDomain.mapTo(temperature, screenDomain);
+
+  print("Draw point at x: $pixelX");
+  // Output: Draw point at x: 150.0 (Exactly in the middle)
+
+  printLine("Memoized Functions");
+
   // Example of using memoized functions
 
   // Benchmark comparison

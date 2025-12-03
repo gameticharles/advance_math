@@ -103,4 +103,7 @@ class FunctionExpression extends Expression {
   bool isInfinity(num x) {
     throw UnimplementedError();
   }
+
+  @override
+  bool isPoly([bool strict = false]) => false;
 }

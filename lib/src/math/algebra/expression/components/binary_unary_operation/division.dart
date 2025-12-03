@@ -41,7 +41,8 @@ class Divide extends BinaryOperationsExpression {
     }
 
     // Default return (should ideally never reach this point)
-    throw Exception('Unsupported evaluation scenario in Divide.evaluate');
+    // throw Exception('Unsupported evaluation scenario in Divide.evaluate');
+    return simplify();
   }
 
 // Helper method to check if an expression contains a Variable
@@ -171,20 +172,44 @@ class Divide extends BinaryOperationsExpression {
 
   @override
   Expression simplifyBasic() {
+    var numerator = left.simplify();
+    var denominator = right.simplify();
+
     // Basic simplification: if both operands are literals, evaluate and return a new Literal.
-    if (left is Literal && right is Literal) {
-      var leftVal = left.evaluate();
-      var rightVal = right.evaluate();
-      if (leftVal is int && rightVal is int && leftVal % rightVal == 0) {
-        return Literal(leftVal / rightVal);
-      }
-      // Do not evaluate to double if we want symbolic fraction
-      // But if inputs were doubles, we might want to evaluate?
-      if (leftVal is double || rightVal is double) {
-        return Literal(leftVal / rightVal);
+    if (numerator is Literal && denominator is Literal) {
+      var l = numerator.value;
+      var r = denominator.value;
+      if (l is num && r is num) {
+        if (r == 0) throw Exception('Division by zero');
+        // If result is integer, return integer
+        if (l % r == 0) return Literal(l ~/ r);
+        return Literal(l / r);
       }
     }
-    return this; // More complex simplification can be added later.
+
+    // x / 1 -> x
+    if (denominator is Literal && denominator.value == 1) return numerator;
+
+    // x / -1 -> -x
+    if (denominator is Literal && denominator.value == -1) {
+      return Multiply(Literal(-1), numerator).simplify();
+    }
+
+    // 0 / x -> 0
+    if (numerator is Literal && numerator.value == 0) return Literal(0);
+
+    // x / x -> 1
+    if (numerator.toString() == denominator.toString()) return Literal(1);
+
+    // Convert division by literal to multiplication by reciprocal
+    // x / c -> x * (1/c)
+    if (denominator is Literal && denominator.value is num) {
+      num val = denominator.value;
+      if (val == 0) throw Exception('Division by zero');
+      return Multiply(Literal(1 / val), numerator).simplify();
+    }
+
+    return Divide(numerator, denominator);
   }
 
   @override
@@ -203,6 +228,27 @@ class Divide extends BinaryOperationsExpression {
 
   @override
   String toString() {
-    return "(${left.toString()} / ${right.toString()})";
+    var leftStr = left.toString();
+    var rightStr = right.toString();
+
+    // Wrap left if it has lower precedence (Add/Subtract)
+    if (left is Add || left is Subtract) {
+      leftStr = '($leftStr)';
+    }
+    // Wrap right if it has lower or equal precedence (Add/Subtract/Multiply/Divide)
+    // Actually, for division, right operand needs parens if it's mul or div too?
+    // a / (b * c) vs a / b * c.
+    // Standard precedence: * and / are equal, left associative.
+    // a / b * c = (a / b) * c.
+    // a / (b * c).
+    // So if right is Multiply or Divide, we need parens.
+    if (right is Add ||
+        right is Subtract ||
+        right is Multiply ||
+        right is Divide) {
+      rightStr = '($rightStr)';
+    }
+
+    return "$leftStr/$rightStr";
   }
 }
