@@ -98,6 +98,11 @@ class Multiply extends BinaryOperationsExpression {
 
   @override
   Expression simplifyBasic() {
+    // print('DEBUG Multiply.simplifyBasic: left=$left (${left.runtimeType}), right=$right (${right.runtimeType})');
+    if (left is Literal && (left as Literal).value == -1 && right is Add) {
+      print('DEBUG Multiply.simplifyBasic ENTRY: -1 * Add detected: $right');
+    }
+
     var simpleLeft = left.simplifyBasic();
     var simpleRight = right.simplifyBasic();
 
@@ -143,25 +148,50 @@ class Multiply extends BinaryOperationsExpression {
 
     // Distribute Literal over Add/Subtract
     // c * (a + b) = ca + cb
-    if (simpleLeft is Literal && simpleRight is Add) {
-      return Add(Multiply(simpleLeft, simpleRight.left),
-              Multiply(simpleLeft, simpleRight.right))
+    Expression rightOperand = simpleRight;
+    while (rightOperand is GroupExpression) {
+      rightOperand = rightOperand.expression;
+    }
+    Expression leftOperand = simpleLeft;
+    while (leftOperand is GroupExpression) {
+      leftOperand = leftOperand.expression;
+    }
+
+    bool isConstant(Expression e) {
+      if (e is Literal) return true;
+      if (e is UnaryExpression && e.operand is Literal) return true;
+      // Add more cases if needed, but avoid evaluate() which triggers simplify()
+      return false;
+    }
+
+    if (isConstant(simpleLeft)) {
+      // print('DEBUG Multiply: simpleLeft is constant: $simpleLeft');
+      // print(
+      //     'DEBUG Multiply: rightOperand=$rightOperand (${rightOperand.runtimeType})');
+      // print('DEBUG Multiply: rightOperand is Add? ${rightOperand is Add}');
+      // print(
+      //     'DEBUG Multiply: rightOperand is Subtract? ${rightOperand is Subtract}');
+    }
+
+    if (isConstant(simpleLeft) && rightOperand is Add) {
+      return Add(Multiply(simpleLeft, rightOperand.left),
+              Multiply(simpleLeft, rightOperand.right))
           .simplifyBasic();
     }
-    if (simpleLeft is Literal && simpleRight is Subtract) {
-      return Subtract(Multiply(simpleLeft, simpleRight.left),
-              Multiply(simpleLeft, simpleRight.right))
+    if (isConstant(simpleLeft) && rightOperand is Subtract) {
+      return Subtract(Multiply(simpleLeft, rightOperand.left),
+              Multiply(simpleLeft, rightOperand.right))
           .simplifyBasic();
     }
     // (a + b) * c = ac + bc
-    if (simpleRight is Literal && simpleLeft is Add) {
-      return Add(Multiply(simpleRight, simpleLeft.left),
-              Multiply(simpleRight, simpleLeft.right))
+    if (isConstant(simpleRight) && leftOperand is Add) {
+      return Add(Multiply(simpleRight, leftOperand.left),
+              Multiply(simpleRight, leftOperand.right))
           .simplifyBasic();
     }
-    if (simpleRight is Literal && simpleLeft is Subtract) {
-      return Subtract(Multiply(simpleRight, simpleLeft.left),
-              Multiply(simpleRight, simpleLeft.right))
+    if (isConstant(simpleRight) && leftOperand is Subtract) {
+      return Subtract(Multiply(simpleRight, leftOperand.left),
+              Multiply(simpleRight, leftOperand.right))
           .simplifyBasic();
     }
 

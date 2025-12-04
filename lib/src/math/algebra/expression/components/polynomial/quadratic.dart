@@ -68,10 +68,21 @@ class Quadratic extends Polynomial {
   @override
   List<Expression> roots() {
     final disc = discriminant().simplify();
+    //print('DEBUG Quadratic: disc=$disc');
     final twoA = Literal(2) * a;
-    final rootDisc = Pow(disc, Literal(0.5));
+    final rootDisc = Pow(disc, Literal(0.5)).simplify();
+    //print('DEBUG Quadratic: rootDisc=$rootDisc');
 
-    return <Expression>[(-b + rootDisc) / twoA, (-b - rootDisc) / twoA];
+    //print('DEBUG Quadratic: b=$b (${b.runtimeType})');
+    final negB = (-b).simplify();
+    //print('DEBUG Quadratic: negB=$negB');
+
+    final root1 = (negB + rootDisc) / twoA;
+    final root2 = (negB - rootDisc) / twoA;
+    //print('DEBUG Quadratic: root1=$root1');
+    //print('DEBUG Quadratic: root2=$root2');
+
+    return <Expression>[root1.simplify(), root2.simplify()];
   }
 
   /// Returns the vertex of the quadratic equation as a [Point].

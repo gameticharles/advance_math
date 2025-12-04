@@ -189,6 +189,7 @@ class Add extends BinaryOperationsExpression {
         while (base is GroupExpression) {
           base = base.expression;
         }
+        // print('DEBUG Add: unwrapped base type=${base.runtimeType}');
 
         // Check if base is Subtract(A, B) or Add(A, -B)
         Expression? A, B;
@@ -198,16 +199,28 @@ class Add extends BinaryOperationsExpression {
         } else if (base is Add) {
           // A + (-B)
           var baseAdd = base;
+          // print('DEBUG Add: baseAdd=$baseAdd');
+          // print('DEBUG Add: baseAdd.left type=${baseAdd.left.runtimeType}');
+
           if (baseAdd.right is Multiply &&
-              (baseAdd.right as Multiply).left is Literal &&
               (baseAdd.right as Multiply).left.evaluate() == -1) {
             A = baseAdd.left;
             B = (baseAdd.right as Multiply).right;
-          } else if (baseAdd.left is Multiply &&
-              (baseAdd.left as Multiply).left is Literal &&
-              (baseAdd.left as Multiply).left.evaluate() == -1) {
+          } else if (baseAdd.left is UnaryExpression &&
+              (baseAdd.left as UnaryExpression).operator == '-') {
             A = baseAdd.right;
-            B = (baseAdd.left as Multiply).right;
+            B = (baseAdd.left as UnaryExpression).operand;
+          } else if (baseAdd.left is Multiply) {
+            var leftMul = baseAdd.left as Multiply;
+            try {
+              var val = leftMul.left.evaluate();
+              if (val == -1) {
+                A = baseAdd.right;
+                B = leftMul.right;
+              }
+            } catch (e) {
+              // Ignore evaluation errors
+            }
           }
         }
 
@@ -224,8 +237,9 @@ class Add extends BinaryOperationsExpression {
             var target4BA =
                 Multiply(Literal(4), Multiply(B, A)).simplifyBasic();
 
-            print('DEBUG Add: term1=$term1, term2=$term2');
-            print('DEBUG Add: target4AB=$target4AB, target4BA=$target4BA');
+            // print('DEBUG Add: term2=$term2');
+            // print('DEBUG Add: target4AB=$target4AB');
+            // print('DEBUG Add: target4BA=$target4BA');
 
             if (term2.toString() == target4AB.toString() ||
                 term2.toString() == target4BA.toString()) {

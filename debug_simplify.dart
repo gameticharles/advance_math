@@ -17,6 +17,10 @@ void main() {
     print('Polynomial parsed successfully: $poly');
     print('Degree: ${poly.degree}');
     print('Coefficients: ${poly.coefficients}');
+    print('Simplified 1st Coeff: ${poly.coefficients[0].simplify()}');
+    print('Simplified 2nd Coeff: ${poly.coefficients[1].simplify()}');
+    print('Simplified 3rd Coeff: ${poly.coefficients[2].simplify()}');
+    print('Simplified 4th Coeff: ${poly.coefficients[3].simplify()}');
 
     print('Attempting to solve original factored expression...');
 
@@ -28,14 +32,20 @@ void main() {
       var polyQuad =
           Polynomial.fromString(quadraticPart.toString(), variable: x);
       print('Quadratic part parsed successfully: $polyQuad');
+      if (polyQuad.degree == 2) {
+        var quad = Quadratic.fromList(polyQuad.coefficients, variable: x);
+        print('Calculating roots for quadratic...');
+        var roots = quad.roots();
+        print('Roots: $roots');
+      }
     } catch (e) {
       print('Quadratic part parsing FAILED: $e');
     }
 
-    // Assuming 'originalFactored' refers to the initial 'expr'
-    var originalFactored = expr;
-    var solutions = ExpressionSolver.solve(originalFactored, x);
-    print('Solutions: $solutions');
+    // // Assuming 'originalFactored' refers to the initial 'expr'
+    // var originalFactored = expr;
+    // var solutions = ExpressionSolver.solve(originalFactored, x);
+    // print('Solutions: $solutions');
   } catch (e, stack) {
     print('Solver failed: $e');
     print(stack);
