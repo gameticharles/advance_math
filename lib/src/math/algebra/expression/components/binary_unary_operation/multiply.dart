@@ -98,11 +98,6 @@ class Multiply extends BinaryOperationsExpression {
 
   @override
   Expression simplifyBasic() {
-    // print('DEBUG Multiply.simplifyBasic: left=$left (${left.runtimeType}), right=$right (${right.runtimeType})');
-    if (left is Literal && (left as Literal).value == -1 && right is Add) {
-      print('DEBUG Multiply.simplifyBasic ENTRY: -1 * Add detected: $right');
-    }
-
     var simpleLeft = left.simplifyBasic();
     var simpleRight = right.simplifyBasic();
 
@@ -126,6 +121,20 @@ class Multiply extends BinaryOperationsExpression {
       simpleRight = Multiply(Literal(-1), getOperand(simpleRight));
       changed = true;
     }
+
+    // Simplify -1 * UnaryExpression('-', a) -> a
+    if (simpleLeft is Literal && simpleLeft.value == -1) {
+      if (simpleRight is UnaryExpression && simpleRight.operator == '-') {
+        return simpleRight.operand.simplifyBasic();
+      }
+    }
+    // Simplify UnaryExpression('-', a) * -1 -> a
+    if (simpleRight is Literal && simpleRight.value == -1) {
+      if (simpleLeft is UnaryExpression && simpleLeft.operator == '-') {
+        return simpleLeft.operand.simplifyBasic();
+      }
+    }
+
     if (changed) {
       return Multiply(simpleLeft, simpleRight).simplifyBasic();
     }
@@ -162,15 +171,6 @@ class Multiply extends BinaryOperationsExpression {
       if (e is UnaryExpression && e.operand is Literal) return true;
       // Add more cases if needed, but avoid evaluate() which triggers simplify()
       return false;
-    }
-
-    if (isConstant(simpleLeft)) {
-      // print('DEBUG Multiply: simpleLeft is constant: $simpleLeft');
-      // print(
-      //     'DEBUG Multiply: rightOperand=$rightOperand (${rightOperand.runtimeType})');
-      // print('DEBUG Multiply: rightOperand is Add? ${rightOperand is Add}');
-      // print(
-      //     'DEBUG Multiply: rightOperand is Subtract? ${rightOperand is Subtract}');
     }
 
     if (isConstant(simpleLeft) && rightOperand is Add) {

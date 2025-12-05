@@ -23,24 +23,9 @@ class Negate extends Expression {
   }
 
   @override
-  Expression simplify() {
-    // If operand is a literal, we can directly negate its value.
-    if (operand is Literal) {
-      var val = (operand as Literal).value;
-      if (val is num) {
-        return Literal(-val);
-      }
-    }
-    // Also simplify the operand itself
-    var simplifiedOperand = operand.simplify();
-    if (simplifiedOperand is Literal) {
-      var val = simplifiedOperand.value;
-      if (val is num) {
-        return Literal(-val);
-      }
-    }
-
-    return Negate(simplifiedOperand);
+  Expression simplifyBasic() {
+    // Convert Negate(x) to -1 * x and simplify that
+    return Multiply(Literal(-1), operand).simplifyBasic();
   }
 
   @override

@@ -67,7 +67,64 @@ class RationalFunction extends Expression {
 
   @override
   Expression simplify() {
-    return this;
+    Expression numSimplified = numerator.simplify();
+    Expression denSimplified = denominator.simplify();
+
+    if (numSimplified is Polynomial && denSimplified is Polynomial) {
+      // Try to divide
+      try {
+        var result = (numSimplified / denSimplified);
+        if (result is Polynomial) {
+          return result;
+        }
+        // If result is Add(Polynomial, RationalFunction), check if remainder is zero
+        if (result is Add) {
+          var remainder = result.right;
+          if (remainder is RationalFunction) {
+            var remNum = remainder.numerator;
+            if (remNum is Polynomial &&
+                remNum.coefficients.length == 1 &&
+                remNum.coefficients[0] == Complex.zero()) {
+              // Remainder is zero, return quotient
+              return result.left;
+            }
+            // Also check if numerator is Literal(0)
+            if (remNum is Literal && remNum.value == Complex.zero()) {
+              return result.left;
+            }
+          }
+        }
+
+        // Let's check Polynomial.gcd
+        Polynomial gcd = numSimplified.gcd(denSimplified);
+        if (gcd.coefficients.length > 1 ||
+            (gcd.coefficients.isNotEmpty &&
+                gcd.coefficients[0] != Complex.one())) {
+          // Divide both by GCD
+          var newNum = (numSimplified / gcd);
+          var newDen = (denSimplified / gcd);
+
+          // Extract Polynomials if they are wrapped in Add(Poly, Rational(0))
+          if (newNum is Add && newNum.left is Polynomial) newNum = newNum.left;
+          if (newDen is Add && newDen.left is Polynomial) newDen = newDen.left;
+
+          // If division by GCD returns Polynomial (which it should), use it
+          if (newNum is Polynomial && newDen is Polynomial) {
+            if (newDen.coefficients.length == 1) {
+              var coeff = newDen.coefficients[0];
+              if (coeff is Literal && coeff.value == Complex.one()) {
+                return newNum;
+              }
+            }
+            return RationalFunction(newNum, newDen);
+          }
+        }
+      } catch (e) {
+        // Ignore errors
+      }
+    }
+
+    return RationalFunction(numSimplified, denSimplified);
   }
 
   @override

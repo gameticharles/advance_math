@@ -31,6 +31,8 @@ abstract class Expression {
   /// Supported types:
   /// - [Expression]: Returns the expression as-is
   /// - [num] (int, double): Converts to [Literal] expression
+  /// - [Complex]: Converts to [Literal] expression
+  /// - [String]: Parses the string into an [Expression]
   ///
   /// Throws [ExpressionTypeConversionException] for unsupported types with
   /// helpful suggestions for resolution.
@@ -38,22 +40,11 @@ abstract class Expression {
     if (value is Expression) {
       return value;
     } else if (value is num) {
-      // Validate numeric values
-      if (value.isNaN) {
-        throw ExpressionValidationException(
-          'invalid_numeric_value',
-          'Cannot create expression from NaN (Not a Number). Use a valid numeric value.',
-          value,
-        );
-      }
-      if (value.isInfinite) {
-        throw ExpressionValidationException(
-          'invalid_numeric_value',
-          'Cannot create expression from infinite value: $value. Use a finite numeric value.',
-          value,
-        );
-      }
       return Literal(value);
+    } else if (value is Complex) {
+      return Literal(value);
+    } else if (value is String) {
+      return Expression.parse(value);
     } else {
       throw ExpressionTypeConversionException(value);
     }

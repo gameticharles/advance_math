@@ -87,8 +87,25 @@
 - **[BUG_FIX]** Fixed `Multiply.simplifyBasic()` to implement associativity rules for coefficient combination (e.g., `(-1) * (2 * x)` → `(-2) * x`)
 - **[IMPROVEMENT]** Enhanced `Subtract` to flatten nested subtractions and additions
 - **[IMPROVEMENT]** Improved term parsing in algebraic operations
+- **[FEATURE]** Enhanced `Expression` type conversion:
+  - Added support for `String` inputs in `_toExpression` (automatic parsing)
+  - Added support for `Complex` inputs in `_toExpression`
+  - Enabled support for `NaN` and `Infinity` values in `Expression` operations
+- **[BUG_FIX]** Fixed type safety in arithmetic operations (`Add`, `Subtract`, `Divide`) to handle mixed `num` and `Complex` types
 
-## Additional Improvements
+## Rational Function Enhancements
+
+- **[FEATURE]** Implemented `RationalFunction.simplify()` with polynomial division and GCD cancellation
+- **[BUG_FIX]** Fixed `RationalFunction.evaluate()` to ensure correct simplification and type handling
+
+## Polynomial Algebra Enhancements
+
+- **[BUG_FIX]** Fixed `Polynomial.fromString` to correctly handle whitespace and division by constants (e.g., `x/2`)
+- **[BUG_FIX]** Fixed `Polynomial.simplify` to prevent root casting errors during GCD calculation
+- **[BUG_FIX]** Fixed `Polynomial.evaluate` to prevent nested `Literal` creation
+- **[BUG_FIX]** Fixed coefficient extraction in polynomial solver for correct quadratic detection
+- **[BUG_FIX]** Fixed identity equation handling (e.g., `solve(x-x, x)` now returns `[0]`)
+- **[BUG_FIX]** Fixed cancellation detection in subtraction (e.g., `x - x = 0`)
 
 - **[FEATURE]** Added comprehensive test suites
   - `test/parser_calculus_test.dart`: 100 tests for differentiation, integration, and solving
@@ -103,12 +120,6 @@
 - **[IMPROVEMENT]** Code formatting improvements across multiple files
 - **[REFACTOR]** Variable naming consistency (e.g., `F1, F2, F3` → `f1, f2, f3` in curl calculations)
 - **[CLEANUP]** Removed `simple_export_test.dart`
-
-## Bug Fixes
-
-- **[BUG_FIX]** Fixed coefficient extraction in polynomial solver for correct quadratic detection
-- **[BUG_FIX]** Fixed identity equation handling (e.g., `solve(x-x, x)` now returns `[0]`)
-- **[BUG_FIX]** Fixed cancellation detection in subtraction (e.g., `x - x = 0`)
 
 ## Geometry Enhancements
 

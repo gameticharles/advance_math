@@ -62,7 +62,14 @@ class Subtract extends BinaryOperationsExpression {
 
     // If both operands are literals, evaluate and return a new Literal.
     if (simplifiedLeft is Literal && simplifiedRight is Literal) {
-      return Literal(simplifiedLeft.evaluate() - simplifiedRight.evaluate());
+      var leftVal = simplifiedLeft.evaluate();
+      var rightVal = simplifiedRight.evaluate();
+      if (leftVal is num && rightVal is Complex) {
+        return Literal(Complex(leftVal, 0) - rightVal);
+      } else if (leftVal is Complex && rightVal is num) {
+        return Literal(leftVal - Complex(rightVal, 0));
+      }
+      return Literal(leftVal - rightVal);
     }
 
     // Check if one of the operands is 0 (identity for addition).

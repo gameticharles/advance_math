@@ -15,6 +15,9 @@ void main() {
   }
 
   // 1. Quadratic failure
+  Expression pp = Polynomial.fromString('x^2-1', variable: Variable('x'));
+
+  print('pp: ${pp.simplify()}');
   check('x^2-1=0', 'x');
   check('x^2+2*x+1=0', 'x');
 

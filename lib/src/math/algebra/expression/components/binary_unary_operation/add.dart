@@ -64,7 +64,14 @@ class Add extends BinaryOperationsExpression {
 
     // If both operands are literals, evaluate and return a new Literal.
     if (simplifiedLeft is Literal && simplifiedRight is Literal) {
-      return Literal(simplifiedLeft.evaluate() + simplifiedRight.evaluate());
+      var leftVal = simplifiedLeft.evaluate();
+      var rightVal = simplifiedRight.evaluate();
+      if (leftVal is num && rightVal is Complex) {
+        return Literal(Complex(leftVal, 0) + rightVal);
+      } else if (leftVal is Complex && rightVal is num) {
+        return Literal(leftVal + Complex(rightVal, 0));
+      }
+      return Literal(leftVal + rightVal);
     }
 
     // Check if one of the operands is 0 (identity for addition).
@@ -189,7 +196,6 @@ class Add extends BinaryOperationsExpression {
         while (base is GroupExpression) {
           base = base.expression;
         }
-        // print('DEBUG Add: unwrapped base type=${base.runtimeType}');
 
         // Check if base is Subtract(A, B) or Add(A, -B)
         Expression? A, B;
@@ -199,8 +205,6 @@ class Add extends BinaryOperationsExpression {
         } else if (base is Add) {
           // A + (-B)
           var baseAdd = base;
-          // print('DEBUG Add: baseAdd=$baseAdd');
-          // print('DEBUG Add: baseAdd.left type=${baseAdd.left.runtimeType}');
 
           if (baseAdd.right is Multiply &&
               (baseAdd.right as Multiply).left.evaluate() == -1) {
@@ -236,10 +240,6 @@ class Add extends BinaryOperationsExpression {
                 Multiply(Literal(4), Multiply(A, B)).simplifyBasic();
             var target4BA =
                 Multiply(Literal(4), Multiply(B, A)).simplifyBasic();
-
-            // print('DEBUG Add: term2=$term2');
-            // print('DEBUG Add: target4AB=$target4AB');
-            // print('DEBUG Add: target4BA=$target4BA');
 
             if (term2.toString() == target4AB.toString() ||
                 term2.toString() == target4BA.toString()) {

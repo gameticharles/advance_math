@@ -29,6 +29,21 @@ class Divide extends BinaryOperationsExpression {
       return leftEval / rightEval;
     }
 
+    // Handle Complex division
+    if (leftEval is Complex || rightEval is Complex) {
+      var lC = (leftEval is num)
+          ? Complex(leftEval, 0)
+          : (leftEval is Complex ? leftEval : null);
+      var rC = (rightEval is num)
+          ? Complex(rightEval, 0)
+          : (rightEval is Complex ? rightEval : null);
+
+      if (lC != null && rC != null) {
+        if (rC == Complex.zero()) throw Exception('Division by zero!');
+        return lC / rC;
+      }
+    }
+
     // If x is null and either operand contains a Variable, return the simplified version of the expression
     if (arg == null && (_containsVariable(left) || _containsVariable(right))) {
       return simplify();
@@ -184,6 +199,14 @@ class Divide extends BinaryOperationsExpression {
         // If result is integer, return integer
         if (l % r == 0) return Literal(l ~/ r);
         return Literal(l / r);
+      }
+
+      // Handle Complex division
+      if (l is Complex || r is Complex) {
+        var lC = (l is num) ? Complex(l, 0) : l as Complex;
+        var rC = (r is num) ? Complex(r, 0) : r as Complex;
+        if (rC == Complex.zero()) throw Exception('Division by zero');
+        return Literal(lC / rC);
       }
     }
 

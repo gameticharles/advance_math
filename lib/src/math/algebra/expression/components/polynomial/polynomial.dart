@@ -115,10 +115,8 @@ class Polynomial extends Expression {
       // Use provided variable or default to 'x'
       final varName = variable?.identifier.name ?? 'x';
 
-      // If the variable is not 'x', replace it with 'x' for parsing
-      // if (varName != 'x') {
-      //   source = source.replaceAll(varName, 'x');
-      // }
+      // Remove all whitespace
+      source = source.replaceAll(RegExp(r'\s+'), '');
 
       // Convert superscripts to normal digits
       final superscripts = {
@@ -153,29 +151,31 @@ class Polynomial extends Expression {
       );
 
       // Regex to match terms:
-      // Group 1: Term with variable (e.g., 3x^2, -x, 0.5x, a*x, -a*c*x)
+      // Group 1: Term with variable (e.g., 3x^2, -x, 0.5x, a*x, -a*c*x, x/2)
       // Group 2: Constant term
-      // We need to be more permissive with coefficients to allow variables
-      // But we must ensure we don't consume the variable itself if it's part of the coefficient?
-      // No, the coefficient is everything BEFORE the variable.
-      // So we match `(.*?)` before `varName`.
-      // But we need to be careful about splitting terms.
-      // Terms are split by + or - (unless inside parentheses, but Polynomials are usually expanded).
-      // A safer approach might be to split by `+` and `-` first, then parse each term?
-      // But `+` and `-` can be unary.
 
-      // Let's try to broaden the existing regex to allow identifiers in coefficient.
-      // Old: `([+-]?(?:\d+(?:\.\d+)?|\.\d+)?\*?`
-      // New: `([+-]?(?:[a-zA-Z0-9_.]+(?:\*[a-zA-Z0-9_.]+)*)?\*?`
-      // This is getting complicated.
-      // Maybe we can match the variable part `x^n` and capture everything before it?
+      // Updated regex to handle division:
+      // We allow the coefficient part to include division, e.g., 1/2*x or x/2
+      // But x/2 is tricky because the /2 comes AFTER the variable.
+      // So we need to match `...x^n...` AND potentially `/...` after it?
+      // Or we can treat `x/2` as `(1/2)x`.
 
-      final RegExp expPattern = RegExp(
+      // Let's stick to the current structure but allow `/` in the coefficient part if it appears before x.
+      // For `x/2`, it's `x` followed by `/2`.
+
+      // The above regex is getting messy. Let's try a simpler approach:
+      // Split by + and - (keeping delimiters), then parse each term.
+      // But we need to handle unary + and - at the start.
+
+      // Let's refine the regex to capture `x/2` specifically.
+      // `...varName...` followed by optional `/number`.
+
+      final RegExp termPattern = RegExp(
           r"([+-]?(?:(?:[a-zA-Z0-9_.]+(?:\*[a-zA-Z0-9_.]+)*)?\*?)?" +
               RegExp.escape(varName) +
-              r"(?:\^\d+)?)|([+-]?(?:[a-zA-Z0-9_.]+(?:\*[a-zA-Z0-9_.]+)*))");
+              r"(?:\^\d+)?(?:/[0-9.]+)?)|([+-]?(?:[a-zA-Z0-9_.]+(?:\*[a-zA-Z0-9_.]+)*))");
 
-      var matches = expPattern.allMatches(source).toList();
+      var matches = termPattern.allMatches(source).toList();
 
       if (matches.isEmpty) {
         throw FormatException(
@@ -183,10 +183,12 @@ class Polynomial extends Expression {
       }
 
       // Strict check: Ensure all characters are consumed by matches
-      // Check if all content was matched
       String matchedStr = matches.map((m) => m.group(0)).join('');
       if (matchedStr.length != source.length) {
-        // print('DEBUG: Polynomial.fromString mismatch. Source: $source, Matched: $matchedStr');
+        // If mismatch, it might be due to overlapping matches or uncaptured chars.
+        // For now, let's rely on the regex being comprehensive.
+        // If `x/2` is matched as `x` and `/2` is left over, it will fail here.
+        // Our regex `(?:/[0-9.]+)?` should handle it.
         throw FormatException('Invalid polynomial format: $source');
       }
 
@@ -195,11 +197,23 @@ class Polynomial extends Expression {
 
       for (var match in matches) {
         String term = match.group(0)!;
+        if (term.isEmpty) continue; // Should not happen with regex
 
         // Check if it's a variable term or constant
-        if (match.group(1) != null) {
+        // Group 1 is variable term, Group 2 is constant
+        // Note: The regex OR `|` means one of them is null.
+
+        if (match.group(1) != null && match.group(1)!.contains(varName)) {
           // Term with variable
           String varTerm = match.group(1)!;
+
+          // Check for division suffix
+          double divisor = 1.0;
+          if (varTerm.contains('/')) {
+            var parts = varTerm.split('/');
+            varTerm = parts[0];
+            divisor = double.parse(parts[1]);
+          }
 
           // Extract coefficient and exponent
           String coeffStr;
@@ -235,6 +249,11 @@ class Polynomial extends Expression {
           } catch (_) {
             // If not a number, parse as Expression
             coeff = Expression.parse(coeffStr);
+          }
+
+          // Apply divisor
+          if (divisor != 1.0) {
+            coeff = Divide(coeff, Literal(divisor)).simplifyBasic();
           }
 
           int degree = int.parse(expStr);
@@ -759,7 +778,10 @@ class Polynomial extends Expression {
       // result += coefficients[i] * pow(x, coefficients.length - 1 - i);
       var term = Multiply(coefficients[i],
           Pow(Literal(x), Literal(coefficients.length - 1 - i)));
-      result = Add(Literal(result), term).evaluate();
+
+      Expression currentResult =
+          (result is Expression) ? result : Literal(result);
+      result = Add(currentResult, term).evaluate();
     }
     return result;
   }
@@ -781,8 +803,13 @@ class Polynomial extends Expression {
 
     // Extract real parts for GCD calculation
     List<num> realParts = coefficients.map((c) {
-      Complex val = (c as Literal).value as Complex;
-      return val.real;
+      var val = (c as Literal).value;
+      if (val is Complex) {
+        return val.real;
+      } else if (val is num) {
+        return val;
+      }
+      return 0;
     }).toList();
 
     // Compute GCD of real parts (convert to int if possible)
@@ -801,8 +828,13 @@ class Polynomial extends Expression {
 
     // Divide all coefficients by the GCD
     List<Expression> newCoefficients = coefficients.map((c) {
-      Complex val = (c as Literal).value as Complex;
-      return Literal(Complex(val.real / gcdValue, val.imaginary / gcdValue));
+      var val = (c as Literal).value;
+      if (val is Complex) {
+        return Literal(Complex(val.real / gcdValue, val.imaginary / gcdValue));
+      } else if (val is num) {
+        return Literal(val / gcdValue);
+      }
+      return c;
     }).toList();
 
     return Polynomial(newCoefficients, variable: variable);
