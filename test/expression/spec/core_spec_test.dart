@@ -9,7 +9,7 @@ void main() {
         reason: 'Simplification of $given');
   }
 
-  group('Nerdamer core', () {
+  group('Expression core', () {
     test('should perform simple arithmetic', () {
       check('((((((1+1))))))', '2');
       check('((((((1+1))+4)))+3)', '9');

@@ -9,7 +9,7 @@ void main() {
     expect(result.toString(), equals(expected), reason: 'Eval of $given');
   }
 
-  group('Nerdamer solve', () {
+  group('Expression solve', () {
     group('linear equations', () {
       test('solve(x+1=5, x)', () => check('solve(x+1=5, x)', '[4]'));
       test('solve(2*x-4=0, x)', () => check('solve(2*x-4=0, x)', '[2]'));
@@ -19,7 +19,7 @@ void main() {
     group('quadratic equations', () {
       test('solve(x^2-1=0, x)', () => check('solve(x^2-1=0, x)', '[1, -1]'));
       test('solve(x^2+2*x+1=0, x)',
-          () => check('solve(x^2+2*x+1=0, x)', '[-1]'));
+          () => check('solve(x^2+2*x+1=0, x)', '[-1, -1]'));
       test('solve(x^2+1=0, x)', () => check('solve(x^2+1=0, x)', '[i, -i]'));
     });
 
