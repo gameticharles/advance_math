@@ -15,6 +15,12 @@ final defaultContext = {
   'sqrt2': sqrt2,
   'sqrt3': sqrt3,
 
+  // Angle Constants
+  'halfPi': AngleConstants.halfPi,
+  'quarterPi': AngleConstants.quarterPi,
+  'deg2rad': AngleConstants.piOver180,
+  'rad2deg': AngleConstants.d180OverPi,
+
   // Basic Math functions
   'abs': abs,
   'sqrt': sqrt,
@@ -143,6 +149,32 @@ final defaultContext = {
   'gcf': gcf,
   'gcd': gcd,
   'lcm': lcm,
+
+  // Missing Basic Math Functions
+  'sinc': sinc,
+  'sumUpTo': (num start, num end, [num step = 1]) =>
+      sumUpTo(start, end, step: step),
+  'isClose': (double a, double b, [double rel = 1e-9, double abs = 1e-15]) =>
+      isClose(a, b, relTol: rel, absTol: abs),
+  'integerPart': (double x) => integerPart(x),
+  'fibRange': (int start, int end) => fibRange(start, end),
+
+  // Calculus Helpers
+  'simpson': (Function f, double a, double b) => simpson(f, a, b),
+  'numIntegrate': (Function f, double a, double b) => numIntegrate(f, a, b),
+  'diff': (Function f, [double h = 0.001]) => diff(f, h),
+
+  // Random (Robustness)
+  'rand': ([num? min, num? max]) {
+    var r = Random();
+    if (min == null && max == null) return r.nextDouble();
+    if (min != null && max == null) return r.nextDouble() * min;
+    if (min != null && max != null) {
+      return min + r.nextDouble() * (max - min);
+    }
+    return r.nextDouble();
+  },
+  'randint': ([int max = 100]) => Random().nextInt(max),
 
   // String functions
   'string': (dynamic x) => x.toString(),

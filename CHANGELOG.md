@@ -213,6 +213,30 @@
   - Factory constructor: `RectangularPrism.cube(side)` for creating cubes
 - **[FEATURE]** Created example: `example/solid_geometry_example.dart`
 
+## Statistics & Basic Math Refactoring
+
+- **[FEATURE]** Refactored core statistics functions to `VarArgsFunction` allowing flexible usage (e.g., `mean(1, 2, 3)` vs `mean([1, 2, 3])`)
+  - `mean`, `median`, `mode`, `variance`, `standardDeviation`
+  - `gcd`, `lcm`
+- **[FEATURE]** Refactored `max` and `min` in `basic.dart` to `VarArgsFunction`
+- **[IMPROVEMENT]** Optimized `SVD` decomposition to use `dart:math` for `max`/`min` operations for better performance and type safety
+
+## Expression Context Enhancements
+
+- **[FEATURE]** Added missing basic math functions to default expression context (`utils.dart`)
+  - `sinc`, `sumUpTo`, `isClose`, `integerPart`, `fibRange`
+- **[FEATURE]** Added calculus helpers to expressions
+  - `diff()`: Numerical differentiation
+  - `simpson()`, `numIntegrate()`: Numerical integration
+- **[FEATURE]** Added robust random number generation to expressions
+  - `rand([min, max])`
+  - `randint(max)`
+- **[FEATURE]** Flattened and exposed constants in expressions
+  - Angle constants: `halfPi`, `quarterPi`, `deg2rad`, `rad2deg`
+  - Physics constants: `c`, `G`, `g`, `h_planck`, etc.
+- **[BUG_FIX]** Fixed `CallExpression` to correctly handle `VarArgsFunction` invocations
+- **[BUG_FIX]** Fixed `IndexExpression` and `BinaryExpression` type handling failures
+
 # 5.3.8
 
 - **[IMPROVEMENT]** Updated dependencies
