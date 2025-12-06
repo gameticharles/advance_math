@@ -111,12 +111,28 @@ void directCallTests() {
   });
 
   print('Sum: ${calculator([1, 2, 3, 4, 5])}');
-  print('Multiply: ${calculator([1, 2, 3, 4, 5], {'operation': 'multiply'})}');
-  print('Average: ${calculator([1, 2, 3, 4, 5], {'operation': 'average'})}');
+  print('Multiply: ${calculator([
+        1,
+        2,
+        3,
+        4,
+        5
+      ], kwargs: {
+        'operation': 'multiply'
+      })}');
+  print('Average: ${calculator([
+        1,
+        2,
+        3,
+        4,
+        5
+      ], kwargs: {
+        'operation': 'average'
+      })}');
 
   // Test error handling
   try {
-    calculator([1, 2, 3], {'operation': 'unknown'});
+    calculator([1, 2, 3], kwargs: {'operation': 'unknown'});
   } catch (e) {
     print('Caught expected error: $e');
   }

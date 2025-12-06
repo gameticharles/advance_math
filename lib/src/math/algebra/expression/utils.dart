@@ -121,103 +121,28 @@ final defaultContext = {
   'triangleWave': triangleWave,
 
   // Statistic functions
-  'max': (dynamic a, [dynamic b, dynamic c, dynamic d, dynamic e, dynamic f]) {
-    var rawArgs = [a, b, c, d, e, f].where((e) => e != null).toList();
-    var args = rawArgs.map((e) {
-      if (e is Complex && e.isReal && e.imaginary == 0) return e.real;
-      return e;
-    }).toList();
-
-    if (args.isEmpty) return 0;
-    if (args.length == 1) {
-      if (args[0] is List) {
-        return (args[0] as List).map((e) {
-          if (e is Complex && e.isReal && e.imaginary == 0) return e.real;
-          return e;
-        }).reduce((curr, next) => max(curr, next));
-      }
-      return args[0];
-    }
-    return args.reduce((curr, next) => max(curr, next));
-  },
-  'min': (dynamic a, [dynamic b, dynamic c, dynamic d, dynamic e, dynamic f]) {
-    var rawArgs = [a, b, c, d, e, f].where((e) => e != null).toList();
-    var args = rawArgs.map((e) {
-      if (e is Complex && e.isReal && e.imaginary == 0) return e.real;
-      return e;
-    }).toList();
-
-    if (args.isEmpty) return 0;
-    if (args.length == 1) {
-      if (args[0] is List) {
-        return (args[0] as List).map((e) {
-          if (e is Complex && e.isReal && e.imaginary == 0) return e.real;
-          return e;
-        }).reduce((curr, next) => min(curr, next));
-      }
-      return args[0];
-    }
-    return args.reduce((curr, next) => min(curr, next));
-  },
-  'sum': (num x, num y) => x + y,
+  'avg': avg,
+  'max': max,
+  'min': min,
+  'sum': sum,
   'sumTo': (num x) => sumTo(x.toInt()),
   'nPr': (num n, int r) => permutations(n, r).length,
   'permutations': (num n, int r) => permutations(n, r).length,
   'nCr': (num n, int r) => combinations(n, r).length,
   'combinations': (num n, int r) => combinations(n, r).length,
-  // 'avg': avg,
-  'avg': (List<dynamic> x) => mean([
-        for (var element in x)
-          if (element is num) element
-      ]),
-  'mean': (List<dynamic> x) => mean([
-        for (var element in x)
-          if (element is num) element
-      ]),
-  'median': (List<dynamic> x) => median([
-        for (var element in x)
-          if (element is num) element
-      ]),
-  'mode': (List<dynamic> x) => mode([
-        for (var element in x)
-          if (element is num) element
-      ]),
-  'variance': (List<dynamic> x) => variance([
-        for (var element in x)
-          if (element is num) element
-      ]),
-  'standardDeviation': (List<dynamic> x) => standardDeviation([
-        for (var element in x)
-          if (element is num) element
-      ]),
-  'stdDev': (List<dynamic> x) => standardDeviation([
-        for (var element in x)
-          if (element is num) element
-      ]),
-  'stdErrMean': (List<dynamic> x) => stdErrMean([
-        for (var element in x)
-          if (element is num) element
-      ]),
-  'tValue': (List<dynamic> x) => tValue([
-        for (var element in x)
-          if (element is num) element
-      ]),
-  'quartiles': (List<dynamic> x) => quartiles([
-        for (var element in x)
-          if (element is num) element
-      ]),
-  'gcf': (List<dynamic> x) => gcf([
-        for (var element in x)
-          if (element is num) element
-      ]),
-  'gcd': (List<dynamic> x) => gcd([
-        for (var element in x)
-          if (element is num) element
-      ]),
-  'lcm': (List<dynamic> x) => lcm([
-        for (var element in x)
-          if (element is num) element
-      ]),
+
+  'mean': mean,
+  'median': median,
+  'mode': mode,
+  'variance': variance,
+  'standardDeviation': stdDev,
+  'stdDev': stdDev,
+  'stdErrMean': stdErrMean,
+  'tValue': tValue,
+  'quartiles': quartiles,
+  'gcf': gcf,
+  'gcd': gcd,
+  'lcm': lcm,
 
   // String functions
   'string': (dynamic x) => x.toString(),

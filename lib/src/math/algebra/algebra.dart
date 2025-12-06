@@ -3,6 +3,7 @@ library algebra;
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:math' as dmath;
 
 //import '../complex.dart';
 import 'package:dartframe/dartframe.dart';

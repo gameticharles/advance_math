@@ -170,7 +170,7 @@ class Log extends Expression {
 
   @override
   int depth() {
-    return 1 + math.max(base.depth(), operand.depth());
+    return 1 + (math.max(base.depth(), operand.depth()) as num).toInt();
   }
 
   @override

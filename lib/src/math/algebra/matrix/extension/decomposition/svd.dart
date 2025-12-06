@@ -69,8 +69,8 @@ class SVD {
 
     A = _Utils.toNumMatrix(A);
 
-    var nu = math.max(_m, _n);
-    _s = Matrix.zeros(1, math.min(_m + 1, _n));
+    var nu = dmath.max(_m, _n);
+    _s = Matrix.zeros(1, dmath.min(_m + 1, _n));
     _u = Matrix.zeros(_m, nu);
     _v = Matrix.zeros(_n, _n);
     var e = Matrix.zeros(1, _n);
@@ -81,9 +81,9 @@ class SVD {
     // Reduce A to bidiagonal form, storing the diagonal elements
     // in s and the super-diagonal elements in e.
 
-    var nct = math.min(_m - 1, _n);
-    var nrt = math.max(0, math.min(_n - 2, _m));
-    for (var k = 0; k < math.max(nct, nrt); k++) {
+    var nct = dmath.min(_m - 1, _n);
+    var nrt = dmath.max(0, dmath.min(_n - 2, _m));
+    for (var k = 0; k < dmath.max(nct, nrt); k++) {
       if (k < nct) {
         // Compute the transformation for the k-th column and
         // place the k-th diagonal in s[k].
@@ -179,7 +179,7 @@ class SVD {
 
     // Set up the final bidiagonal matrix or order p.
 
-    var p = math.min(_n, _m + 1);
+    var p = dmath.min(_n, _m + 1);
     if (nct < _n) {
       _s[0][nct] = A[nct][nct];
     }
@@ -259,7 +259,7 @@ class SVD {
     var tiny = Complex(math.pow(2.0, -966.0));
 
     // Add maximum iteration count to prevent infinite loops
-    maxIterations = maxIterations ?? 100 * math.max(_m, _n);
+    maxIterations = maxIterations ?? 100 * dmath.max(_m, _n);
 
     while (p > 0) {
       // Check if we've exceeded the maximum number of iterations
@@ -379,12 +379,14 @@ class SVD {
           {
             // Calculate the shift.
 
-            var scale = math.max(
-                math.max(
-                    math.max(math.max(_s[0][p - 1].abs(), _s[0][p - 2].abs()),
-                        e[0][p - 2].abs()),
-                    _s[0][k].abs()),
-                e[0][k].abs());
+            var scale = dmath.max(
+                dmath.max(
+                    dmath.max(
+                        dmath.max((_s[0][p - 1].abs() as num),
+                            (_s[0][p - 2].abs() as num)),
+                        (e[0][p - 2].abs() as num)),
+                    (_s[0][k].abs() as num)),
+                (e[0][k].abs() as num));
             var sp = _s[0][p - 1] / scale;
             var spm1 = _s[0][p - 2] / scale;
             var epm1 = e[0][p - 2] / scale;
@@ -550,14 +552,14 @@ class SVD {
   /// return U
   Matrix U() {
     if (_m > _n) {
-      var dim = math.max(_m, _n) - 1;
+      var dim = dmath.max(_m, _n) - 1;
       return _u.slice(0, dim + 1, 0, dim + 1);
     }
     if (_m < _n) {
-      var dim = math.min(_m, _n) - 1;
+      var dim = dmath.min(_m, _n) - 1;
       return _u.slice(0, dim + 1, 0, dim + 1);
     } else {
-      return _u.slice(0, _m, 0, math.min(_m + 1, _n));
+      return _u.slice(0, _m, 0, dmath.min(_m + 1, _n));
     }
   }
 
@@ -574,7 +576,7 @@ class SVD {
     Matrix result = Matrix.zeros(_m, _n);
 
     // Get the minimum dimension to avoid index out of bounds
-    int minDim = math.min(_m, _n);
+    int minDim = dmath.min(_m, _n);
 
     // Set the diagonal elements to the singular values
     for (int i = 0; i < minDim; i++) {
@@ -591,7 +593,7 @@ class SVD {
     dynamic maxSingularValue = _s[0][0];
 
     // Find the smallest non-zero singular value
-    int minDim = math.min(_m, _n);
+    int minDim = dmath.min(_m, _n);
     dynamic minSingularValue = maxSingularValue; // Start with the largest value
 
     for (int i = 0; i < minDim; i++) {

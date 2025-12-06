@@ -1,59 +1,101 @@
 part of 'math.dart';
 
+// Helper to flatten args
+List<dynamic> _flattenArgs(List<dynamic> args) {
+  if (args.isEmpty) return [];
+  if (args.length == 1 && args.first is List) {
+    return args.first as List;
+  }
+  return args;
+}
+
+List<num> _getArgsParams(List<dynamic> args) {
+  return _flattenArgs(args).map((e) {
+    if (e is Complex && e.isReal && e.imaginary == 0) return e.real;
+    return e as num;
+  }).toList();
+}
+
+/// Returns the sum of a list of numbers (num or Complex).
+///
+/// Accepts variable arguments or a single list.
+///
+/// Example:
+/// ```dart
+/// print(sum(1, 2, 3)); // 6
+/// print(sum([1, 2, 3])); // 6
+/// print(sum(Complex(1, 1), Complex(2, 2))); // 3.0 + 3.0i
+/// ```
+dynamic sum = VarArgsFunction((args, kwargs) {
+  var list = _flattenArgs(args);
+  if (list.isEmpty) return 0;
+
+  var nums = list.map((e) {
+    if (e is Complex && e.isReal && e.imaginary == 0) return e.real;
+    return e;
+  }).toList();
+
+  if (nums.any((e) => e is Complex)) {
+    return nums
+        .map((e) => e is Complex ? e : Complex(e, 0))
+        .reduce((a, b) => a + b);
+  }
+  return nums.cast<num>().reduce((a, b) => a + b);
+});
+
 /// Returns the mean (average) of a list of numbers.
 ///
 /// Example:
 /// ```dart
 /// print(mean([1, 2, 3, 4, 5])); // prints: 3.0
+/// print(mean(1, 2, 3, 4, 5));   // prints: 3.0
 /// ```
-num mean(List<num> list) {
+dynamic mean = VarArgsFunction((args, kwargs) {
+  List<num> list = _getArgsParams(args);
+  if (list.isEmpty) return 0;
   return list.reduce((a, b) => a + b) / list.length;
-}
+});
 
 /// Alias for mean.
-num average(List<num> list) {
-  return mean(list);
-}
+dynamic average = mean;
 
 /// Returns the average of two or more numbers.
-/// If more than two numbers are provided, the average is calculated using the mean function.
-///
-/// Example:
-/// ```dart
-/// print(avg(1, 2, 3)); // prints: 2.0
-/// print(avg(1, 2, 3, 4, 5)); // prints: 3.0
-/// print(avg([1, 2, 3, 4, 5])); // prints: 3.0
-/// ```
-dynamic avg = VarArgsFunction((args, kwargs) {
-  // Check if the first argument is a List, and use it directly.
-  if (args.length == 1 && args.first is List) {
-    args = args.first;
-  }
-  return mean(args.map((e) => e as num).toList());
-});
+dynamic avg = mean;
 
 /// Returns the median of a list of numbers.
 ///
+/// The median is the middle value when the list is sorted.
+/// If the list has an even number of elements, returns the average of the two middle values.
+///
 /// Example:
 /// ```dart
-/// print(median([1, 2, 3, 4, 5])); // prints: 3
+/// print(median(1, 3, 2)); // 2
+/// print(median([1, 2, 3, 4])); // 2.5
 /// ```
-num median(List<num> list) {
+dynamic median = VarArgsFunction((args, kwargs) {
+  List<num> list = _getArgsParams(args);
+  if (list.isEmpty) return 0; // Or throw?
   list.sort();
   if (list.length % 2 == 1) {
     return list[list.length ~/ 2];
   } else {
     return (list[list.length ~/ 2 - 1] + list[list.length ~/ 2]) / 2;
   }
-}
+});
 
 /// Returns the mode (most common element(s)) of a list of numbers.
 ///
+/// Returns a list of the most frequent elements.
+///
 /// Example:
 /// ```dart
-/// print(mode([1, 2, 2, 3, 3, 4])); // prints: [2, 3]
+/// print(mode(1, 2, 2, 3)); // [2]
+/// print(mode([1, 1, 2, 2])); // [1, 2]
 /// ```
-List<num> mode(List<num> list) {
+dynamic mode = VarArgsFunction((args, kwargs) {
+  List<num> list = _getArgsParams(args);
+  if (list.isEmpty) return [];
+
   Map<num, int> freqMap = {};
   for (num item in list) {
     freqMap[item] = (freqMap[item] ?? 0) + 1;
@@ -64,58 +106,68 @@ List<num> mode(List<num> list) {
       .where((entry) => entry.value == maxFreq)
       .map((entry) => entry.key)
       .toList();
-}
+});
 
 /// Returns the variance of a list of numbers.
 ///
+/// Calculates the sample variance.
+///
 /// Example:
 /// ```dart
-/// print(variance([1, 2, 3, 4, 5])); // prints: 2.5
+/// print(variance(1, 2, 3, 4, 5)); // 2.5
 /// ```
-double variance(List<num> list) {
+dynamic variance = VarArgsFunction((args, kwargs) {
+  List<num> list = _getArgsParams(args);
+  if (list.length < 2) return 0.0;
+
   num m = mean(list);
   return list.map((num x) => math.pow(x - m, 2)).reduce((a, b) => a + b) /
       (list.length - 1);
-}
+});
 
 /// Returns the standard deviation of a list of numbers.
 ///
+/// Calculates the sample standard deviation.
+///
 /// Example:
 /// ```dart
-/// print(stdDev([1, 2, 3, 4, 5])); // prints: 1.5811388300841898
+/// print(stdDev(1, 2, 3, 4, 5)); // ~1.58
 /// ```
-double stdDev(List<num> list) {
-  return sqrt(variance(list));
-}
+dynamic stdDev = VarArgsFunction((args, kwargs) {
+  return sqrt(variance(args, kwargs: kwargs));
+});
 
 /// Returns the standard deviation of a list of numbers.
+dynamic standardDeviation = stdDev;
+
+/// Returns the standard error of the sample mean.
 ///
 /// Example:
 /// ```dart
-/// print(standardDeviation([1, 2, 3, 4, 5])); // prints: 1.5811388300841898
+/// print(stdErrMean(1, 2, 3, 4, 5)); // ~0.707
 /// ```
-double standardDeviation(List<num> list) => stdDev(list);
-
-/// Returns the standard error of the sample mean
-///
-/// Example:
-/// ```
-/// print(stdErrMean([1, 2, 3, 4, 5])); // prints: 0.7071067811865476
-/// ```
-double stdErrMean(List<num> list) {
-  // if the list is empty or has only one element
+dynamic stdErrMean = VarArgsFunction((args, kwargs) {
+  List<num> list = _getArgsParams(args);
   if (list.isEmpty || list.length == 1) return 0;
-
   return stdDev(list) / sqrt(list.length);
-}
+});
 
-/// Standard error of estimate
+/// Standard error of estimate.
+/// Expects two lists: stdErrEst(List x, List y) or flattened if appropriate (though intended for paired data).
 ///
 /// Example:
+/// ```dart
+/// var x = [1, 2, 3];
+/// var y = [2, 4, 6];
+/// print(stdErrEst(x, y));
 /// ```
-/// print(stdErrEst([1, 2, 3, 4, 5])); // prints: 0.6324555320336759
-/// ```
-double stdErrEst(List<num> x, List<num> y) {
+dynamic stdErrEst = VarArgsFunction((args, kwargs) {
+  if (args.length != 2 || args[0] is! List || args[1] is! List) {
+    throw ArgumentError('stdErrEst requires two lists: x and y');
+  }
+  List<num> x = (args[0] as List).cast<num>();
+  List<num> y = (args[1] as List).cast<num>();
+
   num meanX = mean(x);
   num meanY = mean(y);
   double numerator = 0;
@@ -123,34 +175,36 @@ double stdErrEst(List<num> x, List<num> y) {
     numerator += pow(y[i] - meanY - (x[i] - meanX), 2);
   }
   return sqrt(numerator / (x.length - 2));
-}
+});
 
-/// Returns the t-Value of the list
+/// Returns the t-Value of the list.
+///
 /// Example:
+/// ```dart
+/// print(tValue(1, 2, 3, 4, 5));
 /// ```
-/// print(tValue([1, 2, 3, 4, 5])); // prints: 4.242640687119285
-/// ```
-double tValue(List<num> list) {
-  // if the list is empty or has only one element
+dynamic tValue = VarArgsFunction((args, kwargs) {
+  List<num> list = _getArgsParams(args);
   if (list.isEmpty || list.length == 1) return 0;
-
-  // Calculate the t-Value
   return mean(list) / stdErrMean(list);
-}
+});
 
 /// Returns the 1st, 2nd, and 3rd quartiles of a list of numbers.
 ///
 /// Example:
 /// ```dart
-/// print(quartiles([1, 2, 3, 4, 5, 6, 7, 8, 9])); // prints: [2.5, 5, 7.5]
+/// print(quartiles(1, 2, 3, 4, 5, 6, 7)); // [2, 4, 6]
 /// ```
-List<num> quartiles(List<num> list) {
+dynamic quartiles = VarArgsFunction((args, kwargs) {
+  List<num> list = _getArgsParams(args);
+  if (list.isEmpty) return [0, 0, 0];
+
   list.sort();
   num q1 = median(list.sublist(0, list.length ~/ 2));
   num q2 = median(list);
   num q3 = median(list.sublist((list.length + 1) ~/ 2));
   return [q1, q2, q3];
-}
+});
 
 /// Generates all permutations of elements from `n` taken `r` at a time.
 ///
@@ -171,24 +225,8 @@ List<num> quartiles(List<num> list) {
 /// **Note:** When `simplify` is true, the structure of the result depends on the output of `func` for the first permutation. This might cause issues if `func` doesn't produce consistent output lengths.
 ///
 /// Examples:
-///
-/// 1. Get all permutations of 2 elements from [1, 2, 3]:
 /// ```dart
-/// var permutationsList = permutation(3, 2);
-/// print(permutationsList);
-/// // Output: [[1, 2], [2, 1], [1, 3], [3, 1], [2, 3], [3, 2]]
-/// ```
-///
-/// 2. Calculate the product of each permutation:
-/// ```dart
-/// var productPermutations = permutation(3, 2,
-///     func: (perm) => perm.reduce((a, b) => a * b));
-/// print(productPermutations); // Output: [2, 2, 3, 3, 6, 6] (simplified)
-/// ```
-/// 3. Get the length of the permutations:
-/// ```dart
-/// print(permutations(5, 3).length); // Output: 60
-/// ```
+/// print(permutations(3, 2)); // [[1, 2], [2, 1], [1, 3], [3, 1], [2, 3], [3, 2]]
 /// ```
 dynamic permutations(dynamic n, int r,
     {Function? func, bool simplify = true, Random? random, int? seed}) {
@@ -256,48 +294,9 @@ dynamic permutations(dynamic n, int r,
 ///   - If true, generates the actual combinations.
 ///   - If false, only calculates and returns the number of possible combinations.
 ///
-/// **Note:** When `simplify` is true, the structure of the result depends on the output of `func` for the first combination.
-/// This might cause issues if `func` doesn't produce consistent output lengths.
-///
 /// Examples:
-///
-/// 1. Get all combinations of 3 elements from [1, 2, 3, 4]:
 /// ```dart
-/// var combinations = combinations(4, 3);
-/// print(combinations); // Output: [[1, 2, 3], [1, 2, 4], [1, 3, 4], [2, 3, 4]]
-/// ```
-///
-/// 2. Calculate the sum of each combination:
-/// ```dart
-/// var sumCombinations = combinations(4, 3,
-///     func: (comb) => comb.reduce((a, b) => a + b));
-/// print(sumCombinations); // Output: [6, 7, 8, 9] (simplified)
-/// ```
-///
-/// 3. Get combinations of letters and apply a function (not simplified):
-/// ```dart
-/// var alphaCombn = combinations(["A", "B", "C", "D"], 2, simplify: false);
-/// print(alphaCombn);
-/// // Output:
-/// // [["A", "B"], ["A", "C"], ["A", "D"], ["B", "C"], ["B", "D"], ["C", "D"]]
-/// ```
-///
-/// 4. Calculate the minimum of consecutive elements in each combination:
-/// ```dart
-/// var minCombo = combinations(4, 3, simplify: true, func: (comb) {
-///   List<num> result = [];
-///   for (int i = 0; i < comb.length - 1; i++) {
-///     result.add(min(comb[i], comb[i + 1]));
-///   }
-///   return result;
-/// });
-/// print(minCombo); // Output: [[1, 2], [1, 2], [1, 3], [2, 3]]
-/// ```
-///
-/// 5. Get the number of combinations
-/// ```dart
-/// print(combinations(5, 3).length); // Output: 10
-/// ```
+/// print(combinations(4, 3)); // [[1, 2, 3], [1, 2, 4], [1, 3, 4], [2, 3, 4]]
 /// ```
 dynamic combinations(dynamic n, int r,
     {Function? func, bool simplify = true, bool generateCombinations = true}) {
@@ -368,17 +367,14 @@ dynamic combinations(dynamic n, int r,
   }
 }
 
-/// Calculates the greatest common factor (GCF) of all numbers in the input list.
+/// Calculates the greatest common factor (GCF) of all numbers in the input.
 ///
-/// This function uses the Euclidean algorithm to find the GCF for each pair
-/// of consecutive numbers in the list.
-///
-/// Parameters:
-///  - [numbers]: A list of numbers for which the GCD is computed.
-///
-/// Returns:
-///  - The greatest common factor of all numbers in the input list.
-num gcf(List<num> numbers) {
+/// Example:
+/// ```dart
+/// print(gcf(12, 18, 24)); // 6
+/// ```
+dynamic gcf = VarArgsFunction((args, kwargs) {
+  List<num> numbers = _getArgsParams(args);
   if (numbers.isEmpty) {
     throw ArgumentError('List of numbers cannot be empty.');
   }
@@ -392,23 +388,16 @@ num gcf(List<num> numbers) {
     result = ggcf(result, numbers[i]);
   }
   return result;
-}
+});
 
 /// Returns the greatest common divisor of a list of numbers.
 ///
-/// This function uses the Euclidean algorithm to compute the GCD.
-///
-/// Parameters:
-///  - [numbers]: A list of numbers for which the GCD is computed.
-///
-/// Returns:
-///  - An number representing the GCD of the provided numbers.
-///
 /// Example:
 /// ```dart
-/// print(gcd([48, 18, 24]));  // Output: 6
+/// print(gcd(48, 18, 24));  // Output: 6
 /// ```
-num gcd(List<num> numbers) {
+dynamic gcd = VarArgsFunction((args, kwargs) {
+  List<num> numbers = _getArgsParams(args);
   if (numbers.isEmpty) {
     throw ArgumentError('List of numbers cannot be empty.');
   }
@@ -431,28 +420,19 @@ num gcd(List<num> numbers) {
   }
 
   return a;
-}
+});
 
-/// Extended Euclidean algorithm to find gcd and coefficients of Bezel identity for a list of numbers.
+/// Extended Euclidean algorithm.
 ///
-/// Returns a list of lists where each sublist contains `[d, x, y]` for each pair of consecutive numbers
-/// in the input list such that:
-///
-/// `d = gcd(numbers[i], numbers[i+1]), numbers[i] * x + numbers[i+1] * y = d`
-///
-/// (ie `ax + by = d`) where a and b are the consecutive numbers in the list.
-///
-/// Parameters:
-///  - [numbers]: A list of numbers for which the GCD and coefficients are computed.
-///
-/// Returns:
-///  - A list of lists, where each sublist contains [d, x, y] for the corresponding pair of numbers.
+/// Returns a list of lists where each sublist contains `[d, x, y]` for each pair.
 ///
 /// Example:
 /// ```dart
-/// print(egcd([48, 18, 24]));  // Output: [[6, -1, 3], [6, -1, 1]]
+/// print(egcd(48, 18, 24));  // Output: [[6, -1, 3], [6, -1, 1]]
 /// ```
-List<List<num>> egcd(List<num> numbers) {
+dynamic egcd = VarArgsFunction((args, kwargs) {
+  List<num> numbers = _getArgsParams(args);
+
   List<List<num>> results = [];
 
   // Helper function to compute egcd for a pair of numbers
@@ -479,15 +459,16 @@ List<List<num>> egcd(List<num> numbers) {
   }
 
   return results;
-}
+});
 
-/// Returns the least common multiple of two numbers.
+/// Returns the least common multiple of numbers.
 ///
 /// Example:
 /// ```dart
-/// print(lcm([15, 20]));  // Output: 60
+/// print(lcm(15, 20));  // Output: 60
 /// ```
-num lcm(List<num> numbers) {
+dynamic lcm = VarArgsFunction((args, kwargs) {
+  List<num> numbers = _getArgsParams(args);
   if (numbers.isEmpty) {
     throw ArgumentError('List of numbers cannot be empty.');
   }
@@ -496,7 +477,7 @@ num lcm(List<num> numbers) {
     if (a == 0 || b == 0) {
       return 0;
     } else {
-      return (a * b) / gcd([a, b]);
+      return (a * b) / gcd(a, b);
     }
   }
 
@@ -505,15 +486,21 @@ num lcm(List<num> numbers) {
     result = llcm(result, numbers[i]);
   }
   return result;
-}
+});
 
-/// Returns the correlation of two lists
+/// Returns the correlation of two lists.
 ///
 /// Example:
 /// ```dart
-/// print(correlation(x,y));
+/// print(correlation([1,2,3], [1,2,3])); // 1.0
 /// ```
-double correlation(List<num> x, List<num> y) {
+dynamic correlation = VarArgsFunction((args, kwargs) {
+  if (args.length != 2 || args[0] is! List || args[1] is! List) {
+    throw ArgumentError('correlation requires two lists: x and y');
+  }
+  List<num> x = (args[0] as List).cast<num>();
+  List<num> y = (args[1] as List).cast<num>();
+
   num meanX = mean(x);
   num meanY = mean(y);
 
@@ -528,23 +515,48 @@ double correlation(List<num> x, List<num> y) {
   }
 
   return numerator / sqrt(denominator1 * denominator2);
-}
+});
 
-/// Returns the confidence Interval of a dataset when a confidence level is provided
+/// Returns the confidence Interval of a dataset when a confidence level is provided.
 ///
 /// Example:
 /// ```dart
-/// print(confidence([1, 2, 3, 4, 5])
+/// print(confidenceInterval([1, 2, 3, 4, 5], 0.95));
 /// ```
-List<num> confidenceInterval(List<num> data, double confidenceLevel) {
+dynamic confidenceInterval = VarArgsFunction((args, kwargs) {
+  // args[0] might be list, args[1] confidence level
+  List<num> data;
+
+  if (args.length >= 2 && args[0] is List && args[1] is num) {
+    data = (args[0] as List).cast<num>();
+    (args[1] as num).toDouble(); // Validate type
+  } else {
+    // If flattened? confidenceInterval(0.95, 1, 2, 3)? Ambiguous.
+    // Let's assume strict (List, level) or (level, data).
+    // Given the ambiguity, let's stick to (List, level).
+    throw ArgumentError(
+        "Usage: confidenceInterval(List<num> data, double confidenceLevel)");
+  }
+
   num sampleMean = mean(data);
   num stdErr = stdErrMean(data);
   num margin = tValue(data) * stdErr;
   return [sampleMean - margin, sampleMean + margin];
-}
+});
 
-/// Returns slope and intercept of two datasets
-List<num> regression(List<num> x, List<num> y) {
+/// Returns slope and intercept of two datasets.
+///
+/// Example:
+/// ```dart
+/// print(regression([1,2,3], [2,4,6])); // [2, 0]
+/// ```
+dynamic regression = VarArgsFunction((args, kwargs) {
+  if (args.length != 2 || args[0] is! List || args[1] is! List) {
+    throw ArgumentError('regression requires two lists: x and y');
+  }
+  List<num> x = (args[0] as List).cast<num>();
+  List<num> y = (args[1] as List).cast<num>();
+
   num meanX = mean(x);
   num meanY = mean(y);
 
@@ -552,4 +564,4 @@ List<num> regression(List<num> x, List<num> y) {
   num b = meanY - m * meanX;
 
   return [m, b]; // slope, intercept
-}
+});

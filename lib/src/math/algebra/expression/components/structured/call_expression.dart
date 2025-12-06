@@ -10,6 +10,12 @@ class CallExpression extends Expression {
   dynamic evaluate([dynamic arg]) {
     var evCallee = callee.evaluate(arg);
     var aevArguments = arguments.map((e) => e.evaluate(arg)).toList();
+
+    // Check if the callee is a VarArgsFunction
+    if (evCallee is VarArgsFunction) {
+      return evCallee(aevArguments);
+    }
+
     try {
       return Function.apply(evCallee, aevArguments);
     } catch (e) {

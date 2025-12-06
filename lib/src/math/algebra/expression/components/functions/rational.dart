@@ -150,7 +150,7 @@ class RationalFunction extends Expression {
 
   @override
   int depth() {
-    return 1 + max(numerator.depth(), denominator.depth());
+    return 1 + (max(numerator.depth(), denominator.depth()) as num).toInt();
   }
 
   @override

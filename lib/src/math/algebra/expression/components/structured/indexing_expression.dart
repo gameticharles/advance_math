@@ -103,7 +103,7 @@ class IndexExpression extends Expression {
 
   @override
   int depth() {
-    return 1 + max(object.depth(), index.depth());
+    return 1 + (max(object.depth(), index.depth()) as num).toInt();
   }
 
   @override

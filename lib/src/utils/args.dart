@@ -80,7 +80,7 @@ class VarArgsFunction<T> {
   /// var func = VarArgsFunction<int>((args, kwargs) => args.length);
   /// print(func(1, 2, 3)); // Outputs: 3
   /// ```
-  T call([dynamic args = const [], Map<String, dynamic> kwargs = const {}]) {
+  T call(dynamic args, {Map<String, dynamic> kwargs = const {}}) {
     try {
       // Handle different types of arguments
       List<dynamic> processedArgs;

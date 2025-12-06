@@ -421,17 +421,44 @@ dynamic round(dynamic x, [int decimalPlaces = 0]) {
 /// Example:
 /// ```dart
 /// print(max(2, 3));  // Output: 3
+/// print(max(1, 4, 2)); // Output: 4
+/// print(max([1, 4, 3])); // Output: 4
 /// ```
-//num max(num x, num y) => math.max(x, y);
-T max<T extends dynamic>(T a, T b) => (a > b) ? a : b;
+dynamic max = VarArgsFunction((args, kwargs) {
+  var list = _flattenArgs(args);
+  if (list.isEmpty) return 0;
+  var nums = list.map((e) {
+    if (e is Complex && e.isReal && e.imaginary == 0) return e.real;
+    return e;
+  }).toList();
+  return nums.reduce((curr, next) {
+    if (curr is num && next is num) return math.max(curr, next);
+    // Fallback equality logic if needed or comparable
+    // For now assume num or comparable
+    return (curr as dynamic) > (next as dynamic) ? curr : next;
+  });
+});
 
 /// Returns the minimum of two or more numbers.
 ///
 /// Example:
 /// ```dart
 /// print(min(2, 3));  // Output: 2
+/// print(min(1, 4, 2)); // Output: 1
+/// print(min([1, 4, 3])); // Output: 1
 /// ```
-T min<T extends dynamic>(T a, T b) => (a < b) ? a : b;
+dynamic min = VarArgsFunction((args, kwargs) {
+  var list = _flattenArgs(args);
+  if (list.isEmpty) return 0;
+  var nums = list.map((e) {
+    if (e is Complex && e.isReal && e.imaginary == 0) return e.real;
+    return e;
+  }).toList();
+  return nums.reduce((curr, next) {
+    if (curr is num && next is num) return math.min(curr, next);
+    return (curr as dynamic) < (next as dynamic) ? curr : next;
+  });
+});
 
 /// Returns the hypotenuse or Euclidean norm, sqrt(xx + yy).
 ///
@@ -591,7 +618,7 @@ dynamic lerp(dynamic a, dynamic b, num t) {
 /// ```
 bool isClose(double a, double b,
     {double relTol = 1e-9, double absTol = 1e-15}) {
-  return (a - b).abs() <= max(absTol, relTol * max(a.abs(), b.abs()));
+  return (a - b).abs() <= math.max(absTol, relTol * math.max(a.abs(), b.abs()));
 }
 
 /// Checks if the provided string characters [input] are a digit(s) (0-9).
