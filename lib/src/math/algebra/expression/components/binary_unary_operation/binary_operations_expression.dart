@@ -1,8 +1,8 @@
 part of '../../expression.dart';
 
-// Helper method to convert num to Literal if the other operand is an Expression
+// Helper method to convert num or Complex to Literal if the other operand is an Expression
 dynamic convertToLiteralIfNeeded(dynamic val, dynamic other) {
-  if (val is num && other is Expression) {
+  if ((val is num || val is Complex) && other is Expression) {
     return Literal(val);
   }
   return val;

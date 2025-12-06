@@ -38,7 +38,25 @@ class Cos extends TrigonometricExpression {
 
   @override
   Expression integrate() {
-    return Sin(operand);
+    // ∫cos(ax + b) dx = (1/a) * sin(ax + b)
+    dynamic a = 1;
+
+    if (operand is Add) {
+      if ((operand as Add).left is Multiply) {
+        a = ((operand as Add).left as Multiply).left.evaluate();
+      }
+    } else if (operand is Multiply) {
+      a = (operand as Multiply).left.evaluate();
+    }
+
+    dynamic invA;
+    if (a is Complex) {
+      invA = Complex.one() / a;
+    } else {
+      invA = 1 / a;
+    }
+
+    return Multiply(Literal(invA), Sin(operand));
   }
 
   @override

@@ -21,8 +21,25 @@ class Sec extends TrigonometricExpression {
 
   @override
   Expression integrate() {
-    // Return the natural logarithm of the absolute value of (sec(x) + tan(x))
-    return Ln(Abs(Add(Sec(operand), Tan(operand))));
+    // ∫sec(ax + b) dx = (1/a) * ln|sec(ax + b) + tan(ax + b)|
+    dynamic a = 1;
+
+    if (operand is Add) {
+      if ((operand as Add).left is Multiply) {
+        a = ((operand as Add).left as Multiply).left.evaluate();
+      }
+    } else if (operand is Multiply) {
+      a = (operand as Multiply).left.evaluate();
+    }
+
+    dynamic invA;
+    if (a is Complex) {
+      invA = Complex.one() / a;
+    } else {
+      invA = 1 / a;
+    }
+
+    return Multiply(Literal(invA), Ln(Abs(Add(Sec(operand), Tan(operand)))));
   }
 
   @override

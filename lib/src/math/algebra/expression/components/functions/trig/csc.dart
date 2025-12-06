@@ -110,8 +110,8 @@ class Csc extends TrigonometricExpression {
   @override
   Expression integrate() {
     // Assuming operand is of form: Multiply(a, Variable) + b
-    var a = 1;
-    var b = 0;
+    dynamic a = 1;
+    dynamic b = 0;
 
     if (operand is Add) {
       var sum = operand as Add;
@@ -127,11 +127,32 @@ class Csc extends TrigonometricExpression {
       b = operand.evaluate();
     }
 
-    // Compute the integral using the formula
-    return Multiply(
-        Literal(1 / a),
-        Ln(Abs(Tan(Multiply(Literal(0.5),
-            Add(Multiply(Literal(a), Variable('x')), Literal(b)))))));
+    // Calculate 1/a safely
+    dynamic invA;
+    if (a is Complex) {
+      invA = Complex.one() / a;
+    } else {
+      invA = 1 / a;
+    }
+
+    if (n == 1) {
+      // ∫csc(ax + b) dx = (1/a) * ln|tan((ax+b)/2)|
+      return Multiply(
+          Literal(invA),
+          Ln(Abs(Tan(Multiply(Literal(0.5),
+              Add(Multiply(Literal(a), Variable('x')), Literal(b)))))));
+    } else if (n == 2) {
+      // ∫csc^2(ax + b) dx = -(1/a) * cot(ax + b)
+      dynamic negInvA;
+      if (invA is Complex) {
+        negInvA = -invA;
+      } else {
+        negInvA = -invA;
+      }
+      return Multiply(Literal(negInvA), Cot(operand));
+    } else {
+      throw UnimplementedError('Integration of csc^$n is not yet supported');
+    }
   }
 
   /// Simplifies the csc expression.

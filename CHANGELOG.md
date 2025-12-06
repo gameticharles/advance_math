@@ -1,3 +1,12 @@
+# 5.4.1
+
+- **[BUG_FIX]** Fixed `Csc.integrate` crash and mathematical correctness
+  - Corrected calculation of coefficients (e.g., `1/a`) when `a` is a `Complex` number
+  - Fixed `csc(x)^2` integration to return correct `-cot(x)` instead of log formula
+- **[BUG_FIX]** Fixed integration logic for `Sin`, `Cos`, `Tan`, `Cot`, `Sec` to robustly handle `Complex` coefficients in linear substitutions (`f(ax+b)`)
+- **[BUG_FIX]** Fixed crash in `Variable` multiplication with `Complex` numbers (partial evaluation)
+  - Updated `convertToLiteralIfNeeded` to correctly treat `Complex` numbers as literals, allowing expressions like `Complex(8) * y` to simplify correctly
+
 # 5.4.0
 
 ## Symbolic Calculus & Equation Solving
