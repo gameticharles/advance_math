@@ -5,12 +5,15 @@ void main() {
   void check(String given, dynamic expected) {
     var parsed = Expression.parse(given);
     var result = parsed.evaluate();
+
+    // Normalize expected
+    var exp = expected;
+    if (exp is String) {
+      exp = num.tryParse(exp) ?? exp;
+    }
+
     // Compare as numbers
     if (result is num) {
-      var exp = expected;
-      if (exp is String) {
-        exp = num.tryParse(exp) ?? exp;
-      }
       if (exp is num) {
         expect(result, closeTo(exp, 1e-10), reason: 'Eval of $given');
       } else {
@@ -18,7 +21,7 @@ void main() {
             reason: 'Eval of $given');
       }
     } else if (result is Complex) {
-      expect(result.real, closeTo(expected, 1e-10),
+      expect(result.real, closeTo(exp, 1e-10),
           reason: 'Eval of $given (real part)');
       expect(result.imaginary, closeTo(0, 1e-10),
           reason: 'Eval of $given (imaginary part)');
@@ -31,7 +34,14 @@ void main() {
       if (result is Literal && result.value is num) {
         expect(result.value, closeTo(expected, 1e-10));
       } else {
-        fail('Result $result is not a number');
+        // Debug info for failure
+        if (result.toString() != expected.toString()) {
+          print('Check failed for "$given"');
+          print('Parsed: $parsed');
+          print('Result: $result (${result.runtimeType})');
+          print('Expected: $expected (${expected.runtimeType})');
+        }
+        fail('Result $result is not a number or valid Match');
       }
     }
   }

@@ -121,23 +121,43 @@ final defaultContext = {
   'triangleWave': triangleWave,
 
   // Statistic functions
-  'max': (dynamic x, [dynamic y]) {
-    if (x is List) {
-      return x.reduce((a, b) => max(a, b));
+  'max': (dynamic a, [dynamic b, dynamic c, dynamic d, dynamic e, dynamic f]) {
+    var rawArgs = [a, b, c, d, e, f].where((e) => e != null).toList();
+    var args = rawArgs.map((e) {
+      if (e is Complex && e.isReal && e.imaginary == 0) return e.real;
+      return e;
+    }).toList();
+
+    if (args.isEmpty) return 0;
+    if (args.length == 1) {
+      if (args[0] is List) {
+        return (args[0] as List).map((e) {
+          if (e is Complex && e.isReal && e.imaginary == 0) return e.real;
+          return e;
+        }).reduce((curr, next) => max(curr, next));
+      }
+      return args[0];
     }
-    if (y != null) {
-      return max(x, y);
-    }
-    return x;
+    return args.reduce((curr, next) => max(curr, next));
   },
-  'min': (dynamic x, [dynamic y]) {
-    if (x is List) {
-      return x.reduce((a, b) => min(a, b));
+  'min': (dynamic a, [dynamic b, dynamic c, dynamic d, dynamic e, dynamic f]) {
+    var rawArgs = [a, b, c, d, e, f].where((e) => e != null).toList();
+    var args = rawArgs.map((e) {
+      if (e is Complex && e.isReal && e.imaginary == 0) return e.real;
+      return e;
+    }).toList();
+
+    if (args.isEmpty) return 0;
+    if (args.length == 1) {
+      if (args[0] is List) {
+        return (args[0] as List).map((e) {
+          if (e is Complex && e.isReal && e.imaginary == 0) return e.real;
+          return e;
+        }).reduce((curr, next) => min(curr, next));
+      }
+      return args[0];
     }
-    if (y != null) {
-      return min(x, y);
-    }
-    return x;
+    return args.reduce((curr, next) => min(curr, next));
   },
   'sum': (num x, num y) => x + y,
   'sumTo': (num x) => sumTo(x.toInt()),

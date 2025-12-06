@@ -70,6 +70,14 @@ class BinaryExpression extends Expression {
           var idxExpr = left as IndexExpression;
           var obj = idxExpr.object.evaluate(arg);
           var idx = idxExpr.index.evaluate(arg);
+
+          if (idx is Complex && idx.isReal && idx.imaginary == 0) {
+            idx = idx.real;
+          }
+          if (idx is num && idx == idx.toInt()) {
+            idx = idx.toInt();
+          }
+
           var val = right.evaluate(arg);
 
           if (obj is List && idx is int) {
@@ -80,7 +88,17 @@ class BinaryExpression extends Expression {
             }
           }
         }
-        return Range(left.evaluate(arg), right.evaluate(arg));
+        var start = left.evaluate(arg);
+        var end = right.evaluate(arg);
+
+        if (start is Complex && start.isReal && start.imaginary == 0) {
+          start = start.real;
+        }
+        if (end is Complex && end.isReal && end.imaginary == 0) {
+          end = end.real;
+        }
+
+        return Range(start, end);
       default:
         throw Exception('Unsupported binary operator: $operator');
     }

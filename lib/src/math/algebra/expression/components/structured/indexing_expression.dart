@@ -11,6 +11,13 @@ class IndexExpression extends Expression {
     var obj = object.evaluate(arg);
     var idx = index.evaluate(arg);
 
+    if (idx is Complex && idx.isReal && idx.imaginary == 0) {
+      idx = idx.real;
+    }
+    if (idx is num && idx == idx.toInt()) {
+      idx = idx.toInt();
+    }
+
     if (obj is List) {
       if (idx is int) {
         if (idx < 0) {
@@ -20,9 +27,13 @@ class IndexExpression extends Expression {
       }
       if (idx is Range) {
         var indices = idx.toList();
-        return indices.map((i) {
-          if (i < 0) i += obj.length;
-          return obj[i.toInt()];
+        return indices.map((dynamic i) {
+          if (i is Complex && i.isReal && i.imaginary == 0) i = i.real;
+          if (i is num) {
+            if (i < 0) i += obj.length;
+            return obj[i.toInt()];
+          }
+          throw Exception('Invalid index type in range: ${i.runtimeType}');
         }).toList();
       }
     }
