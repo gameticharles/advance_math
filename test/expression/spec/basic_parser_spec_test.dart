@@ -1,6 +1,8 @@
 import 'package:test/test.dart';
 import 'package:advance_math/advance_math.dart';
 
+/// See [Expression Parser Documentation](../../../doc/expression_parser.md) for a guide derived from these tests.
+
 void main() {
   void check(String given, dynamic expected) {
     var parsed = Expression.parse(given);

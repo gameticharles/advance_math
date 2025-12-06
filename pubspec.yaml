@@ -1,6 +1,6 @@
 name: advance_math
 description: A robust Dart library for comprehensive mathematical programming. Offers expressions, complex numbers, algebra, statistics, angles, and geometry for diverse computations.
-version: 5.3.8
+version: 5.4.0
 repository: https://github.com/gameticharles/advance_math
 
 environment:

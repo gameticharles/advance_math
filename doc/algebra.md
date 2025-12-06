@@ -35,9 +35,11 @@ This module provides a rich set of tools for algebraic computations, including m
   - [Solving Linear Systems (`Matrix.linear`)](#solving-linear-systems)
 - [Mathematical Expressions](#mathematical-expressions)
   - [Overview](#expression-overview)
+  - [Creating Expressions](#creating-expressions)
   - [Usage (Parsing and Evaluation)](#expression-usage)
-  - [Parser Details](#expression-parser-details)
-  - [Supported Elements](#supported-expression-elements)
+  - [Parser Syntax and Features](#parser-syntax-and-features)
+  - [Calculus and Equation Solving](#calculus-and-equation-solving)
+  - [Troubleshooting](#expression-troubleshooting)
 - [Polynomials](#polynomials)
   - [Overview](#polynomial-overview)
   - [Constructors](#polynomial-constructors)
@@ -364,7 +366,76 @@ The `matrix.linear` getter provides access to a `LinearSystemSolvers` instance. 
 
 ## Mathematical Expressions
 
-_(Retained from previous documentation: Overview, Usage, Parser Details, Supported Elements)_
+### Overview
+
+The expression module allows for symbolic mathematical manipulation, supporting variables, simplification, differentiation, integration, and evaluation. Expressions can be built programmatically or parsed from strings.
+
+### Creating Expressions
+
+There are three ways to create expressions programmatically. See [Enhanced Expression Creation Guide](enhanced_expression_creation.md) and [Migration Guide](expression_migration_guide.md) for details.
+
+1.  **Helper Function (`ex`)**: Concise and readable.
+    ```dart
+    var expr = ex(2) * x + ex(3);
+    ```
+2.  **Extension Method (`toExpression`)**: Fluent API.
+    ```dart
+    var expr = 2.toExpression() * x + 3.toExpression();
+    ```
+3.  **Explicit Literal**: Traditional constructor.
+    ```dart
+    var expr = Literal(2) * x + Literal(3);
+    ```
+
+### Usage (Parsing and Evaluation)
+
+The `ExpressionParser` can parse standard mathematical strings including functions, variables, and calculus operations.
+
+```dart
+var parser = ExpressionParser();
+var expr = parser.parse('sin(x) + 2*x^2');
+var result = expr.evaluate({'x': pi/2}); // Evaluates to 1 + 2*(pi/2)^2
+```
+
+### Parser Syntax and Features
+
+For a complete reference on supported operators, functions, and syntax examples, see the [Expression Parser Documentation](expression_parser.md).
+
+- **Basic Operators**: `+`, `-`, `*`, `/`, `^`, `%`
+- **Built-in Functions**: `sin`, `max`, `sqrt`, etc.
+- **Vector Support**: `[1, 2, 3]`, ranges, and indexing.
+
+### Calculus and Equation Solving
+
+The parser supports symbolic calculus operations directly.
+
+#### Differentiation
+
+Syntax: `diff(expression, variable)`
+
+```dart
+parser.parse('diff(x^2, x)'); // 2*x
+```
+
+#### Integration
+
+Syntax: `integrate(expression, variable)`
+
+```dart
+parser.parse('integrate(x, x)'); // 0.5*x^2
+```
+
+#### Equation Solving
+
+Syntax: `solve(equation, variable)`
+
+```dart
+parser.parse('solve(x^2 - 4, x)'); // [2, -2]
+```
+
+### Troubleshooting
+
+For common issues regarding type inference (`num` vs `Expression`), see the [Expression Troubleshooting Guide](expression_troubleshooting.md).
 
 ---
 
