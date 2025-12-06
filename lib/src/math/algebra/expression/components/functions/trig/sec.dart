@@ -4,8 +4,12 @@ class Sec extends TrigonometricExpression {
   Sec(super.operand);
 
   @override
-  num evaluate([dynamic arg]) {
-    return 1 / cos(operand.evaluate(arg));
+  dynamic evaluate([dynamic arg]) {
+    var val = operand.evaluate(arg);
+    if (val is Complex) {
+      return Complex.one() / val.cos();
+    }
+    return 1 / cos(val);
   }
 
   @override

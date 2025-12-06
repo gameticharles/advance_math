@@ -22,45 +22,45 @@ void main() {
         final extensionAdd = 5.toExpression() + x;
         final helperAdd = ex(5) + x;
 
-        expect(literalAdd.evaluate(testValues), equals(8));
-        expect(extensionAdd.evaluate(testValues), equals(8));
-        expect(helperAdd.evaluate(testValues), equals(8));
+        expect(literalAdd.evaluate(testValues), isApprox(8));
+        expect(extensionAdd.evaluate(testValues), isApprox(8));
+        expect(helperAdd.evaluate(testValues), isApprox(8));
 
         // Test subtraction: 10 - x
         final literalSub = Literal(10) - x;
         final extensionSub = 10.toExpression() - x;
         final helperSub = ex(10) - x;
 
-        expect(literalSub.evaluate(testValues), equals(7));
-        expect(extensionSub.evaluate(testValues), equals(7));
-        expect(helperSub.evaluate(testValues), equals(7));
+        expect(literalSub.evaluate(testValues), isApprox(7));
+        expect(extensionSub.evaluate(testValues), isApprox(7));
+        expect(helperSub.evaluate(testValues), isApprox(7));
 
         // Test multiplication: 4 * x
         final literalMul = Literal(4) * x;
         final extensionMul = 4.toExpression() * x;
         final helperMul = ex(4) * x;
 
-        expect(literalMul.evaluate(testValues), equals(12));
-        expect(extensionMul.evaluate(testValues), equals(12));
-        expect(helperMul.evaluate(testValues), equals(12));
+        expect(literalMul.evaluate(testValues), isApprox(12));
+        expect(extensionMul.evaluate(testValues), isApprox(12));
+        expect(helperMul.evaluate(testValues), isApprox(12));
 
         // Test division: 12 / x
         final literalDiv = Literal(12) / x;
         final extensionDiv = 12.toExpression() / x;
         final helperDiv = ex(12) / x;
 
-        expect(literalDiv.evaluate(testValues), equals(4));
-        expect(extensionDiv.evaluate(testValues), equals(4));
-        expect(helperDiv.evaluate(testValues), equals(4));
+        expect(literalDiv.evaluate(testValues), isApprox(4));
+        expect(extensionDiv.evaluate(testValues), isApprox(4));
+        expect(helperDiv.evaluate(testValues), isApprox(4));
 
         // Test power: 2 ^ x
         final literalPow = Literal(2) ^ x;
         final extensionPow = 2.toExpression() ^ x;
         final helperPow = ex(2) ^ x;
 
-        expect(literalPow.evaluate(testValues), equals(8));
-        expect(extensionPow.evaluate(testValues), equals(8));
-        expect(helperPow.evaluate(testValues), equals(8));
+        expect(literalPow.evaluate(testValues), isApprox(8));
+        expect(extensionPow.evaluate(testValues), isApprox(8));
+        expect(helperPow.evaluate(testValues), isApprox(8));
       });
 
       test('should produce equivalent string representations', () {
@@ -95,18 +95,18 @@ void main() {
         final intExtension = 42.toExpression();
         final intHelper = ex(42);
 
-        expect((intLiteral).value, isA<int>());
-        expect((intExtension as Literal).value, isA<int>());
-        expect((intHelper as Literal).value, isA<int>());
+        expect((intLiteral).value, isA<Complex>());
+        expect((intExtension as Literal).value, isA<Complex>());
+        expect((intHelper as Literal).value, isA<Complex>());
 
         // Test double preservation
         final doubleLiteral = Literal(3.14);
         final doubleExtension = 3.14.toExpression();
         final doubleHelper = ex(3.14);
 
-        expect((doubleLiteral).value, isA<double>());
-        expect((doubleExtension as Literal).value, isA<double>());
-        expect((doubleHelper as Literal).value, isA<double>());
+        expect((doubleLiteral).value, isA<Complex>());
+        expect((doubleExtension as Literal).value, isA<Complex>());
+        expect((doubleHelper as Literal).value, isA<Complex>());
       });
     });
 
@@ -120,7 +120,7 @@ void main() {
 
         final testValues = {'x': 2};
         final result = expr.evaluate(testValues);
-        expect(result, equals(15)); // 2*4 + 3*2 + 1 = 15
+        expect(result, isApprox(15)); // 2*4 + 3*2 + 1 = 15
       });
 
       test('should handle multivariate expressions with mixed approaches', () {
@@ -131,7 +131,7 @@ void main() {
 
         final testValues = {'x': 1, 'y': 2, 'z': 1};
         final result = expr.evaluate(testValues);
-        expect(result, equals(4)); // 2*1 + 3*2 - 4*1 = 4
+        expect(result, isApprox(4)); // 2*1 + 3*2 - 4*1 = 4
       });
 
       test('should handle nested expressions with mixed approaches', () {
@@ -142,7 +142,7 @@ void main() {
 
         final testValues = {'x': 1, 'y': 1};
         final result = expr.evaluate(testValues);
-        expect(result, equals(1.5)); // (2+1) * (3-1) / 4 = 6/4 = 1.5
+        expect(result, isApprox(1.5)); // (2+1) * (3-1) / 4 = 6/4 = 1.5
       });
 
       test('should handle complex mathematical expressions', () {
@@ -151,7 +151,7 @@ void main() {
 
         final testValues = {'x': 3};
         final result = expr.evaluate(testValues);
-        expect(result, equals(22)); // 3*9 - 2*3 + 1 = 27 - 6 + 1 = 22
+        expect(result, isApprox(22)); // 3*9 - 2*3 + 1 = 27 - 6 + 1 = 22
       });
 
       test(
@@ -164,7 +164,7 @@ void main() {
 
         final testValues = {'x': 2, 'y': 3};
         final result = expr.evaluate(testValues);
-        expect(result, equals(2.6)); // (5*2 + 3) / (2*3 - 1) = 13/5 = 2.6
+        expect(result, isApprox(2.6)); // (5*2 + 3) / (2*3 - 1) = 13/5 = 2.6
       });
     });
 
@@ -253,10 +253,10 @@ void main() {
       test('should maintain compatibility with existing Literal usage', () {
         // Test that existing Literal usage patterns still work
         final oldStyleExpr = Literal(5) + Literal(3) * Literal(2);
-        expect(oldStyleExpr.evaluate(), equals(11)); // 5 + 3*2 = 11
+        expect(oldStyleExpr.evaluate(), isApprox(11)); // 5 + 3*2 = 11
 
         final oldStyleWithVar = Literal(2) * x + Literal(1);
-        expect(oldStyleWithVar.evaluate({'x': 3}), equals(7)); // 2*3 + 1 = 7
+        expect(oldStyleWithVar.evaluate({'x': 3}), isApprox(7)); // 2*3 + 1 = 7
       });
 
       test('should maintain compatibility with existing Expression operations',
@@ -268,11 +268,11 @@ void main() {
         // Test that expressions can be combined
         final combined = expr1 + expr2;
         expect(combined.evaluate({'x': 2}),
-            equals(13)); // (5+2) + (3*2) = 7 + 6 = 13
+            isApprox(13)); // (5+2) + (3*2) = 7 + 6 = 13
 
         // Test differentiation
         final derivative = expr2.differentiate();
-        expect(derivative.evaluate({'x': 1}), equals(3)); // d/dx(3*x) = 3
+        expect(derivative.evaluate({'x': 1}), isApprox(3)); // d/dx(3*x) = 3
 
         // Test integration
         final integral = ex(3).integrate();
@@ -285,8 +285,8 @@ void main() {
         final newStyleExpr = x + ex(2);
 
         final testValues = {'x': 5};
-        expect(parsedExpr.evaluate(testValues), equals(7));
-        expect(newStyleExpr.evaluate(testValues), equals(7));
+        expect(parsedExpr.evaluate(testValues), isApprox(7));
+        expect(newStyleExpr.evaluate(testValues), isApprox(7));
       });
 
       test('should allow mixing old and new literal creation methods', () {
@@ -295,9 +295,9 @@ void main() {
         final expr2 = 4.toExpression() * Literal(5); // Extension + Old
         final expr3 = ex(6) - 7.toExpression() + Literal(8); // All three
 
-        expect(expr1.evaluate(), equals(5));
-        expect(expr2.evaluate(), equals(20));
-        expect(expr3.evaluate(), equals(7)); // 6 - 7 + 8 = 7
+        expect(expr1.evaluate(), isApprox(5));
+        expect(expr2.evaluate(), isApprox(20));
+        expect(expr3.evaluate(), isApprox(7)); // 6 - 7 + 8 = 7
       });
 
       test('should maintain same behavior across all creation methods', () {
@@ -316,7 +316,7 @@ void main() {
         final result3 = newExpr2.evaluate(testValues);
         final result4 = mixedExpr.evaluate(testValues);
 
-        expect(result1, equals(13)); // 2*3 + 3*2 + 1 = 13
+        expect(result1, isApprox(13)); // 2*3 + 3*2 + 1 = 13
         expect(result2, equals(result1));
         expect(result3, equals(result1));
         expect(result4, equals(result1));
@@ -371,9 +371,9 @@ void main() {
         final expr2 = Literal(2) + Literal(3) * Literal(4);
         final expr3 = 2.toExpression() + 3.toExpression() * 4.toExpression();
 
-        expect(expr1.evaluate(), equals(14));
-        expect(expr2.evaluate(), equals(14));
-        expect(expr3.evaluate(), equals(14));
+        expect(expr1.evaluate(), isApprox(14));
+        expect(expr2.evaluate(), isApprox(14));
+        expect(expr3.evaluate(), isApprox(14));
 
         expect(expr1.toString(), equals(expr2.toString()));
         expect(expr1.toString(), equals(expr3.toString()));
@@ -390,7 +390,7 @@ void main() {
 
         // Calculate discriminant: b² - 4ac
         final discriminant = b * b - ex(4) * a * c;
-        expect(discriminant.evaluate(), equals(1)); // 25 - 24 = 1
+        expect(discriminant.evaluate(), isApprox(1)); // 25 - 24 = 1
       });
 
       test('should work with calculus operations', () {
@@ -399,8 +399,8 @@ void main() {
         final derivative = poly.differentiate();
 
         // d/dx(3x² + 2x + 1) = 6x + 2
-        expect(derivative.evaluate({'x': 1}), equals(8)); // 6*1 + 2 = 8
-        expect(derivative.evaluate({'x': 2}), equals(14)); // 6*2 + 2 = 14
+        expect(derivative.evaluate({'x': 1}), isApprox(8)); // 6*1 + 2 = 8
+        expect(derivative.evaluate({'x': 2}), isApprox(14)); // 6*2 + 2 = 14
       });
 
       test('should handle multi-step expression building', () {
@@ -414,7 +414,7 @@ void main() {
 
         final testValues = {'x': 2};
         final result = expr.evaluate(testValues);
-        expect(result, equals(13)); // -3 + 2*2 + 3*4 = -3 + 4 + 12 = 13
+        expect(result, isApprox(13)); // -3 + 2*2 + 3*4 = -3 + 4 + 12 = 13
       });
 
       test('should work with expression substitution chains', () {
@@ -427,8 +427,21 @@ void main() {
 
         final testValues = {'y': 3};
         final result = substitutedExpr.evaluate(testValues);
-        expect(result, equals(19)); // 2*9 + 1 = 19
+        expect(result, isApprox(19)); // 2*9 + 1 = 19
       });
     });
   });
+}
+
+Matcher isApprox(num expected, {double tolerance = 1e-9}) {
+  return anyOf(
+    closeTo(expected, tolerance),
+    predicate((actual) {
+      if (actual is Complex) {
+        return (actual.real - expected).abs() < tolerance &&
+            actual.imaginary.abs() < tolerance;
+      }
+      return false;
+    }, 'is close to \$expected'),
+  );
 }

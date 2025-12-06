@@ -13,6 +13,9 @@ class Modulo extends BinaryOperationsExpression {
     rightEval = convertToLiteralIfNeeded(rightEval, leftEval);
 
     // If both evaluate to numbers, return the modulo as a number
+    if (leftEval is Complex || rightEval is Complex) {
+      return (Complex(leftEval) % Complex(rightEval)).simplify();
+    }
     if (leftEval is num && rightEval is num) {
       return leftEval % rightEval;
     }

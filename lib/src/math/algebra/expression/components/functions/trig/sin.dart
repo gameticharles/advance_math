@@ -9,6 +9,9 @@ class Sin extends TrigonometricExpression {
     if (eval is num) {
       return sin(eval);
     }
+    if (eval is Complex) {
+      return eval.sin();
+    }
     return Sin(eval);
   }
 

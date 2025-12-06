@@ -17,6 +17,9 @@ class Acos extends TrigonometricExpression {
       }
       return acos(eval);
     }
+    if (eval is Complex) {
+      return eval.acos();
+    }
     return Acos(eval);
   }
 

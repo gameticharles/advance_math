@@ -40,20 +40,49 @@ class Csc extends TrigonometricExpression {
   ///
   /// Throws an exception if the sine of the operand is zero since csc is undefined at such points.
   @override
-  num evaluate([dynamic arg]) {
-    // Check if sin(x) is zero because csc(x) is undefined at these points.
-    var sineValue = sin(operand.evaluate(arg));
-    if (sineValue == 0) {
-      throw Exception(
-          'Cosecant is undefined for operand: ${operand.evaluate(arg)}');
+  dynamic evaluate([dynamic arg]) {
+    var val = operand.evaluate(arg);
+    dynamic sineValue;
+    if (val is num) {
+      sineValue = sin(val);
+    } else if (val is Complex) {
+      sineValue = val.sin();
+    } else {
+      return Csc(operand.evaluate(arg), n: n);
     }
-    var cscValue = 1 / sineValue;
+
+    if (sineValue == 0 ||
+        (sineValue is Complex && sineValue == Complex.zero())) {
+      throw Exception('Cosecant is undefined for operand: $val');
+    }
+
+    var cscValue =
+        (sineValue is Complex) ? (Complex.one() / sineValue) : (1 / sineValue);
 
     // Apply periodicity for even powers
     if (n % 2 == 0) {
-      return pi;
+      // Logic for periodicity seems weird here in original code returning PI.
+      // Original code: if (n % 2 == 0) return pi;
+      // This looks like a bug or placeholder in original code?
+      // "Returns the periodicity..." comment suggests it returns period, but it's inside evaluate.
+      // I will preserve original logic but it looks suspicious.
+      // Actually the original code says:
+      // if (n % 2 == 0) { return pi; }
+      // This is inside evaluate.
+      // Maybe it was intended to return the period? But evaluate should return value.
+      // I'll stick to computing the value.
+      // Wait, line 54 in original Csc.dart:
+      // if (n % 2 == 0) { return pi; }
+      // This must be wrong. I will replace it with actual power calculation.
+      if (cscValue is Complex) {
+        return cscValue.pow(n);
+      }
+      return pow(cscValue, n);
     }
 
+    if (cscValue is Complex) {
+      return cscValue.pow(n);
+    }
     return pow(cscValue, n);
   }
 

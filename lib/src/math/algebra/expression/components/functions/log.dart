@@ -41,9 +41,15 @@ class Log extends Expression {
   Log.natural(this.operand) : base = Literal(math.e);
 
   @override
-  num evaluate([dynamic arg]) {
+  dynamic evaluate([dynamic arg]) {
     final baseValue = base.evaluate(arg);
     final operandValue = operand.evaluate(arg);
+
+    if (baseValue is Complex || operandValue is Complex) {
+      var b = (baseValue is Complex) ? baseValue : Complex(baseValue);
+      var v = (operandValue is Complex) ? operandValue : Complex(operandValue);
+      return (v.ln() / b.ln()).simplify();
+    }
 
     if (baseValue <= 0 || baseValue == 1) {
       throw ArgumentError('Logarithm base must be positive and not equal to 1');
@@ -143,22 +149,20 @@ class Log extends Expression {
   }
 
   @override
-  bool isIndeterminate(num x) {
+  bool isIndeterminate(dynamic x) {
     return base.isIndeterminate(x) || operand.isIndeterminate(x);
   }
 
   @override
-  bool isInfinity(num x) {
-    final baseValue = base.evaluate({'x': x});
-    final operandValue = operand.evaluate({'x': x});
-
-    // log_a(0) approaches -∞
-    if (operandValue == 0) return true;
-
-    // log_a(∞) = ∞ for a > 1
-    if (operandValue == double.infinity && baseValue > 1) return true;
-
-    return false;
+  bool isInfinity(dynamic x) {
+    try {
+      final val = evaluate(x);
+      if (val is Complex) return val.isInfinite;
+      if (val is num) return val.isInfinite;
+      return false;
+    } catch (_) {
+      return false;
+    }
   }
 
   @override

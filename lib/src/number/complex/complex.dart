@@ -9,6 +9,7 @@ part 'extensions/num.dart';
 part 'extensions/trigonometric.dart';
 part 'extensions/hyperbolic.dart';
 part 'extensions/operations.dart';
+part 'extensions/special_functions.dart';
 part 'imaginary.dart';
 
 /// A class representing complex numbers in the form a + bi, where a is the real part
@@ -455,6 +456,282 @@ class Complex implements Comparable<dynamic> {
     return false;
   }
 
+  // Operations with Complex and num types
+  Complex operator +(dynamic other) {
+    if (isNaN) return Complex.nan();
+
+    if (other is Complex) {
+      if (other.isNaN) return Complex.nan();
+      return Complex(real + other.real, imaginary + other.imaginary);
+    } else if (other is num) {
+      if (other.isNaN) return Complex.nan();
+      return Complex(real + other, imaginary);
+    } else {
+      throw ArgumentError('Invalid type for addition: ${other.runtimeType}');
+    }
+  }
+
+  Complex operator -(dynamic other) {
+    if (isNaN) return Complex.nan();
+
+    if (other is Complex) {
+      if (other.isNaN) return Complex.nan();
+      return Complex(real - other.real, imaginary - other.imaginary);
+    } else if (other is num) {
+      if (other.isNaN) return Complex.nan();
+      return Complex(real - other, imaginary);
+    } else {
+      throw ArgumentError('Invalid type for subtraction: ${other.runtimeType}');
+    }
+  }
+
+  Complex operator *(dynamic other) {
+    if (other is Complex) {
+      // Special cases handling for infinity and NaN
+      if (isNaN || other.isNaN) return Complex.nan();
+
+      // Handle infinity cases
+      if (isInfinite || other.isInfinite) {
+        // 0 * inf = NaN
+        if ((real == 0 && imaginary == 0) ||
+            (other.real == 0 && other.imaginary == 0)) {
+          return Complex.nan();
+        }
+
+        // Preserve sign information for real components
+        final sign = real.sign * other.real.sign;
+        return Complex(sign * double.infinity, sign * double.infinity);
+      }
+
+      // Normal multiplication
+      return Complex(
+        real * other.real - imaginary * other.imaginary,
+        real * other.imaginary + imaginary * other.real,
+      );
+    }
+    if (other is num) {
+      if (other.isNaN) return Complex.nan();
+      if (other.isInfinite) {
+        if (isZero) return Complex.nan();
+        return Complex(
+          real.sign * other.sign * double.infinity,
+          imaginary.sign * other.sign * double.infinity,
+        );
+      }
+      return Complex(real * other, imaginary * other);
+    }
+    throw ArgumentError(
+        'Invalid type for multiplication: ${other.runtimeType}');
+  }
+
+  Complex operator /(dynamic other) {
+    if (other is Complex) {
+      // Special cases for NaN and infinity
+      if (isNaN || other.isNaN) return Complex.nan();
+
+      // 0/0, inf/inf give NaN
+      if (other.isZero) return isZero ? Complex.nan() : Complex.infinity();
+      if (isInfinite && other.isInfinite) return Complex.nan();
+
+      // Handle division by infinity
+      if (other.isInfinite) {
+        // When dividing any finite number by infinity, result should be zero
+        if (isFinite) return Complex.zero();
+        // When dividing infinity by infinity, result is NaN
+        return Complex.nan();
+      }
+
+      // Normal case - use the formula (a+bi)/(c+di) = ((ac+bd)/(c²+d²)) + ((bc-ad)/(c²+d²))i
+      final c = other.real;
+      final d = other.imaginary;
+
+      // Use a more numerically stable algorithm based on the magnitudes of c and d
+      if (c.abs() < d.abs()) {
+        final q = c / d;
+        final denominator = c * q + d;
+        return Complex(
+          (real * q + imaginary) / denominator,
+          (imaginary * q - real) / denominator,
+        );
+      } else {
+        final q = d / c;
+        final denominator = d * q + c;
+        return Complex(
+          (imaginary * q + real) / denominator,
+          (imaginary - real * q) / denominator,
+        );
+      }
+    } else if (other is num) {
+      // Special cases
+      if (other.isNaN) return Complex.nan();
+
+      // Handle division by zero
+      if (other == 0) return isZero ? Complex.nan() : Complex.infinity();
+
+      // Handle division by infinity
+      if (other.isInfinite) {
+        // When dividing any finite number by infinity, result should be zero
+        return isFinite ? Complex.zero() : Complex.nan();
+      }
+
+      // Normal case
+      return Complex(real / other, imaginary / other);
+    }
+    throw ArgumentError('Invalid type for division: ${other.runtimeType}');
+  }
+
+  /// Integer division operator
+  ///
+  /// Performs integer division between complex numbers.
+  /// Returns the quotient of the division with the fractional part truncated.
+  ///
+  /// Example:
+  /// ```dart
+  /// Complex(5, 3) ~/ Complex(2, 1)  // Returns the integer part of the division
+  /// ```
+  Complex operator ~/(dynamic divisor) {
+    // Special cases handling
+    if (isNaN) return Complex.nan();
+
+    if (divisor is Complex) {
+      // Special cases for NaN and infinity
+      if (divisor.isNaN) return Complex.nan();
+
+      // 0/0, inf/inf give NaN
+      if (divisor.isZero) return isZero ? Complex.nan() : Complex.infinity();
+      if (isInfinite && divisor.isInfinite) return Complex.nan();
+
+      // Handle division by infinity
+      if (divisor.isInfinite) return Complex.zero();
+
+      // Use the optimized division algorithm from the existing implementation
+      // (a + bi) / (c + di) = (ac + bd) / (c^2 + d^2) + i * (bc - ad) / (c^2 + d^2)
+      final c = divisor.real;
+      final d = divisor.imaginary;
+      final c2d2 = (c * c) + (d * d);
+
+      return Complex(((real * c + imaginary * d) / c2d2).truncate(),
+          ((imaginary * c - real * d) / c2d2).truncate());
+    } else if (divisor is num) {
+      // Special cases
+      if (divisor.isNaN) return Complex.nan();
+
+      // Handle division by zero
+      if (divisor == 0) return isZero ? Complex.nan() : Complex.infinity();
+
+      // Handle division by infinity
+      if (divisor.isInfinite) return Complex.zero();
+
+      // Normal integer division
+      return Complex(
+          (real / divisor).truncate(), (imaginary / divisor).truncate());
+    }
+
+    throw ArgumentError(
+        'Invalid type for integer division: ${divisor.runtimeType}');
+  }
+
+  /// The modulo operator (not supported).
+  Complex operator %(dynamic divisor) {
+    var modulus = magnitude;
+    if (divisor is num) {
+      var remainder = modulus % divisor;
+      return Complex.polar(remainder, phase);
+    } else if (divisor is Complex) {
+      var otherModulus = divisor.magnitude;
+      var remainder = modulus % otherModulus;
+      return Complex.polar(remainder, phase);
+    }
+    return this % divisor;
+
+    // throw const NumberException(
+    //       'The number library does not support raising a complex number to an imaginary power');
+  }
+
+  Complex operator -() => Complex(-real, -imaginary);
+
+  // Reciprocal operator
+  Complex operator ~() {
+    if (real == 0 && imaginary == 0) {
+      return Complex(double.infinity, double.infinity);
+    }
+    if (isNaN) return Complex(double.nan, double.nan);
+    if (isInfinite) return Complex(0, 0);
+
+    final denominator = real * real + imaginary * imaginary;
+    return Complex(real / denominator, -imaginary / denominator);
+  }
+
+  /// The power operator (note: NOT bitwise XOR).
+  /// In order to provide a convenient power operator for all [Number]s, the number library
+  /// overrides the caret operator.  In Dart the caret operator is ordinarily used
+  /// for bitwise XOR operations on [int]s.
+  Complex operator ^(dynamic exponent) {
+    if (exponent is num || exponent is Complex) {
+      return pow(exponent);
+    }
+
+    return Complex.one();
+  }
+
+  /// Returns true if this complex number's magnitude is greater than the magnitude of [obj].
+  /// If [obj] is a number, it's treated as a real number (imaginary part = 0).
+  ///
+  /// Example:
+  /// ```dart
+  /// Complex(3, 4) > Complex(2, 2)  // true (5 > 2√2)
+  /// Complex(3, 4) > 4              // true (5 > 4)
+  /// ```
+  bool operator >(dynamic obj) {
+    if (obj is Complex) return abs() > obj.abs();
+    if (obj is num) return abs() > obj.abs();
+    throw ArgumentError('Comparison only supported with Complex and num types');
+  }
+
+  /// Returns true if this complex number's magnitude is greater than or equal to
+  /// the magnitude of [obj].
+  /// If [obj] is a number, it's treated as a real number (imaginary part = 0).
+  ///
+  /// Example:
+  /// ```dart
+  /// Complex(3, 4) >= Complex(3, 4)  // true (5 = 5)
+  /// Complex(3, 4) >= 5              // true (5 = 5)
+  /// ```
+  bool operator >=(dynamic obj) {
+    if (obj is Complex) return abs() >= obj.abs();
+    if (obj is num) return abs() >= obj.abs();
+    throw ArgumentError('Comparison only supported with Complex and num types');
+  }
+
+  /// Returns true if this complex number's magnitude is less than the magnitude of [obj].
+  /// If [obj] is a number, it's treated as a real number (imaginary part = 0).
+  ///
+  /// Example:
+  /// ```dart
+  /// Complex(1, 1) < Complex(3, 4)  // true (√2 < 5)
+  /// Complex(1, 1) < 2              // true (√2 < 2)
+  /// ```
+  bool operator <(dynamic obj) {
+    if (obj is Complex) return abs() < obj.abs();
+    if (obj is num) return abs() < obj.abs();
+    throw ArgumentError('Comparison only supported with Complex and num types');
+  }
+
+  /// Returns true if this complex number's magnitude is less than or equal to
+  /// the magnitude of [obj].
+  /// If [obj] is a number, it's treated as a real number (imaginary part = 0).
+  ///
+  /// Example:
+  /// ```dart
+  /// Complex(1, 1) <= Complex(1, 1)  // true (√2 = √2)
+  /// Complex(1, 1) <= 2              // true (√2 < 2)
+  /// ```
+  bool operator <=(dynamic obj) {
+    if (obj is Complex) return abs() <= obj.abs();
+    if (obj is num) return abs() <= obj.abs();
+    throw ArgumentError('Comparison only supported with Complex and num types');
+  }
+
   /// Get a hashCode for the complex number.
   ///
   /// Special cases:
@@ -632,280 +909,6 @@ class Complex implements Comparable<dynamic> {
   /// print(z.angle); // Output: 0.7853981633974483
   /// ```
   dynamic get argument => angle;
-
-  // Operations with Complex and num types
-  Complex operator +(dynamic other) {
-    if (isNaN) return Complex.nan();
-
-    if (other is Complex) {
-      if (other.isNaN) return Complex.nan();
-      return Complex(real + other.real, imaginary + other.imaginary);
-    } else if (other is num) {
-      if (other.isNaN) return Complex.nan();
-      return Complex(real + other, imaginary);
-    } else {
-      throw ArgumentError('Invalid type for addition: ${other.runtimeType}');
-    }
-  }
-
-  Complex operator -(dynamic other) {
-    if (isNaN) return Complex.nan();
-
-    if (other is Complex) {
-      if (other.isNaN) return Complex.nan();
-      return Complex(real - other.real, imaginary - other.imaginary);
-    } else if (other is num) {
-      if (other.isNaN) return Complex.nan();
-      return Complex(real - other, imaginary);
-    } else {
-      throw ArgumentError('Invalid type for subtraction: ${other.runtimeType}');
-    }
-  }
-
-  Complex operator *(dynamic other) {
-    if (other is Complex) {
-      // Special cases handling for infinity and NaN
-      if (isNaN || other.isNaN) return Complex.nan();
-
-      // Handle infinity cases
-      if (isInfinite || other.isInfinite) {
-        // 0 * inf = NaN
-        if ((real == 0 && imaginary == 0) ||
-            (other.real == 0 && other.imaginary == 0)) {
-          return Complex.nan();
-        }
-
-        // Preserve sign information for real components
-        final sign = real.sign * other.real.sign;
-        return Complex(sign * double.infinity, sign * double.infinity);
-      }
-
-      // Normal multiplication
-      return Complex(
-        real * other.real - imaginary * other.imaginary,
-        real * other.imaginary + imaginary * other.real,
-      );
-    }
-    if (other is num) {
-      if (other.isNaN) return Complex.nan();
-      if (other.isInfinite) {
-        if (isZero) return Complex.nan();
-        return Complex(
-          real.sign * other.sign * double.infinity,
-          imaginary.sign * other.sign * double.infinity,
-        );
-      }
-      return Complex(real * other, imaginary * other);
-    }
-    throw ArgumentError(
-        'Invalid type for multiplication: ${other.runtimeType}');
-  }
-
-  Complex operator /(dynamic other) {
-    if (other is Complex) {
-      // Special cases for NaN and infinity
-      if (isNaN || other.isNaN) return Complex.nan();
-
-      // 0/0, inf/inf give NaN
-      if (other.isZero) return isZero ? Complex.nan() : Complex.infinity();
-      if (isInfinite && other.isInfinite) return Complex.nan();
-
-      // Handle division by infinity
-      if (other.isInfinite) {
-        // When dividing any finite number by infinity, result should be zero
-        if (isFinite) return Complex.zero();
-        // When dividing infinity by infinity, result is NaN
-        return Complex.nan();
-      }
-
-      // Normal case - use the formula (a+bi)/(c+di) = ((ac+bd)/(c²+d²)) + ((bc-ad)/(c²+d²))i
-      final c = other.real;
-      final d = other.imaginary;
-
-      // Use a more numerically stable algorithm based on the magnitudes of c and d
-      if (c.abs() < d.abs()) {
-        final q = c / d;
-        final denominator = c * q + d;
-        return Complex(
-          (real * q + imaginary) / denominator,
-          (imaginary * q - real) / denominator,
-        );
-      } else {
-        final q = d / c;
-        final denominator = d * q + c;
-        return Complex(
-          (imaginary * q + real) / denominator,
-          (imaginary - real * q) / denominator,
-        );
-      }
-    } else if (other is num) {
-      // Special cases
-      if (other.isNaN) return Complex.nan();
-
-      // Handle division by zero
-      if (other == 0) return isZero ? Complex.nan() : Complex.infinity();
-
-      // Handle division by infinity
-      if (other.isInfinite) {
-        // When dividing any finite number by infinity, result should be zero
-        return isFinite ? Complex.zero() : Complex.nan();
-      }
-
-      // Normal case
-      return Complex(real / other, imaginary / other);
-    }
-    throw ArgumentError('Invalid type for division: ${other.runtimeType}');
-  }
-
-  /// Integer division operator
-  ///
-  /// Performs integer division between complex numbers.
-  /// Returns the quotient of the division with the fractional part truncated.
-  ///
-  /// Example:
-  /// ```dart
-  /// Complex(5, 3) ~/ Complex(2, 1)  // Returns the integer part of the division
-  /// ```
-  Complex operator ~/(dynamic divisor) {
-    // Special cases handling
-    if (isNaN) return Complex.nan();
-
-    if (divisor is Complex) {
-      // Special cases for NaN and infinity
-      if (divisor.isNaN) return Complex.nan();
-
-      // 0/0, inf/inf give NaN
-      if (divisor.isZero) return isZero ? Complex.nan() : Complex.infinity();
-      if (isInfinite && divisor.isInfinite) return Complex.nan();
-
-      // Handle division by infinity
-      if (divisor.isInfinite) return Complex.zero();
-
-      // Use the optimized division algorithm from the existing implementation
-      // (a + bi) / (c + di) = (ac + bd) / (c^2 + d^2) + i * (bc - ad) / (c^2 + d^2)
-      final c = divisor.real;
-      final d = divisor.imaginary;
-      final c2d2 = (c * c) + (d * d);
-
-      return Complex(((real * c + imaginary * d) / c2d2).truncate(),
-          ((imaginary * c - real * d) / c2d2).truncate());
-    } else if (divisor is num) {
-      // Special cases
-      if (divisor.isNaN) return Complex.nan();
-
-      // Handle division by zero
-      if (divisor == 0) return isZero ? Complex.nan() : Complex.infinity();
-
-      // Handle division by infinity
-      if (divisor.isInfinite) return Complex.zero();
-
-      // Normal integer division
-      return Complex(
-          (real / divisor).truncate(), (imaginary / divisor).truncate());
-    }
-
-    throw ArgumentError(
-        'Invalid type for integer division: ${divisor.runtimeType}');
-  }
-
-  /// The modulo operator
-  Complex operator %(dynamic divisor) {
-    var modulus = magnitude;
-    if (divisor is num) {
-      var remainder = modulus % divisor;
-      return Complex.polar(remainder, phase);
-    } else if (divisor is Complex) {
-      var otherModulus = divisor.magnitude;
-      var remainder = modulus % otherModulus;
-      return Complex.polar(remainder, phase);
-    }
-    return this % divisor;
-  }
-
-  /// The negation operator
-  Complex operator -() => Complex(-real, -imaginary);
-
-  /// Reciprocal operator
-  Complex operator ~() {
-    if (real == 0 && imaginary == 0) {
-      return Complex(double.infinity, double.infinity);
-    }
-    if (isNaN) return Complex(double.nan, double.nan);
-    if (isInfinite) return Complex(0, 0);
-
-    final denominator = real * real + imaginary * imaginary;
-    return Complex(real / denominator, -imaginary / denominator);
-  }
-
-  /// The power operator (note: NOT bitwise XOR).
-  /// In order to provide a convenient power operator for all [Number]s, the number library
-  /// overrides the caret operator.  In Dart the caret operator is ordinarily used
-  /// for bitwise XOR operations on [int]s.
-  Complex operator ^(dynamic exponent) {
-    if (exponent is num || exponent is Complex) {
-      return pow(exponent);
-    }
-
-    return Complex.one();
-  }
-
-  /// Returns true if this complex number's magnitude is greater than the magnitude of [obj].
-  /// If [obj] is a number, it's treated as a real number (imaginary part = 0).
-  ///
-  /// Example:
-  /// ```dart
-  /// Complex(3, 4) > Complex(2, 2)  // true (5 > 2√2)
-  /// Complex(3, 4) > 4              // true (5 > 4)
-  /// ```
-  bool operator >(dynamic obj) {
-    if (obj is Complex) return abs() > obj.abs();
-    if (obj is num) return abs() > obj.abs();
-    throw ArgumentError('Comparison only supported with Complex and num types');
-  }
-
-  /// Returns true if this complex number's magnitude is greater than or equal to
-  /// the magnitude of [obj].
-  /// If [obj] is a number, it's treated as a real number (imaginary part = 0).
-  ///
-  /// Example:
-  /// ```dart
-  /// Complex(3, 4) >= Complex(3, 4)  // true (5 = 5)
-  /// Complex(3, 4) >= 5              // true (5 = 5)
-  /// ```
-  bool operator >=(dynamic obj) {
-    if (obj is Complex) return abs() >= obj.abs();
-    if (obj is num) return abs() >= obj.abs();
-    throw ArgumentError('Comparison only supported with Complex and num types');
-  }
-
-  /// Returns true if this complex number's magnitude is less than the magnitude of [obj].
-  /// If [obj] is a number, it's treated as a real number (imaginary part = 0).
-  ///
-  /// Example:
-  /// ```dart
-  /// Complex(1, 1) < Complex(3, 4)  // true (√2 < 5)
-  /// Complex(1, 1) < 2              // true (√2 < 2)
-  /// ```
-  bool operator <(dynamic obj) {
-    if (obj is Complex) return abs() < obj.abs();
-    if (obj is num) return abs() < obj.abs();
-    throw ArgumentError('Comparison only supported with Complex and num types');
-  }
-
-  /// Returns true if this complex number's magnitude is less than or equal to
-  /// the magnitude of [obj].
-  /// If [obj] is a number, it's treated as a real number (imaginary part = 0).
-  ///
-  /// Example:
-  /// ```dart
-  /// Complex(1, 1) <= Complex(1, 1)  // true (√2 = √2)
-  /// Complex(1, 1) <= 2              // true (√2 < 2)
-  /// ```
-  bool operator <=(dynamic obj) {
-    if (obj is Complex) return abs() <= obj.abs();
-    if (obj is num) return abs() <= obj.abs();
-    throw ArgumentError('Comparison only supported with Complex and num types');
-  }
 
   /// Computes the n-th roots of the complex number represented by this object.
   ///
@@ -1352,6 +1355,57 @@ class Complex implements Comparable<dynamic> {
     return a + (b - a) * t;
   }
 
+  // ============================================================
+  // Static utility methods for collections of complex numbers
+  // ============================================================
+
+  /// Computes the sum of a list of complex numbers.
+  ///
+  /// Returns [Complex.zero] for an empty list.
+  ///
+  /// Example:
+  /// ```dart
+  /// var numbers = [Complex(1, 2), Complex(3, 4), Complex(5, 6)];
+  /// var total = Complex.sum(numbers);
+  /// print(total); // Output: 9 + 12i
+  /// ```
+  static Complex sum(List<Complex> numbers) {
+    if (numbers.isEmpty) return Complex.zero();
+    return numbers.fold(Complex.zero(), (acc, z) => acc + z);
+  }
+
+  /// Computes the arithmetic mean of a list of complex numbers.
+  ///
+  /// Throws [ArgumentError] for an empty list.
+  ///
+  /// Example:
+  /// ```dart
+  /// var numbers = [Complex(1, 2), Complex(3, 4), Complex(5, 6)];
+  /// var average = Complex.mean(numbers);
+  /// print(average); // Output: 3 + 4i
+  /// ```
+  static Complex mean(List<Complex> numbers) {
+    if (numbers.isEmpty) {
+      throw ArgumentError('Cannot compute mean of empty list');
+    }
+    return sum(numbers) / numbers.length;
+  }
+
+  /// Computes the product of a list of complex numbers.
+  ///
+  /// Returns [Complex.one] for an empty list.
+  ///
+  /// Example:
+  /// ```dart
+  /// var numbers = [Complex(1, 1), Complex(2, 0), Complex(0, 1)];
+  /// var result = Complex.product(numbers);
+  /// print(result); // Output: -2 + 2i
+  /// ```
+  static Complex product(List<Complex> numbers) {
+    if (numbers.isEmpty) return Complex.one();
+    return numbers.fold(Complex.one(), (acc, z) => acc * z);
+  }
+
   /// Clamps this complex number's magnitude between the specified minimum and maximum values.
   Complex clampMagnitude(num min, num max) {
     final mag = abs();
@@ -1403,6 +1457,13 @@ class Complex implements Comparable<dynamic> {
     final r = (real == -0.0 || real == 0.0) ? 0.0 : real;
     final i = (imaginary == -0.0 || imaginary == 0.0) ? 0.0 : imaginary;
     return r == 0 && i == 0;
+  }
+
+  /// Returns `true` if the real part is one and the imaginary part is zero.
+  bool get isOne {
+    final r = (real == 1.0) ? 1.0 : real;
+    final i = (imaginary == -0.0 || imaginary == 0.0) ? 0.0 : imaginary;
+    return r == 1 && i == 0;
   }
 
   // Method to check if this complex number can be simplified to a basic number

@@ -6,8 +6,12 @@ class Ln extends Expression {
   Ln(this.operand);
 
   @override
-  num evaluate([dynamic arg]) {
-    return log(operand.evaluate(arg));
+  dynamic evaluate([dynamic arg]) {
+    var val = operand.evaluate(arg);
+    if (val is Complex) {
+      return val.ln().simplify();
+    }
+    return math.log(val);
   }
 
   @override
@@ -57,13 +61,20 @@ class Ln extends Expression {
   }
 
   @override
-  bool isIndeterminate(num x) {
-    throw UnimplementedError();
+  bool isIndeterminate(dynamic x) {
+    return operand.isIndeterminate(x);
   }
 
   @override
-  bool isInfinity(num x) {
-    throw UnimplementedError();
+  bool isInfinity(dynamic x) {
+    try {
+      final val = evaluate(x);
+      if (val is Complex) return val.isInfinite;
+      if (val is num) return val.isInfinite;
+      return false;
+    } catch (_) {
+      return false;
+    }
   }
 
   @override

@@ -14,6 +14,9 @@ class Atan extends TrigonometricExpression {
     if (eval is num) {
       return atan(eval);
     }
+    if (eval is Complex) {
+      return eval.atan();
+    }
     return Atan(eval);
   }
 

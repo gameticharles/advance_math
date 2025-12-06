@@ -121,6 +121,43 @@
 - **[REFACTOR]** Variable naming consistency (e.g., `F1, F2, F3` → `f1, f2, f3` in curl calculations)
 - **[CLEANUP]** Removed `simple_export_test.dart`
 
+## Complex Number Enhancements
+
+- **[FEATURE]** Added reciprocal trigonometric functions to Complex (`trigonometric.dart`)
+  - `sec()`: Secant function
+  - `csc()`: Cosecant function
+  - `cot()`: Cotangent function
+- **[FEATURE]** Added inverse reciprocal trigonometric functions
+  - `asec()`, `arcsec()`: Inverse secant
+  - `acsc()`, `arccsc()`: Inverse cosecant
+  - `acot()`, `arccot()`: Inverse cotangent
+- **[FEATURE]** Added alias methods for inverse trig functions
+  - `arcsin()`, `arccos()`, `arctan()`
+- **[FEATURE]** Added reciprocal hyperbolic functions to Complex (`hyperbolic.dart`)
+  - `sech()`: Hyperbolic secant
+  - `csch()`: Hyperbolic cosecant
+  - `coth()`: Hyperbolic cotangent
+- **[FEATURE]** Added inverse reciprocal hyperbolic functions
+  - `asech()`, `arcsech()`: Inverse hyperbolic secant
+  - `acsch()`, `arccsch()`: Inverse hyperbolic cosecant
+  - `acoth()`, `arccoth()`: Inverse hyperbolic cotangent
+- **[FEATURE]** Added alias methods for inverse hyperbolic functions
+  - `arcsinh()`, `arccosh()`, `arctanh()`
+- **[FEATURE]** Added logarithmic functions to Complex (`operations.dart`)
+  - `log10()`: Base-10 logarithm
+  - `log2()`: Base-2 logarithm
+  - `logBase(n)`: Arbitrary base logarithm
+- **[FEATURE]** Added special mathematical functions (`special_functions.dart` - NEW FILE)
+  - `gamma()`: Gamma function using Lanczos approximation
+  - `lnGamma()`: Natural logarithm of gamma function
+  - `digamma()`: Digamma (psi) function
+  - `erf()`: Error function with Taylor series expansion
+  - `erfc()`: Complementary error function
+- **[FEATURE]** Added static utility methods for collections of Complex numbers
+  - `Complex.sum(List<Complex>)`: Sum of complex numbers
+  - `Complex.mean(List<Complex>)`: Arithmetic mean
+  - `Complex.product(List<Complex>)`: Product of complex numbers
+
 ## Geometry Enhancements
 
 ### Plane Geometry

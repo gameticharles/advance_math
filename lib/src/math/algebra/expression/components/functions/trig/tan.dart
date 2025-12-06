@@ -4,8 +4,10 @@ class Tan extends TrigonometricExpression {
   Tan(super.operand);
 
   @override
-  num evaluate([dynamic arg]) {
-    return tan(operand.evaluate(arg));
+  dynamic evaluate([dynamic arg]) {
+    var val = operand.evaluate(arg);
+    if (val is Complex) return val.tan();
+    return tan(val);
   }
 
   @override

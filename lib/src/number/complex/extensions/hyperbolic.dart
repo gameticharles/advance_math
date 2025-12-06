@@ -155,4 +155,178 @@ extension ComplexHyperbolicX<T extends Complex> on T {
     return ((Complex.one() + this) / (Complex.one() - this)).log() *
         Complex(0.5);
   }
+
+  // ============================================================
+  // Alias methods for inverse hyperbolic functions
+  // ============================================================
+
+  /// Alias for [asinh]. Computes the inverse hyperbolic sine of this complex number.
+  Complex arcsinh() => asinh();
+
+  /// Alias for [acosh]. Computes the inverse hyperbolic cosine of this complex number.
+  Complex arccosh() => acosh();
+
+  /// Alias for [atanh]. Computes the inverse hyperbolic tangent of this complex number.
+  Complex arctanh() => atanh();
+
+  // ============================================================
+  // Reciprocal hyperbolic functions
+  // ============================================================
+
+  /// ## Hyperbolic Secant
+  ///
+  /// Compute the [hyperbolic secant](http://mathworld.wolfram.com/HyperbolicSecant.html)
+  /// of this complex number.
+  ///
+  /// Implements the formula:
+  ///
+  ///     sech(z) = 1 / cosh(z)
+  ///
+  /// Returns [Complex.nan] if either real or imaginary part of the
+  /// input argument is `NaN`.
+  ///
+  /// Example:
+  /// ```dart
+  /// var z = Complex(0, 0);
+  /// var z_sech = z.sech();
+  /// print(z_sech); // Output: 1 + 0i
+  /// ```
+  Complex sech() {
+    if (isNaN) return Complex.nan();
+    final coshZ = cosh();
+    if (coshZ.isZero) return Complex.infinity();
+    return ~coshZ;
+  }
+
+  /// ## Hyperbolic Cosecant
+  ///
+  /// Compute the [hyperbolic cosecant](http://mathworld.wolfram.com/HyperbolicCosecant.html)
+  /// of this complex number.
+  ///
+  /// Implements the formula:
+  ///
+  ///     csch(z) = 1 / sinh(z)
+  ///
+  /// Returns [Complex.nan] if either real or imaginary part of the
+  /// input argument is `NaN`.
+  ///
+  /// Example:
+  /// ```dart
+  /// var z = Complex(1, 0);
+  /// var z_csch = z.csch();
+  /// print(z_csch); // Output: ~0.851 + 0i
+  /// ```
+  Complex csch() {
+    if (isNaN) return Complex.nan();
+    final sinhZ = sinh();
+    if (sinhZ.isZero) return Complex.infinity();
+    return ~sinhZ;
+  }
+
+  /// ## Hyperbolic Cotangent
+  ///
+  /// Compute the [hyperbolic cotangent](http://mathworld.wolfram.com/HyperbolicCotangent.html)
+  /// of this complex number.
+  ///
+  /// Implements the formula:
+  ///
+  ///     coth(z) = 1 / tanh(z) = cosh(z) / sinh(z)
+  ///
+  /// Returns [Complex.nan] if either real or imaginary part of the
+  /// input argument is `NaN`.
+  ///
+  /// Example:
+  /// ```dart
+  /// var z = Complex(1, 0);
+  /// var z_coth = z.coth();
+  /// print(z_coth); // Output: ~1.313 + 0i
+  /// ```
+  Complex coth() {
+    if (isNaN) return Complex.nan();
+    final sinhZ = sinh();
+    if (sinhZ.isZero) return Complex.infinity();
+    return cosh() / sinhZ;
+  }
+
+  // ============================================================
+  // Inverse reciprocal hyperbolic functions
+  // ============================================================
+
+  /// ## Inverse Hyperbolic Secant
+  ///
+  /// Compute the inverse hyperbolic secant of this complex number.
+  ///
+  /// Implements the formula:
+  ///
+  ///     asech(z) = acosh(1/z)
+  ///
+  /// Returns [Complex.nan] if either real or imaginary part of the
+  /// input argument is `NaN`.
+  ///
+  /// Example:
+  /// ```dart
+  /// var z = Complex(0.5, 0);
+  /// var z_asech = z.asech();
+  /// print(z_asech); // Output: ~1.317 + 0i
+  /// ```
+  Complex asech() {
+    if (isNaN) return Complex.nan();
+    if (isZero) return Complex.infinity();
+    return (~this).acosh();
+  }
+
+  /// Alias for [asech]. Computes the inverse hyperbolic secant of this complex number.
+  Complex arcsech() => asech();
+
+  /// ## Inverse Hyperbolic Cosecant
+  ///
+  /// Compute the inverse hyperbolic cosecant of this complex number.
+  ///
+  /// Implements the formula:
+  ///
+  ///     acsch(z) = asinh(1/z)
+  ///
+  /// Returns [Complex.nan] if either real or imaginary part of the
+  /// input argument is `NaN`.
+  ///
+  /// Example:
+  /// ```dart
+  /// var z = Complex(0.5, 0);
+  /// var z_acsch = z.acsch();
+  /// print(z_acsch); // Output: ~1.444 + 0i
+  /// ```
+  Complex acsch() {
+    if (isNaN) return Complex.nan();
+    if (isZero) return Complex.infinity();
+    return (~this).asinh();
+  }
+
+  /// Alias for [acsch]. Computes the inverse hyperbolic cosecant of this complex number.
+  Complex arccsch() => acsch();
+
+  /// ## Inverse Hyperbolic Cotangent
+  ///
+  /// Compute the inverse hyperbolic cotangent of this complex number.
+  ///
+  /// Implements the formula:
+  ///
+  ///     acoth(z) = atanh(1/z)
+  ///
+  /// Returns [Complex.nan] if either real or imaginary part of the
+  /// input argument is `NaN`.
+  ///
+  /// Example:
+  /// ```dart
+  /// var z = Complex(2, 0);
+  /// var z_acoth = z.acoth();
+  /// print(z_acoth); // Output: ~0.549 + 0i
+  /// ```
+  Complex acoth() {
+    if (isNaN) return Complex.nan();
+    if (isZero) return Complex(0, math.pi / 2);
+    return (~this).atanh();
+  }
+
+  /// Alias for [acoth]. Computes the inverse hyperbolic cotangent of this complex number.
+  Complex arccoth() => acoth();
 }

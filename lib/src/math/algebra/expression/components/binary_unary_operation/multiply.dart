@@ -25,6 +25,12 @@ class Multiply extends BinaryOperationsExpression {
     rightEval = convertToLiteralIfNeeded(rightEval, leftEval);
 
     // If both evaluate to numbers, return the sum as a number
+    if (leftEval is Complex) {
+      return (leftEval * rightEval).simplify();
+    }
+    if (rightEval is Complex) {
+      return (rightEval * leftEval).simplify();
+    }
     if (leftEval is num && rightEval is num) {
       return leftEval * rightEval;
     }
@@ -143,10 +149,10 @@ class Multiply extends BinaryOperationsExpression {
     if (simpleLeft is Literal && simpleRight is Literal) {
       var leftVal = simpleLeft.evaluate();
       var rightVal = simpleRight.evaluate();
-      if (leftVal is num && rightVal is Complex) {
-        return Literal(rightVal * leftVal);
+      if (leftVal is Complex || rightVal is Complex) {
+        return Literal(Complex(leftVal) * Complex(rightVal)).simplify();
       }
-      return Literal(leftVal * rightVal);
+      return Literal(leftVal * rightVal).simplify();
     }
 
     // Enforce right-associativity: (A * B) * C -> A * (B * C)

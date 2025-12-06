@@ -24,6 +24,9 @@ class Cos extends TrigonometricExpression {
     if (eval is num) {
       return cos(eval);
     }
+    if (eval is Complex) {
+      return eval.cos();
+    }
     return Cos(eval);
   }
 

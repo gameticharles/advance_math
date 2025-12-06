@@ -8,35 +8,75 @@ class Trigonometric extends Expression {
 
   @override
   double evaluate([dynamic arg]) {
+    final eval = operand.evaluate();
     switch (functionName) {
       case 'sin':
-        return sin(operand.evaluate());
+        if (eval is Complex) {
+          return eval.sin().simplify();
+        }
+        return sin(eval);
       case 'cos':
-        return cos(operand.evaluate());
+        if (eval is Complex) {
+          return eval.cos().simplify();
+        }
+        return cos(eval);
       case 'tan':
-        return tan(operand.evaluate());
+        if (eval is Complex) {
+          return eval.tan().simplify();
+        }
+        return tan(eval);
       case 'asin':
-        return asin(operand.evaluate());
+        if (eval is Complex) {
+          return eval.asin().simplify();
+        }
+        return asin(eval);
       case 'acos':
-        return acos(operand.evaluate());
+        if (eval is Complex) {
+          return eval.acos().simplify();
+        }
+        return acos(eval);
       case 'atan':
-        return atan(operand.evaluate());
+        if (eval is Complex) {
+          return eval.atan().simplify();
+        }
+        return atan(eval);
       case 'csc':
-        double sinValue = sin(operand.evaluate());
+        if (eval is Complex) {
+          final sine = eval.sin();
+          if (sine == Complex.zero()) {
+            return Complex.infinity().simplify();
+          }
+          return (Complex.one() / sine).simplify();
+        }
+        double sinValue = sin(eval);
         if (sinValue == 0) {
           throw Exception(
               'Cosecant is undefined for operand value: ${operand.evaluate()}');
         }
         return 1 / sinValue;
       case 'sec':
-        double cosValue = cos(operand.evaluate());
+        if (eval is Complex) {
+          final cosine = eval.cos();
+          if (cosine == Complex.zero()) {
+            return Complex.infinity().simplify();
+          }
+          return (Complex.one() / cosine).simplify();
+        }
+        double cosValue = cos(eval);
         if (cosValue == 0) {
           throw Exception(
               'Secant is undefined for operand value: ${operand.evaluate()}');
         }
         return 1 / cosValue;
       case 'cot':
-        double tanValue = tan(operand.evaluate());
+        if (eval is Complex) {
+          final tangent = eval.tan();
+          if (tangent == Complex.zero()) {
+            return Complex.infinity().simplify();
+          }
+          return (Complex.one() / tangent).simplify();
+        }
+        double tanValue = tan(eval);
         if (tanValue == 0) {
           throw Exception(
               'Cotangent is undefined for operand value: ${operand.evaluate()}');
@@ -100,12 +140,12 @@ class Trigonometric extends Expression {
   }
 
   @override
-  bool isIndeterminate(num x) {
+  bool isIndeterminate(dynamic x) {
     throw UnimplementedError();
   }
 
   @override
-  bool isInfinity(num x) {
+  bool isInfinity(dynamic x) {
     throw UnimplementedError();
   }
 

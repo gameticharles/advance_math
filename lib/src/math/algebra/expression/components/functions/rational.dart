@@ -49,7 +49,7 @@ class RationalFunction extends Expression {
   }
 
   @override
-  bool isIndeterminate(num x) {
+  bool isIndeterminate(dynamic x) {
     dynamic numValue = numerator.evaluate(x);
     dynamic denValue = denominator.evaluate(x);
     return (numValue == 0 && denValue == 0) ||
@@ -57,7 +57,7 @@ class RationalFunction extends Expression {
   }
 
   @override
-  bool isInfinity(num x) {
+  bool isInfinity(dynamic x) {
     dynamic value = evaluate(x);
     return value.isInfinite;
   }

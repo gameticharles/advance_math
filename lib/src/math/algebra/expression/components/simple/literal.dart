@@ -5,8 +5,9 @@ class Literal extends Expression {
   final String raw;
 
   // Constructor to initialize the literal's value
-  Literal(this.value, [String? raw])
-      : raw = raw ?? (value is String ? '"$value"' : '$value');
+  Literal(dynamic value, [String? raw])
+      : value = value is num ? Complex(value) : value,
+        raw = raw ?? (value is String ? '"$value"' : '$value');
 
   @override
   dynamic evaluate([dynamic arg]) {
@@ -63,13 +64,17 @@ class Literal extends Expression {
   }
 
   @override
-  bool isIndeterminate(num x) {
-    throw UnimplementedError();
+  bool isIndeterminate(dynamic x) {
+    if (value is Complex) return (value as Complex).isNaN;
+    if (value is num) return (value as num).isNaN;
+    return false;
   }
 
   @override
-  bool isInfinity(num x) {
-    throw UnimplementedError();
+  bool isInfinity(dynamic x) {
+    if (value is Complex) return (value as Complex).isInfinite;
+    if (value is num) return (value as num).isInfinite;
+    return false;
   }
 
   @override

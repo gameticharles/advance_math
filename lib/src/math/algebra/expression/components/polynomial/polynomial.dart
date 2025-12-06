@@ -650,14 +650,14 @@ class Polynomial extends Expression {
   }
 
   @override
-  bool isIndeterminate(num x) {
+  bool isIndeterminate(dynamic x) {
     // For a single polynomial, it's never indeterminate.
     return false;
   }
 
   /// Simplified. Check if the evaluation at x is infinite.
   @override
-  bool isInfinity(num x) {
+  bool isInfinity(dynamic x) {
     return evaluate(x).isInfinite;
   }
 

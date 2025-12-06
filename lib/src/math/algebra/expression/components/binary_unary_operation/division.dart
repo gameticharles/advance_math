@@ -29,19 +29,11 @@ class Divide extends BinaryOperationsExpression {
       return leftEval / rightEval;
     }
 
-    // Handle Complex division
     if (leftEval is Complex || rightEval is Complex) {
-      var lC = (leftEval is num)
-          ? Complex(leftEval, 0)
-          : (leftEval is Complex ? leftEval : null);
-      var rC = (rightEval is num)
-          ? Complex(rightEval, 0)
-          : (rightEval is Complex ? rightEval : null);
-
-      if (lC != null && rC != null) {
-        if (rC == Complex.zero()) throw Exception('Division by zero!');
-        return lC / rC;
+      if (Complex(rightEval) == Complex.zero()) {
+        throw Exception('Division by zero!');
       }
+      return (Complex(leftEval) / Complex(rightEval)).simplify();
     }
 
     // If x is null and either operand contains a Variable, return the simplified version of the expression

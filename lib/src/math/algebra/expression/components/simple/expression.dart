@@ -225,8 +225,8 @@ abstract class Expression {
   int size();
 
   // Future methods for determining specific properties of the expression.
-  bool isIndeterminate(num x);
-  bool isInfinity(num x);
+  bool isIndeterminate(dynamic x);
+  bool isInfinity(dynamic x);
 
   /// Checks if the expression is a polynomial.
   ///
@@ -277,42 +277,42 @@ class ThisExpression extends Expression {
   Expression differentiate([Variable? v]) => this;
 
   @override
-  evaluate([arg]) {
-    arg = {...defaultContext, ...arg};
-    return evaluate(arg);
+  @override
+  dynamic evaluate([dynamic arg]) {
+    return this;
   }
 
   @override
-  Expression expand() => expand();
+  Expression expand() => this;
 
   @override
-  Expression integrate() => integrate();
+  Expression integrate() => this;
 
   @override
-  Expression simplify() => Simplifier.simplify(this);
+  Expression simplify() => this;
 
   @override
   Expression substitute(Expression oldExpr, Expression newExpr) {
-    return substitute(oldExpr, newExpr);
+    return this == oldExpr ? newExpr : this;
   }
 
   @override
-  bool isIndeterminate(num x) => isIndeterminate(x);
+  bool isIndeterminate(dynamic x) => false;
 
   @override
-  bool isInfinity(num x) => isInfinity(x);
+  bool isInfinity(dynamic x) => false;
 
   @override
-  bool isPoly([bool strict = false]) => isPoly(strict);
+  bool isPoly([bool strict = false]) => false;
 
   @override
-  int depth() => depth();
+  int depth() => 1;
 
   @override
-  int size() => size();
+  int size() => 1;
 
   @override
-  Set<Variable> getVariableTerms() => getVariableTerms();
+  Set<Variable> getVariableTerms() => {};
 }
 
 typedef SingleMemberAccessor<T> = dynamic Function(T);

@@ -31,10 +31,10 @@ class GroupExpression extends Expression {
   }
 
   @override
-  bool isIndeterminate(num x) => expression.isIndeterminate(x);
+  bool isIndeterminate(dynamic x) => expression.isIndeterminate(x);
 
   @override
-  bool isInfinity(num x) => expression.isInfinity(x);
+  bool isInfinity(dynamic x) => expression.isInfinity(x);
 
   @override
   bool isPoly([bool strict = false]) => expression.isPoly(strict);

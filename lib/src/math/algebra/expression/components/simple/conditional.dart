@@ -55,12 +55,12 @@ class ConditionalExpression extends Expression {
   }
 
   @override
-  bool isIndeterminate(num x) {
+  bool isIndeterminate(dynamic x) {
     throw UnimplementedError();
   }
 
   @override
-  bool isInfinity(num x) {
+  bool isInfinity(dynamic x) {
     throw UnimplementedError();
   }
 

@@ -49,12 +49,12 @@ class Negate extends Expression {
   }
 
   @override
-  bool isIndeterminate(num x) {
-    throw UnimplementedError();
+  bool isIndeterminate(dynamic x) {
+    return operand.isIndeterminate(x);
   }
 
   @override
-  bool isInfinity(num x) {
+  bool isInfinity(dynamic x) {
     return operand.isInfinity(x);
   }
 

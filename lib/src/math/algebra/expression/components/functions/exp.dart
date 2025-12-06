@@ -25,8 +25,9 @@ class Exp extends Expression {
   Exp(this.operand);
 
   @override
-  num evaluate([dynamic arg]) {
+  dynamic evaluate([dynamic arg]) {
     final operandValue = operand.evaluate(arg);
+    if (operandValue is Complex) return operandValue.exp();
     return math.exp(operandValue);
   }
 
@@ -114,20 +115,26 @@ class Exp extends Expression {
   @override
   Expression substitute(Expression oldExpr, Expression newExpr) {
     if (this == oldExpr) {
-      return newExpr;
+      return newExpr.simplify();
     }
-    return Exp(operand.substitute(oldExpr, newExpr));
+    return Exp(operand.substitute(oldExpr, newExpr)).simplify();
   }
 
   @override
-  bool isIndeterminate(num x) {
+  bool isIndeterminate(dynamic x) {
     return operand.isIndeterminate(x);
   }
 
   @override
-  bool isInfinity(num x) {
-    final operandValue = operand.evaluate({'x': x});
-    return operandValue == double.infinity;
+  bool isInfinity(dynamic x) {
+    try {
+      final val = evaluate(x);
+      if (val is Complex) return val.isInfinite;
+      if (val is num) return val.isInfinite;
+      return false;
+    } catch (_) {
+      return false;
+    }
   }
 
   @override

@@ -42,7 +42,7 @@ class UnaryExpression extends Expression {
         }
       case '%':
         if (!prefix) {
-          if (operandVal is num) {
+          if (operandVal is num || operandVal is Complex) {
             return operandVal * 0.01;
           }
           // If operand is expression, return Multiply(operand, 0.01)?
@@ -103,12 +103,12 @@ class UnaryExpression extends Expression {
   }
 
   @override
-  bool isIndeterminate(num x) {
-    throw UnimplementedError();
+  bool isIndeterminate(dynamic x) {
+    return operand.isIndeterminate(x);
   }
 
   @override
-  bool isInfinity(num x) {
+  bool isInfinity(dynamic x) {
     return operand.isInfinity(x);
   }
 
@@ -137,13 +137,24 @@ class UnaryExpression extends Expression {
     if (operator == '-' && prefix) {
       if (simplifiedOperand is Literal) {
         var val = simplifiedOperand.value;
-        if (val is num) {
+        if (val is num || val is Complex) {
           return Literal(-val);
         }
       }
     }
     if (operator == '+' && prefix) {
       return simplifiedOperand;
+    }
+    if (operator == '%' && !prefix) {
+      if (simplifiedOperand is Literal) {
+        var value = simplifiedOperand.value;
+        if (value is Complex) {
+          return (Complex(value) / Complex(100)).simplify();
+        }
+        if (value is num) {
+          return Literal(value / 100).simplify();
+        }
+      }
     }
 
     if (simplifiedOperand != operand) {

@@ -155,4 +155,181 @@ extension ComplexTrigonometricX<T extends Complex> on T {
 
     return ((this + Complex.i()) / (Complex.i() - this)).log() * 0.5.imag;
   }
+
+  // ============================================================
+  // Alias methods for inverse trigonometric functions
+  // ============================================================
+
+  /// Alias for [asin]. Computes the inverse sine of this complex number.
+  Complex arcsin() => asin();
+
+  /// Alias for [acos]. Computes the inverse cosine of this complex number.
+  Complex arccos() => acos();
+
+  /// Alias for [atan]. Computes the inverse tangent of this complex number.
+  Complex arctan() => atan();
+
+  // ============================================================
+  // Reciprocal trigonometric functions
+  // ============================================================
+
+  /// ## Secant
+  ///
+  /// Compute the [secant](http://mathworld.wolfram.com/Secant.html)
+  /// of this complex number.
+  ///
+  /// Implements the formula:
+  ///
+  ///     sec(z) = 1 / cos(z)
+  ///
+  /// Returns [Complex.nan] if either real or imaginary part of the
+  /// input argument is `NaN`.
+  ///
+  /// Example:
+  /// ```dart
+  /// var z = Complex(0, 0);
+  /// var z_sec = z.sec();
+  /// print(z_sec); // Output: 1 + 0i
+  /// ```
+  Complex sec() {
+    if (isNaN) return Complex.nan();
+    final cosZ = cos();
+    if (cosZ.isZero) return Complex.infinity();
+    return ~cosZ;
+  }
+
+  /// ## Cosecant
+  ///
+  /// Compute the [cosecant](http://mathworld.wolfram.com/Cosecant.html)
+  /// of this complex number.
+  ///
+  /// Implements the formula:
+  ///
+  ///     csc(z) = 1 / sin(z)
+  ///
+  /// Returns [Complex.nan] if either real or imaginary part of the
+  /// input argument is `NaN`.
+  ///
+  /// Example:
+  /// ```dart
+  /// var z = Complex(math.pi / 2, 0);
+  /// var z_csc = z.csc();
+  /// print(z_csc); // Output: 1 + 0i
+  /// ```
+  Complex csc() {
+    if (isNaN) return Complex.nan();
+    final sinZ = sin();
+    if (sinZ.isZero) return Complex.infinity();
+    return ~sinZ;
+  }
+
+  /// ## Cotangent
+  ///
+  /// Compute the [cotangent](http://mathworld.wolfram.com/Cotangent.html)
+  /// of this complex number.
+  ///
+  /// Implements the formula:
+  ///
+  ///     cot(z) = 1 / tan(z) = cos(z) / sin(z)
+  ///
+  /// Returns [Complex.nan] if either real or imaginary part of the
+  /// input argument is `NaN`.
+  ///
+  /// Example:
+  /// ```dart
+  /// var z = Complex(math.pi / 4, 0);
+  /// var z_cot = z.cot();
+  /// print(z_cot); // Output: ~1 + 0i
+  /// ```
+  Complex cot() {
+    if (isNaN) return Complex.nan();
+    final sinZ = sin();
+    if (sinZ.isZero) return Complex.infinity();
+    return cos() / sinZ;
+  }
+
+  // ============================================================
+  // Inverse reciprocal trigonometric functions
+  // ============================================================
+
+  /// ## Inverse Secant (Arcsecant)
+  ///
+  /// Compute the [inverse secant](http://mathworld.wolfram.com/InverseSecant.html)
+  /// of this complex number.
+  ///
+  /// Implements the formula:
+  ///
+  ///     asec(z) = acos(1/z)
+  ///
+  /// Returns [Complex.nan] if either real or imaginary part of the
+  /// input argument is `NaN`.
+  ///
+  /// Example:
+  /// ```dart
+  /// var z = Complex(2, 0);
+  /// var z_asec = z.asec();
+  /// print(z_asec); // Output: π/3 + 0i
+  /// ```
+  Complex asec() {
+    if (isNaN) return Complex.nan();
+    if (isZero) return Complex.infinity();
+    return (~this).acos();
+  }
+
+  /// Alias for [asec]. Computes the inverse secant of this complex number.
+  Complex arcsec() => asec();
+
+  /// ## Inverse Cosecant (Arccosecant)
+  ///
+  /// Compute the [inverse cosecant](http://mathworld.wolfram.com/InverseCosecant.html)
+  /// of this complex number.
+  ///
+  /// Implements the formula:
+  ///
+  ///     acsc(z) = asin(1/z)
+  ///
+  /// Returns [Complex.nan] if either real or imaginary part of the
+  /// input argument is `NaN`.
+  ///
+  /// Example:
+  /// ```dart
+  /// var z = Complex(2, 0);
+  /// var z_acsc = z.acsc();
+  /// print(z_acsc); // Output: π/6 + 0i
+  /// ```
+  Complex acsc() {
+    if (isNaN) return Complex.nan();
+    if (isZero) return Complex.infinity();
+    return (~this).asin();
+  }
+
+  /// Alias for [acsc]. Computes the inverse cosecant of this complex number.
+  Complex arccsc() => acsc();
+
+  /// ## Inverse Cotangent (Arccotangent)
+  ///
+  /// Compute the [inverse cotangent](http://mathworld.wolfram.com/InverseCotangent.html)
+  /// of this complex number.
+  ///
+  /// Implements the formula:
+  ///
+  ///     acot(z) = atan(1/z)
+  ///
+  /// Returns [Complex.nan] if either real or imaginary part of the
+  /// input argument is `NaN`.
+  ///
+  /// Example:
+  /// ```dart
+  /// var z = Complex(1, 0);
+  /// var z_acot = z.acot();
+  /// print(z_acot); // Output: π/4 + 0i
+  /// ```
+  Complex acot() {
+    if (isNaN) return Complex.nan();
+    if (isZero) return Complex(math.pi / 2, 0);
+    return (~this).atan();
+  }
+
+  /// Alias for [acot]. Computes the inverse cotangent of this complex number.
+  Complex arccot() => acot();
 }

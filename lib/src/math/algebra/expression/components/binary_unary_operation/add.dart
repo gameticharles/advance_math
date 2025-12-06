@@ -15,6 +15,12 @@ class Add extends BinaryOperationsExpression {
     rightEval = convertToLiteralIfNeeded(rightEval, leftEval);
 
     // If both evaluate to numbers, return the sum as a number
+    if (leftEval is Complex) {
+      return (leftEval + rightEval).simplify();
+    }
+    if (rightEval is Complex) {
+      return (rightEval + leftEval).simplify();
+    }
     if (leftEval is num && rightEval is num) {
       return leftEval + rightEval;
     }
@@ -68,8 +74,9 @@ class Add extends BinaryOperationsExpression {
       var rightVal = simplifiedRight.evaluate();
       if (leftVal is num && rightVal is Complex) {
         return Literal(Complex(leftVal, 0) + rightVal);
-      } else if (leftVal is Complex && rightVal is num) {
-        return Literal(leftVal + Complex(rightVal, 0));
+      }
+      if (leftVal is Complex || rightVal is Complex) {
+        return Literal((Complex(leftVal) + Complex(rightVal)));
       }
       return Literal(leftVal + rightVal);
     }

@@ -57,13 +57,27 @@ class MemberExpression extends Expression {
   }
 
   @override
-  bool isIndeterminate(num x) {
-    throw UnimplementedError();
+  bool isIndeterminate(dynamic x) {
+    try {
+      final val = evaluate(x);
+      if (val is Complex) return val.isNaN;
+      if (val is num) return val.isNaN;
+      return false;
+    } catch (_) {
+      return false;
+    }
   }
 
   @override
-  bool isInfinity(num x) {
-    throw UnimplementedError();
+  bool isInfinity(dynamic x) {
+    try {
+      final val = evaluate(x);
+      if (val is Complex) return val.isInfinite;
+      if (val is num) return val.isInfinite;
+      return false;
+    } catch (_) {
+      return false;
+    }
   }
 
   @override

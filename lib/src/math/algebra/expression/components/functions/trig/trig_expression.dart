@@ -11,12 +11,19 @@ abstract class TrigonometricExpression extends Expression {
   }
 
   @override
-  bool isIndeterminate(num x) {
-    throw UnimplementedError();
+  bool isIndeterminate(dynamic x) {
+    try {
+      final val = evaluate(x);
+      if (val is Complex) return val.isNaN;
+      if (val is num) return val.isNaN;
+      return false;
+    } catch (_) {
+      return true; // If evaluation fails, it might be indeterminate
+    }
   }
 
   @override
-  bool isInfinity(num x) {
+  bool isInfinity(dynamic x) {
     return evaluate(x).isInfinite;
   }
 

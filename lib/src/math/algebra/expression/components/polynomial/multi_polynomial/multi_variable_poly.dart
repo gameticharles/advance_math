@@ -406,7 +406,7 @@ class MultiVariablePolynomial extends Expression {
   }
 
   @override
-  bool isIndeterminate(num x) {
+  bool isIndeterminate(dynamic x) {
     // Check if univariate to use x
     Set<String> allVars = {};
     for (var term in terms) {
@@ -433,7 +433,7 @@ class MultiVariablePolynomial extends Expression {
   }
 
   @override
-  bool isInfinity(num x) {
+  bool isInfinity(dynamic x) {
     // Check if univariate to use x
     Set<String> allVars = {};
     for (var term in terms) {

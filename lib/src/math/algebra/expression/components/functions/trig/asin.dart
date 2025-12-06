@@ -17,6 +17,9 @@ class Asin extends TrigonometricExpression {
       }
       return asin(eval);
     }
+    if (eval is Complex) {
+      return eval.asin();
+    }
     return Asin(eval);
   }
 

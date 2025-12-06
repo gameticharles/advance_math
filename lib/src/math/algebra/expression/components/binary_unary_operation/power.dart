@@ -15,6 +15,9 @@ class Pow extends BinaryOperationsExpression {
     rightEval = convertToLiteralIfNeeded(rightEval, leftEval);
 
     // If both evaluate to numbers, return the sum as a number
+    if (leftEval is Complex || rightEval is Complex) {
+      return Complex(leftEval).pow(Complex(rightEval)).simplify();
+    }
     if (leftEval is num && rightEval is num) {
       return pow(leftEval, rightEval);
     }
