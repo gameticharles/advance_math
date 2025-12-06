@@ -99,8 +99,8 @@ final class DurandKerner extends Polynomial {
     this.initialGuess = const [],
     this.precision = 1.0e-10,
     this.maxSteps = 2000,
-    Variable? variable,
-  }) : super(variable: variable);
+    super.variable,
+  });
 
   /// Creates a new object that finds all the roots of a polynomial equation
   /// using the Durand-Kerner algorithm. The polynomial can only have real

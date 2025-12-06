@@ -5,7 +5,7 @@ class _ApostrophusData {
   var tally = false;
   var match = 0;
 
-  reset() {
+  void reset() {
     count = 0;
     tally = false;
     match = 0;

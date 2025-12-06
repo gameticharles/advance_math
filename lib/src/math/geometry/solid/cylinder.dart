@@ -44,9 +44,8 @@ class Cylinder extends SolidGeometry {
   ///
   /// h = V / (πr²)
   Cylinder.fromVolumeAndRadius(
-      {required double volume, required double radius, Point? center})
+      {required double volume, required this.radius, Point? center})
       : center = center ?? Point(0, 0, 0),
-        radius = radius,
         height = volume / (pi * radius * radius),
         super('Cylinder') {
     if (volume <= 0 || radius <= 0) {

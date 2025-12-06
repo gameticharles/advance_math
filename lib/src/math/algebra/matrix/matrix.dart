@@ -102,7 +102,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
   List<int> get shape => [rowCount, columnCount];
 
   /// Assigns the value to the specified row index of the matrix.
-  operator []=(int index, List<dynamic> value) {
+  void operator []=(int index, List<dynamic> value) {
     if (_data.isNotEmpty && value.length != columnCount) {
       throw Exception('Row has different length than the other rows');
     }

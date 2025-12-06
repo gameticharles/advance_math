@@ -109,6 +109,7 @@ class Heptagon extends Polygon {
   /// Calculates the area of the heptagon.
   ///
   /// Area = (7/4) × side² × cot(π/7)
+  @override
   double area() {
     return (7 / 4) * side * side * (1 / tan(pi / 7));
   }

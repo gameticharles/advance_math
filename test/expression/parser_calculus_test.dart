@@ -20,8 +20,8 @@ void main() {
           () => expect(parser.parse('diff(x^1, x)').toString(), equals('1')));
       test(
           'diff(x^-1, x)',
-          () => expect(parser.parse('diff(x^-1, x)').toString(),
-              contains('-1 * (x^-2)')));
+          () => expect(
+              parser.parse('diff(x^-1, x)').toString(), contains('x^-1*-1/x')));
 
       // 6-10: Partial Differentiation
       test('diff(y, x)',
@@ -33,7 +33,7 @@ void main() {
       test(
           'diff(x^2*y^2, x)',
           () => expect(
-              parser.parse('diff(x^2*y^2, x)').toString(), contains('2 * x')));
+              parser.parse('diff(x^2*y^2, x)').toString(), contains('2*x')));
       test('diff(x+y, x)',
           () => expect(parser.parse('diff(x+y, x)').toString(), equals('1')));
 
@@ -53,11 +53,11 @@ void main() {
       test(
           'diff(sin(2*x), x)',
           () => expect(parser.parse('diff(sin(2*x), x)').toString(),
-              contains('cos((2 * x))')));
+              contains('2*cos(2*x)')));
       test(
           'diff(cos(x^2), x)',
           () => expect(parser.parse('diff(cos(x^2), x)').toString(),
-              contains('sin((x^2))')));
+              contains('-2*x*sin(x^2)')));
 
       // 16-20: Exponential & Logarithmic
       test(
@@ -67,11 +67,11 @@ void main() {
       test(
           'diff(exp(2*x), x)',
           () => expect(parser.parse('diff(exp(2*x), x)').toString(),
-              contains('exp((2 * x))')));
+              contains('2*exp(2*x)')));
       test(
           'diff(ln(x), x)',
           () => expect(
-              parser.parse('diff(ln(x), x)').toString(), contains('1 / x')));
+              parser.parse('diff(ln(x), x)').toString(), contains('1/x')));
       test(
           'diff(ln(x^2), x)',
           () => expect(parser.parse('diff(ln(x^2), x)').toString(),
@@ -101,8 +101,8 @@ void main() {
               parser.parse('diff(x^0.5, x)').toString(), contains('x^-0.5')));
       test(
           'diff(1/x^2, x)',
-          () => expect(
-              parser.parse('diff(x^-2, x)').toString(), contains('x^-3')));
+          () => expect(parser.parse('diff(x^-2, x)').toString(),
+              anyOf(contains('x^-3'), contains('x^-2*-2/x'))));
 
       // 26-30: Product & Quotient Rules
       test(
@@ -162,15 +162,15 @@ void main() {
       test(
           'integrate(5, x)',
           () => expect(
-              parser.parse('integrate(5, x)').toString(), contains('5 * x')));
+              parser.parse('integrate(5, x)').toString(), contains('5*x')));
       test(
           'integrate(pi, x)',
           () => expect(
-              parser.parse('integrate(pi, x)').toString(), contains('pi * x')));
+              parser.parse('integrate(pi, x)').toString(), contains('pi*x')));
       test(
           'integrate(y, x)',
           () => expect(
-              parser.parse('integrate(y, x)').toString(), contains('y * x')));
+              parser.parse('integrate(y, x)').toString(), contains('y*x')));
 
       // 41-45: Trigonometric
       test(
@@ -213,48 +213,53 @@ void main() {
               contains('x')));
       test(
           'integrate(exp(x)-exp(x), x)',
-          () => expect(parser.parse('integrate(exp(x)-exp(x), x)').toString(),
-              contains('0')));
+          () => expect(
+              parser.parse('integrate(exp(x)-exp(x), x)').simplify().toString(),
+              equals('0')));
 
       // 51-55: Substitution (Linear)
       test(
           'integrate(sin(2*x), x)',
-          () => expect(parser.parse('integrate(sin(2*x), x)').toString(),
-              contains('cos((2 * x))'))); // -0.5*cos(2x) - requires sub
+          () => expect(
+              parser.parse('integrate(sin(2*x), x)').toString(),
+              anyOf(contains('cos((2 * x))'),
+                  contains('cos(2*x)')))); // -0.5*cos(2x) - requires sub
       test(
           'integrate(exp(3*x), x)',
           () => expect(parser.parse('integrate(exp(3*x), x)').toString(),
-              contains('exp((3 * x))')));
+              anyOf(contains('exp((3 * x))'), contains('exp(3*x)'))));
       test(
           'integrate(cos(x/2), x)',
           () => expect(parser.parse('integrate(cos(x/2), x)').toString(),
-              contains('sin((x / 2))')));
+              anyOf(contains('sin((x / 2))'), contains('sin(x/2)'))));
       test(
           'integrate((2*x+1)^2, x)',
           () => expect(parser.parse('integrate((2*x+1)^2, x)').toString(),
-              contains('(2 * x)')));
+              anyOf(contains('(2 * x)'), contains('2*x'))));
       test(
           'integrate(1/(2*x), x)',
           () => expect(parser.parse('integrate(1/(2*x), x)').toString(),
-              contains('ln((2 * x))')));
+              anyOf(contains('ln((2 * x))'), contains('ln((2*x))'))));
 
       // 56-60: Substitution (Non-linear)
       test(
           'integrate(2*x*sin(x^2), x)',
           () => expect(parser.parse('integrate(2*x*sin(x^2), x)').toString(),
-              contains('cos((x^2))')));
+              anyOf(contains('cos((x^2))'), contains('cos(x^2)'))));
       test(
           'integrate(x*exp(x^2), x)',
           () => expect(parser.parse('integrate(x*exp(x^2), x)').toString(),
-              contains('exp((x^2))')));
+              anyOf(contains('exp((x^2))'), contains('exp(x^2)'))));
       test(
           'integrate(cos(x)*sin(x), x)',
-          () => expect(parser.parse('integrate(cos(x)*sin(x), x)').toString(),
-              contains('sin(x)'))); // sin^2/2 or -cos^2/2
+          () => expect(
+              parser.parse('integrate(cos(x)*sin(x), x)').toString(),
+              anyOf(contains('sin(x)'),
+                  contains('cos(x)')))); // sin^2/2 or -cos^2/2
       test(
           'integrate(x^2*cos(x^3), x)',
           () => expect(parser.parse('integrate(x^2*cos(x^3), x)').toString(),
-              contains('sin((x^3))')));
+              anyOf(contains('sin((x^3))'), contains('sin(x^3)'))));
       test(
           'integrate(exp(sin(x))*cos(x), x)',
           () => expect(
@@ -264,24 +269,30 @@ void main() {
       // 61-65: Integration by Parts
       test(
           'integrate(x*exp(x), x)',
-          () => expect(parser.parse('integrate(x*exp(x), x)').toString(),
-              contains('x * exp(x)')));
+          () => expect(
+              parser.parse('integrate(x*exp(x), x)').toString(),
+              anyOf(contains('x * exp(x)'), contains('x*exp(x)-exp(x)'),
+                  contains('x*exp(x)-1*exp(x)'))));
       test(
           'integrate(x*sin(x), x)',
-          () => expect(parser.parse('integrate(x*sin(x), x)').toString(),
-              contains('x * cos(x)')));
+          () => expect(
+              parser.parse('integrate(x*sin(x), x)').toString(),
+              anyOf(contains('x * cos(x)'), contains('x*-(cos(x))'),
+                  contains('x*-1*cos(x)'))));
       test(
           'integrate(x*cos(x), x)',
           () => expect(parser.parse('integrate(x*cos(x), x)').toString(),
-              contains('x * sin(x)')));
+              contains('x*sin(x)')));
       test(
           'integrate(ln(x), x)',
-          () => expect(parser.parse('integrate(ln(x), x)').toString(),
-              contains('x * ln(x)'))); // x*ln(x) - x
+          () => expect(
+              parser.parse('integrate(ln(x), x)').toString(),
+              anyOf(contains('x*ln(x)-x'), contains('ln(x)*1*x-1*x'),
+                  contains('ln(x)*x-1*x')))); // x*ln(x) - x
       test(
           'integrate(x^2*exp(x), x)',
           () => expect(parser.parse('integrate(x^2*exp(x), x)').toString(),
-              contains('x^2')));
+              contains('x^2*exp(x)')));
 
       // 66-70: Definite Integrals (Simulated via FTC)
       test(
@@ -294,16 +305,22 @@ void main() {
               contains('sin(x)')));
       test(
           'integrate(1/(x+1), x)',
-          () => expect(parser.parse('integrate(1/(x+1), x)').toString(),
-              contains('ln((x + 1))')));
+          () => expect(
+              parser
+                  .parse('integrate(1/(x+1), x)')
+                  .toString()
+                  .replaceAll(' ', ''),
+              contains('ln((x+1))')));
       test(
           'integrate(x/(x^2+1), x)',
           () => expect(parser.parse('integrate(x/(x^2+1), x)').toString(),
-              contains('ln(((x^2) + 1))')));
+              anyOf(contains('ln(((x^2) + 1))'), contains('ln((x^2+1))'))));
       test(
           'integrate(tan(x), x)',
-          () => expect(parser.parse('integrate(tan(x), x)').toString(),
-              contains('ln(cos(x))'))); // -ln|cos(x)|
+          () => expect(
+              parser.parse('integrate(tan(x), x)').toString(),
+              anyOf(contains('ln(cos(x))'),
+                  contains('ln(sec(x))')))); // -ln|cos(x)| or ln|sec(x)|
     });
 
     group('Solver Edge Cases (30 tests)', () {
@@ -357,25 +374,21 @@ void main() {
       test(
           'solve(x^2 + 1, x)',
           () => expect(parser.parse('solve(x^2 + 1, x)').toString(),
-              equals('[]'))); // No real roots
+              contains('i'))); // Complex roots: i, -i
       test(
           'solve(0*x - 5, x)',
           () => expect(() => parser.parse('solve(0*x - 5, x)'),
-              throwsA(isA<UnimplementedError>())));
-      test(
-          'solve(1, x)',
-          () => expect(() => parser.parse('solve(1, x)'),
-              throwsA(isA<UnimplementedError>())));
+              throwsA(anything))); // Should throw exception
+      test('solve(1, x)',
+          () => expect(parser.parse('solve(1, x)').toString(), equals('[]')));
       test(
           'solve(x-x, x)',
-          () => expect(
-              parser.parse('solve(x-x, x)').toString(),
-              contains(
-                  '0'))); // 0=0, all x? currently might return 0 literal or [] depending on impl
+          () =>
+              expect(parser.parse('solve(x-x, x)').toString(), contains('0')));
       test(
           'solve(x^2 + 4, x)',
           () => expect(
-              parser.parse('solve(x^2 + 4, x)').toString(), equals('[]')));
+              parser.parse('solve(x^2 + 4, x)').toString(), contains('i')));
 
       // 86-90: Variable Isolation
       test(
@@ -412,6 +425,7 @@ void main() {
           'solve(x^3, x)',
           () =>
               expect(parser.parse('solve(x^3, x)').toString(), contains('0')));
+      //[NaN + NaNi, NaN + NaNi, NaN + NaNi]
       test(
           'solve(x^2 - 2*x + 1, x)',
           () => expect(

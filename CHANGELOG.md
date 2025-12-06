@@ -62,6 +62,12 @@
 - **[IMPROVEMENT]** Enhanced `BasicTrigStrategy` with trigonometric power reduction
   - Power reduction for `sin^2(x)`, `cos^2(x)`, etc.
 - **[IMPROVEMENT]** Improved `IntegrationByPartsStrategy` to handle logarithmic and inverse trigonometric functions
+- **[BUG_FIX]** Fixed `Cubic` equation solver robustness:
+  - Added explicit check for triple roots (`d0=0`, `d1=0`) to prevent `NaN` results
+  - Improved zero-check logic for intermediate values using magnitude thresholds
+- **[BUG_FIX]** Fixed `IntegrationByParts` failure for solo functions (e.g., `ln(x)`, `asin(x)`) by treating them as `f(x) * 1`
+- **[BUG_FIX]** Fixed `PowerRuleStrategy` to correctly handle `Complex` exponents safely avoiding type cast errors
+- **[FEATURE]** Added logarithmic integration pattern (`u'/u`) to `SubstitutionStrategy` supporting forms like `integrate(1/(x+1))`
 
 ## Test Coverage Improvements
 

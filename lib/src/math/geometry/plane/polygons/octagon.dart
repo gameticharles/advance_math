@@ -108,6 +108,7 @@ class Octagon extends Polygon {
   /// Calculates the area of the octagon.
   ///
   /// Area = 2(1 + √2) × side²
+  @override
   double area() {
     return 2 * (1 + sqrt(2)) * side * side;
   }

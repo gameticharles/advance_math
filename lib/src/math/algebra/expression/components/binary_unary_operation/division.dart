@@ -224,6 +224,40 @@ class Divide extends BinaryOperationsExpression {
       return Multiply(Literal(1 / val), numerator).simplify();
     }
 
+    // Cancellation: A / (c * A) -> 1/c
+    if (denominator is Multiply &&
+        (denominator.left is Literal || denominator.right is Literal)) {
+      Expression c;
+      Expression terms;
+      if (denominator.left is Literal) {
+        c = denominator.left;
+        terms = denominator.right;
+      } else {
+        c = denominator.right;
+        terms = denominator.left;
+      }
+      if (terms.toString() == numerator.toString()) {
+        return Divide(Literal(1), c).simplify();
+      }
+    }
+
+    // Cancellation: (c * A) / A -> c
+    if (numerator is Multiply &&
+        (numerator.left is Literal || numerator.right is Literal)) {
+      Expression c;
+      Expression terms;
+      if (numerator.left is Literal) {
+        c = numerator.left;
+        terms = numerator.right;
+      } else {
+        c = numerator.right;
+        terms = numerator.left;
+      }
+      if (terms.toString() == denominator.toString()) {
+        return c;
+      }
+    }
+
     return Divide(numerator, denominator);
   }
 

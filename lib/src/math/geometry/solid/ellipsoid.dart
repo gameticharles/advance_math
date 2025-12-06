@@ -87,8 +87,9 @@ class Ellipsoid extends SolidGeometry {
     Point? center,
   }) {
     if (volume <= 0) throw ArgumentError('Volume must be positive');
-    if (ratioAB <= 0 || ratioAC <= 0)
+    if (ratioAB <= 0 || ratioAC <= 0) {
       throw ArgumentError('Ratios must be positive');
+    }
 
     // V = (4/3)π × a × (a/ratioAB) × (a/ratioAC) = (4/3)π × a³/(ratioAB × ratioAC)
     // a³ = 3V × ratioAB × ratioAC / (4π)

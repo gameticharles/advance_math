@@ -116,7 +116,7 @@ dynamic exp(dynamic x) {
   } else if (x is Complex) {
     return x.exp();
   } else {
-    throw ArgumentError('Input should be either num or Number');
+    throw ArgumentError('Input should be either num or Complex');
   }
 }
 

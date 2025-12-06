@@ -1040,7 +1040,24 @@ class Complex implements Comparable<dynamic> {
   ///
   /// print(z_power); // Output: -1.6401010184280038 + 0.202050398556709i
   /// ```
-  Complex pow(dynamic x) => (log() * x).exp();
+  Complex pow(dynamic x) {
+    if (x is num) {
+      if (x == 0) return Complex.one();
+      if (x == 1) return this;
+      if (imaginary == 0 && !real.isNaN && !x.isNaN) {
+        return Complex(math.pow(real, x), 0);
+      }
+      return (log() * x).exp();
+    } else if (x is Complex) {
+      if (x.isZero) return Complex.one();
+      if (x.isOne) return this;
+      if (x.imaginary == 0 && !x.real.isNaN) {
+        return pow(x.real);
+      }
+      return (log() * x).exp();
+    }
+    throw ArgumentError('Invalid exponent type: ${x.runtimeType}');
+  }
 
   /// Returns a new complex number representing the square root of this number.
   ///

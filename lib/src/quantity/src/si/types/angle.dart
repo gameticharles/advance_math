@@ -543,7 +543,7 @@ class Rotation {
   final num rad;
 
   /// Returns an inverted version of this `Rotation`, e.g., -90° to 90°.
-  operator -() {
+  Rotation operator -() {
     return Rotation.fromDegrees(-deg);
   }
 

@@ -59,15 +59,70 @@ class Cubic extends Polynomial {
     final sigma = Literal(Complex(-0.5, 0.5 * sqrt(3)));
 
     final d0 = b * b - a * c * three;
+
     final d1 = (two * Pow(b, three)) -
         (a * b * c * Literal(9)) +
         (a * a * d * Literal(27));
+
+    // Check for triple root case (d0 = 0 and d1 = 0)
+    bool d0Zero = false;
+    bool d1Zero = false;
+
+    if (d0 is Literal && d0.value == 0) {
+      d0Zero = true;
+    } else if (d0.evaluate() == 0 ||
+        (d0.evaluate() is Complex &&
+            (d0.evaluate() as Complex).abs() < 1e-10)) {
+      d0Zero = true;
+    }
+
+    if (d1 is Literal && d1.value == 0) {
+      d1Zero = true;
+    } else if (d1.evaluate() == 0 ||
+        (d1.evaluate() is Complex &&
+            (d1.evaluate() as Complex).abs() < 1e-10)) {
+      d1Zero = true;
+    }
+
+    if (d0Zero && d1Zero) {
+      // x = -b / (3a)
+      final root = (Literal(0) - b) / (a * three);
+      return [root, root, root];
+    }
 
     // sqrtD = sqrt(-27 * a^2 * discriminant)
     final sqrtD = Pow(discriminant() * a * a * Literal(-27), Literal(0.5));
 
     // C = ((d1 + sqrtD) / 2)^(1/3)
-    final C = Pow((d1 + sqrtD) / two, Literal(1.0 / 3.0));
+    Expression C = Pow((d1 + sqrtD) / two, Literal(1.0 / 3.0));
+
+    // Check for C being zero (to avoid division by zero)
+    // If C is zero, it implies d0 is also zero (triple root case)
+    try {
+      bool isZero = false;
+      if (C is Literal) {
+        if (C.value == 0) isZero = true;
+        if (C.value is Complex && (C.value as Complex) == Complex.zero()) {
+          isZero = true;
+        }
+      }
+
+      if (!isZero) {
+        final cVal = C.evaluate();
+        if (cVal is num && cVal == 0) isZero = true;
+        if (cVal is Complex && cVal.abs().real < 1e-10) isZero = true;
+      }
+
+      if (isZero) {
+        // C is zero, so we use the handling for triple root
+        // x = -b / (3a)
+        final root = (Literal(0) - b) / (a * three);
+        return [root, root, root];
+      }
+    } catch (e) {
+      // Evaluation might fail for generic variables, proceed with standard formula
+      // but risky.
+    }
 
     final constTerm = Literal(-1) / (a * three);
 

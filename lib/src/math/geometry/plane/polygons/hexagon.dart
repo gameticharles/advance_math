@@ -126,6 +126,7 @@ class Hexagon extends Polygon {
   /// Calculates the area of the hexagon.
   ///
   /// Area = (3√3/2) × side²
+  @override
   double area() {
     return (3 * sqrt(3) / 2) * side * side;
   }

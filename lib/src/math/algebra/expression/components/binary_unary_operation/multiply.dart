@@ -362,6 +362,17 @@ class Multiply extends BinaryOperationsExpression {
       return Subtract(aSquared, bSquared);
     }
 
+    // Cancellation: A * (B / A) = B
+    if (simpleRight is Divide &&
+        simpleRight.right.toString() == simpleLeft.toString()) {
+      return simpleRight.left.simplifyBasic();
+    }
+    // Cancellation: (B / A) * A = B
+    if (simpleLeft is Divide &&
+        simpleLeft.right.toString() == simpleRight.toString()) {
+      return simpleLeft.left.simplifyBasic();
+    }
+
     // If operands changed but no rule matched, return new Multiply
     if (simpleLeft != left || simpleRight != right) {
       return Multiply(simpleLeft, simpleRight);
