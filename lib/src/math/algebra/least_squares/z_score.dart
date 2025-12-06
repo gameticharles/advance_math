@@ -76,7 +76,7 @@ class ZScore {
   /// @return confidence level between 0 and 100 corresponding to the Z-score.
   static double computeConfidenceLevel(num zScore, {bool twoTailed = true}) {
     // Compute the tail area
-    double p = (1.0 + erf(zScore / math.sqrt(2.0))) / 2.0;
+    double p = (1.0 + math.erf(zScore / math.sqrt(2.0))) / 2.0;
 
     // Convert the tail area to a confidence level
     double confidenceLevel = 100 * (1 - (1 - p) * (twoTailed ? 2.0 : 1.0));
@@ -109,7 +109,7 @@ class ZScore {
   ///
   /// @return CDF value at the given Z-score.
   static double computeCDF(double zScore) {
-    return 0.5 * (1 + erf(zScore / math.sqrt(2)));
+    return 0.5 * (1 + math.erf(zScore / math.sqrt(2)));
   }
 
   /// Compute the confidence interval for a given sample mean, sample size, and standard deviation.
@@ -149,7 +149,7 @@ class ZScore {
   ///
   /// @return The p-value.
   static double computePValue(double zScore) {
-    return 1 - (1.0 + erf(zScore / math.sqrt(2.0))) / 2.0;
+    return 1 - (1.0 + math.erf(zScore / math.sqrt(2.0))) / 2.0;
   }
 
   /// Convert Z-score to T-score.
@@ -177,7 +177,7 @@ class ZScore {
   ///
   /// @return The percentile.
   static double computePercentile(double zScore) {
-    return (1.0 + erf(zScore / math.sqrt(2.0))) / 2.0 * 100;
+    return (1.0 + math.erf(zScore / math.sqrt(2.0))) / 2.0 * 100;
   }
 
   /// Compute Z-score from a raw score.

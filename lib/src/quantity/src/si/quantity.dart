@@ -214,7 +214,7 @@ abstract class Quantity implements Comparable<dynamic> {
     var x = -4.0;
     var count = 0;
     while (count < 10000) {
-      final fx = erf(x);
+      final fx = math.erf(x);
       if ((fx - test).abs() < eps) {
         final z = x * math.sqrt(2.0);
         return this + (standardUncertainty * z);

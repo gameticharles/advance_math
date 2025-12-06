@@ -13,6 +13,7 @@ part 'statistics.dart';
 part 'constants.dart';
 part 'trigonometry.dart';
 part 'logarithm.dart';
+part 'special_functions.dart';
 
 /// A generator of random byte, bool, int, BigInt, or double values.
 ///

@@ -68,6 +68,9 @@
 - **[BUG_FIX]** Fixed `IntegrationByParts` failure for solo functions (e.g., `ln(x)`, `asin(x)`) by treating them as `f(x) * 1`
 - **[BUG_FIX]** Fixed `PowerRuleStrategy` to correctly handle `Complex` exponents safely avoiding type cast errors
 - **[FEATURE]** Added logarithmic integration pattern (`u'/u`) to `SubstitutionStrategy` supporting forms like `integrate(1/(x+1))`
+- **[BUG_FIX]** Fixed `integrate(cos(x)*sin(x))` sign error by improving `Divide.simplifyBasic`
+- **[IMPROVEMENT]** Generalized linear substitution to handle implicit constant factors (e.g. `integrate((2x+1)^2)`)
+- **[BUG_FIX]** Fixed `solve(x^3)` returning `NaN` by fixing `Complex.pow` for zero base
 
 ## Test Coverage Improvements
 
@@ -159,6 +162,14 @@
   - `digamma()`: Digamma (psi) function
   - `erf()`: Error function with Taylor series expansion
   - `erfc()`: Complementary error function
+  - `beta()`: Beta function
+  - `zeta()`: Riemann Zeta function
+- **[FEATURE]** Added precision functions
+  - `expm1()`: `e^x - 1` for small `x`
+  - `log1p()`: `ln(1 + x)` for small `x`
+- **[FEATURE]** Added floating-point utilities
+  - `frexp()`: Mantissa and exponent decomposition
+  - `ldexp()`: Recompose double from mantissa and exponent
 - **[FEATURE]** Added static utility methods for collections of Complex numbers
   - `Complex.sum(List<Complex>)`: Sum of complex numbers
   - `Complex.mean(List<Complex>)`: Arithmetic mean
@@ -187,6 +198,12 @@
 - **[IMPROVEMENT]** Refactored `Sector`, `Segment`, and `Arc` classes
   - Encapsulated fields with private accessors and validation
   - Optimized `contains(Point)` method in `Sector` for better performance
+- **[REFACTOR]** Merged `ErrorEllipse` implementation
+  - Consolidated fields to support both covariance matrix (`sigmaX2`, `sigmaY2`, `sigmaXY`) and standard deviation (`sigmaX`, `sigmaY`, `rho`)
+  - Added `generateEllipsePoints()` for plotting
+  - Added `toJson()`/`fromJson()` serialization
+  - Added dynamic `updateParameters()` method
+  - Restored `PlaneGeometry` inheritance and `contains()` logic
 
 ### Solid Geometry
 

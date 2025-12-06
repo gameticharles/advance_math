@@ -333,4 +333,124 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
 
     return prefactor * sum;
   }
+  // ============================================================
+  // Beta and Zeta functions
+  // ============================================================
+
+  /// ## Beta Function
+  ///
+  /// Computes the [Beta function](http://mathworld.wolfram.com/BetaFunction.html)
+  /// B(z, w) = Γ(z)Γ(w) / Γ(z+w).
+  ///
+  /// Example:
+  /// ```dart
+  /// var z = Complex(1, 0);
+  /// var w = Complex(2, 0);
+  /// print(z.beta(w)); // Output: 0.5 + 0i
+  /// ```
+  Complex beta(Complex w) {
+    if (isNaN || w.isNaN) return Complex.nan();
+    return (gamma() * w.gamma()) / (this + w).gamma();
+  }
+
+  /// ## Riemann Zeta Function
+  ///
+  /// Computes the [Riemann Zeta function](http://mathworld.wolfram.com/RiemannZetaFunction.html)
+  /// for this complex number.
+  ///
+  /// Uses the Alternating Zeta function (Dirichlet Eta function) for Re(s) > 0,
+  /// and the functional equation for Re(s) < 0.
+  ///
+  /// Example:
+  /// ```dart
+  /// var s = Complex(2, 0);
+  /// print(s.zeta()); // Output: ~1.645 + 0i (pi^2/6)
+  /// ```
+  Complex zeta() {
+    if (isNaN) return Complex.nan();
+    if (real == 1.0 && imaginary == 0.0) return Complex.infinity();
+
+    // Reflection formula for Re(s) < 0
+    // ζ(s) = 2^s * π^(s-1) * sin(πs/2) * Γ(1-s) * ζ(1-s)
+    if (real < 0) {
+      final s = this;
+      final oneMinusS = Complex(1, 0) - s;
+      final twoPowS = Complex(2, 0).pow(s);
+      final piPowSMinus1 = Complex(math.pi, 0).pow(s - Complex(1, 0));
+      final sinPiSOver2 = (Complex(math.pi, 0) * s / Complex(2, 0)).sin();
+      final gammaOneMinusS = oneMinusS.gamma();
+      final zetaOneMinusS = oneMinusS.zeta();
+
+      return twoPowS *
+          piPowSMinus1 *
+          sinPiSOver2 *
+          gammaOneMinusS *
+          zetaOneMinusS;
+    }
+
+    // For Re(s) >= 0 (and not 1), use Dirichlet Eta function
+    // ζ(s) = η(s) / (1 - 2^(1-s))
+    // η(s) = Σ (-1)^(n-1) / n^s
+    Complex eta = Complex.zero();
+    // 1000 iterations for reasonable precision in this generic implementation
+    for (int n = 1; n <= 1000; n++) {
+      final sign = (n % 2 == 1) ? 1.0 : -1.0;
+      final term = Complex(sign, 0) / Complex(n, 0).pow(this);
+      eta = eta + term;
+      // Basic convergence check
+      if (eta.abs() > 1e-10 && term.abs() < 1e-15 * eta.abs() && n > 20) break;
+    }
+
+    final oneMinusTwoPowOneMinusS =
+        Complex(1, 0) - Complex(2, 0).pow(Complex(1, 0) - this);
+    return eta / oneMinusTwoPowOneMinusS;
+  }
+
+  // ============================================================
+  // Precision Helper Functions
+  // ============================================================
+
+  /// ## expm1
+  ///
+  /// Computes e^z - 1 with high precision for values of z near zero.
+  Complex expm1() {
+    if (isNaN) return Complex.nan();
+    // If z is small, use Taylor series: z + z^2/2! + z^3/3! ...
+    if (abs() < 0.1) {
+      Complex sum = Complex.zero();
+      Complex term = Complex(1, 0);
+      for (int n = 1; n < 20; n++) {
+        term = term * this / Complex(n, 0);
+        sum = sum + term;
+      }
+      return sum;
+    }
+    return exp() - Complex(1, 0);
+  }
+
+  /// ## log1p
+  ///
+  /// Computes natural logarithm of (1 + z) with high precision for values of z near zero.
+  Complex log1p() {
+    if (isNaN) return Complex.nan();
+    // log(1+z). If z is small, use Taylor series: z - z^2/2 + z^3/3 ...
+    if (abs() < 0.1) {
+      Complex sum = Complex.zero();
+      Complex term = this; // z
+      sum = sum + term;
+      Complex zPow = this;
+
+      for (int n = 2; n < 20; n++) {
+        zPow = zPow * this;
+        Complex nextTerm = zPow / Complex(n, 0);
+        if (n % 2 == 0) {
+          sum = sum - nextTerm;
+        } else {
+          sum = sum + nextTerm;
+        }
+      }
+      return sum;
+    }
+    return (Complex(1, 0) + this).log();
+  }
 }

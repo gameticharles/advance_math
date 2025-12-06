@@ -1223,57 +1223,6 @@ double numIntegrate(Function f, double a, double b,
   }
 }
 
-/// Computes the gamma function of [z].
-///
-/// The gamma function is an extension of the factorial function to complex numbers,
-/// with a pole at every non-positive integer.
-///
-/// For a given input [z], the function computes:
-///
-/// \[
-/// \Gamma(z) = \int_0^\infty t^{z-1} e^{-t} dt
-/// \]
-///
-/// Parameters:
-///  - [z]: A double value for which the gamma function is computed.
-///
-/// Returns:
-///  - A double value representing the gamma function of [z].
-///
-/// Example:
-/// ```dart
-/// var result = gamma(0.5);
-/// print(result);  // Expected output: ~1.77245385091 (which is the square root of Pi)
-/// ```
-double gamma(num z) {
-  const int g = 7;
-  const List<double> C = [
-    0.99999999999980993,
-    676.5203681218851,
-    -1259.1392167224028,
-    771.32342877765313,
-    -176.61502916214059,
-    12.507343278686905,
-    -0.13857109526572012,
-    9.9843695780195716e-6,
-    1.5056327351493116e-7
-  ];
-
-  if (z < 0.5) {
-    return pi / (sin(pi * z) * gamma(1 - z));
-  } else {
-    z -= 1;
-
-    var x = C[0];
-    for (var i = 1; i < g + 2; i++) {
-      x += C[i] / (z + i);
-    }
-
-    var t = z + g + 0.5;
-    return sqrt(2 * pi) * pow(t, (z + 0.5)) * exp(-t) * x;
-  }
-}
-
 /// Returns the factorial of a number.
 ///
 /// Example:
@@ -1862,4 +1811,64 @@ bool isHappyNumber(int n) {
   }
 
   return n == 1;
+}
+
+/// Decomposes a double [x] into a normalized fraction and an integral power of 2.
+/// Returns a record `(double mantissa, int exponent)` such that `x = mantissa * 2^exponent`.
+/// The absolute value of `mantissa` will be in the range [0.5, 1.0) or 0.0.
+///
+/// Example:
+/// ```dart
+/// var parts = frexp(8.0);
+/// print(parts); // (0.5, 4) because 8.0 = 0.5 * 2^4
+/// ```
+({double mantissa, int exponent}) frexp(num x) {
+  double d = x.toDouble();
+  if (d == 0.0) return (mantissa: 0.0, exponent: 0);
+  if (d.isNaN || d.isInfinite) return (mantissa: d, exponent: 0);
+
+  // Use bit operations for IEEE 754 double precision
+  // 1 bit sign, 11 bits exponent, 52 bits significand
+  // Bias is 1023
+  var bd = ByteData(8);
+  bd.setFloat64(0, d);
+  var bits = bd.getInt64(0);
+
+  // Extract exponent bits (bit 52-62)
+  var rawExp = (bits >> 52) & 0x7FF;
+
+  // Handle denormalized numbers
+  if (rawExp == 0) {
+    // Determine the shift needed to normalize
+    // This is simplified; robust impl might scale x by 2^54 and adjust
+    d *= 9007199254740992.0; // 2^53
+    bd.setFloat64(0, d);
+    bits = bd.getInt64(0);
+    rawExp = (bits >> 52) & 0x7FF;
+    rawExp -= 53;
+  }
+
+  // Calculate exponent
+  var exp = rawExp - 1022;
+
+  // Replace exponent with bias-1 (1022) to make mantissa in [0.5, 1.0)
+  // New exponent bits should be 1022 (0x3FE)
+  // Clear exponent bits (mask: 0x800FFFFFFFFFFFFF) and set 0x3FE
+  var mantissaBits = (bits & 0x800FFFFFFFFFFFFF) | (0x3FE << 52);
+  bd.setInt64(0, mantissaBits);
+  var mantissa = bd.getFloat64(0);
+
+  return (mantissa: mantissa, exponent: exp);
+}
+
+/// Computes the result of multiplying the floating-point number [x] by 2 raised to the power [exp].
+/// `result = x * 2^exp`.
+///
+/// Example:
+/// ```dart
+/// print(ldexp(0.5, 3)); // 4.0
+/// ```
+double ldexp(num x, int exp) {
+  // Simple implementation using pow, optimization possible with bit ops
+  return (x * pow(2, exp)).toDouble();
 }

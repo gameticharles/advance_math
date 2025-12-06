@@ -8,7 +8,6 @@ import 'dart:math' as dmath;
 //import '../complex.dart';
 import 'package:dartframe/dartframe.dart';
 
-import '../../number/util/utils.dart';
 import '../../number/complex/complex.dart';
 import '../geometry/geometry.dart';
 import '/src/math/basic/math.dart' as math;
