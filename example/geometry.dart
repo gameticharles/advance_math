@@ -1,6 +1,6 @@
 import 'package:advance_math/advance_math.dart';
 
-main() {
+void main() {
   var p = Polygon(vertices: [
     Point(591.40, 591.40),
     Point(652.40, 542.70),

@@ -19,9 +19,9 @@ part of '../../geometry.dart';
 /// ```
 class Arc {
   num _radius;
-  Angle _centralAngle;
-  Point _center;
-  num _startAngle;
+  Angle centralAngle;
+  Point center;
+  num startAngle;
 
   /// The radius of the circle from which the arc is taken
   num get radius => _radius;
@@ -32,24 +32,6 @@ class Arc {
     _radius = value;
   }
 
-  /// The central angle subtended by the arc
-  Angle get centralAngle => _centralAngle;
-  set centralAngle(Angle value) {
-    _centralAngle = value;
-  }
-
-  /// The center point of the circle
-  Point get center => _center;
-  set center(Point value) {
-    _center = value;
-  }
-
-  /// The starting angle of the arc (default: 0)
-  num get startAngle => _startAngle;
-  set startAngle(num value) {
-    _startAngle = value;
-  }
-
   /// Creates an arc with the specified radius and central angle.
   ///
   /// [radius] must be positive.
@@ -58,12 +40,10 @@ class Arc {
   /// [startAngle] is the starting angle in radians (default: 0).
   ///
   /// Throws [ArgumentError] if radius is not positive.
-  Arc(double radius, Angle centralAngle,
-      {Point? center, double startAngle = 0.0})
+  Arc(double radius, this.centralAngle,
+      {Point? center, double this.startAngle = 0.0})
       : _radius = radius,
-        _centralAngle = centralAngle,
-        _center = center ?? Point(0, 0),
-        _startAngle = startAngle {
+        center = center ?? Point(0, 0) {
     if (radius <= 0) {
       throw ArgumentError('Radius must be positive, got: $radius');
     }
@@ -85,11 +65,10 @@ class Arc {
   ///
   /// Throws [ArgumentError] if parameters are invalid.
   Arc.fromLength(double radius, double arcLength,
-      {Point? center, double startAngle = 0.0})
+      {Point? center, double this.startAngle = 0.0})
       : _radius = radius,
-        _centralAngle = Angle(rad: arcLength / radius),
-        _center = center ?? Point(0, 0),
-        _startAngle = startAngle {
+        centralAngle = Angle(rad: arcLength / radius),
+        center = center ?? Point(0, 0) {
     if (radius <= 0 || arcLength <= 0) {
       throw ArgumentError(
           'Radius and arc length must be positive. Got radius: $radius, arcLength: $arcLength');
@@ -102,11 +81,10 @@ class Arc {
   ///
   /// Throws [ArgumentError] if parameters are invalid.
   Arc.fromChord(double radius, double chordLength,
-      {Point? center, double startAngle = 0.0})
+      {Point? center, double this.startAngle = 0.0})
       : _radius = radius,
-        _centralAngle = Angle(rad: 2 * asin(chordLength / (2 * radius))),
-        _center = center ?? Point(0, 0),
-        _startAngle = startAngle {
+        centralAngle = Angle(rad: 2 * asin(chordLength / (2 * radius))),
+        center = center ?? Point(0, 0) {
     if (radius <= 0 || chordLength <= 0) {
       throw ArgumentError(
           'Radius and chord length must be positive. Got radius: $radius, chordLength: $chordLength');
@@ -125,11 +103,10 @@ class Arc {
   ///
   /// Throws [ArgumentError] if parameters are invalid.
   Arc.fromPoints(Point start, Point end, double radius,
-      {double startAngle = 0.0})
+      {double this.startAngle = 0.0})
       : _radius = radius,
-        _centralAngle = Angle(rad: 0),
-        _center = Point(0, 0),
-        _startAngle = startAngle {
+        centralAngle = Angle(rad: 0),
+        center = Point(0, 0) {
     double distance = start.distanceTo(end);
     if (distance > 2 * radius) {
       throw ArgumentError(
@@ -147,56 +124,56 @@ class Arc {
     num perpX = (-dy / distance).toDouble();
     num perpY = (dx / distance).toDouble();
 
-    _center = Point(
+    center = Point(
       midpoint.x + perpX * distanceToCenter,
       midpoint.y + perpY * distanceToCenter,
     );
 
     // Calculate central angle
-    _centralAngle = Angle(rad: 2 * asin(halfChord / radius));
+    centralAngle = Angle(rad: 2 * asin(halfChord / radius));
 
     // Calculate start angle
-    _startAngle = atan2(start.y - _center.y, start.x - _center.x);
+    startAngle = atan2(start.y - center.y, start.x - center.x);
   }
 
   /// Gets the arc length.
   ///
   /// Arc length = θ × r
-  num get length => _centralAngle.rad * _radius;
+  num get length => centralAngle.rad * _radius;
 
   /// Gets the chord length (straight line connecting arc endpoints).
   ///
   /// Chord = 2r × sin(θ/2)
-  num get chordLength => 2 * _radius * sin(_centralAngle.rad / 2);
+  num get chordLength => 2 * _radius * sin(centralAngle.rad / 2);
 
   /// Gets the height (sagitta) of the arc.
   ///
   /// Sagitta = r - √(r² - (chord/2)²) = r × (1 - cos(θ/2))
-  num get sagitta => _radius * (1 - cos(_centralAngle.rad / 2));
+  num get sagitta => _radius * (1 - cos(centralAngle.rad / 2));
 
   /// Gets the start point of the arc.
   Point get startPoint {
     return Point(
-      _center.x + _radius * cos(_startAngle),
-      _center.y + _radius * sin(_startAngle),
+      center.x + _radius * cos(startAngle),
+      center.y + _radius * sin(startAngle),
     );
   }
 
   /// Gets the end point of the arc.
   Point get endPoint {
-    num endAngle = _startAngle + _centralAngle.rad;
+    num endAngle = startAngle + centralAngle.rad;
     return Point(
-      _center.x + _radius * cos(endAngle),
-      _center.y + _radius * sin(endAngle),
+      center.x + _radius * cos(endAngle),
+      center.y + _radius * sin(endAngle),
     );
   }
 
   /// Gets the midpoint of the arc.
   Point get midpoint {
-    num midAngle = _startAngle + _centralAngle.rad / 2;
+    num midAngle = startAngle + centralAngle.rad / 2;
     return Point(
-      _center.x + _radius * cos(midAngle),
-      _center.y + _radius * sin(midAngle),
+      center.x + _radius * cos(midAngle),
+      center.y + _radius * sin(midAngle),
     );
   }
 
@@ -207,10 +184,10 @@ class Arc {
     if (t < 0 || t > 1) {
       throw ArgumentError('Parameter t must be in range [0, 1], got: $t');
     }
-    num angle = _startAngle + t * _centralAngle.rad;
+    num angle = startAngle + t * centralAngle.rad;
     return Point(
-      _center.x + _radius * cos(angle),
-      _center.y + _radius * sin(angle),
+      center.x + _radius * cos(angle),
+      center.y + _radius * sin(angle),
     );
   }
 
@@ -221,7 +198,7 @@ class Arc {
     if (t < 0 || t > 1) {
       throw ArgumentError('Parameter t must be in range [0, 1], got: $t');
     }
-    double angle = _startAngle + t * _centralAngle.rad;
+    double angle = startAngle + t * centralAngle.rad;
     // Tangent is perpendicular to radius, so rotate by 90°
     return Point(
       -_radius * sin(angle),
@@ -240,10 +217,10 @@ class Arc {
 
     // Check extreme points if they fall within the arc's angular range
     // Normalize angles to [0, 2pi) for comparison
-    num start = _startAngle % (2 * pi);
+    num start = startAngle % (2 * pi);
     if (start < 0) start += 2 * pi;
 
-    num end = (start + _centralAngle.rad);
+    num end = (start + centralAngle.rad);
     // Note: end can be > 2pi, which is fine for range checking
 
     // Helper to check if an angle is within [start, end]
@@ -256,16 +233,16 @@ class Arc {
 
     // Check 0, pi/2, pi, 3pi/2
     if (isAngleInArc(0) || isAngleInArc(2 * pi)) {
-      pointsToCheck.add(Point(_center.x + _radius, _center.y));
+      pointsToCheck.add(Point(center.x + _radius, center.y));
     }
     if (isAngleInArc(pi / 2)) {
-      pointsToCheck.add(Point(_center.x, _center.y + _radius));
+      pointsToCheck.add(Point(center.x, center.y + _radius));
     }
     if (isAngleInArc(pi)) {
-      pointsToCheck.add(Point(_center.x - _radius, _center.y));
+      pointsToCheck.add(Point(center.x - _radius, center.y));
     }
     if (isAngleInArc(3 * pi / 2)) {
-      pointsToCheck.add(Point(_center.x, _center.y - _radius));
+      pointsToCheck.add(Point(center.x, center.y - _radius));
     }
 
     for (var p in pointsToCheck) {
@@ -285,6 +262,6 @@ class Arc {
 
   @override
   String toString() {
-    return 'Arc(radius: $_radius, centralAngle: ${_centralAngle.deg}°, length: $length)';
+    return 'Arc(radius: $_radius, centralAngle: ${centralAngle.deg}°, length: $length)';
   }
 }

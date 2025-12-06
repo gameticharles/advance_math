@@ -20,8 +20,8 @@ part of '../../geometry.dart';
 /// ```
 class Segment extends PlaneGeometry {
   num _radius;
-  Angle _centralAngle;
-  Point _center;
+  Angle centralAngle;
+  Point center;
 
   /// The radius of the circle from which the segment is taken
   num get radius => _radius;
@@ -32,18 +32,6 @@ class Segment extends PlaneGeometry {
     _radius = value;
   }
 
-  /// The central angle of the segment
-  Angle get centralAngle => _centralAngle;
-  set centralAngle(Angle value) {
-    _centralAngle = value;
-  }
-
-  /// The center point of the circle
-  Point get center => _center;
-  set center(Point value) {
-    _center = value;
-  }
-
   /// Creates a segment with the specified radius and central angle.
   ///
   /// [radius] must be positive.
@@ -51,10 +39,9 @@ class Segment extends PlaneGeometry {
   /// [center] is the optional center point (defaults to origin).
   ///
   /// Throws [ArgumentError] if radius is not positive.
-  Segment(num radius, Angle centralAngle, {Point? center})
+  Segment(num radius, this.centralAngle, {Point? center})
       : _radius = radius,
-        _centralAngle = centralAngle,
-        _center = center ?? Point(0, 0),
+        center = center ?? Point(0, 0),
         super('Segment') {
     if (radius <= 0) {
       throw ArgumentError('Radius must be positive, got: $radius');
@@ -74,8 +61,8 @@ class Segment extends PlaneGeometry {
   /// Throws [ArgumentError] if parameters are invalid.
   Segment.fromChord(num radius, num chordLength, {Point? center})
       : _radius = radius,
-        _centralAngle = Angle(rad: 2 * asin(chordLength / (2 * radius))),
-        _center = center ?? Point(0, 0),
+        centralAngle = Angle(rad: 2 * asin(chordLength / (2 * radius))),
+        center = center ?? Point(0, 0),
         super('Segment') {
     if (radius <= 0 || chordLength <= 0) {
       throw ArgumentError(
@@ -94,8 +81,8 @@ class Segment extends PlaneGeometry {
   /// Throws [ArgumentError] if parameters are invalid.
   Segment.fromHeight(num radius, num height, {Point? center})
       : _radius = radius,
-        _centralAngle = Angle(rad: 2 * acos((radius - height) / radius)),
-        _center = center ?? Point(0, 0),
+        centralAngle = Angle(rad: 2 * acos((radius - height) / radius)),
+        center = center ?? Point(0, 0),
         super('Segment') {
     if (radius <= 0 || height <= 0) {
       throw ArgumentError(
@@ -110,25 +97,24 @@ class Segment extends PlaneGeometry {
   /// Gets the arc length of the segment.
   ///
   /// Arc length = θ × r
-  num get arcLength => _centralAngle.rad * _radius;
+  num get arcLength => centralAngle.rad * _radius;
 
   /// Gets the chord length (straight line across the segment).
   ///
   /// Chord = 2r × sin(θ/2)
-  num get chordLength => 2 * _radius * sin(_centralAngle.rad / 2);
+  num get chordLength => 2 * _radius * sin(centralAngle.rad / 2);
 
   /// Gets the height (sagitta) of the segment.
   ///
   /// Height = r × (1 - cos(θ/2))
-  num get height => _radius * (1 - cos(_centralAngle.rad / 2));
+  num get height => _radius * (1 - cos(centralAngle.rad / 2));
 
   /// Calculates the area of the segment.
   ///
   /// Area = (r²/2) × (θ - sin(θ))
   @override
   double area() {
-    return (_radius * _radius / 2) *
-        (_centralAngle.rad - sin(_centralAngle.rad));
+    return (_radius * _radius / 2) * (centralAngle.rad - sin(centralAngle.rad));
   }
 
   /// Calculates the perimeter of the segment.
@@ -142,12 +128,12 @@ class Segment extends PlaneGeometry {
   /// Gets the area of the corresponding sector.
   ///
   /// Sector area = (θ/2) × r²
-  num get sectorArea => 0.5 * _centralAngle.rad * _radius * _radius;
+  num get sectorArea => 0.5 * centralAngle.rad * _radius * _radius;
 
   /// Gets the area of the triangle formed by the two radii and chord.
   ///
   /// Triangle area = (r²/2) × sin(θ)
-  num get triangleArea => (_radius * _radius / 2) * sin(_centralAngle.rad);
+  num get triangleArea => (_radius * _radius / 2) * sin(centralAngle.rad);
 
   /// Calculates the bounding box of the segment.
   List<Point> boundingBox() {
@@ -157,22 +143,22 @@ class Segment extends PlaneGeometry {
     num maxY = double.negativeInfinity;
 
     // Endpoints of the chord/arc
-    Point p1 = Point(_center.x + _radius, _center.y);
-    Point p2 = Point(_center.x + _radius * cos(_centralAngle.rad),
-        _center.y + _radius * sin(_centralAngle.rad));
+    Point p1 = Point(center.x + _radius, center.y);
+    Point p2 = Point(center.x + _radius * cos(centralAngle.rad),
+        center.y + _radius * sin(centralAngle.rad));
 
     List<Point> pointsToCheck = [p1, p2];
 
     // Check extreme points of the arc
-    num endAngle = _centralAngle.rad;
+    num endAngle = centralAngle.rad;
     if (endAngle >= pi / 2) {
-      pointsToCheck.add(Point(_center.x, _center.y + _radius));
+      pointsToCheck.add(Point(center.x, center.y + _radius));
     }
     if (endAngle >= pi) {
-      pointsToCheck.add(Point(_center.x - _radius, _center.y));
+      pointsToCheck.add(Point(center.x - _radius, center.y));
     }
     if (endAngle >= 3 * pi / 2) {
-      pointsToCheck.add(Point(_center.x, _center.y - _radius));
+      pointsToCheck.add(Point(center.x, center.y - _radius));
     }
 
     // Note: Center is NOT necessarily part of the segment bounding box unless the segment is > semicircle
@@ -197,6 +183,6 @@ class Segment extends PlaneGeometry {
 
   @override
   String toString() {
-    return 'Segment(radius: $_radius, centralAngle: ${_centralAngle.deg}°, area: ${area()}, chordLength: $chordLength)';
+    return 'Segment(radius: $_radius, centralAngle: ${centralAngle.deg}°, area: ${area()}, chordLength: $chordLength)';
   }
 }
