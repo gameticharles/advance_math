@@ -751,28 +751,14 @@ void main() {
     var y = Complex(re, im);
 
     expect(x == y, isTrue);
-    /*expect(Complex.equals(x, y), isTrue);
-
-    final int maxUlps = 5;
-    for (int i = 0; i < maxUlps; i++) {
-      re = FastMath.nextUp(re);
-      im = FastMath.nextUp(im);
-    }
-    y = Complex(re, im);
-    expect(Complex.equals(x, y, maxUlps), isTrue);
-
-    re = FastMath.nextUp(re);
-    im = FastMath.nextUp(im);
-    y = Complex(re, im);
-    expect(Complex.equals(x, y, maxUlps), isFalse);*/
   });
 
-  /*test('FloatingPointEqualsNaN', () {
-    Complex c = Complex(double.nan(), 1);
-    expect(Complex.equals(c, c), isFalse);
+  test('FloatingPointEqualsNaN', () {
+    Complex c = Complex(double.nan, 1);
+    expect(c.equals(c), isFalse);
 
     c = Complex(1, double.nan);
-    expect(Complex.equals(c, c), isFalse);
+    expect(c.equals(c), isFalse);
   });
 
   test('FloatingPointEqualsWithAllowedDelta', () {
@@ -781,10 +767,10 @@ void main() {
     final double tol1 = 0.0625;
     final Complex x = Complex(re, im);
     final Complex y = Complex(re + tol1, im + tol1);
-    expect(Complex.equals(x, y, tol1), isTrue);
+    expect(x.equals(y, tolerance: tol1), isTrue);
 
     final double tol2 = 0.0624;
-    expect(Complex.equals(x, y, tol2), isFalse);
+    expect(x.equals(y, tolerance: tol2), isFalse);
   });
 
   test('FloatingPointEqualsWithRelativeTolerance', () {
@@ -795,8 +781,8 @@ void main() {
     final double f = 1 + tol;
     final Complex x = Complex(re, im);
     final Complex y = Complex(re * f, im * f);
-    expect(Complex.equalsWithRelativeTolerance(x, y, tol), isTrue);
-  });*/
+    expect(x.isApproximatelyEqualTo(y, tolerance: tol), isTrue);
+  });
 
   test('EqualsTrue', () {
     var x = Complex(3.0, 4.0);

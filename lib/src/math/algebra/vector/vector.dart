@@ -726,7 +726,7 @@ class Vector extends IterableMixin<dynamic> {
   }
 
   Point toPoint() =>
-      Point.fromList(_data.map((e) => Complex(e).toNum() as num).toList());
+      Point.fromList(_data.map((e) => Complex(e).toNum()).toList());
 
   @override
   String toString() {

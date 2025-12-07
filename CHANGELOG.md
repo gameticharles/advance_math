@@ -1,6 +1,7 @@
 # 5.4.2
 
 - **[IMPROVEMENT]** docs: Improve doc comment formatting by consistently using backticks for code references and ranges.
+- **[FEATURE]** Added `ComplexArray` for efficient storage and operations on complex numbers, including FFT and IFFT.
 
 # 5.4.1
 
