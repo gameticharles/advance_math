@@ -1,9 +1,11 @@
 // ignore_for_file: unused_element
 
+import 'dart:typed_data';
+// import 'dart:math' as dmath; // For internal double-only math
+
 import '../../../advance_math.dart' show Memoize, MemoizeOptions;
 import '../../math/basic/math.dart' as math;
 import '../util/jenkins_hash.dart';
-// import 'package:advance_math/src/number/util/jenkins_hash.dart';
 
 part 'extensions/num.dart';
 part 'extensions/trigonometric.dart';
@@ -11,6 +13,7 @@ part 'extensions/hyperbolic.dart';
 part 'extensions/operations.dart';
 part 'extensions/special_functions.dart';
 part 'imaginary.dart';
+part 'complex_array.dart';
 
 /// A class representing complex numbers in the form a + bi, where a is the real part
 /// and b is the imaginary part.
@@ -1037,7 +1040,6 @@ class Complex implements Comparable<dynamic> {
   /// ```dart
   /// var z = Complex(1, 2);
   /// var z_power = z.pow(Complex(2, 1));
-  ///
   /// print(z_power); // Output: -1.6401010184280038 + 0.202050398556709i
   /// ```
   Complex pow(dynamic x) {
@@ -1685,7 +1687,7 @@ class Complex implements Comparable<dynamic> {
   /// Complex(-3, 4).toNum()       // returns -5.0 (double, magnitude with sign)
   /// Complex(3, 1e-16).toNum()    // returns 3 (int, negligible imaginary part)
   /// ```
-  dynamic toNum({double relTol = 1e-9, double absTol = 1e-15}) {
+  num toNum({double relTol = 1e-9, double absTol = 1e-15}) {
     // First check if it's a simple real number
     if (isSimplifiable(relTol: relTol, absTol: absTol)) {
       return simplify(relTol: relTol, absTol: absTol);

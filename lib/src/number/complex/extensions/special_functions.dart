@@ -232,7 +232,7 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
   /// var result = z.erf();
   /// print(result); // Output: ~0.8427 + 0i
   /// ```
-  Complex erf() {
+  Complex erf({double epsilon = 1e-15, int maxIterations = 200}) {
     if (isNaN) return Complex.nan();
     if (isZero) return Complex.zero();
 
@@ -246,18 +246,20 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
 
       final zSquared = this * this;
 
-      for (int n = 1; n < 100; n++) {
+      for (int n = 1; n < maxIterations; n++) {
         term = term * (-zSquared) / Complex(n.toDouble(), 0);
         final nextTerm = term / Complex((2 * n + 1).toDouble(), 0);
         sum = sum + nextTerm;
-        if (nextTerm.abs() < 1e-15 * sum.abs()) break;
+
+        // Adaptive check: stop when term is negligible relative to sum
+        if (nextTerm.abs() < epsilon * sum.abs()) break;
       }
 
       return twoOverSqrtPi * sum;
     }
 
     // For large |z|, use the relation erf(z) = 1 - erfc(z)
-    return Complex(1, 0) - erfc();
+    return Complex(1, 0) - erfc(epsilon: epsilon, maxIterations: maxIterations);
   }
 
   /// ## Complementary Error Function
@@ -277,26 +279,28 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
   /// var result = z.erfc();
   /// print(result); // Output: ~0.1573 + 0i
   /// ```
-  Complex erfc() {
+  Complex erfc({double epsilon = 1e-15, int maxIterations = 200}) {
     if (isNaN) return Complex.nan();
     if (isZero) return Complex(1, 0);
 
     // For small |z|, use erfc(z) = 1 - erf(z)
     if (abs() < 4.0) {
-      return Complex(1, 0) - _erfTaylor();
+      return Complex(1, 0) -
+          _erfTaylor(epsilon: epsilon, maxIterations: maxIterations);
     }
 
     // For large |z| with Re(z) > 0, use continued fraction expansion
     if (real > 0) {
-      return _erfcAsymptotic();
+      return _erfcAsymptotic(epsilon: epsilon, maxIterations: maxIterations);
     }
 
     // For Re(z) < 0, use reflection formula: erfc(-z) = 2 - erfc(z)
-    return Complex(2, 0) - (-this).erfc();
+    return Complex(2, 0) -
+        (-this).erfc(epsilon: epsilon, maxIterations: maxIterations);
   }
 
   /// Taylor series for erf (used internally)
-  Complex _erfTaylor() {
+  Complex _erfTaylor({double epsilon = 1e-15, int maxIterations = 100}) {
     final twoOverSqrtPi = Complex(2.0 / math.sqrt(math.pi), 0);
     Complex sum = Complex.zero();
     Complex term = this;
@@ -304,18 +308,18 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
 
     final zSquared = this * this;
 
-    for (int n = 1; n < 100; n++) {
+    for (int n = 1; n < maxIterations; n++) {
       term = term * (-zSquared) / Complex(n.toDouble(), 0);
       final nextTerm = term / Complex((2 * n + 1).toDouble(), 0);
       sum = sum + nextTerm;
-      if (nextTerm.abs() < 1e-15 * sum.abs()) break;
+      if (nextTerm.abs() < epsilon * sum.abs()) break;
     }
 
     return twoOverSqrtPi * sum;
   }
 
   /// Asymptotic expansion for erfc (used internally)
-  Complex _erfcAsymptotic() {
+  Complex _erfcAsymptotic({double epsilon = 1e-15, int maxIterations = 20}) {
     // erfc(z) ≈ (e^(-z²) / (z√π)) * Σ ((-1)^n * (2n-1)!! / (2z²)^n)
     final zSquared = this * this;
     final expNegZSquared = (-zSquared).exp();
@@ -325,10 +329,10 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
     Complex term = Complex(1, 0);
     final twoZSquared = zSquared * Complex(2, 0);
 
-    for (int n = 1; n <= 20; n++) {
+    for (int n = 1; n <= maxIterations; n++) {
       term = term * Complex(-(2 * n - 1).toDouble(), 0) / twoZSquared;
       sum = sum + term;
-      if (term.abs() < 1e-15 * sum.abs()) break;
+      if (term.abs() < epsilon * sum.abs()) break;
     }
 
     return prefactor * sum;
@@ -366,7 +370,7 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
   /// var s = Complex(2, 0);
   /// print(s.zeta()); // Output: ~1.645 + 0i (pi^2/6)
   /// ```
-  Complex zeta() {
+  Complex zeta({double epsilon = 1e-10, int maxIterations = 1000}) {
     if (isNaN) return Complex.nan();
     if (real == 1.0 && imaginary == 0.0) return Complex.infinity();
 
@@ -379,7 +383,8 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
       final piPowSMinus1 = Complex(math.pi, 0).pow(s - Complex(1, 0));
       final sinPiSOver2 = (Complex(math.pi, 0) * s / Complex(2, 0)).sin();
       final gammaOneMinusS = oneMinusS.gamma();
-      final zetaOneMinusS = oneMinusS.zeta();
+      final zetaOneMinusS =
+          oneMinusS.zeta(epsilon: epsilon, maxIterations: maxIterations);
 
       return twoPowS *
           piPowSMinus1 *
@@ -393,12 +398,16 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
     // η(s) = Σ (-1)^(n-1) / n^s
     Complex eta = Complex.zero();
     // 1000 iterations for reasonable precision in this generic implementation
-    for (int n = 1; n <= 1000; n++) {
+    for (int n = 1; n <= maxIterations; n++) {
       final sign = (n % 2 == 1) ? 1.0 : -1.0;
       final term = Complex(sign, 0) / Complex(n, 0).pow(this);
       eta = eta + term;
       // Basic convergence check
-      if (eta.abs() > 1e-10 && term.abs() < 1e-15 * eta.abs() && n > 20) break;
+      if (eta.abs() > epsilon &&
+          term.abs() < (epsilon * 1e-5) * eta.abs() &&
+          n > 20) {
+        break;
+      }
     }
 
     final oneMinusTwoPowOneMinusS =

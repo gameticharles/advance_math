@@ -1,3 +1,7 @@
+# 5.4.2
+
+- **[IMPROVEMENT]** docs: Improve doc comment formatting by consistently using backticks for code references and ranges.
+
 # 5.4.1
 
 - **[BUG_FIX]** Fixed `Csc.integrate` crash and mathematical correctness

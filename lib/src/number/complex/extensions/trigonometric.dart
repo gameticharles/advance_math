@@ -107,22 +107,6 @@ extension ComplexTrigonometricX<T extends Complex> on T {
     return Complex(math.sin(real2) / d, math.sinh(imaginary2) / d);
   }
 
-  /// ## Arcsine
-  ///
-  /// Compute the [inverse sine](http://mathworld.wolfram.com/InverseSine.html)
-  /// of this complex number.
-  ///
-  /// Implements the formula:
-  ///
-  ///     asin(z) = -i (log(sqrt(1 - z^2) + iz))
-  ///
-  /// Returns [Complex.nan] if either real or imaginary part of the
-  /// input argument is `NaN` or infinite.
-  Complex acos() {
-    if (isNaN) return Complex.nan();
-    return (this + (sqrt1z() * Complex.i())).log() * (-Complex.i());
-  }
-
   /// ## Arccosine
   ///
   /// Compute the [inverse cosine](http://mathworld.wolfram.com/InverseCosine.html)
@@ -134,9 +118,99 @@ extension ComplexTrigonometricX<T extends Complex> on T {
   ///
   /// Returns [Complex.nan] if either real or imaginary part of the
   /// input argument is `NaN` or infinite.
+  Complex acos() {
+    if (isNaN) return Complex.nan();
+    return (this + (sqrt1z() * Complex.i())).log() * (-Complex.i());
+
+    // // acos(z) = pi/2 - asin(z)
+    // final asinVal = asin();
+    // return Complex(dmath.pi / 2 - asinVal.real, -asinVal.imaginary);
+  }
+
+  /// ## Arcsine
+  ///
+  /// Compute the [inverse sine](http://mathworld.wolfram.com/InverseSine.html)
+  /// of this complex number.
+  ///
+  /// Implements the formula:
+  ///
+  ///     asin(z) = -i (log(sqrt(1 - z^2) + iz))
+  ///
+  /// Returns [Complex.nan] if either real or imaginary part of the
+  /// input argument is `NaN` or infinite.
+  ///
   Complex asin() {
     if (isNaN) return Complex.nan();
     return (sqrt1z() + (this * Complex.i())).log() * -Complex.i();
+
+    // // 1. Calculate 1 - z^2
+    // // z^2 = (x^2 - y^2) + i(2xy)
+    // // 1 - z^2 = (1 - x^2 + y^2) - i(2xy)
+    // final x2 = real * real;
+    // final y2 = imaginary * imaginary;
+    // final oneMinusZ2Real = 1.0 - x2 + y2;
+    // final oneMinusZ2Imag = -2.0 * real * imaginary;
+
+    // // 2. Calculate sqrt(1 - z^2)
+    // // Robust local sqrt implementation
+    // double sr, si;
+    // if (oneMinusZ2Real.isNaN || oneMinusZ2Imag.isNaN) {
+    //   sr = double.nan;
+    //   si = double.nan;
+    // } else {
+    //   // Avoid overflow/underflow
+    //   final absReal = oneMinusZ2Real.abs();
+    //   final absImag = oneMinusZ2Imag.abs();
+    //   double w;
+    //   if (absReal >= absImag) {
+    //     // |oneMinusZ2Real| >= |oneMinusZ2Imag|
+    //     final ratio = oneMinusZ2Imag / oneMinusZ2Real;
+    //     w = dmath.sqrt(absReal) *
+    //         dmath.sqrt((1 + dmath.sqrt(1 + ratio * ratio)) / 2);
+    //   } else {
+    //     final ratio = oneMinusZ2Real / oneMinusZ2Imag;
+    //     w = dmath.sqrt(absImag) *
+    //         dmath.sqrt((ratio.abs() + dmath.sqrt(1 + ratio * ratio)) / 2);
+    //   }
+
+    //   if (oneMinusZ2Real >= 0) {
+    //     sr = w;
+    //     si = oneMinusZ2Imag / (2 * w);
+    //   } else {
+    //     si = (oneMinusZ2Imag >= 0) ? w : -w;
+    //     sr = oneMinusZ2Imag / (2 * si);
+    //   }
+    // }
+
+    // // 3. Calculate iz = -y + ix
+    // final izReal = -imaginary;
+    // final izImag = real;
+
+    // // 4. Calculate iz + sqrt(1 - z^2)
+    // final sumReal = izReal + sr;
+    // final sumImag = izImag + si;
+
+    // // 5. Calculate log(sum)
+    // // log(w) = log|w| + i*arg(w)
+    // // Robust hypot
+    // double sumAbs;
+    // final absSumReal = sumReal.abs();
+    // final absSumImag = sumImag.abs();
+    // if (absSumReal > absSumImag) {
+    //   final r = absSumImag / absSumReal;
+    //   sumAbs = absSumReal * dmath.sqrt(1 + r * r);
+    // } else if (absSumImag == 0) {
+    //   sumAbs = 0;
+    // } else {
+    //   final r = absSumReal / absSumImag;
+    //   sumAbs = absSumImag * dmath.sqrt(1 + r * r);
+    // }
+
+    // final logReal = dmath.log(sumAbs);
+    // final logImag = dmath.atan2(sumImag, sumReal);
+
+    // // 6. Calculate -i * log(sum) = -i * (lr + i*li) = -i*lr + li = li - i*lr
+    // return Complex(logImag, -logReal);
   }
 
   /// ## Arctangent
@@ -154,6 +228,43 @@ extension ComplexTrigonometricX<T extends Complex> on T {
     if (isNaN) return Complex.nan();
 
     return ((this + Complex.i()) / (Complex.i() - this)).log() * 0.5.imag;
+
+    //  // 1. Calculate i + z = (x) + i(1+y)
+    // final nReal = real;
+    // final nImag = 1.0 + imaginary;
+
+    // // 2. Calculate i - z = (-x) + i(1-y)
+    // final dReal = -real;
+    // final dImag = 1.0 - imaginary;
+
+    // // 3. Divide n / d
+    // // (a+bi)/(c+di) = (ac+bd)/(c^2+d^2) + i(bc-ad)/(c^2+d^2)
+    // final denom = dReal * dReal + dImag * dImag;
+    // final qReal = (nReal * dReal + nImag * dImag) / denom;
+    // final qImag = (nImag * dReal - nReal * dImag) / denom;
+
+    // // 4. log(q)
+    // // Robust hypot for log abs
+    // double qAbs;
+    // final absQReal = qReal.abs();
+    // final absQImag = qImag.abs();
+    // if (absQReal > absQImag) {
+    //   final r = absQImag / absQReal;
+    //   qAbs = absQReal * dmath.sqrt(1 + r * r);
+    // } else if (absQImag == 0) {
+    //   qAbs = 0;
+    // } else {
+    //   final r = absQReal / absQImag;
+    //   qAbs = absQImag * dmath.sqrt(1 + r * r);
+    // }
+
+    // final logReal = dmath.log(qAbs);
+    // final logImag = dmath.atan2(qImag, qReal);
+
+    // // 5. Multiply by i/2 = 0 + 0.5i
+    // // (lr + i*li) * 0.5i = 0.5i*lr - 0.5*li
+    // // = -0.5*li + i(0.5*lr)
+    // return Complex(-0.5 * logImag, 0.5 * logReal);
   }
 
   // ============================================================
@@ -163,7 +274,7 @@ extension ComplexTrigonometricX<T extends Complex> on T {
   /// Alias for [asin]. Computes the inverse sine of this complex number.
   Complex arcsin() => asin();
 
-  /// Alias for [acos]. Computes the inverse cosine of this complex number.
+  /// Alias for [acos]. Computes the i snverse cosine of this complex number.
   Complex arccos() => acos();
 
   /// Alias for [atan]. Computes the inverse tangent of this complex number.
