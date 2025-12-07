@@ -73,7 +73,7 @@ BigInt _gcd(BigInt a, BigInt b) {
 /// and a non-zero [denominator].
 ///
 /// This class is highly optimized for performance ("Hot Path" execution) while
-/// remaining robust enough to handle [Infinity], [NaN], and arbitrary precision.
+/// remaining robust enough to handle `[Infinity]`, `[NaN]`, and arbitrary precision.
 ///
 /// ### Features:
 /// * **Arbitrary Precision:** Uses [BigInt] to prevent overflows.

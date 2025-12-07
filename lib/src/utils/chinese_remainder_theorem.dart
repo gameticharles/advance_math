@@ -10,7 +10,7 @@ part of '../../advance_math.dart';
 ///
 /// The methods provided in this class help to eliminate coefficients, reduce the equations to
 /// pairwise co-prime moduli, and finally apply the CRT to find a unique solution modulo M, where
-/// M = m[0] * m[1] * ... * m[n-1].
+/// M = `m[0]` * `m[1]` * ... * `m[n-1]`.
 ///
 /// Example usage:
 /// ```dart

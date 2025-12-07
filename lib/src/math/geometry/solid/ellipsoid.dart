@@ -111,7 +111,7 @@ class Ellipsoid extends SolidGeometry {
   /// Calculates the surface area of the ellipsoid.
   ///
   /// Uses Knud Thomsen's approximation formula:
-  /// S ≈ 4π[(a^p×b^p + a^p×c^p + b^p×c^p)/3]^(1/p) where p ≈ 1.6075
+  /// S ≈ `4π[(a^p×b^p + a^p×c^p + b^p×c^p)/3]^(1/p)` where p ≈ 1.6075
   @override
   double surfaceArea() {
     const double p = 1.6075;

@@ -226,7 +226,7 @@ class Integer extends Real {
   @override
   Number truncate() => this;
 
-  /// Support [dart:json] stringify.
+  /// Support `[dart:json]` stringify.
   ///
   /// Map Contents:
   ///     'i' : int value

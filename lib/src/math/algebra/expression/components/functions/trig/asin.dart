@@ -2,8 +2,8 @@ part of '../../../expression.dart';
 
 /// Represents the inverse sine (arcsin) function.
 ///
-/// Domain: [-1, 1]
-/// Range: [-π/2, π/2]
+/// Domain: `[-1, 1]`
+/// Range: `[-π/2, π/2]`
 /// Derivative: d/dx(asin(x)) = 1/√(1-x²)
 class Asin extends TrigonometricExpression {
   Asin(super.operand);

@@ -589,8 +589,8 @@ class Decimal implements Comparable<Decimal> {
 
   /// Calculates the arc sine (inverse sine) of the current [Decimal] value.
   ///
-  /// The result is in radians and will be in the range [-π/2, π/2].
-  /// Throws an [ArgumentError] if the value is outside the range [-1, 1].
+  /// The result is in radians and will be in the range `[-π/2, π/2]`.
+  /// Throws an [ArgumentError] if the value is outside the range `[-1, 1]`.
   Decimal asin() {
     if (this < Decimal.fromInt(-1) || this > Decimal.fromInt(1)) {
       throw ArgumentError('asin(x) is only defined for x in the range [-1, 1]');
@@ -627,8 +627,8 @@ class Decimal implements Comparable<Decimal> {
 
   /// Calculates the arc cosine (inverse cosine) of the current [Decimal] value.
   ///
-  /// The result is in radians and will be in the range [0, π].
-  /// Throws an [ArgumentError] if the value is outside the range [-1, 1].
+  /// The result is in radians and will be in the range `[0, π]`.
+  /// Throws an [ArgumentError] if the value is outside the range `[-1, 1]`.
   Decimal acos() {
     if (this < Decimal.fromInt(-1) || this > Decimal.fromInt(1)) {
       throw ArgumentError('acos(x) is only defined for x in the range [-1, 1]');
@@ -641,7 +641,7 @@ class Decimal implements Comparable<Decimal> {
 
   /// Calculates the arc tangent (inverse tangent) of the current [Decimal] value.
   ///
-  /// The result is in radians and will be in the range [-π/2, π/2].
+  /// The result is in radians and will be in the range `[-π/2, π/2]`.
   Decimal atan() {
     // Use the series expansion for small values
     if (abs() < Decimal.one) {
@@ -856,8 +856,8 @@ extension RationalExt on Rational {
 
 //   /// Calculates the arc sine (inverse sine) of the current [Decimal] value.
 //   ///
-//   /// The result is in radians and will be in the range [-π/2, π/2].
-//   /// Throws an [ArgumentError] if the value is outside the range [-1, 1].
+//   /// The result is in radians and will be in the range `[-π/2, π/2]`.
+//   /// Throws an [ArgumentError] if the value is outside the range `[-1, 1]`.
 //   Decimal asin() {
 //     if (this < Decimal.fromInt(-1) || this > Decimal.fromInt(1)) {
 //       throw ArgumentError('asin(x) is only defined for x in the range [-1, 1]');
@@ -891,8 +891,8 @@ extension RationalExt on Rational {
 
 //   /// Calculates the arc cosine (inverse cosine) of the current [Decimal] value.
 //   ///
-//   /// The result is in radians and will be in the range [0, π].
-//   /// Throws an [ArgumentError] if the value is outside the range [-1, 1].
+//   /// The result is in radians and will be in the range `[0, π]`.
+//   /// Throws an [ArgumentError] if the value is outside the range `[-1, 1]`.
 //   Decimal acos() {
 //     if (this < Decimal.fromInt(-1) || this > Decimal.fromInt(1)) {
 //       throw ArgumentError('acos(x) is only defined for x in the range [-1, 1]');

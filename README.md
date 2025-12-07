@@ -51,7 +51,6 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
 
 ## Todo
 
-- Implement Expression
 - Improve speed and performance
 
 ## Usage

@@ -143,7 +143,7 @@ class Sector extends PlaneGeometry {
 
   /// Calculates the bounding box of the sector.
   ///
-  /// Returns a list of 4 points defining the rectangle [min, max].
+  /// Returns a list of 4 points defining the rectangle `[min, max]`.
   List<Point> boundingBox() {
     num minX = center.x;
     num maxX = center.x;

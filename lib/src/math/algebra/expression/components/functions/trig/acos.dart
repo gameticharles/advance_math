@@ -2,8 +2,8 @@ part of '../../../expression.dart';
 
 /// Represents the inverse cosine (arccos) function.
 ///
-/// Domain: [-1, 1]
-/// Range: [0, π]
+/// Domain: `[-1, 1]`
+/// Range: `[0, π]`
 /// Derivative: d/dx(acos(x)) = -1/√(1-x²)
 class Acos extends TrigonometricExpression {
   Acos(super.operand);

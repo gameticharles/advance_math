@@ -869,7 +869,7 @@ class Polygon extends PlaneGeometry {
   /// Returns:
   /// --------
   /// `Tuple<double, double>`
-  ///     The centroid of the polygon as a tuple of [x, y] coordinates.
+  ///     The centroid of the polygon as a tuple of `[x, y]` coordinates.
   ///
   /// Example:
   /// --------

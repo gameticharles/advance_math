@@ -4,7 +4,7 @@ part of '../algebra.dart';
 class RootFinding {
   // --- Bracketing Methods ---
 
-  /// Finds a root of a continuous function [f] in the interval [a, b] using the Bisection method.
+  /// Finds a root of a continuous function [f] in the interval `[a, b]` using the Bisection method.
   ///
   /// The function must have different signs at [a] and [b].
   ///

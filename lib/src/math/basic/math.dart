@@ -198,7 +198,7 @@ class Random implements math.Random, AbstractRandomProvider {
 
   /// Generates a random BigInt with a specified bit length.
   ///
-  /// The generated BigInt will be in the range [2^(bitLength-1), 2^bitLength - 1].
+  /// The generated BigInt will be in the range `[2^(bitLength-1), 2^bitLength - 1]`.
   ///
   /// Throws an [ArgumentError] if [bitLength] is less than or equal to zero.
   ///

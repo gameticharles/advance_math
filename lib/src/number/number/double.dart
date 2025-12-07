@@ -134,7 +134,7 @@ class Double extends Real {
   bool get isInteger =>
       !value.isNaN && value.isFinite && value.toInt() == value;
 
-  /// Support [dart:json] stringify.
+  /// Support `[dart:json]` stringify.
   ///
   /// Map Contents:
   ///     'd' : double value

@@ -40,8 +40,8 @@ class PDE {
   ///
   /// [alpha]: Thermal diffusivity constant.
   /// [initial]: Initial condition u(x, 0).
-  /// [xRange]: [x_min, x_max].
-  /// [tRange]: [t_min, t_max].
+  /// [xRange]: `[x_min, x_max]`.
+  /// [tRange]: `[t_min, t_max]`.
   /// [boundaryLeft]: Boundary value at x = x_min.
   /// [boundaryRight]: Boundary value at x = x_max.
   /// [nx]: Number of spatial points.
@@ -108,8 +108,8 @@ class PDE {
   /// Solves: ∂²u/∂t² = c² * ∂²u/∂x²
   ///
   /// [c]: Wave speed.
-  /// [xRange]: [x_min, x_max].
-  /// [tRange]: [t_min, t_max].
+  /// [xRange]: `[x_min, x_max]`.
+  /// [tRange]: `[t_min, t_max]`.
   /// [initialPosition]: Initial position u(x, 0).
   /// [initialVelocity]: Initial velocity ∂u/∂t(x, 0).
   /// [boundaryLeft]: Boundary value at x = x_min.

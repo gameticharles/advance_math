@@ -5,7 +5,7 @@ class ODEResult {
 
   /// Solution values at each time point.
   /// For single ODE: `List<num>`
-  /// For systems: `List<List<num>>` where each inner list is [y1, y2, ..., yn] at time t[i]
+  /// For systems: `List<List<num>>` where each inner list is `[y1, y2, ..., yn]` at time t[i]
   final List<dynamic> y;
 
   /// Number of steps taken.

@@ -32,7 +32,7 @@ class Quartic extends Polynomial {
   /// ```
   ///
   /// Use this constructor if you have complex coefficients. If no [Complex]
-  /// values are required, then consider using [Quartic.realEquation] for a
+  /// values are required, then consider using `[Quartic.realEquation]` for a
   /// less verbose syntax.
   Quartic({
     dynamic a = 1,

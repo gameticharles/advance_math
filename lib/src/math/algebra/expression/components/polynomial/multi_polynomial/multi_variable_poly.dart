@@ -12,7 +12,7 @@ class MultiVariablePolynomial extends Expression {
   ///
   /// [source]: A string representation of a Multivariate Polynomial.
   ///
-  /// Returns a [MultivariatePolynomial] instance representing the input string.
+  /// Returns a `[MultivariatePolynomial]` instance representing the input string.
   ///
   /// Throws [FormatException] if the input string is invalid or cannot be parsed into a Polynomial.
   factory MultiVariablePolynomial.fromString(String source) {

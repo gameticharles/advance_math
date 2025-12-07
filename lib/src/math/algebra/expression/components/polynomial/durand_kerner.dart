@@ -93,7 +93,7 @@ final class DurandKerner extends Polynomial {
   ///
   /// Since `-5` is the coefficient with the highest degree (2), it goes first.
   /// If the coefficients of your polynomial are only real numbers, consider
-  /// using the [DurandKerner.realEquation] constructor instead.
+  /// using the `[DurandKerner.realEquation]` constructor instead.
   DurandKerner(
     super.coefficients, {
     this.initialGuess = const [],

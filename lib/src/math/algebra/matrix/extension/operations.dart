@@ -1930,7 +1930,7 @@ extension MatrixOperationExtension on Matrix {
 
   /// Rounds each element in the matrix to the specified number of decimal places.
   ///
-  /// [`decimals`]: The number of decimal places to round to.
+  /// `decimals`: The number of decimal places to round to.
   ///
   /// Returns a new matrix with the rounded elements.
   ///

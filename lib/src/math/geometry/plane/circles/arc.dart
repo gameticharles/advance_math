@@ -177,12 +177,12 @@ class Arc {
     );
   }
 
-  /// Gets a point on the arc at parametric position t ∈ [0, 1].
+  /// Gets a point on the arc at parametric position t ∈ `[0, 1]`.
   ///
   /// t = 0 gives the start point, t = 1 gives the end point.
   Point pointAt(num t) {
     if (t < 0 || t > 1) {
-      throw ArgumentError('Parameter t must be in range [0, 1], got: $t');
+      throw ArgumentError('Parameter t must be in range `[0, 1]`, got: $t');
     }
     num angle = startAngle + t * centralAngle.rad;
     return Point(
@@ -191,12 +191,12 @@ class Arc {
     );
   }
 
-  /// Gets the tangent vector at parametric position t ∈ [0, 1].
+  /// Gets the tangent vector at parametric position t ∈ `[0, 1]`.
   ///
   /// The tangent vector is perpendicular to the radius at that point.
   Point tangentAt(double t) {
     if (t < 0 || t > 1) {
-      throw ArgumentError('Parameter t must be in range [0, 1], got: $t');
+      throw ArgumentError('Parameter t must be in range `[0, 1]`, got: $t');
     }
     double angle = startAngle + t * centralAngle.rad;
     // Tangent is perpendicular to radius, so rotate by 90°

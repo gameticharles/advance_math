@@ -111,7 +111,7 @@ class PI extends Decimal {
         pi.getTimePerDigit(), pi.getTotalTime());
   }
 
-  /// Performs a binary split on the given range [a, b] to calculate the
+  /// Performs a binary split on the given range `[a, b]` to calculate the
   /// values of P, Q, and R for the Chudnovsky algorithm.
   ///
   /// The Chudnovsky algorithm is a method for calculating the digits of pi.

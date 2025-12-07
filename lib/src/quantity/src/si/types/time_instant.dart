@@ -491,7 +491,7 @@ num getLeapSeconds(double tai, {bool pre1972LeapSeconds = false}) {
 /// For 1620-present, Delta T is calculated using a table of delta T values
 /// determined from historical observations (and published in the Astronomical
 /// Almanac.  For dates prior to 1620, approximate polynomial algorithms are
-/// used [Chapront, Chapront-Touze & Francou (1997)].
+/// used `[Chapront, Chapront-Touze & Francou (1997)]`.
 ///
 /// Because Delta T depends on measured values of the Earth's rotation that
 /// result from irregular and complex tidal forces for which accurate predictive

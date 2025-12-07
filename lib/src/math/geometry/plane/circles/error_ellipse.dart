@@ -254,25 +254,26 @@ class ErrorEllipse extends PlaneGeometry {
   }
 
   /// Generates points representing the ellipse for plotting.
-  List<Map<String, double>> generateEllipsePoints(int numPoints) {
+  List<Map<String, double>> generateEllipsePoints(int numPoints,
+      {Point? center}) {
     List<Map<String, double>> points = [];
     double theta = _orientation.rad.toDouble();
     double cosTheta = cos(theta);
     double sinTheta = sin(theta);
-    double cx = center.x.toDouble();
-    double cy = center.y.toDouble();
+    double cx = (center ?? this.center).x.toDouble();
+    double cy = (center ?? this.center).y.toDouble();
 
     for (int i = 0; i < numPoints; i++) {
       double angle = (2 * pi * i) / numPoints;
-      double ca = cos(angle);
-      double sa = sin(angle);
 
       // x = cx + a*cos(t)*cos(θ) - b*sin(t)*sin(θ)
       // y = cy + a*cos(t)*sin(θ) + b*sin(t)*cos(θ)
-      double x =
-          cx + _semiMajorAxis * ca * cosTheta - _semiMinorAxis * sa * sinTheta;
-      double y =
-          cy + _semiMajorAxis * ca * sinTheta + _semiMinorAxis * sa * cosTheta;
+      double x = cx +
+          _semiMajorAxis * cos(angle) * cosTheta -
+          _semiMinorAxis * sin(angle) * sinTheta;
+      double y = cy +
+          _semiMajorAxis * cos(angle) * sinTheta +
+          _semiMinorAxis * sin(angle) * cosTheta;
       points.add({'x': x, 'y': y});
     }
     return points;

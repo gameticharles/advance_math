@@ -569,7 +569,7 @@ class Precision extends Real {
   @override
   bool operator >=(dynamic other) => !(this < other);
 
-  /// Support [dart:json] stringify.
+  /// Support `[dart:json]` stringify.
   ///
   /// Map Contents:
   ///     'decimal' : string representation of the number
