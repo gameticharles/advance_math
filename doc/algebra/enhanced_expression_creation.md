@@ -36,11 +36,13 @@ final expr = Literal(2) * x + Literal(3);
 ```
 
 **Pros:**
+
 - Always works, no type inference issues
 - Explicit and clear intent
 - Full control over literal creation
 
 **Cons:**
+
 - Verbose for complex expressions
 - Can make code harder to read
 
@@ -54,11 +56,13 @@ final expr = 2.toExpression() * x + 3.toExpression();
 ```
 
 **Pros:**
+
 - Fluent API style
 - Clear conversion intent
 - Works with all numeric types
 
 **Cons:**
+
 - Slightly more verbose than helper function
 - Requires method call on each number
 
@@ -72,11 +76,13 @@ final expr = ex(2) * x + ex(3);
 ```
 
 **Pros:**
+
 - Most concise syntax
 - Easy to read and write
 - Minimal typing required
 
 **Cons:**
+
 - Requires importing the helper function
 - Less explicit than other methods
 
@@ -89,12 +95,12 @@ import 'package:advance_math/advance_math.dart';
 
 void main() {
   final x = Variable('x');
-  
+
   // All three approaches for: 2x + 3
   final expr1 = Literal(2) * x + Literal(3);           // Explicit
   final expr2 = 2.toExpression() * x + 3.toExpression(); // Extension
   final expr3 = ex(2) * x + ex(3);                     // Helper
-  
+
   // All produce the same result
   print(expr1.evaluate({'x': 5})); // 13
   print(expr2.evaluate({'x': 5})); // 13
@@ -126,10 +132,10 @@ final negExpr = (-2).toExpression() * x;     // negative
 
 ```dart
 // Polynomial: 3x⁴ - 2x³ + 5x² - 7x + 11
-final polynomial = 3.toExpression() * (x ^ ex(4)) - 
-                   2.toExpression() * (x ^ ex(3)) + 
-                   ex(5) * (x ^ ex(2)) - 
-                   7.toExpression() * x + 
+final polynomial = 3.toExpression() * (x ^ ex(4)) -
+                   2.toExpression() * (x ^ ex(3)) +
+                   ex(5) * (x ^ ex(2)) -
+                   7.toExpression() * x +
                    Literal(11);
 
 print('P(2) = ${polynomial.evaluate({'x': 2})}');
@@ -143,10 +149,10 @@ final y = Variable('y');
 final z = Variable('z');
 
 // f(x,y,z) = 2xyz + 3x²y - 4xz² + 5yz - 6
-final multivar = ex(2) * x * y * z + 
-                 3.toExpression() * (x ^ ex(2)) * y - 
-                 Literal(4) * x * (z ^ ex(2)) + 
-                 ex(5) * y * z - 
+final multivar = ex(2) * x * y * z +
+                 3.toExpression() * (x ^ ex(2)) * y -
+                 Literal(4) * x * (z ^ ex(2)) +
+                 ex(5) * y * z -
                  6.toExpression();
 
 print('f(1,2,3) = ${multivar.evaluate({'x': 1, 'y': 2, 'z': 3})}');
@@ -167,8 +173,8 @@ print('R(3) = ${rational.evaluate({'x': 3})}');
 
 ```dart
 // T(x) = sin(2x) + cos(3x) * tan(x/2)
-final trigExpr = Sin(2.toExpression() * x) + 
-                 Cos(ex(3) * x) * 
+final trigExpr = Sin(2.toExpression() * x) +
+                 Cos(ex(3) * x) *
                  Tan(x / ex(2));
 ```
 
@@ -248,7 +254,7 @@ print(negExpr.evaluate({'x': 2}));    // -4
 Use parentheses and mixed approaches for clarity:
 
 ```dart
-final complex = ((2.toExpression() * x + ex(1)) ^ ex(2)) * 
+final complex = ((2.toExpression() * x + ex(1)) ^ ex(2)) *
                 (ex(3) * x - Literal(4));
 ```
 
@@ -288,11 +294,13 @@ All methods have identical compilation overhead since they all create the same u
 ### From Verbose Literal Usage
 
 **Before:**
+
 ```dart
 final oldExpr = Add(Multiply(Literal(2), x), Literal(3));
 ```
 
 **After:**
+
 ```dart
 final newExpr = 2.toExpression() * x + ex(3);
 // or
@@ -302,6 +310,7 @@ final newExpr = ex(2) * x + ex(3);
 ### Complex Expression Migration
 
 **Before:**
+
 ```dart
 final oldComplex = Add(
   Multiply(Literal(3), Pow(x, Literal(2))),
@@ -313,6 +322,7 @@ final oldComplex = Add(
 ```
 
 **After:**
+
 ```dart
 final newComplex = ex(3) * (x ^ ex(2)) + (2.toExpression() * y - ex(5));
 ```
@@ -331,16 +341,19 @@ Migration is completely backward compatible. You can:
 ### When to Use Each Approach
 
 1. **Use `ex()` helper for simple expressions:**
+
    ```dart
    final simple = ex(2) * x + ex(3);
    ```
 
 2. **Use `toExpression()` for fluent APIs:**
+
    ```dart
    final fluent = 2.toExpression() * x + 3.toExpression();
    ```
 
 3. **Use `Literal()` for explicit control:**
+
    ```dart
    final explicit = Literal(2) * x + Literal(3);
    ```
@@ -370,7 +383,7 @@ Migration is completely backward compatible. You can:
 void testExpression() {
   final x = Variable('x');
   final expr = ex(2) * x + ex(3);
-  
+
   // Test with multiple values
   expect(expr.evaluate({'x': 0}), equals(3));
   expect(expr.evaluate({'x': 1}), equals(5));
@@ -382,4 +395,4 @@ void testExpression() {
 
 The enhanced expression creation methods provide flexible, intuitive ways to work with mathematical expressions while maintaining full backward compatibility. Choose the approach that best fits your coding style and use case, or mix approaches as needed for optimal readability and maintainability.
 
-For more examples, see the `example/enhanced_expression_creation.dart` file in the library.
+For more examples, see the [example/enhanced_expression_creation.dart](example/enhanced_expression_creation.dart) file in the library.

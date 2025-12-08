@@ -40,12 +40,14 @@ The library now provides three approaches for creating expressions with numeric 
 ### Simple Expressions
 
 **Before:**
+
 ```dart
 // Verbose Literal constructor usage
 final expr = Add(Multiply(Literal(2), x), Literal(3));
 ```
 
 **After:**
+
 ```dart
 // Concise with helper function
 final expr = ex(2) * x + ex(3);
@@ -57,6 +59,7 @@ final expr = 2.toExpression() * x + 3.toExpression();
 ### Polynomial Expressions
 
 **Before:**
+
 ```dart
 // Complex nested constructors
 final polynomial = Add(
@@ -69,6 +72,7 @@ final polynomial = Add(
 ```
 
 **After:**
+
 ```dart
 // Natural mathematical notation
 final polynomial = ex(3) * (x ^ ex(2)) + ex(2) * x + ex(1);
@@ -77,6 +81,7 @@ final polynomial = ex(3) * (x ^ ex(2)) + ex(2) * x + ex(1);
 ### Multivariate Expressions
 
 **Before:**
+
 ```dart
 // Deeply nested constructor calls
 final multivar = Add(
@@ -95,6 +100,7 @@ final multivar = Add(
 ```
 
 **After:**
+
 ```dart
 // Readable mathematical expression
 final multivar = ex(2) * x * y + ex(3) * x + (ex(4) - y);
@@ -103,6 +109,7 @@ final multivar = ex(2) * x * y + ex(3) * x + (ex(4) - y);
 ### Trigonometric Functions
 
 **Before:**
+
 ```dart
 // Verbose function composition
 final trigExpr = Add(
@@ -112,6 +119,7 @@ final trigExpr = Add(
 ```
 
 **After:**
+
 ```dart
 // Clean function composition
 final trigExpr = Sin(ex(2) * x) + Cos(ex(3) * x + ex(1));
@@ -140,16 +148,19 @@ final expr3 = Add(
 ### Step 2: Choose Your Migration Strategy
 
 **Strategy A: Gradual Migration**
+
 - Migrate one expression at a time
 - Test each change individually
 - Keep existing code working
 
 **Strategy B: Module-by-Module**
+
 - Migrate entire functions or classes
 - Maintain consistency within modules
 - Update related code together
 
 **Strategy C: Mixed Approach**
+
 - Use new methods for new code
 - Keep existing code unchanged
 - Mix approaches as needed
@@ -196,25 +207,25 @@ After each transformation, verify the behavior:
 ```dart
 void validateMigration() {
   final x = Variable('x');
-  
+
   // Original expression
   final original = Add(Multiply(Literal(2), x), Literal(3));
-  
+
   // Migrated expression
   final migrated = ex(2) * x + ex(3);
-  
+
   // Test with multiple values
   final testValues = [0, 1, -1, 2.5, -3.7];
-  
+
   for (final value in testValues) {
     final context = {'x': value};
     final originalResult = original.evaluate(context);
     final migratedResult = migrated.evaluate(context);
-    
-    assert(originalResult == migratedResult, 
+
+    assert(originalResult == migratedResult,
            'Results differ for x=$value: $originalResult vs $migratedResult');
   }
-  
+
   print('Migration validated successfully!');
 }
 ```
@@ -224,11 +235,13 @@ void validateMigration() {
 ### Pattern 1: Coefficient Multiplication
 
 **Before:**
+
 ```dart
 final expr = Multiply(Literal(coefficient), variable);
 ```
 
 **After:**
+
 ```dart
 final expr = ex(coefficient) * variable;
 ```
@@ -236,11 +249,13 @@ final expr = ex(coefficient) * variable;
 ### Pattern 2: Polynomial Terms
 
 **Before:**
+
 ```dart
 final term = Multiply(Literal(coeff), Pow(variable, Literal(power)));
 ```
 
 **After:**
+
 ```dart
 final term = ex(coeff) * (variable ^ ex(power));
 ```
@@ -248,11 +263,13 @@ final term = ex(coeff) * (variable ^ ex(power));
 ### Pattern 3: Addition Chains
 
 **Before:**
+
 ```dart
 final expr = Add(Add(term1, term2), term3);
 ```
 
 **After:**
+
 ```dart
 final expr = term1 + term2 + term3;
 ```
@@ -260,11 +277,13 @@ final expr = term1 + term2 + term3;
 ### Pattern 4: Nested Functions
 
 **Before:**
+
 ```dart
 final expr = Sin(Add(Multiply(Literal(2), x), Literal(1)));
 ```
 
 **After:**
+
 ```dart
 final expr = Sin(ex(2) * x + ex(1));
 ```
@@ -272,6 +291,7 @@ final expr = Sin(ex(2) * x + ex(1));
 ### Pattern 5: Complex Expressions
 
 **Before:**
+
 ```dart
 final complex = Divide(
   Add(
@@ -283,6 +303,7 @@ final complex = Divide(
 ```
 
 **After:**
+
 ```dart
 final complex = (ex(2) * (x ^ ex(2)) + ex(1)) / (x - ex(3));
 ```
@@ -363,15 +384,15 @@ Create a script to find migration candidates:
 ```dart
 void findMigrationCandidates(String filePath) {
   final content = File(filePath).readAsStringSync();
-  
+
   // Find Literal constructor usage
   final literalPattern = RegExp(r'Literal\(\d+(?:\.\d+)?\)');
   final literalMatches = literalPattern.allMatches(content);
-  
+
   // Find Add/Multiply/etc. constructor usage
   final constructorPattern = RegExp(r'(Add|Multiply|Subtract|Divide|Pow)\(');
   final constructorMatches = constructorPattern.allMatches(content);
-  
+
   print('File: $filePath');
   print('  Literal constructors: ${literalMatches.length}');
   print('  Operation constructors: ${constructorMatches.length}');
@@ -384,11 +405,11 @@ void findMigrationCandidates(String filePath) {
 Create a helper to validate migrations:
 
 ```dart
-void validateExpressionEquivalence(Expression original, Expression migrated, 
+void validateExpressionEquivalence(Expression original, Expression migrated,
                                   Map<String, dynamic> testContext) {
   final originalResult = original.evaluate(testContext);
   final migratedResult = migrated.evaluate(testContext);
-  
+
   if (originalResult != migratedResult) {
     throw Exception('Migration validation failed: '
                    '$originalResult != $migratedResult '
@@ -405,10 +426,10 @@ import 'package:advance_math/advance_math.dart';
 void migrateExpressions() {
   final x = Variable('x');
   final y = Variable('y');
-  
+
   // Example migration of a complex expression
   print('=== Migration Example ===');
-  
+
   // Original verbose expression
   final original = Add(
     Add(
@@ -417,10 +438,10 @@ void migrateExpressions() {
     ),
     Subtract(Literal(5), y)
   );
-  
+
   // Migrated concise expression
   final migrated = ex(3) * (x ^ ex(2)) + ex(2) * x * y + (ex(5) - y);
-  
+
   // Validation
   final testCases = [
     {'x': 1, 'y': 1},
@@ -428,15 +449,15 @@ void migrateExpressions() {
     {'x': -1, 'y': 0},
     {'x': 0.5, 'y': -2.5},
   ];
-  
+
   print('Original: $original');
   print('Migrated: $migrated');
   print();
-  
+
   for (final testCase in testCases) {
     final originalResult = original.evaluate(testCase);
     final migratedResult = migrated.evaluate(testCase);
-    
+
     print('Test $testCase:');
     print('  Original: $originalResult');
     print('  Migrated: $migratedResult');
@@ -458,6 +479,7 @@ The migration to enhanced expression creation methods is designed to be smooth a
 The enhanced methods provide significant improvements in readability and usability while preserving all the power and flexibility of the original API.
 
 For more examples and detailed usage patterns, see:
-- `doc/enhanced_expression_creation.md` - Comprehensive usage guide
-- `doc/expression_troubleshooting.md` - Troubleshooting common issues
-- `example/enhanced_expression_creation.dart` - Working examples
+
+- [enhanced_expression_creation.md](enhanced_expression_creation.md) - Comprehensive usage guide
+- [expression_troubleshooting.md](expression_troubleshooting.md) - Troubleshooting common issues
+- [example/enhanced_expression_creation.dart](example/enhanced_expression_creation.dart) - Working examples

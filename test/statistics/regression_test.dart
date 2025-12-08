@@ -129,7 +129,8 @@ void main() {
       expect(result.coefficients.length, equals(2));
 
       // Predictions should be between 0 and 1
-      expect(result.predictions.every((p) => p >= 0 && p <= 1), isTrue);
+      expect(result.predictions.data.every((p) => p is num && p >= 0 && p <= 1),
+          isTrue);
 
       // Lower x values should predict closer to 0
       expect(result.predictions[0], lessThan(0.5));

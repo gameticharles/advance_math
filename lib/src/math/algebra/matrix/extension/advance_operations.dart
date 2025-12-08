@@ -1,6 +1,6 @@
 part of '../../algebra.dart';
 
-/*TODO:
+/*TO DO:
 Advanced Matrix Operations:
    - Kronecker product
    - Hadamard product

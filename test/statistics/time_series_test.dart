@@ -30,7 +30,7 @@ void main() {
 
       expect(smoothed.length, equals(data.length));
       // Should capture trend
-      expect(smoothed.last, greaterThan(smoothed.first));
+      expect(smoothed.data.last, greaterThan(smoothed.data.first));
     });
   });
 
@@ -98,7 +98,7 @@ void main() {
       expect(decomp.residual.length, equals(24));
 
       // Trend should be increasing
-      expect(decomp.trend.last, greaterThan(decomp.trend.first));
+      expect(decomp.trend.data.last, greaterThan(decomp.trend.data.first));
 
       // Seasonal component should repeat
       expect(decomp.seasonal[0], closeTo(decomp.seasonal[12], 1.0));
@@ -122,16 +122,16 @@ void main() {
       List<num> data = [1, 3, 6, 10, 15];
       var diff = TimeSeries.difference(data);
 
-      expect(diff, equals([2, 3, 4, 5])); // Differences
+      expect(diff.data, equals([2, 3, 4, 5])); // Differences
       expect(diff.length, equals(data.length - 1));
     });
 
     test('Second difference', () {
       List<num> data = [1, 3, 6, 10, 15];
       var diff1 = TimeSeries.difference(data);
-      var diff2 = TimeSeries.difference(diff1);
+      var diff2 = TimeSeries.difference(diff1.data.cast<num>().toList());
 
-      expect(diff2, equals([1, 1, 1])); // Constant second differences
+      expect(diff2.data, equals([1, 1, 1])); // Constant second differences
     });
   });
 }

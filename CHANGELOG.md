@@ -1,7 +1,9 @@
 # 5.4.2
 
-- **[IMPROVEMENT]** docs: Improve doc comment formatting by consistently using backticks for code references and ranges.
+- **[IMPROVEMENT]** doc: Improve doc comment formatting by consistently using backticks for code references and ranges.
 - **[FEATURE]** Added `ComplexArray` for efficient storage and operations on complex numbers, including FFT and IFFT.
+- **[FEATURE]** Added `Scalar`, `DartData`, `Series`, `DataFrame`, `DataCube`, and `NDArray` support from `dartframe`.
+- **[FEATURE]** Added new statistical and interpolation methods, refactored documentation and number tests, and updated existing modules.
 
 # 5.4.1
 

@@ -1,6 +1,6 @@
 part of '../algebra.dart';
 
-/* TODO:
+/* TO DO:
 Performance Optimizations:
    - Implement parallel processing techniques to improve the performance of computationally intensive operations (e.g., matrix multiplication, decompositions)
    - Optimize existing methods using efficient algorithms or data structures

@@ -1,4 +1,5 @@
 import '../algebra/algebra.dart';
+import 'package:dartframe/dartframe.dart';
 import 'dart:math' as math;
 
 /// Helper to safely convert dynamic matrix values to double.
@@ -11,10 +12,22 @@ double _toNum(dynamic val) {
   }
 }
 
+/// Helper to convert List or Series to `List<num>`.
+List<num> _toNumList(dynamic input) {
+  if (input is Series) {
+    return input.data.cast<num>().toList();
+  }
+  if (input is List) {
+    return input.cast<num>();
+  }
+  throw ArgumentError('Input must be List<num> or Series');
+}
+
+/// Result of a regression analysis.
 /// Result of a regression analysis.
 class RegressionResult {
   /// Regression coefficients (including intercept as first element).
-  final List<num> coefficients;
+  final Series coefficients;
 
   /// R-squared value.
   final num rSquared;
@@ -23,16 +36,16 @@ class RegressionResult {
   final num? adjustedRSquared;
 
   /// Residuals.
-  final List<num> residuals;
+  final Series residuals;
 
   /// Predicted values.
-  final List<num> predictions;
+  final Series predictions;
 
   /// Standard errors of coefficients.
-  final List<num>? standardErrors;
+  final Series? standardErrors;
 
   /// P-values for coefficients.
-  final List<num>? pValues;
+  final Series? pValues;
 
   RegressionResult({
     required this.coefficients,
@@ -45,74 +58,88 @@ class RegressionResult {
   });
 
   /// Predict new values.
-  num predict(List<num> x) {
-    if (x.length != coefficients.length - 1) {
+  /// [x] can be a `List<num>` or Series.
+  num predict(dynamic x) {
+    if (x is! List && x is! Series) {
+      throw ArgumentError('Input x must be List or Series');
+    }
+
+    // Convert Series to List for indexing if needed, or iterate
+    List<dynamic> xList = (x is Series) ? x.toList() : x as List;
+
+    if (xList.length != coefficients.length - 1) {
       throw ArgumentError('Input dimension mismatch');
     }
 
-    num result = coefficients[0]; // Intercept
-    for (int i = 0; i < x.length; i++) {
-      result += coefficients[i + 1] * x[i];
+    // coefficients is Series<dynamic>, cast if needed or access via []
+    // coefficients[0] is intercept
+    num result = coefficients[0] as num;
+    for (int i = 0; i < xList.length; i++) {
+      result += (coefficients[i + 1] as num) * (xList[i] as num);
     }
     return result;
   }
 
   @override
   String toString() {
-    return 'RegressionResult(R²=$rSquared, coefficients=$coefficients)';
+    return 'RegressionResult(R²=${rSquared.toStringAsFixed(4)}, coefficients=${coefficients.data})';
   }
 }
 
 /// Regression analysis methods.
 class Regression {
   /// Simple linear regression (y = a + bx).
-  static RegressionResult linear(List<num> x, List<num> y) {
-    if (x.length != y.length || x.isEmpty) {
+  static RegressionResult linear(dynamic x, dynamic y) {
+    List<num> xList = _toNumList(x);
+    List<num> yList = _toNumList(y);
+
+    if (xList.length != yList.length || xList.isEmpty) {
       throw ArgumentError('x and y must have same non-zero length');
     }
 
-    int n = x.length;
-    num sumX = x.reduce((a, b) => a + b);
-    num sumY = y.reduce((a, b) => a + b);
+    int n = xList.length;
+    num sumX = xList.reduce((a, b) => a + b);
+    num sumY = yList.reduce((a, b) => a + b);
     num sumXY = 0, sumX2 = 0;
 
     for (int i = 0; i < n; i++) {
-      sumXY += x[i] * y[i];
-      sumX2 += x[i] * x[i];
+      sumXY += xList[i] * yList[i];
+      sumX2 += xList[i] * xList[i];
     }
 
     num slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
     num intercept = (sumY - slope * sumX) / n;
 
     // Calculate predictions and residuals
-    List<num> predictions = x.map((xi) => intercept + slope * xi).toList();
+    List<num> predictions = xList.map((xi) => intercept + slope * xi).toList();
     List<num> residuals = [];
     for (int i = 0; i < n; i++) {
-      residuals.add(y[i] - predictions[i]);
+      residuals.add(yList[i] - predictions[i]);
     }
 
     // Calculate R-squared
     num yMean = sumY / n;
     num ssTot =
-        y.map((yi) => (yi - yMean) * (yi - yMean)).reduce((a, b) => a + b);
+        yList.map((yi) => (yi - yMean) * (yi - yMean)).reduce((a, b) => a + b);
     num ssRes = residuals.map((r) => r * r).reduce((a, b) => a + b);
     num rSquared = 1 - ssRes / ssTot;
 
     return RegressionResult(
-      coefficients: [intercept, slope],
+      coefficients: Series([intercept, slope], name: 'coefficients'),
       rSquared: rSquared,
       adjustedRSquared: 1 - (1 - rSquared) * (n - 1) / (n - 2),
-      residuals: residuals,
-      predictions: predictions,
+      residuals: Series(residuals, name: 'residuals'),
+      predictions: Series(predictions, name: 'predictions'),
     );
   }
 
   /// Multiple linear regression.
-  static RegressionResult multipleLinear(Matrix X, List<num> y) {
+  static RegressionResult multipleLinear(Matrix X, dynamic y) {
+    List<num> yList = _toNumList(y);
     int n = X.rowCount;
     int p = X.columnCount;
 
-    if (y.length != n) {
+    if (yList.length != n) {
       throw ArgumentError('y length must match X rows');
     }
 
@@ -127,7 +154,7 @@ class Regression {
     }
 
     Matrix xMat = Matrix(xData);
-    Matrix yMat = Matrix(y.map((e) => [e.toDouble()]).toList());
+    Matrix yMat = Matrix(yList.map((e) => [e.toDouble()]).toList());
 
     // Use Gauss-Jordan to solve (X'X)β = X'y
     Matrix xTX = xMat.transpose() * xMat;
@@ -153,38 +180,39 @@ class Regression {
     // Calculate residuals and R-squared
     List<num> residuals = [];
     for (int i = 0; i < n; i++) {
-      residuals.add(y[i] - predictions[i]);
+      residuals.add(yList[i] - predictions[i]);
     }
 
-    num yMean = y.reduce((a, b) => a + b) / n;
+    num yMean = yList.reduce((a, b) => a + b) / n;
     num ssTot =
-        y.map((yi) => (yi - yMean) * (yi - yMean)).reduce((a, b) => a + b);
+        yList.map((yi) => (yi - yMean) * (yi - yMean)).reduce((a, b) => a + b);
     num ssRes = residuals.map((r) => r * r).reduce((a, b) => a + b);
     num rSquared = 1 - ssRes / ssTot;
     num adjRSquared = 1 - (1 - rSquared) * (n - 1) / (n - p - 1);
 
     return RegressionResult(
-      coefficients: coefficients,
+      coefficients: Series(coefficients, name: 'coefficients'),
       rSquared: rSquared,
       adjustedRSquared: adjRSquared,
-      residuals: residuals,
-      predictions: predictions,
+      residuals: Series(residuals, name: 'residuals'),
+      predictions: Series(predictions, name: 'predictions'),
     );
   }
 
   /// Polynomial regression.
-  static RegressionResult polynomial(List<num> x, List<num> y, int degree) {
+  static RegressionResult polynomial(dynamic x, dynamic y, int degree) {
+    List<num> xList = _toNumList(x);
     if (degree < 1) {
       throw ArgumentError('degree must be at least 1');
     }
 
     // Generate polynomial features
-    int n = x.length;
+    int n = xList.length;
     List<List<double>> xPoly = [];
     for (int i = 0; i < n; i++) {
       List<double> row = [];
       for (int d = 1; d <= degree; d++) {
-        row.add(math.pow(x[i], d).toDouble());
+        row.add(math.pow(xList[i], d).toDouble());
       }
       xPoly.add(row);
     }
@@ -194,11 +222,12 @@ class Regression {
   }
 
   /// Ridge regression (L2 regularization).
-  static RegressionResult ridge(Matrix X, List<num> y, {double alpha = 1.0}) {
+  static RegressionResult ridge(Matrix X, dynamic y, {double alpha = 1.0}) {
+    List<num> yList = _toNumList(y);
     int n = X.rowCount;
     int p = X.columnCount;
 
-    if (y.length != n) {
+    if (yList.length != n) {
       throw ArgumentError('y length must match X rows');
     }
 
@@ -213,7 +242,7 @@ class Regression {
     }
 
     Matrix xMat = Matrix(xData);
-    Matrix yMat = Matrix(y.map((e) => [e.toDouble()]).toList());
+    Matrix yMat = Matrix(yList.map((e) => [e.toDouble()]).toList());
 
     // Use built-in ridge regression
     Matrix beta = LinearSystemSolvers.ridgeRegression(xMat, yMat, alpha);
@@ -235,31 +264,32 @@ class Regression {
 
     List<num> residuals = [];
     for (int i = 0; i < n; i++) {
-      residuals.add(y[i] - predictions[i]);
+      residuals.add(yList[i] - predictions[i]);
     }
 
-    num yMean = y.reduce((a, b) => a + b) / n;
+    num yMean = yList.reduce((a, b) => a + b) / n;
     num ssTot =
-        y.map((yi) => (yi - yMean) * (yi - yMean)).reduce((a, b) => a + b);
+        yList.map((yi) => (yi - yMean) * (yi - yMean)).reduce((a, b) => a + b);
     num ssRes = residuals.map((r) => r * r).reduce((a, b) => a + b);
     num rSquared = 1 - ssRes / ssTot;
 
     return RegressionResult(
-      coefficients: coefficients,
+      coefficients: Series(coefficients, name: 'coefficients'),
       rSquared: rSquared,
       adjustedRSquared: 1 - (1 - rSquared) * (n - 1) / (n - p - 1),
-      residuals: residuals,
-      predictions: predictions,
+      residuals: Series(residuals, name: 'residuals'),
+      predictions: Series(predictions, name: 'predictions'),
     );
   }
 
   /// Logistic regression for binary classification.
   static RegressionResult logistic(
     Matrix X,
-    List<num> y, {
+    dynamic y, {
     int maxIter = 100,
     double learningRate = 0.01,
   }) {
+    List<num> yList = _toNumList(y);
     int n = X.rowCount;
     int p = X.columnCount;
 
@@ -280,7 +310,7 @@ class Regression {
       // Calculate gradients
       List<num> gradients = List.filled(p + 1, 0.0);
       for (int i = 0; i < n; i++) {
-        num error = predictions[i] - y[i];
+        num error = predictions[i] - yList[i];
         gradients[0] += error;
         for (int j = 0; j < p; j++) {
           gradients[j + 1] += error * X[i][j].toDouble();
@@ -305,14 +335,14 @@ class Regression {
 
     List<num> residuals = [];
     for (int i = 0; i < n; i++) {
-      residuals.add(y[i] - predictions[i]);
+      residuals.add(yList[i] - predictions[i]);
     }
 
     // Calculate pseudo R-squared (McFadden's)
-    num yMean = y.reduce((a, b) => a + b) / n;
+    num yMean = yList.reduce((a, b) => a + b) / n;
     num nullDeviance = 0;
     for (int i = 0; i < n; i++) {
-      if (y[i] == 1) {
+      if (yList[i] == 1) {
         nullDeviance -= 2 * math.log(yMean);
       } else {
         nullDeviance -= 2 * math.log(1 - yMean);
@@ -322,7 +352,7 @@ class Regression {
     num residualDeviance = 0;
     for (int i = 0; i < n; i++) {
       num p = predictions[i].clamp(1e-10, 1 - 1e-10);
-      if (y[i] == 1) {
+      if (yList[i] == 1) {
         residualDeviance -= 2 * math.log(p);
       } else {
         residualDeviance -= 2 * math.log(1 - p);
@@ -332,10 +362,141 @@ class Regression {
     num pseudoR2 = 1 - residualDeviance / nullDeviance;
 
     return RegressionResult(
-      coefficients: coefficients,
+      coefficients: Series(coefficients, name: 'coefficients'),
       rSquared: pseudoR2,
-      residuals: residuals,
-      predictions: predictions,
+      residuals: Series(residuals, name: 'residuals'),
+      predictions: Series(predictions, name: 'predictions'),
+    );
+  }
+
+  /// Lasso regression (L1 regularization) using Coordinate Descent.
+  static RegressionResult lasso(Matrix X, dynamic y,
+      {double alpha = 1.0, int maxIter = 1000, double tol = 1e-4}) {
+    return elasticNet(X, y,
+        alpha: alpha, l1Ratio: 1.0, maxIter: maxIter, tol: tol);
+  }
+
+  /// Elastic Net regression (L1 and L2 regularization).
+  /// [l1Ratio] = 1.0 is Lasso, 0.0 is Ridge.
+  static RegressionResult elasticNet(
+    Matrix X,
+    dynamic y, {
+    double alpha = 1.0,
+    double l1Ratio = 0.5,
+    int maxIter = 1000,
+    double tol = 1e-4,
+  }) {
+    List<num> yList = _toNumList(y);
+    int n = X.rowCount;
+    int p = X.columnCount;
+
+    // Standardize features? Usually needed for regularization.
+    // For simplicity here, we assume user provided standardized data or we work raw.
+    // Let's implement Coordinate Descent on raw data but ideally inputs should be centered/scaled.
+    // WARNING: Intercept handling in regularized regression is tricky. Usually intercept is not penalized.
+    // We will add intercept column and NOT penalize it (index 0).
+
+    // Add intercept
+    List<List<double>> xData = [];
+    for (int i = 0; i < n; i++) {
+      List<double> row = [1.0];
+      for (int j = 0; j < p; j++) {
+        row.add(_toNum(X[i][j]));
+      }
+      xData.add(row);
+    }
+    // Now p is p+1 (including intercept)
+    int pTotal = p + 1;
+
+    // Initialize beta = 0
+    List<double> beta = List.filled(pTotal, 0.0);
+
+    // Precompute sum of squares for each column (denominator part)
+    List<double> normCols = List.filled(pTotal, 0.0);
+    for (int j = 0; j < pTotal; j++) {
+      double s = 0;
+      for (int i = 0; i < n; i++) {
+        s += xData[i][j] * xData[i][j];
+      }
+      normCols[j] = s;
+    }
+
+    double lambda1 = alpha * l1Ratio;
+    double lambda2 = alpha * (1 - l1Ratio);
+
+    for (int iter = 0; iter < maxIter; iter++) {
+      double maxShift = 0.0;
+
+      for (int j = 0; j < pTotal; j++) {
+        // Calculate partial residual (y - y_pred_without_j)
+        // r_i = y_i - sum_{k!=j} x_ik * beta_k
+        //     = (y_i - y_pred) + x_ij * beta_j
+
+        // Recomputing predictions every step is slow O(np), doing partial update O(n)
+        double rho = 0.0;
+        for (int i = 0; i < n; i++) {
+          // Calculate prediction
+          double pred = 0;
+          for (int k = 0; k < pTotal; k++) {
+            pred += xData[i][k] * beta[k];
+          }
+          double rI = yList[i] - pred + xData[i][j] * beta[j];
+          rho += xData[i][j] * rI;
+        }
+
+        // Soft thresholding
+        double oldBeta = beta[j];
+        if (j == 0) {
+          // Do not penalize intercept
+          beta[j] = rho / normCols[j];
+        } else {
+          double denom =
+              normCols[j] + lambda2; // Include L2 penalty in denominator
+          // Simple Coordinate Descent for Elastic Net:
+          // beta_j = S(rho, lambda1) / (sum(x_ij^2) + lambda2)
+          if (rho > lambda1) {
+            beta[j] = (rho - lambda1) / denom;
+          } else if (rho < -lambda1) {
+            beta[j] = (rho + lambda1) / denom;
+          } else {
+            beta[j] = 0.0;
+          }
+        }
+
+        double shift = (beta[j] - oldBeta).abs();
+        if (shift > maxShift) maxShift = shift;
+      }
+
+      if (maxShift < tol) break;
+    }
+
+    // Prepare result
+    List<num> predictions = [];
+    for (int i = 0; i < n; i++) {
+      double pred = 0;
+      for (int j = 0; j < pTotal; j++) {
+        pred += beta[j] * xData[i][j];
+      }
+      predictions.add(pred);
+    }
+
+    List<num> residuals = [];
+    for (int i = 0; i < n; i++) {
+      residuals.add(yList[i] - predictions[i]);
+    }
+
+    // R2
+    num yMean = yList.reduce((a, b) => a + b) / n;
+    num ssTot =
+        yList.map((yi) => (yi - yMean) * (yi - yMean)).reduce((a, b) => a + b);
+    num ssRes = residuals.map((r) => r * r).reduce((a, b) => a + b);
+    num rSquared = 1 - ssRes / ssTot;
+
+    return RegressionResult(
+      coefficients: Series(beta, name: 'coefficients'),
+      rSquared: rSquared,
+      residuals: Series(residuals, name: 'residuals'),
+      predictions: Series(predictions, name: 'predictions'),
     );
   }
 

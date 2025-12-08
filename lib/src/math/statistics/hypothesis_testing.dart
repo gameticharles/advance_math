@@ -1,4 +1,16 @@
 import 'dart:math' as math;
+import 'package:dartframe/dartframe.dart';
+
+/// Helper to convert List or Series to `List<num>`.
+List<num> _toNumList(dynamic input) {
+  if (input is Series) {
+    return input.data.cast<num>().toList();
+  }
+  if (input is List) {
+    return input.cast<num>();
+  }
+  throw ArgumentError('Input must be List<num> or Series');
+}
 
 /// Result of a hypothesis test.
 class HypothesisTestResult {
@@ -42,24 +54,26 @@ class HypothesisTesting {
   /// Tests if two samples have different means.
   /// Assumes independent samples with approximately normal distributions.
   static HypothesisTestResult tTest(
-    List<num> sample1,
-    List<num> sample2, {
+    dynamic sample1,
+    dynamic sample2, {
     double alpha = 0.05,
     bool equalVariance = true,
   }) {
-    int n1 = sample1.length;
-    int n2 = sample2.length;
+    List<num> s1 = _toNumList(sample1);
+    List<num> s2 = _toNumList(sample2);
+    int n1 = s1.length;
+    int n2 = s2.length;
 
     // Calculate means
-    num mean1 = sample1.reduce((a, b) => a + b) / n1;
-    num mean2 = sample2.reduce((a, b) => a + b) / n2;
+    num mean1 = s1.reduce((a, b) => a + b) / n1;
+    num mean2 = s2.reduce((a, b) => a + b) / n2;
 
     // Calculate variances
     num var1 =
-        sample1.map((x) => (x - mean1) * (x - mean1)).reduce((a, b) => a + b) /
+        s1.map((x) => (x - mean1) * (x - mean1)).reduce((a, b) => a + b) /
             (n1 - 1);
     num var2 =
-        sample2.map((x) => (x - mean2) * (x - mean2)).reduce((a, b) => a + b) /
+        s2.map((x) => (x - mean2) * (x - mean2)).reduce((a, b) => a + b) /
             (n2 - 1);
 
     num tStat;
@@ -98,15 +112,15 @@ class HypothesisTesting {
   ///
   /// Tests if sample mean differs from population mean mu0.
   static HypothesisTestResult tTestOneSample(
-    List<num> sample,
+    dynamic sample,
     num mu0, {
     double alpha = 0.05,
   }) {
-    int n = sample.length;
-    num mean = sample.reduce((a, b) => a + b) / n;
+    List<num> s = _toNumList(sample);
+    int n = s.length;
+    num mean = s.reduce((a, b) => a + b) / n;
     num variance =
-        sample.map((x) => (x - mean) * (x - mean)).reduce((a, b) => a + b) /
-            (n - 1);
+        s.map((x) => (x - mean) * (x - mean)).reduce((a, b) => a + b) / (n - 1);
     num se = math.sqrt(variance / n);
     num tStat = (mean - mu0) / se;
     num df = n - 1;
@@ -125,13 +139,14 @@ class HypothesisTesting {
 
   /// Z-test for known population standard deviation.
   static HypothesisTestResult zTest(
-    List<num> sample,
+    dynamic sample,
     num mu0,
     num sigma, {
     double alpha = 0.05,
   }) {
-    int n = sample.length;
-    num mean = sample.reduce((a, b) => a + b) / n;
+    List<num> s = _toNumList(sample);
+    int n = s.length;
+    num mean = s.reduce((a, b) => a + b) / n;
     num se = sigma / math.sqrt(n);
     num zStat = (mean - mu0) / se;
 
@@ -151,21 +166,24 @@ class HypothesisTesting {
   ///
   /// Tests if observed frequencies match expected frequencies.
   static HypothesisTestResult chiSquareTest(
-    List<num> observed,
-    List<num> expected, {
+    dynamic observed,
+    dynamic expected, {
     double alpha = 0.05,
   }) {
-    if (observed.length != expected.length) {
+    List<num> obs = _toNumList(observed);
+    List<num> exp = _toNumList(expected);
+
+    if (obs.length != exp.length) {
       throw ArgumentError('Observed and expected must have same length');
     }
 
     num chiSq = 0;
-    for (int i = 0; i < observed.length; i++) {
-      num diff = observed[i] - expected[i];
-      chiSq += (diff * diff) / expected[i];
+    for (int i = 0; i < obs.length; i++) {
+      num diff = obs[i] - exp[i];
+      chiSq += (diff * diff) / exp[i];
     }
 
-    num df = observed.length - 1;
+    num df = obs.length - 1;
     num pValue = 1 - _chiSquareCDF(chiSq, df);
 
     return HypothesisTestResult(
@@ -182,30 +200,30 @@ class HypothesisTesting {
   ///
   /// Tests if means of multiple groups are different.
   static HypothesisTestResult anovaTest(
-    List<List<num>> groups, {
+    List<dynamic> groups, {
     double alpha = 0.05,
   }) {
-    int k = groups.length; // Number of groups
-    int n = groups.fold(
-        0, (sum, group) => sum + group.length); // Total observations
+    List<List<num>> g = groups.map((group) => _toNumList(group)).toList();
+    int k = g.length; // Number of groups
+    int n = g.fold(0, (sum, group) => sum + group.length); // Total observations
 
     // Grand mean
     num grandMean = 0;
-    for (var group in groups) {
+    for (var group in g) {
       grandMean += group.reduce((a, b) => a + b);
     }
     grandMean /= n;
 
     // Between-group sum of squares (SSB)
     num ssb = 0;
-    for (var group in groups) {
+    for (var group in g) {
       num groupMean = group.reduce((a, b) => a + b) / group.length;
       ssb += group.length * (groupMean - grandMean) * (groupMean - grandMean);
     }
 
     // Within-group sum of squares (SSW)
     num ssw = 0;
-    for (var group in groups) {
+    for (var group in g) {
       num groupMean = group.reduce((a, b) => a + b) / group.length;
       for (var x in group) {
         ssw += (x - groupMean) * (x - groupMean);
