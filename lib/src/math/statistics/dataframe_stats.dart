@@ -190,7 +190,7 @@ extension DataFrameStats on DataFrame {
 
   // --- Data Preprocessing ---
 
-  /// Normalizes a column (Min-Max Scaling) to [0, 1].
+  /// Normalizes a column (Min-Max Scaling) to `[0, 1]`.
   /// Returns a new `List<num>`.
   List<num> normalizeColumn(String col) {
     List<num> data = _getCol(col);

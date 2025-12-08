@@ -924,7 +924,7 @@ class Complex implements Comparable<dynamic> {
   /// * Special cases (NaN, infinity, zero)
   /// * All possible roots when allRoots is true
   ///
-  /// If `n` is zero, returns 1 for the principal root or [1] for all roots.
+  /// If `n` is zero, returns 1 for the principal root or `[1]` for all roots.
   /// If this complex number is zero and n is positive, returns zero.
   /// If this complex number is zero and n is negative, throws an ArgumentError.
   ///

@@ -149,7 +149,7 @@ class Cubic extends Polynomial {
   /// _f(x) = ax^3 + bx^2 + cx + d = 0_
   Expression get d => coefficients[3];
 
-  /// {@macro algebraic_deep_copy}
+  /// Creates a deep copy of the object with optional new values.
   Cubic copyWith({
     Expression? a,
     Expression? b,

@@ -3,7 +3,7 @@ part of 'complex.dart';
 /// A specialized array for efficient storage and manipulation of complex numbers.
 ///
 /// Uses a [Float64List] to store real and imaginary parts interleaved:
-/// [real0, imag0, real1, imag1, ...]. This improves memory locality and
+/// `[real0, imag0, real1, imag1, ...]`. This improves memory locality and
 /// allows for potential future SIMD optimizations.
 class ComplexArray {
   final Float64List _data;

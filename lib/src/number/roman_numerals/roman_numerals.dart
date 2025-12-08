@@ -309,12 +309,12 @@ class RomanNumerals {
     return RomanNumerals(newValue);
   }
 
-  /// Shift the bits of this integer to the left by [shiftAmount].
+  /// Shift the bits of this integer to the left by `[shiftAmount]`.
   RomanNumerals operator <<(int shiftAmount) {
     return RomanNumerals(value << shiftAmount);
   }
 
-  /// Shift the bits of this integer to the right by [shiftAmount].
+  /// Shift the bits of this integer to the right by `[shiftAmount]`.
   RomanNumerals operator >>(int shiftAmount) {
     return RomanNumerals(value >> shiftAmount);
   }

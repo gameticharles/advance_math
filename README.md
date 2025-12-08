@@ -1151,7 +1151,7 @@ print(RomanNumerals.fromRoman('(M)') - RomanNumerals.fromRoman('(CC)DXXV')); // 
 print(RomanNumerals.fromRoman('(DCCXCIX)CDLXXV').value); // 799475
 ```
 
-Also support shifting the bits of this integer to the left by [shiftAmount].
+Also support shifting the bits of this integer to the left by `[shiftAmount]`.
 
 ```dart
 print(a << 1); // (IV)XLVI
