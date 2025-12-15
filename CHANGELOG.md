@@ -1,3 +1,7 @@
+# 5.4.4
+
+- **[IMPROVEMENT]** Downgrade `characters` package to `1.4.0` to fix `pubspec.yaml`.
+
 # 5.4.3
 
 - **[BUG_FIX]** Fix bugs and clean code.
