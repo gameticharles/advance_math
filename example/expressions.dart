@@ -1,6 +1,6 @@
 import 'package:advance_math/advance_math.dart';
 
-final context1 = {
+final Map<String, dynamic> context1 = {
   'x': 3.0,
   'y': 4.0,
   'z': 2,
@@ -10,7 +10,7 @@ final context1 = {
   'e': e,
 };
 
-final context = {...defaultContext, ...context1};
+final Map<String, dynamic> context = {...defaultContext, ...context1};
 
 void main(List<String> args) {
   // Example 1: Handle only positional arguments
@@ -71,6 +71,11 @@ void main(List<String> args) {
   logicMath();
   stringMath();
   dateTimeMath();
+  physicsConstantsMath();
+  advancedMathFunctions();
+  trigAndWavesMath();
+  advancedStatisticsMath();
+  randomAndUtilsMath();
   polynomial();
   multiPolynomial();
   expressionMath();
@@ -222,10 +227,205 @@ void dateTimeMath() {
     'hoursDiff("2018-01-01", "2018-01-02")',
     'hoursDiff("2019-02-01T08:00", "2019-02-01T12:00")',
     'hoursDiff("2019-02-01T08:20", "2019-02-01T12:00")',
-    'hoursDiff("2018-01-01", "2018-01-01")'
+    'hoursDiff("2018-01-01", "2018-01-01")',
+    'minutesDiff("2019-02-01T08:00", "2019-02-01T08:05")',
+    'secondsDiff("2019-02-01T08:00:00", "2019-02-01T08:00:10")',
+    'millisecondsDiff("2019-02-01T08:00:00.000", "2019-02-01T08:00:00.500")',
+    'microsecondsDiff("2019-02-01T08:00:00.000000", "2019-02-01T08:00:00.000500")',
   ];
 
   evaluateExpressions(expressions, "DateTime Math equations", context);
+}
+
+void physicsConstantsMath() {
+  List<String> expressions = [
+    'speedOfLight',
+    'c',
+    'planckConstant',
+    'h',
+    'reducedPlanckConstant',
+    'gravitationalConstant',
+    'G',
+    'standardGravity',
+    'g',
+    'boltzmannConstant',
+    'k',
+    'electronMass',
+    'protonMass',
+    'neutronMass',
+    'elementaryCharge',
+    'avogadrosNumber',
+    'Na',
+    'gasConstant',
+    'R',
+    'stefanBoltzmannConstant',
+    'NaN',
+    'Infinity',
+  ];
+  evaluateExpressions(expressions, "Physics Constants", context);
+}
+
+void advancedMathFunctions() {
+  List<String> expressions = [
+    'tau',
+    'ln2',
+    'ln10',
+    'log2e',
+    'log10e',
+    'sqrt1_2',
+    'sqrt2',
+    'sqrt3',
+    'halfPi',
+    'quarterPi',
+    'deg2rad',
+    'rad2deg',
+    'cbrt(27)',
+    'nthRoot(16, 4)',
+    'exp(2)',
+    'factorial2(5)',
+    'doubleFactorial(5)',
+    'step(0.5)',
+    'rect(0.2)',
+    'sign(-10)',
+    'modF(3.14)',
+    'mod(10, 3)',
+    'modInv(3, 11)',
+    'nChooseRModPrime(10, 5, 13)',
+    'floor(3.9)',
+    'ceil(3.1)',
+    'hypot(3, 4)',
+    'clamp(10, 0, 5)',
+    'lerp(0, 10, 0.5)',
+    'rec(3, 4)', // Rectangular to polar return
+    'pol(5, 0.927)', // Polar to rectangular return
+    'isDigit("5")',
+    'isAlpha("A")',
+    'isAlphaNumeric("A1")',
+    'isDivisible(10, 2)',
+    'isEven(4)',
+    'isOdd(3)',
+    'isPrime(7)',
+    'nthPrime(5)',
+    'sieve(20)',
+    'fibonacci(10)',
+    'fib(10)',
+    'isPerfectSquare(16)',
+    'isPerfectCube(27)',
+    'isFibonacci(8)',
+    'isPalindrome(121)',
+    'isPandigital(123456789)',
+    'isArmstrongNumber(153)',
+    'isPerfectNumber(28)',
+    'trunc(3.14)',
+    'factors(12)',
+    'factorsOf(12)',
+    'primeFactors(56)',
+    'nthTriangleNumber(5)',
+    'nthPentagonalNumber(5)',
+    'nthHexagonalNumber(5)',
+    'nthTetrahedralNumber(5)',
+    'nthHarmonicNumber(5)',
+    'erfc(0.5)',
+    'lgamma(5)',
+    'digamma(5)',
+    'expm1(1)',
+    'log1p(0.5)',
+    'collatzPeak(6)',
+    'longestCollatzInRange(1, 10)',
+    'isKaprekarNumber(45)',
+    'isNarcissisticNumber(153)',
+    'frexp(8.0)',
+    'ldexp(0.5, 4)',
+    'getDigits(1234)',
+    'egcd(12, 18)',
+  ];
+  evaluateExpressions(expressions, "Advanced Math Functions", context);
+}
+
+void trigAndWavesMath() {
+  List<String> expressions = [
+    'sin(30)',
+    'cos(30)',
+    'tan(30)',
+    'csc(30)',
+    'sec(30)',
+    'cot(30)',
+    'asin(0.5)',
+    'acos(0.5)',
+    'atan(1)',
+    'atan2(1, 1)',
+    'asec(2)',
+    'acsc(2)',
+    'acot(1)',
+    'sinh(1)',
+    'cosh(1)',
+    'tanh(1)',
+    'csch(1)',
+    'sech(1)',
+    'coth(1)',
+    'asinh(1)',
+    'acosh(2)',
+    'atanh(0.5)',
+    'acsch(1)',
+    'asech(0.5)',
+    'acoth(2)',
+    'vers(pi/2)',
+    'covers(pi/2)',
+    'havers(pi/2)',
+    'exsec(pi/4)',
+    'excsc(pi/4)',
+    'sawtooth(1.5)',
+    'squareWave(1.5)',
+    'triangleWave(1.5)',
+    'sinc(pi/2)',
+  ];
+  evaluateExpressions(expressions, "Trigonometry & Waves", context);
+}
+
+void advancedStatisticsMath() {
+  List<String> expressions = [
+    'standardDeviation([1, 2, 3, 4, 5])',
+    'stdDev([1, 2, 3, 4, 5])',
+    'stdErrMean([1, 2, 3, 4, 5])',
+    'stdErrEst([1, 2, 3], [1.1, 1.9, 3.2])',
+    'tValue([1, 2, 3, 4, 5])',
+    'quartiles([1, 2, 3, 4, 5, 6, 7, 8, 9])',
+    'gcf([12, 18])',
+    'gcd([12, 18])',
+    'lcm([12, 18])',
+    'correlation([1, 2, 3], [2, 4, 6])',
+    'confidenceInterval([1, 2, 3, 4, 5], 0.95)',
+    'regression([1, 2, 3, 4, 5], [2, 4, 5, 4, 5])',
+  ];
+  evaluateExpressions(expressions, "Advanced Statistics", context);
+}
+
+void randomAndUtilsMath() {
+  List<String> expressions = [
+    'rand(3)',
+    'rand(10)',
+    'rand(5, 15)',
+    'randint(10)',
+    'randomBetween(1, 10)',
+    'randomString(10)',
+    'randomNumeric(5)',
+    'randomAlpha(8)',
+    'randomAlphaNumeric(8)',
+    'randomMerge("abc", "123")',
+    'time(sumTo(10000))',
+    'isClose(3.14159, 3.14159265, 1e-5)',
+    'integerPart(-4.7)',
+    'fibRange(1, 10)',
+    'number2str(123)',
+    'roots("x^2 + 2x + 1")',
+    'derivative("x^2 + 5x + 6")',
+    'integrate("2x + 5")',
+    'simplify("2x + 3x + 5")',
+    'simpson("x*x", 0, 2)',
+    'numIntegrate("x*x", 0, 2)',
+    'diff("x*x", 2)',
+  ];
+  evaluateExpressions(expressions, "Random & Utilities", context);
 }
 
 void polynomial() {

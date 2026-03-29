@@ -345,19 +345,21 @@ class ExpressionParser {
   // until the terminator character `)` or `]` is encountered.
   // e.g. `foo(bar, baz)`, `my_func()`, or `[bar, baz]`
   Parser<List<Expression>> get arguments => expression
-      .starSeparated(char(',').trim())
+      .plusSeparated(char(',').trim())
       .map((result) => result.elements)
       .castList<Expression>()
       .optionalWith([]);
 
+
   Parser<Map<Expression, Expression>> get mapArguments =>
       (expression & char(':').trim() & expression)
           .map((l) => MapEntry<Expression, Expression>(l[0], l[2]))
-          .starSeparated(char(',').trim())
+          .plusSeparated(char(',').trim())
           .map((result) => result.elements)
           .castList<MapEntry<Expression, Expression>>()
           .map((l) => Map.fromEntries(l))
           .optionalWith({});
+
 
   // Gobble a non-literal variable name. This variable name may include properties
   // e.g. `foo`, `bar.baz`, `foo['bar'].baz`
