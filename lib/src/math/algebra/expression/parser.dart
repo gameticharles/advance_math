@@ -705,9 +705,101 @@ class ExpressionParser {
         return l;
       });
 
+  // Binary expression variant that does NOT include ':' as a valid operator.
+  // Used in the ifTrue branch of ternary to prevent ':' from being consumed.
+  Parser<String> get explicitBinaryOpsNoColon {
+    final sortedOps = binaryOperations.keys
+        .where((k) => k != 'IMPLICIT_MUL' && k != ':')
+        .toList()
+      ..sort((a, b) => b.length.compareTo(a.length));
+    return sortedOps
+        .map<Parser<String>>((v) => string(v))
+        .reduce((a, b) => (a | b).cast<String>())
+        .trim();
+  }
+
+  Parser<String> get binaryOperationNoColon {
+    final explicitOps = explicitBinaryOpsNoColon;
+    final implicitOp = epsilon()
+        .seq(_lookahead(digit() |
+            char('.') |
+            letter() |
+            anyOf(r'$_([{') |
+            anyOf('!~')))
+        .map((_) => 'IMPLICIT_MUL');
+    return explicitOps.or(implicitOp).cast<String>();
+  }
+
+  Parser<Expression> get binaryExpressionNoColon =>
+      token.starSeparated(binaryOperationNoColon).map((result) {
+        final List<dynamic> elements = <dynamic>[];
+        for (int i = 0; i < result.elements.length; i++) {
+          elements.add(result.elements[i]);
+          if (i < result.separators.length) {
+            elements.add(result.separators[i]);
+          }
+        }
+        if (elements.isEmpty) throw FormatException('Empty binary expression');
+        if (elements.length == 1) return elements[0];
+
+        Expression createBinary(String op, Expression l, Expression r) {
+          switch (op) {
+            case '+':
+              return Add(l, r);
+            case '-':
+              return Subtract(l, r);
+            case '*':
+            case 'IMPLICIT_MUL':
+              return Multiply(l, r);
+            case '/':
+              return Divide(l, r);
+            case '^':
+              return Pow(l, r);
+            case '=':
+              return Subtract(l, r);
+            case '%':
+              return Modulo(l, r);
+            default:
+              return BinaryExpression(op, l, r);
+          }
+        }
+
+        List<dynamic> processRight(List<dynamic> tokens, String op) {
+          while (tokens.contains(op)) {
+            int idx = tokens.lastIndexOf(op);
+            var right = tokens.removeAt(idx + 1);
+            tokens.removeAt(idx);
+            var left = tokens.removeAt(idx - 1);
+            tokens.insert(idx - 1, createBinary(op, left, right));
+          }
+          return tokens;
+        }
+
+        var stack = elements;
+        stack = processRight(stack, '^');
+        while (stack.length > 1) {
+          int maxPrec = BinaryExpression.precedenceForOperator(stack[1]);
+          int index = 1;
+          for (int i = 3; i < stack.length; i += 2) {
+            int prec = BinaryExpression.precedenceForOperator(stack[i]);
+            if (prec > maxPrec) {
+              maxPrec = prec;
+              index = i;
+            }
+          }
+          var l = stack[index - 1];
+          var op = stack[index];
+          var r = stack[index + 1];
+          stack.replaceRange(index - 1, index + 2, [createBinary(op, l, r)]);
+        }
+        return stack[0];
+      });
+
   // Ternary expression: test ? consequent : alternate
+  // Note: use binaryExpressionNoColon for ifTrue to prevent ':' (binary range op)
+  // from consuming the ternary separator.
   Parser<List<Expression>> get conditionArguments =>
-      (char('?').trim() & expression.trim() & char(':').trim())
+      (char('?').trim() & binaryExpressionNoColon.trim() & char(':').trim())
           .pick(1)
           .seq(expression)
           .castList();

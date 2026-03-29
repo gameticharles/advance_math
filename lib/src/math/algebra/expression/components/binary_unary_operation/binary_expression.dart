@@ -11,11 +11,21 @@ class BinaryExpression extends Expression {
 
   @override
   dynamic evaluate([dynamic arg]) {
+    // Helper to unwrap Complex to num when the imaginary part is zero
+    dynamic unwrap(dynamic v) {
+      if (v is Complex && v.isReal) return v.simplify();
+      return v;
+    }
+
     switch (operator) {
       case 'P':
-        return permutations(left.evaluate(arg), right.evaluate(arg)).length;
+        return permutations(
+                unwrap(left.evaluate(arg)), unwrap(right.evaluate(arg)))
+            .length;
       case 'C':
-        return combinations(left.evaluate(arg), right.evaluate(arg)).length;
+        return combinations(
+                unwrap(left.evaluate(arg)), unwrap(right.evaluate(arg)))
+            .length;
       case '||':
       case 'or':
         return left.evaluate(arg) || right.evaluate(arg);
@@ -27,13 +37,25 @@ class BinaryExpression extends Expression {
       case '!=':
         return left.evaluate(arg) != right.evaluate(arg);
       case '>':
-        return left.evaluate(arg) > right.evaluate(arg);
+        final lv = unwrap(left.evaluate(arg));
+        final rv = unwrap(right.evaluate(arg));
+        if (lv is num && rv is num) return lv > rv;
+        return lv > rv;
       case '>=':
-        return left.evaluate(arg) >= right.evaluate(arg);
+        final lv = unwrap(left.evaluate(arg));
+        final rv = unwrap(right.evaluate(arg));
+        if (lv is num && rv is num) return lv >= rv;
+        return lv >= rv;
       case '<':
-        return left.evaluate(arg) < right.evaluate(arg);
+        final lv = unwrap(left.evaluate(arg));
+        final rv = unwrap(right.evaluate(arg));
+        if (lv is num && rv is num) return lv < rv;
+        return lv < rv;
       case '<=':
-        return left.evaluate(arg) <= right.evaluate(arg);
+        final lv = unwrap(left.evaluate(arg));
+        final rv = unwrap(right.evaluate(arg));
+        if (lv is num && rv is num) return lv <= rv;
+        return lv <= rv;
       case '??':
         return left.evaluate(arg) ?? right.evaluate(arg);
       case '<<':

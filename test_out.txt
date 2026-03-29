@@ -1,0 +1,13 @@
+Running build hooks...Running build hooks...Test 1 (5*3-4): 11.0 (type: double)
+Test 2 (6*x+4 @x=3): 22.0 (type: double)
+Test 3 ERROR: ParserException[1:7]: end of input expected
+Test 4 ERROR: Exception: Factorial is only defined for non-negative integers.
+Test 5 (10.5/5.25): 2 (type: int)
+Test 6 (poly @x=2): 19.0 (type: double)
+Test 7 (sqrt(49)+10): 17.0
+Test 8 ERROR: type 'Complex' is not a subtype of type 'int'
+Test 9 (avg): 9.6
+Test 10 (mean): 3.0
+Test 11 ERROR: Invalid argument(s): Input should be either num or Complex
+Test 12 (exp(1) == e): true
+Test 13 ERROR: ParserException[1:8]: end of input expected

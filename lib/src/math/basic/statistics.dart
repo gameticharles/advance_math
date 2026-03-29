@@ -367,6 +367,13 @@ dynamic combinations(dynamic n, int r,
   }
 }
 
+/// Alias for combinations.
+dynamic nCr =
+    (dynamic n, int r) => combinations(n, r, generateCombinations: false);
+
+/// Alias for permutations.
+dynamic nPr = (dynamic n, int r) => permutations(n, r).length;
+
 /// Calculates the greatest common factor (GCF) of all numbers in the input.
 ///
 /// Example:

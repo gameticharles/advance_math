@@ -200,8 +200,8 @@ dynamic atan(dynamic x) {
   } else if (x is Complex) {
     // Using the formula: atan(z) = (i/2) * (log(1 - iz) - log(1 + iz))
     Complex i = Complex(0, 1);
-    dynamic result =
-        (i / 2) * (log(Complex(1, 0) - i * x) - log(Complex(1, 0) + i * x));
+    dynamic result = (i / (Complex(2, 0))) *
+        (log(Complex(1, 0) - i * x) - log(Complex(1, 0) + i * x));
     return result;
   } else {
     throw ArgumentError('Input should be either num or Complex');

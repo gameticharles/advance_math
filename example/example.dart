@@ -419,6 +419,8 @@ void main() async {
   groupedByAreaRange.forEach((key, value) {
     print('$key: ${value.map((p) => p['id']).join(', ')}');
   });
+
+  print(sqrt(-1)); // Output: 4.0
 }
 
 class Parcel {

@@ -182,10 +182,18 @@ class Divide extends BinaryOperationsExpression {
     var numerator = left.simplify();
     var denominator = right.simplify();
 
+    // Helper to extract numeric value from Literal (may be Complex wrapping a real)
+    dynamic extractNum(Literal lit) {
+      final v = lit.value;
+      if (v is num) return v;
+      if (v is Complex && v.isReal) return v.simplify(); // returns int or double
+      return v;
+    }
+
     // Basic simplification: if both operands are literals, evaluate and return a new Literal.
     if (numerator is Literal && denominator is Literal) {
-      var l = numerator.value;
-      var r = denominator.value;
+      var l = extractNum(numerator);
+      var r = extractNum(denominator);
       if (l is num && r is num) {
         if (r == 0) throw Exception('Division by zero');
         // If result is integer, return integer
@@ -203,25 +211,35 @@ class Divide extends BinaryOperationsExpression {
     }
 
     // x / 1 -> x
-    if (denominator is Literal && denominator.value == 1) return numerator;
-
-    // x / -1 -> -x
-    if (denominator is Literal && denominator.value == -1) {
-      return Multiply(Literal(-1), numerator).simplify();
+    if (denominator is Literal) {
+      final dv = extractNum(denominator);
+      if (dv == 1) return numerator;
+      // x / -1 -> -x
+      if (dv == -1) return Multiply(Literal(-1), numerator).simplify();
+      // 0 / x -> 0 (but only if numerator is 0)
+      if (numerator is Literal) {
+        final nv = extractNum(numerator);
+        if (nv == 0) return Literal(0);
+      }
     }
 
     // 0 / x -> 0
-    if (numerator is Literal && numerator.value == 0) return Literal(0);
+    if (numerator is Literal) {
+      final nv = extractNum(numerator);
+      if (nv == 0) return Literal(0);
+    }
 
     // x / x -> 1
     if (numerator.toString() == denominator.toString()) return Literal(1);
 
     // Convert division by literal to multiplication by reciprocal
     // x / c -> x * (1/c)
-    if (denominator is Literal && denominator.value is num) {
-      num val = denominator.value;
-      if (val == 0) throw Exception('Division by zero');
-      return Multiply(Literal(1 / val), numerator).simplify();
+    if (denominator is Literal) {
+      final dv = extractNum(denominator);
+      if (dv is num) {
+        if (dv == 0) throw Exception('Division by zero');
+        return Multiply(Literal(1 / dv), numerator).simplify();
+      }
     }
 
     // Cancellation: A / (c * A) -> 1/c

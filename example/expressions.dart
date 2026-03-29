@@ -126,7 +126,27 @@ void simpleMath() {
     'acosh(60)',
     'acot(0.5)',
     'csc(60)',
-    'atan2(3,2)'
+    'atan2(3,2)',
+    'phi',
+    'eulerGamma',
+    'c',
+    'G',
+    'nan',
+    'inf',
+    'erf(0.5)',
+    'zeta(2)',
+    'beta(2, 3)',
+    'collatz(6)',
+    'isHappyNumber(19)',
+    'isMersennePrime(7)',
+    'binomialCoefficient(5, 2)',
+    'sin(30)',
+    'sin(pi/6)',
+    'avg(1, 2, 3, 4, 5)',
+    'correlation([1, 2, 3], [2, 4, 6])',
+    'fact(5)',
+    'average([10, 20, 30])',
+    'time(sumTo(100))',
   ];
 
   evaluateExpressions(expressions, "Simple Math equations", context);

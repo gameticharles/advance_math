@@ -14,6 +14,34 @@ final defaultContext = {
   'sqrt1_2': sqrt1_2,
   'sqrt2': sqrt2,
   'sqrt3': sqrt3,
+  'phi': 1.618033988749895,
+  'eulerGamma': 0.577215664901532,
+  'nan': double.nan,
+  'NaN': double.nan,
+  'inf': double.infinity,
+  'Infinity': double.infinity,
+
+  // Physics Constants
+  'speedOfLight': PhysicsConstants.speedOfLight,
+  'c': PhysicsConstants.speedOfLight,
+  'planckConstant': PhysicsConstants.planckConstant,
+  'h': PhysicsConstants.planckConstant,
+  'reducedPlanckConstant': PhysicsConstants.reducedPlanckConstant,
+  'gravitationalConstant': PhysicsConstants.gravitationalConstant,
+  'G': PhysicsConstants.gravitationalConstant,
+  'standardGravity': PhysicsConstants.standardGravity,
+  'g': PhysicsConstants.standardGravity,
+  'boltzmannConstant': PhysicsConstants.boltzmannConstant,
+  'k': PhysicsConstants.boltzmannConstant,
+  'electronMass': PhysicsConstants.electronMass,
+  'protonMass': PhysicsConstants.protonMass,
+  'neutronMass': PhysicsConstants.neutronMass,
+  'elementaryCharge': PhysicsConstants.elementaryCharge,
+  'avogadrosNumber': PhysicsConstants.avogadrosNumber,
+  'Na': PhysicsConstants.avogadrosNumber,
+  'gasConstant': PhysicsConstants.gasConstant,
+  'R': PhysicsConstants.gasConstant,
+  'stefanBoltzmannConstant': PhysicsConstants.stefanBoltzmannConstant,
 
   // Angle Constants
   'halfPi': AngleConstants.halfPi,
@@ -32,23 +60,37 @@ final defaultContext = {
   'log10': log10,
   'log': log,
   'ln': log,
-  'factorial': factorial,
+  'fact': (dynamic x) => factorial(x is Complex ? x.real.toInt() : (x as num).toInt()),
+  'factorial': (dynamic x) => factorial(x is Complex ? x.real.toInt() : (x as num).toInt()),
   'factorial2': factorial2,
-  'doubleFactorial': doubleFactorial,
+  'doubleFactorial': (dynamic x) => doubleFactorial(
+      x is Complex ? x.real.toDouble() : (x as num).toDouble()),
   'step': step,
   'rect': rect,
   'sign': sign,
   'modF': modF,
   'mod': mod,
-  'modInv': (num a, num m) => modInv(a, m),
+  'modInv': (dynamic a, dynamic m) => modInv(
+      a is Complex ? a.real : a as num,
+      m is Complex ? m.real : m as num),
   'nChooseRModPrime': nChooseRModPrime,
   'bigIntNChooseRModPrime': bigIntNChooseRModPrime,
   'floor': floor,
   'ceil': ceil,
   'hypot': hypot,
-  'round': round,
-  'roundDecimal': (num x, int n) => round(x, n),
-  'roundTo': (num x, int n) => round(x, n),
+  'round': (dynamic x, [dynamic decimalPlaces = 0]) {
+    final dp = decimalPlaces is Complex
+        ? decimalPlaces.real.toInt()
+        : (decimalPlaces as num).toInt();
+    final xVal = x is Complex && x.isReal ? x.simplify() : x;
+    return round(xVal is num ? xVal : x, dp);
+  },
+  'roundDecimal': (dynamic x, dynamic n) =>
+      round(x is Complex ? x.real : x as num,
+            n is Complex ? n.real.toInt() : (n as num).toInt()),
+  'roundTo': (dynamic x, dynamic n) =>
+      round(x is Complex ? x.real : x as num,
+            n is Complex ? n.real.toInt() : (n as num).toInt()),
   'clamp': clamp,
   'lerp': lerp,
   'rec': rec,
@@ -81,6 +123,41 @@ final defaultContext = {
   'nthTetrahedralNumber': nthTetrahedralNumber,
   'nthHarmonicNumber': nthHarmonicNumber,
   'gamma': gamma,
+  'erf': erf,
+  'erfc': erfc,
+  'lgamma': lgamma,
+  'digamma': digamma,
+  'beta': beta,
+  'zeta': zeta,
+  'expm1': expm1,
+  'log1p': log1p,
+
+  'collatz': (dynamic n, [dynamic returnSequence = true]) => collatz(
+      n is Complex ? n.real.toInt() : (n as num).toInt(),
+      returnSequence is Complex ? returnSequence.real == 1 : (returnSequence as bool)),
+  'collatzPeak': (dynamic n) => collatzPeak(
+      n is Complex ? n.real.toInt() : (n as num).toInt()),
+  'longestCollatzInRange': (dynamic start, dynamic end) => longestCollatzInRange(
+      start is Complex ? start.real.toInt() : (start as num).toInt(),
+      end is Complex ? end.real.toInt() : (end as num).toInt()),
+  'isKaprekarNumber': (dynamic n) => isKaprekarNumber(
+      n is Complex ? n.real.toInt() : (n as num).toInt()),
+  'isNarcissisticNumber': (dynamic n) => isNarcissisticNumber(
+      n is Complex ? n.real.toInt() : (n as num).toInt()),
+  'isHappyNumber': (dynamic n) => isHappyNumber(
+      n is Complex ? n.real.toInt() : (n as num).toInt()),
+  'isMersennePrime': (dynamic n) => isMersennePrime(
+      n is Complex ? n.real.toInt() : (n as num).toInt()),
+  'frexp': frexp,
+  'ldexp': (dynamic x, dynamic n) => ldexp(
+      x is Complex ? x.real : x as num,
+      n is Complex ? n.real.toInt() : (n as num).toInt()),
+  'getDigits': (dynamic n) => getDigits(
+      n is Complex ? n.real.toInt() : (n as num).toInt()),
+  'egcd': egcd,
+  'binomialCoefficient': (dynamic n, dynamic k) => binomialCoefficient(
+      n is Complex ? n.real.toInt() : (n as num).toInt(),
+      k is Complex ? k.real.toInt() : (k as num).toInt()),
 
   //Polynomials
   'roots': (dynamic exp) => Polynomial.fromString(exp.toString()).roots(),
@@ -92,19 +169,33 @@ final defaultContext = {
   'simplify': (dynamic exp) => Expression.parse(exp.toString()).simplify(),
 
   // Trigonometric functions
-  'sin': (num x) => sin(degToRad(x)),
-  'cos': (num x) => cos(degToRad(x)),
-  'tan': (num x) => tan(degToRad(x)),
-  'csc': (num x) => csc(degToRad(x)),
-  'sec': (num x) => sec(degToRad(x)),
-  'cot': (num x) => cot(degToRad(x)),
-  'asin': (num x) => radToDeg(asin(x)),
-  'acos': (num x) => radToDeg(acos(x)),
-  'atan': (num x) => radToDeg(atan(x)),
-  'atan2': (num x, num y) => radToDeg(atan2(x, y)),
-  'asec': (num x) => radToDeg(asec(x)),
-  'acsc': (num x) => radToDeg(acsc(x)),
-  'acot': (num x) => radToDeg(acot(x)),
+  'sin': (dynamic x) => sin(x is Complex ? x : degToRad(x as num)),
+  'cos': (dynamic x) => cos(x is Complex ? x : degToRad(x as num)),
+  'tan': (dynamic x) => tan(x is Complex ? x : degToRad(x as num)),
+  'csc': (dynamic x) => csc(x is Complex ? x : degToRad(x as num)),
+  'sec': (dynamic x) => sec(x is Complex ? x : degToRad(x as num)),
+  'cot': (dynamic x) => cot(x is Complex ? x : degToRad(x as num)),
+  'asin': (dynamic x) => x is Complex
+      ? asin(x)
+      : radToDeg((asin(x) as Complex).simplify()),
+  'acos': (dynamic x) => x is Complex
+      ? acos(x)
+      : radToDeg((acos(x) as Complex).simplify()),
+  'atan': (dynamic x) => x is Complex
+      ? atan(x)
+      : radToDeg((atan(x) as Complex).simplify()),
+  'atan2': (dynamic a, dynamic b) => a is Complex || b is Complex
+      ? atan2(a, b)
+      : radToDeg(atan2(a as num, b as num)),
+  'asec': (dynamic x) => x is Complex
+      ? asec(x)
+      : radToDeg((asec(x) as Complex).simplify()),
+  'acsc': (dynamic x) => x is Complex
+      ? acsc(x)
+      : radToDeg((acsc(x) as Complex).simplify()),
+  'acot': (dynamic x) => x is Complex
+      ? acot(x)
+      : radToDeg((acot(x) as Complex).simplify()),
   'sinh': sinh,
   'cosh': cosh,
   'tanh': tanh,
@@ -131,24 +222,38 @@ final defaultContext = {
   'max': max,
   'min': min,
   'sum': sum,
-  'sumTo': (num x) => sumTo(x.toInt()),
-  'nPr': (num n, int r) => permutations(n, r).length,
-  'permutations': (num n, int r) => permutations(n, r).length,
-  'nCr': (num n, int r) => combinations(n, r).length,
-  'combinations': (num n, int r) => combinations(n, r).length,
+  'sumTo': (dynamic x) => sumTo(
+      x is Complex ? x.real.toInt() : (x as num).toInt()),
+  'nPr': (dynamic n, dynamic r) => permutations(
+      n is Complex ? n.real.toInt() : (n as num).toInt(),
+      r is Complex ? r.real.toInt() : (r as num).toInt()).length,
+  'permutations': (dynamic n, dynamic r) => permutations(
+      n is Complex ? n.real.toInt() : (n as num).toInt(),
+      r is Complex ? r.real.toInt() : (r as num).toInt()).length,
+  'nCr': (dynamic n, dynamic r) => combinations(
+      n is Complex ? n.real.toInt() : (n as num).toInt(),
+      r is Complex ? r.real.toInt() : (r as num).toInt()).length,
+  'combinations': (dynamic n, dynamic r) => combinations(
+      n is Complex ? n.real.toInt() : (n as num).toInt(),
+      r is Complex ? r.real.toInt() : (r as num).toInt()).length,
 
   'mean': mean,
+  'average': mean,
   'median': median,
   'mode': mode,
   'variance': variance,
   'standardDeviation': stdDev,
   'stdDev': stdDev,
   'stdErrMean': stdErrMean,
+  'stdErrEst': stdErrEst,
   'tValue': tValue,
   'quartiles': quartiles,
   'gcf': gcf,
   'gcd': gcd,
   'lcm': lcm,
+  'correlation': correlation,
+  'confidenceInterval': confidenceInterval,
+  'regression': regression,
 
   // Missing Basic Math Functions
   'sinc': sinc,
@@ -175,6 +280,22 @@ final defaultContext = {
     return r.nextDouble();
   },
   'randint': ([int max = 100]) => Random().nextInt(max),
+  'randomBetween': randomBetween,
+  'randomString': randomString,
+  'randomNumeric': randomNumeric,
+  'randomAlpha': randomAlpha,
+  'randomAlphaNumeric': randomAlphaNumeric,
+  'randomMerge': randomMerge,
+
+  // Utilities
+  'time': (dynamic x) {
+    final t = time(x);
+    return {'result': t.result, 'elapsed': t.elapsed.inMicroseconds / 1000.0};
+  },
+  'timeAsync': (dynamic x) async {
+    final t = await timeAsync(x);
+    return {'result': t.result, 'elapsed': t.elapsed.inMicroseconds / 1000.0};
+  },
 
   // String functions
   'string': (dynamic x) => x.toString(),

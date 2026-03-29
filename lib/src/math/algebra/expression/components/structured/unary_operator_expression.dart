@@ -11,14 +11,21 @@ class UnaryExpression extends Expression {
 
   @override
   dynamic evaluate([dynamic arg]) {
-    final operandVal = operand.evaluate(arg);
+    var operandVal = operand.evaluate(arg);
 
     if (!prefix && operator == '!') {
-      // Handle factorial
+      // Handle factorial - unwrap Complex to int if possible
+      if (operandVal is Complex && operandVal.isReal) {
+        operandVal = operandVal.simplify();
+      }
+      if (operandVal is double && operandVal == operandVal.truncateToDouble()) {
+        operandVal = operandVal.toInt();
+      }
       if (operandVal is int && operandVal >= 0) {
         return factorial(operandVal);
       } else {
-        throw Exception('Factorial is only defined for non-negative integers.');
+        throw Exception(
+            'Factorial is only defined for non-negative integers, got: $operandVal (${operandVal.runtimeType})');
       }
     }
 

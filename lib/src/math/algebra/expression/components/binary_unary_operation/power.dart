@@ -96,22 +96,34 @@ class Pow extends BinaryOperationsExpression {
     var simplifiedBase = base.simplify();
     var simplifiedExponent = exponent.simplify();
 
+    // Helper to extract real numeric value from Literal (which may wrap Complex)
+    dynamic litVal(Literal lit) {
+      final v = lit.value;
+      if (v is num) return v;
+      if (v is Complex && v.isReal) return v.simplify();
+      return v;
+    }
+
     if (simplifiedExponent is Literal) {
-      var exponentValue = simplifiedExponent.evaluate();
+      var exponentValue = litVal(simplifiedExponent);
       if (exponentValue == 0) return Literal(1);
       if (exponentValue == 1) return simplifiedBase;
     }
 
-    if (simplifiedBase is Literal && simplifiedBase.evaluate() == 0) {
-      if (simplifiedExponent is Literal && simplifiedExponent.evaluate() > 0) {
-        return Literal(0);
+    if (simplifiedBase is Literal) {
+      final bv = litVal(simplifiedBase);
+      if (bv == 0) {
+        if (simplifiedExponent is Literal &&
+            litVal(simplifiedExponent) > 0) {
+          return Literal(0);
+        }
+        throw Exception('0 raised to a non-positive power is undefined.');
       }
-      throw Exception('0 raised to a non-positive power is undefined.');
     }
 
     if (simplifiedBase is Literal && simplifiedExponent is Literal) {
-      var b = simplifiedBase.value;
-      var e = simplifiedExponent.value;
+      var b = litVal(simplifiedBase);
+      var e = litVal(simplifiedExponent);
       if (b is num && e is num) {
         return Literal(pow(b, e));
       }

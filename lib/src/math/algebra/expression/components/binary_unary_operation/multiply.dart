@@ -107,6 +107,14 @@ class Multiply extends BinaryOperationsExpression {
     var simpleLeft = left.simplifyBasic();
     var simpleRight = right.simplifyBasic();
 
+    // Helper to extract real numeric value from Literal (which may wrap Complex)
+    dynamic litVal(Literal lit) {
+      final v = lit.value;
+      if (v is num) return v;
+      if (v is Complex && v.isReal) return v.simplify();
+      return v;
+    }
+
     // Normalize Negate(expr) or UnaryExpression('-', expr) to -1 * expr
     bool isNegate(Expression e) {
       return e is Negate || (e is UnaryExpression && e.operator == '-');
@@ -129,13 +137,13 @@ class Multiply extends BinaryOperationsExpression {
     }
 
     // Simplify -1 * UnaryExpression('-', a) -> a
-    if (simpleLeft is Literal && simpleLeft.value == -1) {
+    if (simpleLeft is Literal && litVal(simpleLeft) == -1) {
       if (simpleRight is UnaryExpression && simpleRight.operator == '-') {
         return simpleRight.operand.simplifyBasic();
       }
     }
     // Simplify UnaryExpression('-', a) * -1 -> a
-    if (simpleRight is Literal && simpleRight.value == -1) {
+    if (simpleRight is Literal && litVal(simpleRight) == -1) {
       if (simpleLeft is UnaryExpression && simpleLeft.operator == '-') {
         return simpleLeft.operand.simplifyBasic();
       }
@@ -147,8 +155,8 @@ class Multiply extends BinaryOperationsExpression {
 
     // Basic simplification: if both operands are literals, evaluate and return a new Literal.
     if (simpleLeft is Literal && simpleRight is Literal) {
-      var leftVal = simpleLeft.evaluate();
-      var rightVal = simpleRight.evaluate();
+      var leftVal = litVal(simpleLeft);
+      var rightVal = litVal(simpleRight);
       if (leftVal is Complex || rightVal is Complex) {
         return Literal(Complex(leftVal) * Complex(rightVal)).simplify();
       }
@@ -202,15 +210,15 @@ class Multiply extends BinaryOperationsExpression {
     }
 
     // Handle cases like x * 0 = 0, x * 1 = x
-    if (simpleLeft is Literal && simpleLeft.evaluate() == 0 ||
-        simpleRight is Literal && simpleRight.evaluate() == 0) {
+    if (simpleLeft is Literal && litVal(simpleLeft) == 0 ||
+        simpleRight is Literal && litVal(simpleRight) == 0) {
       return Literal(0);
     }
 
-    if (simpleLeft is Literal && simpleLeft.evaluate() == 1) {
+    if (simpleLeft is Literal && litVal(simpleLeft) == 1) {
       return simpleRight;
     }
-    if (simpleRight is Literal && simpleRight.evaluate() == 1) {
+    if (simpleRight is Literal && litVal(simpleRight) == 1) {
       return simpleLeft;
     }
 
@@ -250,9 +258,10 @@ class Multiply extends BinaryOperationsExpression {
     if (simpleLeft is Literal &&
         simpleRight is Multiply &&
         simpleRight.left is Literal) {
-      var c1 = simpleLeft.evaluate();
-      var c2 = (simpleRight.left as Literal).evaluate();
+      var c1 = litVal(simpleLeft);
+      var c2 = litVal(simpleRight.left as Literal);
       var val = (c1 is num && c2 is Complex) ? c2 * c1 : c1 * c2;
+      if (val is Complex && val.isReal) val = val.simplify();
       return Multiply(Literal(val), simpleRight.right).simplifyBasic();
     }
 
@@ -260,9 +269,10 @@ class Multiply extends BinaryOperationsExpression {
     if (simpleLeft is Multiply &&
         simpleLeft.left is Literal &&
         simpleRight is Literal) {
-      var c1 = (simpleLeft.left as Literal).evaluate();
-      var c2 = simpleRight.evaluate();
+      var c1 = litVal(simpleLeft.left as Literal);
+      var c2 = litVal(simpleRight);
       var val = (c1 is num && c2 is Complex) ? c2 * c1 : c1 * c2;
+      if (val is Complex && val.isReal) val = val.simplify();
       return Multiply(Literal(val), simpleLeft.right).simplifyBasic();
     }
 
@@ -270,9 +280,10 @@ class Multiply extends BinaryOperationsExpression {
     if (simpleLeft is Literal &&
         simpleRight is Multiply &&
         simpleRight.right is Literal) {
-      var c1 = simpleLeft.evaluate();
-      var c2 = (simpleRight.right as Literal).evaluate();
+      var c1 = litVal(simpleLeft);
+      var c2 = litVal(simpleRight.right as Literal);
       var val = (c1 is num && c2 is Complex) ? c2 * c1 : c1 * c2;
+      if (val is Complex && val.isReal) val = val.simplify();
       return Multiply(Literal(val), simpleRight.left).simplifyBasic();
     }
 
@@ -280,9 +291,10 @@ class Multiply extends BinaryOperationsExpression {
     if (simpleLeft is Multiply &&
         simpleLeft.right is Literal &&
         simpleRight is Literal) {
-      var c1 = (simpleLeft.right as Literal).evaluate();
-      var c2 = simpleRight.evaluate();
+      var c1 = litVal(simpleLeft.right as Literal);
+      var c2 = litVal(simpleRight);
       var val = (c1 is num && c2 is Complex) ? c2 * c1 : c1 * c2;
+      if (val is Complex && val.isReal) val = val.simplify();
       return Multiply(Literal(val), simpleLeft.left).simplifyBasic();
     }
 
@@ -291,9 +303,12 @@ class Multiply extends BinaryOperationsExpression {
       if ((simpleLeft).right.toString() == (simpleRight).right.toString() &&
           (simpleLeft).left is Literal &&
           (simpleRight).left is Literal) {
-        var c1 = (simpleLeft).left.evaluate();
-        var c2 = (simpleRight).left.evaluate();
+        var c1 = litVal((simpleLeft).left as Literal);
+        var c2 = litVal((simpleRight).left as Literal);
         var newCoefficient = (c1 is num && c2 is Complex) ? c2 * c1 : c1 * c2;
+        if (newCoefficient is Complex && newCoefficient.isReal) {
+          newCoefficient = newCoefficient.simplify();
+        }
         var newBase = (simpleLeft).right;
         return Multiply(Literal(newCoefficient), Pow(newBase, Literal(2)));
       }
