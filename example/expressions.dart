@@ -550,12 +550,20 @@ void randomAndUtilsMath() {
 void matrixMath() {
   List<String> expressions = [
     'matrix("1 2; 3 4") + matrix("5 6; 7 8")',
-    'matrix("1 2; 3 4") - matrix("5 6; 7 8")',
+    '-matrix("1 2; 3 4")',
     'matrix("1 2; 3 4") * matrix("5 6; 7 8")',
-    'matrix("1 2; 3 4") / matrix("5 6; 7 8")',
+    'matrix("1 2; 3 4") / 2',
     'matrix("1 2; 3 4") ^ 2',
-    'matrix("1 2; 3 4") ^ matrix("5 6; 7 8")',
-    'matrix("1 2; 3 4") ^ 0.5',
+    'det(matrix("1 2; 3 4"))',
+    'inv(matrix("1 2; 3 4"))',
+    'transpose(matrix("1 2; 3 4"))',
+    'sin(matrix("0 1; 1 0"))',
+    'exp(matrix("0 0; 0 0"))',
+    'lu(matrix("4 3; 6 3")).L',
+    'eye(3)',
+    'ones(2, 3)',
+    'zeros(2, 2)',
+    'diag([1, 2, 3])',
   ];
   evaluateExpressions(expressions, "Matrix Math", context);
 }

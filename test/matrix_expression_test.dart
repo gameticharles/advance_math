@@ -34,6 +34,23 @@ void main() {
       expect(resNeg[0][0], Complex(-1));
     });
 
+    test('Matrix Creation (zeros, ones, eye)', () {
+      final resZeros =
+          Expression.parse('zeros(2, 2)').evaluate(context) as Matrix;
+      expect(resZeros[0][0], Complex(0));
+      expect(resZeros[0][0], isA<Complex>());
+
+      final resOnes =
+          Expression.parse('ones(2, 2)').evaluate(context) as Matrix;
+      expect(resOnes[0][0], Complex(1));
+      expect(resOnes[0][0], isA<Complex>());
+
+      final resEye = Expression.parse('eye(2)').evaluate(context) as Matrix;
+      expect(resEye[0][0], Complex(1));
+      expect(resEye[1][1], Complex(1));
+      expect(resEye[0][1], Complex(0));
+    });
+
     test('Matrix Multiplication', () {
       final expr = Expression.parse('matrix("1 2; 3 4") * matrix("5 6; 7 8")');
       final result = expr.evaluate(context) as Matrix;

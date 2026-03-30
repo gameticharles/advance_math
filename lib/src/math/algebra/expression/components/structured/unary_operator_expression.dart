@@ -31,6 +31,7 @@ class UnaryExpression extends Expression {
 
     switch (operator) {
       case '-':
+        if (operandVal is Matrix) return -operandVal;
         return -operandVal;
       case '+':
         return operandVal;
