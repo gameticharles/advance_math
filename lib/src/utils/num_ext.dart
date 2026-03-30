@@ -80,8 +80,9 @@ extension NumExtension on num {
     if (decimalPlaces == 0) {
       return round();
     } else {
-      return (this * math.pow(10, decimalPlaces)).round() /
-          math.pow(10, decimalPlaces);
+      return ((Complex(this) * math.pow(10, decimalPlaces)).round() /
+              math.pow(10, decimalPlaces))
+          .toDouble();
     }
   }
 

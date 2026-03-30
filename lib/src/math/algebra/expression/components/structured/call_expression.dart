@@ -13,7 +13,7 @@ class CallExpression extends Expression {
 
     // Check if the callee is a function-like object
     if (evCallee is VarArgsFunction) {
-      return evCallee(aevArguments);
+      return evCallee(aevArguments, kwargs: <String, dynamic>{});
     }
 
     if (evCallee is Function) {

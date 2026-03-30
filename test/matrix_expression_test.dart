@@ -114,9 +114,9 @@ void main() {
 
       // Verification: P * A = L * U?
       final A = Matrix("4 3; 6 3");
-      final PA = P * A;
-      final LU = L * U;
-      expect(PA.isAlmostEqual(LU), isTrue);
+      final pa = P * A;
+      final lu = L * U;
+      expect(pa.isAlmostEqual(lu), isTrue);
     });
 
     test('Matrix Member Access', () {

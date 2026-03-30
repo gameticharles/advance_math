@@ -7,12 +7,26 @@ final Map<String, dynamic> defaultContext =
 
 int _toInt(dynamic v) => v is Complex ? v.real.toInt() : (v as num).toInt();
 
+List<dynamic> _flattenArgs(List<dynamic> args) {
+  if (args.isEmpty) return [];
+  if (args.length == 1 && args.first is List) {
+    return args.first as List;
+  }
+  if (args.length == 1 && args.first is Vector) {
+    return (args.first as Vector).toList();
+  }
+  return args;
+}
+
 /// A class that provides the default context for mathematical expressions.
 class ExpressionContext {
   /// Builds the default context by merging various specialized contexts.
   static Map<String, dynamic> buildDefaultContext() {
     return {
       ..._sharedExtras(),
+      ..._flowExtras(),
+      ..._vectorExtras(),
+      ..._numberExtras(),
       ..._matrixExtras(),
       ..._geometryExtras(),
       ..._complexExtras(),
@@ -274,6 +288,27 @@ class ExpressionContext {
             n is Complex ? n.real.toInt() : (n as num).toInt(),
             k is Complex ? k.real.toInt() : (k as num).toInt()),
 
+        // Roman Numerals
+        'roman': (dynamic n) {
+          if (n is String) return RomanNumerals.fromRoman(n).value;
+          int val = n is Complex ? n.real.toInt() : (n as num).toInt();
+          return RomanNumerals(val).toString();
+        },
+
+        // Perfect Numbers
+        'nthPerfectNumber': (dynamic n) {
+          int val = n is Complex ? n.real.toInt() : (n as num).toInt();
+          return PerfectNumber(val).perfectNumber;
+        },
+        'nthMersennePrime': (dynamic n) {
+          int val = n is Complex ? n.real.toInt() : (n as num).toInt();
+          return PerfectNumber(val).mersennePrime;
+        },
+        'nthMersenneExponent': (dynamic n) {
+          int val = n is Complex ? n.real.toInt() : (n as num).toInt();
+          return PerfectNumber(val).mersenneExponent;
+        },
+
         //Polynomials
         'roots': (dynamic exp) => Polynomial.fromString(exp.toString()).roots(),
 
@@ -432,39 +467,39 @@ class ExpressionContext {
             DateTime.parse(x).difference(DateTime.parse(y)).inMilliseconds,
         'microsecondsDiff': (dynamic x, dynamic y) =>
             DateTime.parse(x).difference(DateTime.parse(y)).inMicroseconds,
+      };
 
+  static Map<String, dynamic> _flowExtras() => {
         // iif(cond, trueVal, falseVal)
         'iif': VarArgsFunction((args, _) {
           final cond = args[0];
-          final a = args[1];
-          final b = args[2];
           bool isTrue = false;
           if (cond is bool) {
             isTrue = cond;
           } else if (cond is num) {
-            isTrue = cond.toDouble() != 0;
+            isTrue = cond != 0;
           } else if (cond is Complex) {
             isTrue = cond.real != 0;
+          } else if (cond is Vector) {
+            isTrue = cond.magnitude != 0;
           }
-          return isTrue ? a : b;
+          return isTrue ? args[1] : args[2];
         }),
-
         // if(cond, trueVal, falseVal)
         'if': VarArgsFunction((args, _) {
           final cond = args[0];
-          final a = args[1];
-          final b = args[2];
           bool isTrue = false;
           if (cond is bool) {
             isTrue = cond;
           } else if (cond is num) {
-            isTrue = cond.toDouble() != 0;
+            isTrue = cond != 0;
           } else if (cond is Complex) {
             isTrue = cond.real != 0;
+          } else if (cond is Vector) {
+            isTrue = cond.magnitude != 0;
           }
-          return isTrue ? a : b;
+          return isTrue ? args[1] : args[2];
         }),
-
         // switch(value, case1, val1, case2, val2, ..., defaultVal)
         'switch': VarArgsFunction((args, _) {
           if (args.length < 2) {
@@ -485,6 +520,190 @@ class ExpressionContext {
             return args.last;
           }
         }),
+        'coalesce': VarArgsFunction((args, _) {
+          for (var arg in args) {
+            if (arg != null) return arg;
+          }
+          return null;
+        }),
+        'choose': VarArgsFunction((args, _) {
+          if (args.isEmpty) {
+            throw ArgumentError('choose() requires at least one argument');
+          }
+          final index = _toInt(args[0]);
+          if (index < 1 || index >= args.length) {
+            throw ArgumentError('choose() index $index out of bounds');
+          }
+          return args[index];
+        }),
+        'cond': VarArgsFunction((args, _) {
+          for (int i = 0; i < args.length - 1; i += 2) {
+            final test = args[i];
+            bool isTrue = false;
+            if (test is bool) {
+              isTrue = test;
+            } else if (test is num) {
+              isTrue = test != 0;
+            } else if (test is Complex) {
+              isTrue = test.real != 0;
+            } else if (test is Vector) {
+              isTrue = test.magnitude != 0;
+            }
+
+            if (isTrue) return args[i + 1];
+          }
+          if (args.length % 2 != 0) return args.last;
+          return null;
+        }),
+        'any': VarArgsFunction((args, _) {
+          for (var arg in _flattenArgs(args)) {
+            bool isTrue = false;
+            if (arg is bool) {
+              isTrue = arg;
+            } else if (arg is num) {
+              isTrue = arg != 0;
+            } else if (arg is Complex) {
+              isTrue = arg.real != 0;
+            } else if (arg is Vector) {
+              isTrue = arg.magnitude != 0;
+            }
+            if (isTrue) return true;
+          }
+          return false;
+        }),
+        'all': VarArgsFunction((args, _) {
+          final flat = _flattenArgs(args);
+          if (flat.isEmpty) return true;
+          for (var arg in flat) {
+            bool isTrue = false;
+            if (arg is bool) {
+              isTrue = arg;
+            } else if (arg is num) {
+              isTrue = arg != 0;
+            } else if (arg is Complex) {
+              isTrue = arg.real != 0;
+            } else if (arg is Vector) {
+              isTrue = arg.magnitude != 0;
+            }
+            if (!isTrue) return false;
+          }
+          return true;
+        }),
+      };
+
+  static Map<String, dynamic> _vectorExtras() => {
+        'vector': VarArgsFunction((args, _) {
+          if (args.isEmpty) throw ArgumentError('vector() requires arguments');
+          final first = args.first;
+          if (first is List) return Vector.fromList(first);
+          if (first is Vector) return first;
+          if (first is String) {
+            // Minimal string parsing for vector: "1 2 3" or "1, 2, 3"
+            final cleaned = first.replaceAll(',', ' ');
+            final parts = cleaned
+                .split(RegExp(r'\s+'))
+                .where((s) => s.isNotEmpty)
+                .map((s) => Complex.parse(s))
+                .toList();
+            return Vector.fromList(parts);
+          }
+          // If multiple numeric args
+          return Vector.fromList(args);
+        }),
+        'linspaceVector': VarArgsFunction((args, _) => Vector.linspace(
+              _toInt(args[0]),
+              _toInt(args[1]),
+              args.length > 2 ? _toInt(args[2]) : 50,
+            )),
+        'rangeVector': VarArgsFunction((args, _) => Vector.range(
+              _toInt(args[0]),
+              start: args.length > 1 ? _toInt(args[1]) : 0,
+              step: args.length > 2 ? _toInt(args[2]) : 1,
+            )),
+        'randomVector': VarArgsFunction((args, _) => Vector.random(
+              _toInt(args[0]),
+              min: args.length > 1 ? (args[1] as num).toDouble() : 0.0,
+              max: args.length > 2 ? (args[2] as num).toDouble() : 1.0,
+            )),
+        'dot': VarArgsFunction(
+            (args, _) => (args[0] as Vector).dot(args[1] as Vector)),
+        'cross': VarArgsFunction(
+            (args, _) => (args[0] as Vector).cross(args[1] as Vector)),
+        'innerProduct': VarArgsFunction(
+            (args, _) => (args[0] as Vector).innerProduct(args[1] as Vector)),
+        'outerProduct': VarArgsFunction(
+            (args, _) => (args[0] as Vector).outerProduct(args[1] as Vector)),
+        'mag': VarArgsFunction((args, _) => (args.first as Vector).magnitude),
+        'magnitude':
+            VarArgsFunction((args, _) => (args.first as Vector).magnitude),
+        'angle': VarArgsFunction(
+            (args, _) => (args[0] as Vector).angle(args[1] as Vector)),
+        'projection': VarArgsFunction(
+            (args, _) => (args[0] as Vector).projection(args[1] as Vector)),
+        'isParallelTo': VarArgsFunction(
+            (args, _) => (args[0] as Vector).isParallelTo(args[1] as Vector)),
+        'isPerpendicularTo': VarArgsFunction((args, _) =>
+            (args[0] as Vector).isPerpendicularTo(args[1] as Vector)),
+        'toSpherical':
+            VarArgsFunction((args, _) => (args.first as Vector).toSpherical()),
+        'toCylindrical': VarArgsFunction(
+            (args, _) => (args.first as Vector).toCylindrical()),
+        'toPolar':
+            VarArgsFunction((args, _) => (args.first as Vector).toPolar()),
+        'unit':
+            VarArgsFunction((args, _) => (args.first as Vector).normalize()),
+        'normalize':
+            VarArgsFunction((args, _) => (args.first as Vector).normalize()),
+        'distance': VarArgsFunction(
+            (args, _) => (args[0] as Vector).distance(args[1] as Vector)),
+        'zerosVector': VarArgsFunction((args, _) => Vector(_toInt(args[0]))),
+        'onesVector': VarArgsFunction(
+            (args, _) => Vector(List.filled(_toInt(args[0]), 1))),
+      };
+
+  static Map<String, dynamic> _numberExtras() => {
+        'toRoman': VarArgsFunction(
+            (args, _) => RomanNumerals(_toInt(args[0])).toRoman()),
+        'fromRoman': VarArgsFunction(
+            (args, _) => RomanNumerals.fromRoman(args[0].toString()).value),
+        'romanDate': VarArgsFunction(
+            (args, _) => RomanNumerals.dateToRoman(args[0].toString())),
+        'isPerfect':
+            VarArgsFunction((args, _) => PerfectNumber.isPerfect(args[0])),
+        'nthPerfect': VarArgsFunction((args, _) {
+          final n = _toInt(args[0]);
+          return PerfectNumber(n).perfectNumber;
+        }),
+        'perfectProps': VarArgsFunction((args, _) {
+          final n = _toInt(args[0]);
+          return PerfectNumber(n).properties;
+        }),
+
+        // PI Calculation
+        'piCalc': VarArgsFunction((args, _) {
+          final algoStr = args[0].toString().toLowerCase();
+          final prec = args.length > 1 ? _toInt(args[1]) : 100;
+          PiCalcAlgorithm algo = PiCalcAlgorithm.Ramanujan;
+          if (algoStr.contains('chudnovsky')) algo = PiCalcAlgorithm.Chudnovsky;
+          if (algoStr.contains('gauss')) algo = PiCalcAlgorithm.GaussLegendre;
+          if (algoStr.contains('bbp')) algo = PiCalcAlgorithm.BBP;
+          if (algoStr.contains('madhava')) algo = PiCalcAlgorithm.Madhava;
+          if (algoStr.contains('ramanujan')) algo = PiCalcAlgorithm.Ramanujan;
+          if (algoStr.contains('newton')) algo = PiCalcAlgorithm.NewtonEuler;
+          return PI(algorithm: algo, precision: prec).value;
+        }),
+        'nthPiDigit': VarArgsFunction((args, _) {
+          final n = _toInt(args[0]);
+          final prec = args.length > 1 ? _toInt(args[1]) : (n + 10);
+          return PI(precision: prec).getNthDigit(n);
+        }),
+
+        'piDigits': (dynamic start, dynamic end) {
+          int s =
+              start is Complex ? start.real.toInt() : (start as num).toInt();
+          int e = end is Complex ? end.real.toInt() : (end as num).toInt();
+          return PI(precision: e).getDigits(s, e);
+        },
       };
 
   static Map<String, dynamic> _matrixExtras() => {
@@ -536,18 +755,34 @@ class ExpressionContext {
         'rank': VarArgsFunction((args, _) => (args.first as Matrix).rank()),
         'trace': VarArgsFunction((args, _) => (args.first as Matrix).trace()),
         'norm': VarArgsFunction((args, _) {
-          final m = args.first as Matrix;
-          if (args.length > 1) {
-            final normType = args[1];
-            if (normType == 'manhattan' || normType == 1) {
-              return m.norm(Norm.manhattan);
+          final m = args.first;
+          if (m is Vector) {
+            if (args.length > 1) {
+              final normType = args[1];
+              if (normType == 'manhattan' || normType == 1) {
+                return m.norm(Norm.manhattan);
+              }
+              if (normType == 'frobenius') return m.norm(Norm.frobenius);
+              if (normType == 'chebyshev' || normType == double.infinity) {
+                return m.norm(Norm.chebyshev);
+              }
             }
-            if (normType == 'frobenius') return m.norm(Norm.frobenius);
-            if (normType == 'chebyshev' || normType == double.infinity) {
-              return m.norm(Norm.chebyshev);
-            }
+            return m.norm();
           }
-          return m.norm();
+          if (m is Matrix) {
+            if (args.length > 1) {
+              final normType = args[1];
+              if (normType == 'manhattan' || normType == 1) {
+                return m.norm(Norm.manhattan);
+              }
+              if (normType == 'frobenius') return m.norm(Norm.frobenius);
+              if (normType == 'chebyshev' || normType == double.infinity) {
+                return m.norm(Norm.chebyshev);
+              }
+            }
+            return m.norm();
+          }
+          throw ArgumentError('norm() expects a Vector or Matrix');
         }),
         'nullity':
             VarArgsFunction((args, _) => (args.first as Matrix).nullity()),
@@ -863,6 +1098,14 @@ class ExpressionContext {
         'max': max,
         'min': min,
         'sum': sum,
+        'product': VarArgsFunction((args, _) {
+          final first = args.first;
+          if (first is Vector) return first.product();
+          if (first is List) {
+            return first.fold<num>(1, (a, b) => a * b);
+          }
+          return args.reduce((a, b) => a * b);
+        }),
 
         'sumTo': (dynamic x) =>
             sumTo(x is Complex ? x.real.toInt() : (x as num).toInt()),

@@ -781,7 +781,7 @@ bool isPrime(dynamic number, [int certainty = 12]) {
   // If the number is small, use trial division
   if (n.bitLength <= 31) {
     int num = n.toInt();
-    int limit = sqrt(num).toInt();
+    int limit = (sqrt(num) as Complex).real.toInt();
     for (int i = 5; i <= limit; i += 6) {
       if (num % i == 0 || num % (i + 2) == 0) return false;
     }

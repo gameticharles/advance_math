@@ -6,6 +6,9 @@ List<dynamic> _flattenArgs(List<dynamic> args) {
   if (args.length == 1 && args.first is List) {
     return args.first as List;
   }
+  if (args.length == 1 && args.first is Vector) {
+    return (args.first as Vector).toList();
+  }
   return args;
 }
 

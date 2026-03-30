@@ -337,7 +337,7 @@ extension VectorOperations on Vector {
   /// The vector `[3, 4]` gets normalized to `[0.6, 0.8]` because 3/5 = 0.6 and 4/5 = 0.8,
   /// where 5 is the norm of the original vector.
   Vector normalize([Norm normType = Norm.frobenius]) {
-    num normValue = norm(normType);
+    dynamic normValue = norm(normType);
     if (normValue == 0) {
       throw ArgumentError("Cannot normalize a zero vector.");
     }

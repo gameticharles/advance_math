@@ -5,9 +5,8 @@ class Literal extends Expression {
   final String raw;
 
   // Constructor to initialize the literal's value
-  Literal(dynamic value, [String? raw])
-      : value = value,
-        raw = raw ?? (value is String ? '"$value"' : '$value');
+  Literal(this.value, [String? raw])
+      : raw = raw ?? (value is String ? '"$value"' : '$value');
 
   @override
   dynamic evaluate([dynamic arg]) {
