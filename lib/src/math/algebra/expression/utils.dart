@@ -417,7 +417,10 @@ final Map<String, dynamic> defaultContext = {
       DateTime.parse(x).difference(DateTime.parse(y)).inMicroseconds,
 
   // iif(cond, trueVal, falseVal)
-  'iif': (dynamic cond, dynamic a, dynamic b) {
+  'iif': VarArgsFunction((args, _) {
+    final cond = args[0];
+    final a = args[1];
+    final b = args[2];
     bool isTrue = false;
     if (cond is bool) {
       isTrue = cond;
@@ -427,10 +430,13 @@ final Map<String, dynamic> defaultContext = {
       isTrue = cond.real != 0;
     }
     return isTrue ? a : b;
-  },
+  }),
 
   // if(cond, trueVal, falseVal)
-  'if': (dynamic cond, dynamic a, dynamic b) {
+  'if': VarArgsFunction((args, _) {
+    final cond = args[0];
+    final a = args[1];
+    final b = args[2];
     bool isTrue = false;
     if (cond is bool) {
       isTrue = cond;
@@ -440,22 +446,28 @@ final Map<String, dynamic> defaultContext = {
       isTrue = cond.real != 0;
     }
     return isTrue ? a : b;
-  },
+  }),
 
   // switch(value, case1, val1, case2, val2, ..., defaultVal)
-  'switch': (dynamic value, List<dynamic> cases) {
-    if (cases.length % 2 == 0) {
-      throw ArgumentError('switch requires an even number of arguments');
+  'switch': VarArgsFunction((args, _) {
+    if (args.length < 2) {
+      throw ArgumentError('switch requires at least 2 arguments');
     }
-
-    for (int i = 0; i < cases.length - 1; i += 2) {
-      if (cases[i] == value) {
-        return cases[i + 1];
+    final value = args[0];
+    if (args.length % 2 == 0) {
+      // No default value, last case is just a case
+      for (int i = 1; i < args.length; i += 2) {
+        if (args[i] == value) return args[i + 1];
       }
+      return null;
+    } else {
+      // Last value is the default
+      for (int i = 1; i < args.length - 1; i += 2) {
+        if (args[i] == value) return args[i + 1];
+      }
+      return args.last;
     }
-
-    return cases.last;
-  },
+  }),
 };
 
 dynamic _simpsonWrapper(dynamic f, dynamic a, dynamic b) {

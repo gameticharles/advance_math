@@ -59,11 +59,15 @@ void main(List<String> args) {
     '3 != 3',
     '5! != 120',
     '5! + 3!',
-    'x! != y'
+    'x! != y',
+    'iif(true, 1, 2)',
+    'if(true, 1, 2)',
+    'switch(1,[ 1, 2, 2, 3, 3, 4])',
+    'choose(5, 2)',
   ];
 
   evaluateExpressions(testCases, "Test Cases", context);
-
+  return;
   simpleMath();
   complexMath();
   conditionMath();
