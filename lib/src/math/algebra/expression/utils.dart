@@ -415,6 +415,47 @@ final Map<String, dynamic> defaultContext = {
       DateTime.parse(x).difference(DateTime.parse(y)).inMilliseconds,
   'microsecondsDiff': (dynamic x, dynamic y) =>
       DateTime.parse(x).difference(DateTime.parse(y)).inMicroseconds,
+
+  // iif(cond, trueVal, falseVal)
+  'iif': (dynamic cond, dynamic a, dynamic b) {
+    bool isTrue = false;
+    if (cond is bool) {
+      isTrue = cond;
+    } else if (cond is num) {
+      isTrue = cond.toDouble() != 0;
+    } else if (cond is Complex) {
+      isTrue = cond.real != 0;
+    }
+    return isTrue ? a : b;
+  },
+
+  // if(cond, trueVal, falseVal)
+  'if': (dynamic cond, dynamic a, dynamic b) {
+    bool isTrue = false;
+    if (cond is bool) {
+      isTrue = cond;
+    } else if (cond is num) {
+      isTrue = cond.toDouble() != 0;
+    } else if (cond is Complex) {
+      isTrue = cond.real != 0;
+    }
+    return isTrue ? a : b;
+  },
+
+  // switch(value, case1, val1, case2, val2, ..., defaultVal)
+  'switch': (dynamic value, List<dynamic> cases) {
+    if (cases.length % 2 == 0) {
+      throw ArgumentError('switch requires an even number of arguments');
+    }
+
+    for (int i = 0; i < cases.length - 1; i += 2) {
+      if (cases[i] == value) {
+        return cases[i + 1];
+      }
+    }
+
+    return cases.last;
+  },
 };
 
 dynamic _simpsonWrapper(dynamic f, dynamic a, dynamic b) {
