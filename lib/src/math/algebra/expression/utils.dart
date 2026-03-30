@@ -680,7 +680,13 @@ class ExpressionContext {
         }),
 
         // PI Calculation
-        'piCalc': VarArgsFunction((args, _) {
+        'piCalc': (dynamic precision) {
+          int val = precision is Complex
+              ? precision.real.toInt()
+              : (precision as num).toInt();
+          return PI(precision: val).toString();
+        },
+        'piCalcAlg': VarArgsFunction((args, _) {
           final algoStr = args[0].toString().toLowerCase();
           final prec = args.length > 1 ? _toInt(args[1]) : 100;
           PiCalcAlgorithm algo = PiCalcAlgorithm.Ramanujan;

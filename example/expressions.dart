@@ -88,10 +88,12 @@ void main(List<String> args) {
       'nthPerfect(1): ${Expression.parse('nthPerfect(1)').evaluate(context)}');
 
   print('\n--- Pi Algorithms ---');
+  print('pi: ${Expression.parse('piCalc(100)').evaluate(context)}');
   print(
-      'pi Ramanujan 50: ${Expression.parse('piCalc("ramanujan", 50)').evaluate(context)}');
+      'pi Ramanujan 50: ${Expression.parse('piCalcAlg("ramanujan", 50)').evaluate(context)}');
   print(
-      'pi Chudnovsky 50: ${Expression.parse('piCalc("chudnovsky", 50)').evaluate(context)}');
+      'pi Chudnovsky 50: ${Expression.parse('piCalcAlg("chudnovsky", 50)').evaluate(context)}');
+
   print(
       'pi 10th digit: ${Expression.parse('nthPiDigit(10)').evaluate(context)}');
 
