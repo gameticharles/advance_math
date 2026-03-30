@@ -599,3 +599,45 @@ dynamic regression = VarArgsFunction((args, kwargs) {
 
   return [m, b];
 });
+
+/// A collection of statistical functions.
+class Statistics {
+  /// Returns the mean of a list of numbers.
+  static dynamic mean(List<dynamic> args) =>
+      (_flattenArgs(args).isNotEmpty) ? _mean(_getArgsParams(args)) : 0;
+
+  /// Returns the median of a list of numbers.
+  static dynamic median(List<dynamic> args) =>
+      _flattenArgs(args).isNotEmpty ? (median as VarArgsFunction).callback(args, {}) : 0;
+
+  /// Returns the mode of a list of numbers.
+  static dynamic mode(List<dynamic> args) => (mode as VarArgsFunction).callback(args, {});
+
+  /// Returns the variance of a list of numbers.
+  static dynamic variance(List<dynamic> args) => (variance as VarArgsFunction).callback(args, {});
+
+  /// Returns the standard deviation of a list of numbers.
+  static dynamic stdDev(List<dynamic> args) => (stdDev as VarArgsFunction).callback(args, {});
+
+
+  /// Returns the quartiles of a list of numbers.
+  static List<num> quartiles(List<num> list) => _quartiles(list);
+
+  static List<num> _quartiles(List<num> list) {
+    if (list.isEmpty) return [0, 0, 0];
+    var sorted = List<num>.from(list)..sort();
+    num q1 = _median(sorted.sublist(0, sorted.length ~/ 2));
+    num q2 = _median(sorted);
+    num q3 = _median(sorted.sublist((sorted.length + 1) ~/ 2));
+    return [q1, q2, q3];
+  }
+
+  /// Returns the covariance of two lists.
+  static double covariance(List<double> x, List<double> y) {
+    if (x.length != y.length || x.isEmpty) return 0.0;
+    final mx = x.reduce((a, b) => a + b) / x.length;
+    final my = y.reduce((a, b) => a + b) / y.length;
+    return x.asMap().entries.fold(0.0, (s, e) => s + (e.value - mx) * (y[e.key] - my)) / x.length;
+  }
+}
+

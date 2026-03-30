@@ -164,7 +164,7 @@ class Complex implements Comparable<dynamic> {
 
     final t = second / first;
 
-    return first * (Complex(1, 0) + (t * t));
+    return first * (Complex(1) + (t * t));
   }
 
   static Complex _parseComponent(String s) {

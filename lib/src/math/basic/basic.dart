@@ -505,8 +505,8 @@ dynamic hypot(dynamic x, dynamic y) {
     return math.sqrt(x * x + y * y);
   } else {
     // Convert to Complex if needed
-    Complex cx = x is Complex ? x : Complex(x, 0);
-    Complex cy = y is Complex ? y : Complex(y, 0);
+    Complex cx = x is Complex ? x : Complex(x);
+    Complex cy = y is Complex ? y : Complex(y);
 
     // Calculate x² + y²
     Complex sumOfSquares = (cx * cx) + (cy * cy);

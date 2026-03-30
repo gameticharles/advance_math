@@ -6,7 +6,7 @@ class Literal extends Expression {
 
   // Constructor to initialize the literal's value
   Literal(dynamic value, [String? raw])
-      : value = value is num ? Complex(value) : value,
+      : value = value,
         raw = raw ?? (value is String ? '"$value"' : '$value');
 
   @override
