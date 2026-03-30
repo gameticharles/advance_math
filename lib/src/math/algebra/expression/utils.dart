@@ -271,10 +271,10 @@ final Map<String, dynamic> defaultContext = {
   'sinc': (dynamic x) => sinc(x),
 
   // Statistic functions
-  'avg': (dynamic dat) => avg(dat),
-  'max': (dynamic dat) => max(dat),
-  'min': (dynamic dat) => min(dat),
-  'sum': (dynamic dat) => sum(dat),
+  'avg': avg,
+  'max': max,
+  'min': min,
+  'sum': sum,
 
   'sumTo': (dynamic x) =>
       sumTo(x is Complex ? x.real.toInt() : (x as num).toInt()),
@@ -295,31 +295,23 @@ final Map<String, dynamic> defaultContext = {
           r is Complex ? r.real.toInt() : (r as num).toInt())
       .length,
 
-  'mean': (dynamic dat) => mean(_sanitizeList(dat)),
-  'average': (dynamic dat) => mean(_sanitizeList(dat)),
-  'median': (dynamic dat) => median(_sanitizeList(dat)),
-  'mode': (dynamic dat) => mode(_sanitizeList(dat)),
-  'variance': (dynamic dat) => variance(_sanitizeList(dat)),
-  'standardDeviation': (dynamic dat) => stdDev(_sanitizeList(dat)),
-  'stdDev': (dynamic dat) => stdDev(_sanitizeList(dat)),
-  'stdErrMean': (dynamic dat) => stdErrMean(_sanitizeList(dat)),
-  'stdErrEst': (dynamic x, dynamic y) =>
-      stdErrEst(_sanitizeList(x), _sanitizeList(y)),
-  'tValue': (dynamic dat) => tValue(_sanitizeList(dat)),
-  'quartiles': (dynamic dat) => quartiles(_sanitizeList(dat)),
-  'gcf': (dynamic dat) => gcd(_sanitizeList(dat)),
-  'gcd': (dynamic dat) => gcd(_sanitizeList(dat)),
-
-  'lcm': (dynamic dat) => lcm(_sanitizeList(dat)),
-  'correlation': (dynamic x, dynamic y) =>
-      correlation(_sanitizeList(x), _sanitizeList(y)),
-  'confidenceInterval': (dynamic dat, dynamic confidence) => confidenceInterval(
-      _sanitizeList(dat),
-      confidence is Complex
-          ? confidence.real.toDouble()
-          : (confidence as num).toDouble()),
-  'regression': (dynamic x, dynamic y) =>
-      regression(_sanitizeList(x), _sanitizeList(y)),
+  'mean': mean,
+  'average': mean,
+  'median': median,
+  'mode': mode,
+  'variance': variance,
+  'standardDeviation': stdDev,
+  'stdDev': stdDev,
+  'stdErrMean': stdErrMean,
+  'stdErrEst': stdErrEst,
+  'tValue': tValue,
+  'quartiles': quartiles,
+  'gcf': gcf,
+  'gcd': gcd,
+  'lcm': lcm,
+  'correlation': correlation,
+  'confidenceInterval': confidenceInterval,
+  'regression': regression,
 
   // Missing Basic Math Functions
   'sinc_old': (dynamic x) =>
@@ -425,27 +417,13 @@ final Map<String, dynamic> defaultContext = {
       DateTime.parse(x).difference(DateTime.parse(y)).inMicroseconds,
 };
 
-List<num> _sanitizeList(dynamic dat) {
-  if (dat is! List) return <num>[];
-  return dat
-      .map((e) {
-        if (e is Complex) return e.real;
-        if (e is num) return e;
-        return 0; // Fallback
-      })
-      .toList()
-      .cast<num>();
-}
-
 dynamic _simpsonWrapper(dynamic f, dynamic a, dynamic b) {
   num Function(num) fn;
   if (f is String) {
     final expr = ExpressionParser().parse(f);
     fn = (x) {
-      final val = expr.evaluate(<String, dynamic>{
-        ...defaultContext,
-        'x': x is num ? Complex(x, 0) : x
-      });
+      final val =
+          expr.evaluate(<String, dynamic>{...defaultContext, 'x': Complex(x)});
 
       if (val is Complex) return val.real;
       if (val is num) return val.toDouble();
@@ -465,8 +443,8 @@ dynamic _numIntegrateWrapper(dynamic f, dynamic a, dynamic b) {
   if (f is String) {
     final expr = ExpressionParser().parse(f);
     fn = (x) {
-      final val = expr.evaluate(
-          <String, dynamic>{...defaultContext, 'x': Complex(x.toDouble(), 0)});
+      final val =
+          expr.evaluate(<String, dynamic>{...defaultContext, 'x': Complex(x)});
 
       if (val is Complex) return val.real;
       if (val is num) return val.toDouble();
@@ -486,8 +464,8 @@ dynamic _diffWrapper(dynamic f, [dynamic h = 0.001]) {
   if (f is String) {
     final expr = ExpressionParser().parse(f);
     fn = (x) {
-      final val = expr.evaluate(
-          <String, dynamic>{...defaultContext, 'x': Complex(x.toDouble(), 0)});
+      final val =
+          expr.evaluate(<String, dynamic>{...defaultContext, 'x': Complex(x)});
 
       if (val is Complex) return val.real;
       if (val is num) return val.toDouble();

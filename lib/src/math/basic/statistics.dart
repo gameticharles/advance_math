@@ -11,9 +11,74 @@ List<dynamic> _flattenArgs(List<dynamic> args) {
 
 List<num> _getArgsParams(List<dynamic> args) {
   return _flattenArgs(args).map((e) {
-    if (e is Complex && e.isReal && e.imaginary == 0) return e.real;
+    if (e is Complex) return e.real;
     return e as num;
   }).toList();
+}
+
+List<num> _toNumList(dynamic dat) {
+  if (dat is List) {
+    return dat.map((e) => e is Complex ? e.real : e as num).toList();
+  }
+  return [];
+}
+
+// Internal implementations to avoid VarArgsFunction dispatch overhead
+num _sum(List<dynamic> list) {
+  if (list.isEmpty) return 0;
+
+  var nums = list.map((e) {
+    if (e is Complex && e.isReal && e.imaginary == 0) return e.real;
+    return e;
+  }).toList();
+
+  if (nums.any((e) => e is Complex)) {
+    return (nums
+        .map((e) => e is Complex ? e : Complex(e, 0))
+        .reduce((a, b) => a + b)).real;
+  }
+  return nums.cast<num>().reduce((a, b) => a + b);
+}
+
+num _mean(List<num> list) {
+  if (list.isEmpty) return 0;
+  return list.reduce((a, b) => a + b) / list.length;
+}
+
+num _variance(List<num> list) {
+  if (list.length < 2) return 0.0;
+  num m = _mean(list);
+  return list.map((num x) => math.pow(x - m, 2)).reduce((a, b) => a + b) /
+      (list.length - 1);
+}
+
+num _stdDev(List<num> list) {
+  return math.sqrt(_variance(list));
+}
+
+num _stdErrMean(List<num> list) {
+  if (list.isEmpty || list.length == 1) return 0;
+  return _stdDev(list) / math.sqrt(list.length);
+}
+
+num _correlation(List<num> x, List<num> y) {
+  if (x.length != y.length) {
+    throw ArgumentError('Lists must have the same length');
+  }
+  num meanX = _mean(x);
+  num meanY = _mean(y);
+
+  num numerator = 0;
+  num denominator1 = 0;
+  num denominator2 = 0;
+
+  for (int i = 0; i < x.length; i++) {
+    numerator += (x[i] - meanX) * (y[i] - meanY);
+    denominator1 += math.pow(x[i] - meanX, 2);
+    denominator2 += math.pow(y[i] - meanY, 2);
+  }
+
+  return numerator / math.sqrt(denominator1 * denominator2);
 }
 
 /// Returns the sum of a list of numbers (num or Complex).
@@ -26,22 +91,7 @@ List<num> _getArgsParams(List<dynamic> args) {
 /// print(sum([1, 2, 3])); // 6
 /// print(sum(Complex(1, 1), Complex(2, 2))); // 3.0 + 3.0i
 /// ```
-dynamic sum = VarArgsFunction((args, kwargs) {
-  var list = _flattenArgs(args);
-  if (list.isEmpty) return 0;
-
-  var nums = list.map((e) {
-    if (e is Complex && e.isReal && e.imaginary == 0) return e.real;
-    return e;
-  }).toList();
-
-  if (nums.any((e) => e is Complex)) {
-    return nums
-        .map((e) => e is Complex ? e : Complex(e, 0))
-        .reduce((a, b) => a + b);
-  }
-  return nums.cast<num>().reduce((a, b) => a + b);
-});
+dynamic sum = VarArgsFunction((args, kwargs) => _sum(_flattenArgs(args)));
 
 /// Returns the mean (average) of a list of numbers.
 ///
@@ -50,11 +100,7 @@ dynamic sum = VarArgsFunction((args, kwargs) {
 /// print(mean([1, 2, 3, 4, 5])); // prints: 3.0
 /// print(mean(1, 2, 3, 4, 5));   // prints: 3.0
 /// ```
-dynamic mean = VarArgsFunction((args, kwargs) {
-  List<num> list = _getArgsParams(args);
-  if (list.isEmpty) return 0;
-  return list.reduce((a, b) => a + b) / list.length;
-});
+dynamic mean = VarArgsFunction((args, kwargs) => _mean(_getArgsParams(args)));
 
 /// Alias for mean.
 dynamic average = mean;
@@ -74,7 +120,7 @@ dynamic avg = mean;
 /// ```
 dynamic median = VarArgsFunction((args, kwargs) {
   List<num> list = _getArgsParams(args);
-  if (list.isEmpty) return 0; // Or throw?
+  if (list.isEmpty) return 0;
   list.sort();
   if (list.length % 2 == 1) {
     return list[list.length ~/ 2];
@@ -116,14 +162,8 @@ dynamic mode = VarArgsFunction((args, kwargs) {
 /// ```dart
 /// print(variance(1, 2, 3, 4, 5)); // 2.5
 /// ```
-dynamic variance = VarArgsFunction((args, kwargs) {
-  List<num> list = _getArgsParams(args);
-  if (list.length < 2) return 0.0;
-
-  num m = mean(list);
-  return list.map((num x) => math.pow(x - m, 2)).reduce((a, b) => a + b) /
-      (list.length - 1);
-});
+dynamic variance =
+    VarArgsFunction((args, kwargs) => _variance(_getArgsParams(args)));
 
 /// Returns the standard deviation of a list of numbers.
 ///
@@ -133,24 +173,20 @@ dynamic variance = VarArgsFunction((args, kwargs) {
 /// ```dart
 /// print(stdDev(1, 2, 3, 4, 5)); // ~1.58
 /// ```
-dynamic stdDev = VarArgsFunction((args, kwargs) {
-  return sqrt(variance(args, kwargs: kwargs));
-});
+dynamic stdDev =
+    VarArgsFunction((args, kwargs) => _stdDev(_getArgsParams(args)));
 
 /// Returns the standard deviation of a list of numbers.
 dynamic standardDeviation = stdDev;
 
-/// Returns the standard error of the sample mean.
+/// Returns the standard error of the mean of a list of numbers.
 ///
 /// Example:
 /// ```dart
 /// print(stdErrMean(1, 2, 3, 4, 5)); // ~0.707
 /// ```
-dynamic stdErrMean = VarArgsFunction((args, kwargs) {
-  List<num> list = _getArgsParams(args);
-  if (list.isEmpty || list.length == 1) return 0;
-  return stdDev(list) / sqrt(list.length);
-});
+dynamic stdErrMean =
+    VarArgsFunction((args, kwargs) => _stdErrMean(_getArgsParams(args)));
 
 /// Standard error of estimate.
 /// Expects two lists: stdErrEst(List x, List y) or flattened if appropriate (though intended for paired data).
@@ -165,16 +201,16 @@ dynamic stdErrEst = VarArgsFunction((args, kwargs) {
   if (args.length != 2 || args[0] is! List || args[1] is! List) {
     throw ArgumentError('stdErrEst requires two lists: x and y');
   }
-  List<num> x = (args[0] as List).cast<num>();
-  List<num> y = (args[1] as List).cast<num>();
+  List<num> x = _toNumList(args[0]);
+  List<num> y = _toNumList(args[1]);
 
-  num meanX = mean(x);
-  num meanY = mean(y);
+  num meanX = _mean(x);
+  num meanY = _mean(y);
   double numerator = 0;
   for (int i = 0; i < x.length; i++) {
-    numerator += pow(y[i] - meanY - (x[i] - meanX), 2);
+    numerator += math.pow(y[i] - meanY - (x[i] - meanX), 2);
   }
-  return sqrt(numerator / (x.length - 2));
+  return math.sqrt(numerator / (x.length - 2));
 });
 
 /// Returns the t-Value of the list.
@@ -186,7 +222,7 @@ dynamic stdErrEst = VarArgsFunction((args, kwargs) {
 dynamic tValue = VarArgsFunction((args, kwargs) {
   List<num> list = _getArgsParams(args);
   if (list.isEmpty || list.length == 1) return 0;
-  return mean(list) / stdErrMean(list);
+  return _mean(list) / _stdErrMean(list);
 });
 
 /// Returns the 1st, 2nd, and 3rd quartiles of a list of numbers.
@@ -200,11 +236,21 @@ dynamic quartiles = VarArgsFunction((args, kwargs) {
   if (list.isEmpty) return [0, 0, 0];
 
   list.sort();
-  num q1 = median(list.sublist(0, list.length ~/ 2));
-  num q2 = median(list);
-  num q3 = median(list.sublist((list.length + 1) ~/ 2));
+  num q1 = _median(list.sublist(0, list.length ~/ 2));
+  num q2 = _median(list);
+  num q3 = _median(list.sublist((list.length + 1) ~/ 2));
   return [q1, q2, q3];
 });
+
+num _median(List<num> list) {
+  if (list.isEmpty) return 0;
+  list.sort();
+  if (list.length % 2 == 1) {
+    return list[list.length ~/ 2];
+  } else {
+    return (list[list.length ~/ 2 - 1] + list[list.length ~/ 2]) / 2;
+  }
+}
 
 /// Generates all permutations of elements from `n` taken `r` at a time.
 ///
@@ -228,9 +274,9 @@ dynamic quartiles = VarArgsFunction((args, kwargs) {
 /// ```dart
 /// print(permutations(3, 2)); // [[1, 2], [2, 1], [1, 3], [3, 1], [2, 3], [3, 2]]
 /// ```
-dynamic permutations(dynamic n, int r,
+dynamic permutations(dynamic n, dynamic rInput,
     {Function? func, bool simplify = true, Random? random, int? seed}) {
-  // Initialize random number generator with seed (if provided)
+  int r = rInput is Complex ? rInput.real.toInt() : (rInput as num).toInt();
   if (random == null) {
     random = seed != null ? Random(seed) : Random();
   } else if (seed != null) {
@@ -250,13 +296,12 @@ dynamic permutations(dynamic n, int r,
 
   void generatePermutations(int index, List<dynamic> current) {
     if (index == r) {
-      result.add(List.from(current)); // Add a copy of the permutation
+      result.add(List.from(current));
       return;
     }
 
     for (int i = 0; i < n.length; i++) {
       if (!current.contains(n[i])) {
-        // Avoid duplicates
         current.add(n[i]);
         generatePermutations(index + 1, current);
         current.removeLast();
@@ -298,8 +343,9 @@ dynamic permutations(dynamic n, int r,
 /// ```dart
 /// print(combinations(4, 3)); // [[1, 2, 3], [1, 2, 4], [1, 3, 4], [2, 3, 4]]
 /// ```
-dynamic combinations(dynamic n, int r,
+dynamic combinations(dynamic n, dynamic rInput,
     {Function? func, bool simplify = true, bool generateCombinations = true}) {
+  int r = rInput is Complex ? rInput.real.toInt() : (rInput as num).toInt();
   if (n is int) {
     n = List<int>.generate(n, (i) => i + 1);
   } else if (n is! List) {
@@ -312,15 +358,14 @@ dynamic combinations(dynamic n, int r,
 
   if (!generateCombinations) {
     int x = n is int ? n : n.length;
-    return factorial(x) ~/
-        (factorial(r) * factorial(x - r)); // Return count as a List
+    return factorial(x) ~/ (factorial(r) * factorial(x - r));
   }
 
   List<List> result = [];
 
   void getCombinations(int start, List<dynamic> current) {
     if (current.length == r) {
-      result.add(List.from(current)); // Add a copy of the combination
+      result.add(List.from(current));
       return;
     }
 
@@ -369,12 +414,12 @@ dynamic combinations(dynamic n, int r,
 
 /// Alias for combinations.
 dynamic nCr =
-    (dynamic n, int r) => combinations(n, r, generateCombinations: false);
+    (dynamic n, dynamic r) => combinations(n, r, generateCombinations: false);
 
 /// Alias for permutations.
-dynamic nPr = (dynamic n, int r) => permutations(n, r).length;
+dynamic nPr = (dynamic n, dynamic r) => permutations(n, r).length;
 
-/// Calculates the greatest common factor (GCF) of all numbers in the input.
+/// Returns the greatest common factor (GCF) of a list of numbers.
 ///
 /// Example:
 /// ```dart
@@ -411,7 +456,6 @@ dynamic gcd = VarArgsFunction((args, kwargs) {
 
   // Sort and ensure all numbers are positive
   numbers = numbers.map((x) => x.abs()).toList()..sort();
-
   num a = numbers.removeAt(0);
 
   for (var b in numbers) {
@@ -484,7 +528,7 @@ dynamic lcm = VarArgsFunction((args, kwargs) {
     if (a == 0 || b == 0) {
       return 0;
     } else {
-      return (a * b) / gcd(a, b);
+      return (a * b) / (gcd(a, b) as num);
     }
   }
 
@@ -505,49 +549,32 @@ dynamic correlation = VarArgsFunction((args, kwargs) {
   if (args.length != 2 || args[0] is! List || args[1] is! List) {
     throw ArgumentError('correlation requires two lists: x and y');
   }
-  List<num> x = (args[0] as List).cast<num>();
-  List<num> y = (args[1] as List).cast<num>();
-
-  num meanX = mean(x);
-  num meanY = mean(y);
-
-  num numerator = 0;
-  num denominator1 = 0;
-  num denominator2 = 0;
-
-  for (int i = 0; i < x.length; i++) {
-    numerator += (x[i] - meanX) * (y[i] - meanY);
-    denominator1 += pow(x[i] - meanX, 2);
-    denominator2 += pow(y[i] - meanY, 2);
-  }
-
-  return numerator / sqrt(denominator1 * denominator2);
+  return _correlation(_toNumList(args[0]), _toNumList(args[1]));
 });
 
-/// Returns the confidence Interval of a dataset when a confidence level is provided.
+/// Returns the confidence interval of a list of numbers.
 ///
 /// Example:
 /// ```dart
-/// print(confidenceInterval([1, 2, 3, 4, 5], 0.95));
+/// print(confidenceInterval([1,2,3], 0.95)); // [1.0, 3.0]
 /// ```
 dynamic confidenceInterval = VarArgsFunction((args, kwargs) {
-  // args[0] might be list, args[1] confidence level
   List<num> data;
 
-  if (args.length >= 2 && args[0] is List && args[1] is num) {
-    data = (args[0] as List).cast<num>();
-    (args[1] as num).toDouble(); // Validate type
+  if (args.length >= 2 && args[0] is List) {
+    data = _toNumList(args[0]);
+    final confidence = args[1];
+    if (confidence is! num && confidence is! Complex) {
+      throw ArgumentError("confidenceLevel must be num or Complex");
+    }
   } else {
-    // If flattened? confidenceInterval(0.95, 1, 2, 3)? Ambiguous.
-    // Let's assume strict (List, level) or (level, data).
-    // Given the ambiguity, let's stick to (List, level).
     throw ArgumentError(
         "Usage: confidenceInterval(List<num> data, double confidenceLevel)");
   }
 
-  num sampleMean = mean(data);
-  num stdErr = stdErrMean(data);
-  num margin = tValue(data) * stdErr;
+  num sampleMean = _mean(data);
+  num stdErr = _stdErrMean(data);
+  num margin = (tValue(data) as num) * stdErr;
   return [sampleMean - margin, sampleMean + margin];
 });
 
@@ -561,14 +588,14 @@ dynamic regression = VarArgsFunction((args, kwargs) {
   if (args.length != 2 || args[0] is! List || args[1] is! List) {
     throw ArgumentError('regression requires two lists: x and y');
   }
-  List<num> x = (args[0] as List).cast<num>();
-  List<num> y = (args[1] as List).cast<num>();
+  List<num> x = _toNumList(args[0]);
+  List<num> y = _toNumList(args[1]);
 
-  num meanX = mean(x);
-  num meanY = mean(y);
+  num meanX = _mean(x);
+  num meanY = _mean(y);
 
-  num m = correlation(x, y) * (stdDev(y) / stdDev(x));
+  num m = _correlation(x, y) * (_stdDev(y) / _stdDev(x));
   num b = meanY - m * meanX;
 
-  return [m, b]; // slope, intercept
+  return [m, b];
 });
