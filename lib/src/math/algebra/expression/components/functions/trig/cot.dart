@@ -6,6 +6,9 @@ class Cot extends TrigonometricExpression {
   @override
   dynamic evaluate([dynamic arg]) {
     var val = operand.evaluate(arg);
+    if (val is Matrix) {
+      return val.cot();
+    }
     if (val is num || val is Complex) {
       return cot(val);
     }

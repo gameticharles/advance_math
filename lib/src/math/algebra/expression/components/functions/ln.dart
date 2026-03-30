@@ -8,6 +8,9 @@ class Ln extends Expression {
   @override
   dynamic evaluate([dynamic arg]) {
     var val = operand.evaluate(arg);
+    if (val is Matrix) {
+      return val.log();
+    }
     if (val is Complex) {
       return val.ln();
     }

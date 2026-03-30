@@ -6,6 +6,9 @@ class Sec extends TrigonometricExpression {
   @override
   dynamic evaluate([dynamic arg]) {
     var val = operand.evaluate(arg);
+    if (val is Matrix) {
+      return val.sec();
+    }
     if (val is num || val is Complex) {
       return sec(val);
     }

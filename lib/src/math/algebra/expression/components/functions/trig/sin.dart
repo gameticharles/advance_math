@@ -6,6 +6,9 @@ class Sin extends TrigonometricExpression {
   @override
   dynamic evaluate([dynamic arg]) {
     var eval = operand.evaluate(arg);
+    if (eval is Matrix) {
+      return eval.sin();
+    }
     if (eval is num || eval is Complex) {
       return sin(eval);
     }

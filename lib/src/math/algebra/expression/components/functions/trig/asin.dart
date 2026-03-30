@@ -11,6 +11,9 @@ class Asin extends TrigonometricExpression {
   @override
   dynamic evaluate([dynamic arg]) {
     var eval = operand.evaluate(arg);
+    if (eval is Matrix) {
+      return eval.asin();
+    }
     if (eval is num || eval is Complex) {
       return asin(eval);
     }

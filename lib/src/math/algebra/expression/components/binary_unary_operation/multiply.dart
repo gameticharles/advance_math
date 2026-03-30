@@ -9,6 +9,12 @@ class Multiply extends BinaryOperationsExpression {
     dynamic rightEval = right.evaluate(arg);
 
     // Handle the identity and zero properties of multiplication
+    if (leftEval is Matrix) {
+      return (leftEval * rightEval);
+    }
+    if (rightEval is Matrix) {
+      return (leftEval * rightEval);
+    }
     if ((leftEval is num && leftEval == 0) ||
         (rightEval is num && rightEval == 0)) {
       return 0;

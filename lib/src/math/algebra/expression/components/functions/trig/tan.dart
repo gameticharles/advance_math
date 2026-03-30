@@ -6,6 +6,9 @@ class Tan extends TrigonometricExpression {
   @override
   dynamic evaluate([dynamic arg]) {
     var val = operand.evaluate(arg);
+    if (val is Matrix) {
+      return val.tan();
+    }
     if (val is num || val is Complex) {
       return tan(val);
     }

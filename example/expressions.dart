@@ -91,11 +91,15 @@ void main(List<String> args) {
   logicMath();
   stringMath();
   dateTimeMath();
+
   physicsConstantsMath();
   advancedMathFunctions();
   trigAndWavesMath();
   advancedStatisticsMath();
   randomAndUtilsMath();
+
+  matrixMath();
+
   polynomial();
   multiPolynomial();
   expressionMath();
@@ -541,6 +545,19 @@ void randomAndUtilsMath() {
     'diff("x*x", 2)',
   ];
   evaluateExpressions(expressions, "Random & Utilities", context);
+}
+
+void matrixMath() {
+  List<String> expressions = [
+    'matrix("1 2; 3 4") + matrix("5 6; 7 8")',
+    'matrix("1 2; 3 4") - matrix("5 6; 7 8")',
+    'matrix("1 2; 3 4") * matrix("5 6; 7 8")',
+    'matrix("1 2; 3 4") / matrix("5 6; 7 8")',
+    'matrix("1 2; 3 4") ^ 2',
+    'matrix("1 2; 3 4") ^ matrix("5 6; 7 8")',
+    'matrix("1 2; 3 4") ^ 0.5',
+  ];
+  evaluateExpressions(expressions, "Matrix Math", context);
 }
 
 void polynomial() {

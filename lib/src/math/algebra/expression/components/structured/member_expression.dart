@@ -6,11 +6,13 @@ class MemberExpression extends Expression {
   final List<MemberAccessor> memberAccessors;
 
   MemberExpression(this.object, this.property,
-      {this.memberAccessors = const []});
+      {List<MemberAccessor>? memberAccessors})
+      : memberAccessors = memberAccessors ?? [MemberAccessor.mapAccessor];
 
   @override
   dynamic evaluate([dynamic arg]) {
     var obj = object.evaluate(arg);
+    if (obj == null) return null;
     return _getMember(obj, property.name);
   }
 

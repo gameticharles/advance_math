@@ -24,6 +24,12 @@ class Divide extends BinaryOperationsExpression {
     leftEval = convertToLiteralIfNeeded(leftEval, rightEval);
     rightEval = convertToLiteralIfNeeded(rightEval, leftEval);
 
+    if (leftEval is Matrix) {
+      return (leftEval / rightEval);
+    }
+    if (rightEval is Matrix) {
+      return (leftEval / rightEval);
+    }
     // If both evaluate to numbers, return the sum as a number
     if (leftEval is num && rightEval is num) {
       return leftEval / rightEval;

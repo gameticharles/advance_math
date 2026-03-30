@@ -15,6 +15,12 @@ class Add extends BinaryOperationsExpression {
     rightEval = convertToLiteralIfNeeded(rightEval, leftEval);
 
     // If both evaluate to numbers, return the sum as a number
+    if (leftEval is Matrix) {
+      return (leftEval + rightEval);
+    }
+    if (rightEval is Matrix) {
+      return (leftEval + rightEval);
+    }
     if (leftEval is Complex) {
       return (leftEval + rightEval).simplify();
     }

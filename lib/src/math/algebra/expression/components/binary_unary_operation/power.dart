@@ -15,6 +15,12 @@ class Pow extends BinaryOperationsExpression {
     rightEval = convertToLiteralIfNeeded(rightEval, leftEval);
 
     // If both evaluate to numbers, return the sum as a number
+    if (leftEval is Matrix) {
+      return (leftEval ^ rightEval);
+    }
+    if (rightEval is Matrix) {
+      return (leftEval ^ rightEval);
+    }
     if (leftEval is Complex || rightEval is Complex) {
       return Complex(leftEval).pow(Complex(rightEval)).simplify();
     }
@@ -113,8 +119,7 @@ class Pow extends BinaryOperationsExpression {
     if (simplifiedBase is Literal) {
       final bv = litVal(simplifiedBase);
       if (bv == 0) {
-        if (simplifiedExponent is Literal &&
-            litVal(simplifiedExponent) > 0) {
+        if (simplifiedExponent is Literal && litVal(simplifiedExponent) > 0) {
           return Literal(0);
         }
         throw Exception('0 raised to a non-positive power is undefined.');

@@ -27,6 +27,7 @@ class Exp extends Expression {
   @override
   dynamic evaluate([dynamic arg]) {
     final operandValue = operand.evaluate(arg);
+    if (operandValue is Matrix) return operandValue.exp();
     if (operandValue is Complex) return operandValue.exp();
     return math.exp(operandValue);
   }

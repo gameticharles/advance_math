@@ -98,17 +98,49 @@ class ExpressionContext {
         'rad2deg': AngleConstants.d180OverPi,
 
         // Basic Math functions
-        'log': log,
-        'ln': log,
-        'exp': (dynamic x) => exp(x),
-        'pow': (dynamic x, dynamic y) => pow(x, y),
-        'abs': (dynamic x) => abs(x),
-        'sqrt': (dynamic x) => sqrt(x),
-        'cbrt': (dynamic x) => cbrt(x),
-        'nthRoot': (dynamic x, dynamic n) =>
-            nthRoot(x, n is Complex ? n.real.toInt() : (n as num).toInt()),
-        'logBase': (dynamic b, dynamic x) => logBase(b, x),
-        'log10': (dynamic x) => log10(x),
+        'log': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).log()
+            : (x is Complex ? x.log() : math.log(x as num)),
+        'ln': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).log()
+            : (x is Complex ? x.log() : math.log(x as num)),
+        'exp': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).exp()
+            : (x is Complex ? x.exp() : math.exp(x as num)),
+        'pow': (dynamic x, dynamic y) => x is Matrix
+            ? MatrixFunctions(x).pow(y is Complex ? y.real : y as num)
+            : (x is Complex
+                ? x.pow(y)
+                : (y is Complex
+                    ? Complex(x).pow(y)
+                    : (y is Matrix
+                        ? MatrixFunctions(y).pow(x as num)
+                        : math.pow(x as num, y as num)))),
+        'abs': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).abs()
+            : (x is Complex ? x.abs() : math.abs(x as num)),
+        'sqrt': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).sqrt()
+            : (x is Complex ? x.sqrt() : math.sqrt(x as num)),
+        'cbrt': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).nthRoot(3)
+            : (x is Complex ? x.nthRoot(3) : math.cbrt(x as num)),
+        'nthRoot': (dynamic x, dynamic n) => x is Matrix
+            ? MatrixFunctions(x)
+                .nthRoot((n is Complex ? n.real : n as num).toInt())
+            : (x is Complex
+                ? x.nthRoot(n is Complex ? n.real : n as num)
+                : (n is Complex
+                    ? Complex(x).pow(1 / n.real)
+                    : math.nthRoot(x as num, (n as num).toInt()))),
+        'logBase': (dynamic b, dynamic x) => x is Matrix
+            ? MatrixFunctions(x).logn((b is Complex ? b.real : b as num))
+            : (x is Complex
+                ? x.logBase(b is Complex ? b.real : b as num)
+                : math.logBase(b, x)),
+        'log10': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).logn(10)
+            : (x is Complex ? x.log10() : math.log10(x)),
         'fact': (dynamic x) =>
             factorial(x is Complex ? x.real.toInt() : (x as num).toInt()),
         'factorial': (dynamic x) =>
@@ -289,33 +321,83 @@ class ExpressionContext {
             Expression.parse(exp.toString()).simplify(),
 
         // Trigonometric functions
-        'sin': (dynamic x) => sin(x),
-        'cos': (dynamic x) => cos(x),
-        'tan': (dynamic x) => tan(x),
-        'csc': (dynamic x) => csc(x),
-        'sec': (dynamic x) => sec(x),
-        'cot': (dynamic x) => cot(x),
-        'asin': (dynamic x) => asin(x),
-        'acos': (dynamic x) => acos(x),
-        'atan': (dynamic x) => atan(x),
-        'atan2': (dynamic a, dynamic b) => atan2(a, b),
-        'asec': (dynamic x) => asec(x),
-        'acsc': (dynamic x) => acsc(x),
-        'acot': (dynamic x) => acot(x),
+        'sin': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).sin()
+            : (x is Complex ? x.sin() : math.sin(x as num)),
+        'cos': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).cos()
+            : (x is Complex ? x.cos() : math.cos(x as num)),
+        'tan': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).tan()
+            : (x is Complex ? x.tan() : math.tan(x as num)),
+        'csc': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).csc()
+            : (x is Complex ? x.csc() : math.csc(x)),
+        'sec': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).sec()
+            : (x is Complex ? x.sec() : math.sec(x)),
+        'cot': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).cot()
+            : (x is Complex ? x.cot() : math.cot(x)),
+        'asin': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).asin()
+            : (x is Complex ? x.asin() : math.asin(x as num)),
+        'acos': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).acos()
+            : (x is Complex ? x.acos() : math.acos(x as num)),
+        'atan': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).atan()
+            : (x is Complex ? x.atan() : math.atan(x as num)),
+        'atan2': (dynamic a, dynamic b) => a is Matrix
+            ? MatrixFunctions(a).atan2(b as Matrix)
+            : math.atan2(a as num, b as num),
+        'asec': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).asec()
+            : (x is Complex ? x.asec() : math.asec(x)),
+        'acsc': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).acsc()
+            : (x is Complex ? x.acsc() : math.acsc(x)),
+        'acot': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).acot()
+            : (x is Complex ? x.acot() : math.acot(x)),
 
-        'sinh': (dynamic x) => sinh(x),
-        'cosh': (dynamic x) => cosh(x),
-        'tanh': (dynamic x) => tanh(x),
-        'csch': (dynamic x) => csch(x),
-        'sech': (dynamic x) => sech(x),
-        'coth': (dynamic x) => coth(x),
+        'sinh': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).sinh()
+            : (x is Complex ? x.sinh() : math.sinh(x)),
+        'cosh': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).cosh()
+            : (x is Complex ? x.cosh() : math.cosh(x)),
+        'tanh': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).tanh()
+            : (x is Complex ? x.tanh() : math.tanh(x)),
+        'csch': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).csch()
+            : (x is Complex ? x.csch() : math.csch(x)),
+        'sech': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).sech()
+            : (x is Complex ? x.sech() : math.sech(x)),
+        'coth': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).coth()
+            : (x is Complex ? x.coth() : math.coth(x)),
 
-        'asinh': (dynamic x) => asinh(x),
-        'acosh': (dynamic x) => acosh(x),
-        'atanh': (dynamic x) => atanh(x),
-        'acsch': (dynamic x) => acsch(x),
-        'asech': (dynamic x) => asech(x),
-        'acoth': (dynamic x) => acoth(x),
+        'asinh': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).asinh()
+            : (x is Complex ? x.asinh() : math.asinh(x)),
+        'acosh': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).acosh()
+            : (x is Complex ? x.acosh() : math.acosh(x)),
+        'atanh': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).atanh()
+            : (x is Complex ? x.atanh() : math.atanh(x)),
+        'acsch': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).acsch()
+            : (x is Complex ? x.acsch() : math.acsch(x)),
+        'asech': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).asech()
+            : (x is Complex ? x.asech() : math.asech(x)),
+        'acoth': (dynamic x) => x is Matrix
+            ? MatrixFunctions(x).acoth()
+            : (x is Complex ? x.acoth() : math.acoth(x)),
         'vers': (dynamic x) => vers(x),
         'covers': (dynamic x) => covers(x),
         'havers': (dynamic x) => havers(x),
@@ -495,11 +577,13 @@ class ExpressionContext {
   static Map<String, dynamic> _matrixExtras() => {
         ..._sharedExtras(),
 
+        // Creators
         'matrix': VarArgsFunction((args, _) {
           if (args.isEmpty) throw ArgumentError('matrix() requires arguments');
           final first = args.first;
           if (first is String) return Matrix(first);
           if (first is List) return Matrix(first);
+          if (first is Matrix) return first;
           throw ArgumentError(
               'matrix() expects a string like "1 2; 3 4" or a List of Lists');
         }),
@@ -512,33 +596,95 @@ class ExpressionContext {
         'eye': VarArgsFunction((args, _) => Matrix.eye(args[0] as int)),
         'diag': VarArgsFunction(
             (args, _) => Matrix.fromDiagonal(args.first as List)),
+        'diagonalMatrix': VarArgsFunction(
+            (args, _) => Matrix.fromDiagonal(args.first as List)),
         'rand_matrix': VarArgsFunction(
             (args, _) => Matrix.random(args[0] as int, args[1] as int)),
+        'fill': VarArgsFunction(
+            (args, _) => Matrix.fill(args[0] as int, args[1] as int, args[2])),
         'linspace': VarArgsFunction((args, _) => Matrix.linspace(
               (args[0] as num).toInt(),
               (args[1] as num).toInt(),
               args.length > 2 ? args[2] as int : 50,
             )),
+        'rowVector':
+            VarArgsFunction((args, _) => RowMatrix(args.first as List)),
+        'colVector':
+            VarArgsFunction((args, _) => ColumnMatrix(args.first as List)),
 
-        // Decompositions / properties
+        // Properties
         'det':
             VarArgsFunction((args, _) => (args.first as Matrix).determinant()),
         'inv': VarArgsFunction((args, _) => (args.first as Matrix).inverse()),
+        'pinv': VarArgsFunction(
+            (args, _) => (args.first as Matrix).pseudoInverse()),
         'transpose':
             VarArgsFunction((args, _) => (args.first as Matrix).transpose()),
         'rank': VarArgsFunction((args, _) => (args.first as Matrix).rank()),
         'trace': VarArgsFunction((args, _) => (args.first as Matrix).trace()),
-        'norm': VarArgsFunction((args, _) => (args.first as Matrix).norm()),
+        'norm': VarArgsFunction((args, _) {
+          final m = args.first as Matrix;
+          if (args.length > 1) {
+            final normType = args[1];
+            if (normType == 'manhattan' || normType == 1) {
+              return m.norm(Norm.manhattan);
+            }
+            if (normType == 'frobenius') return m.norm(Norm.frobenius);
+            if (normType == 'chebyshev' || normType == double.infinity) {
+              return m.norm(Norm.chebyshev);
+            }
+          }
+          return m.norm();
+        }),
         'nullity':
             VarArgsFunction((args, _) => (args.first as Matrix).nullity()),
-        'eigenvalues':
-            VarArgsFunction((args, _) => (args.first as Matrix).eigen().values),
+        'cond': VarArgsFunction(
+            (args, _) => (args.first as Matrix).conditionNumber()),
+        'rowCount':
+            VarArgsFunction((args, _) => (args.first as Matrix).rowCount),
+        'colCount':
+            VarArgsFunction((args, _) => (args.first as Matrix).columnCount),
+        'shape': VarArgsFunction((args, _) => (args.first as Matrix).shape),
+        'isSquare': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isSquareMatrix()),
+        'isSymmetric': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isSymmetricMatrix()),
+        'isDiagonal': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isDiagonalMatrix()),
+        'isIdentity': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isIdentityMatrix()),
+        'isOrthogonal': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isOrthogonalMatrix()),
+        'isSingular': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isSingularMatrix()),
+        'isPositiveDefinite': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isPositiveDefiniteMatrix()),
+        'isUpperTriangular': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isUpperTriangular()),
+        'isLowerTriangular': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isLowerTriangular()),
 
-        // Solve Ax = b
+        // Manipulation
+        'reshape': VarArgsFunction((args, _) =>
+            (args[0] as Matrix).reshape(args[1] as int, args[2] as int)),
+        'flatten':
+            VarArgsFunction((args, _) => (args.first as Matrix).flatten()),
+        'hcat': VarArgsFunction((args, _) {
+          List<Matrix> matrices = args.map((e) => e as Matrix).toList();
+          return Matrix.concatenate(matrices, axis: 1);
+        }),
+        'vcat': VarArgsFunction((args, _) {
+          List<Matrix> matrices = args.map((e) => e as Matrix).toList();
+          return Matrix.concatenate(matrices, axis: 0);
+        }),
+        'ref': VarArgsFunction(
+            (args, _) => (args.first as Matrix).rowEchelonForm()),
+        'rref': VarArgsFunction(
+            (args, _) => (args.first as Matrix).reducedRowEchelonForm()),
         'solve': VarArgsFunction((args, _) {
           final A = args[0] as Matrix;
           final b = args[1] as Matrix;
-          return A.linear.solve(b, method: LinearSystemMethod.gaussElimination);
+          return A.linear.solve(b);
         }),
 
         // Element access helpers
@@ -546,13 +692,80 @@ class ExpressionContext {
             (args, _) => (args[0] as Matrix).row(args[1] as int)),
         'col': VarArgsFunction(
             (args, _) => (args[0] as Matrix).column(args[1] as int)),
-        'shape': VarArgsFunction((args, _) => (args.first as Matrix).shape),
 
-        // Stats on matrix
-        'mat_mean': VarArgsFunction((args, _) => (args.first as Matrix).mean()),
-        'mat_sum': VarArgsFunction((args, _) => (args.first as Matrix).sum()),
-        'mat_max': VarArgsFunction((args, _) => (args.first as Matrix).max()),
-        'mat_min': VarArgsFunction((args, _) => (args.first as Matrix).min()),
+        // Stats
+        'mat_mean': VarArgsFunction((args, _) {
+          final m = args.first as Matrix;
+          final axis = args.length > 1 ? args[1] as int? : null;
+          if (axis == 0) {
+            return List.generate(
+                m.columnCount,
+                (j) =>
+                    m.column(j).elements.reduce((a, b) => a + b) / m.rowCount);
+          } else if (axis == 1) {
+            return List.generate(
+                m.rowCount,
+                (i) =>
+                    m.row(i).elements.reduce((a, b) => a + b) / m.columnCount);
+          } else {
+            return m.elements.reduce((a, b) => a + b) /
+                (m.rowCount * m.columnCount);
+          }
+        }),
+        'mat_sum': VarArgsFunction((args, _) {
+          final m = args.first as Matrix;
+          final axis = args.length > 1 ? args[1] as int? : null;
+          return m.sum(axis: axis);
+        }),
+        'mat_max': VarArgsFunction((args, _) {
+          final m = args.first as Matrix;
+          final axis = args.length > 1 ? args[1] as int? : null;
+          return m.max(axis: axis);
+        }),
+        'mat_min': VarArgsFunction((args, _) {
+          final m = args.first as Matrix;
+          final axis = args.length > 1 ? args[1] as int? : null;
+          return m.min(axis: axis);
+        }),
+        'mat_var':
+            VarArgsFunction((args, _) => (args.first as Matrix).variance()),
+        'mat_std': VarArgsFunction(
+            (args, _) => (args.first as Matrix).standardDeviation()),
+        'mat_median':
+            VarArgsFunction((args, _) => (args.first as Matrix).median()),
+
+        // Decompositions (as Maps for easy access)
+        'lu': VarArgsFunction((args, _) {
+          final lu = (args.first as Matrix)
+              .decomposition
+              .luDecompositionDoolittlePartialPivoting();
+          return {'L': lu.L, 'U': lu.U, 'P': lu.P};
+        }),
+        'qr': VarArgsFunction((args, _) {
+          final qr =
+              (args.first as Matrix).decomposition.qrDecompositionHouseholder();
+          return {'Q': qr.Q, 'R': qr.R};
+        }),
+        'svd': VarArgsFunction((args, _) {
+          final svd =
+              (args.first as Matrix).decomposition.singularValueDecomposition();
+          return {'U': svd.U, 'S': svd.S, 'V': svd.V};
+        }),
+        'cholesky': VarArgsFunction((args, _) {
+          final chol =
+              (args.first as Matrix).decomposition.choleskyDecomposition();
+          return {'L': chol.L};
+        }),
+        'eigen': VarArgsFunction((args, _) {
+          final eigen =
+              (args.first as Matrix).decomposition.eigenvalueDecomposition();
+          return {'D': eigen.D, 'V': eigen.V};
+        }),
+        'schur': VarArgsFunction((args, _) {
+          final schur =
+              (args.first as Matrix).decomposition.schurDecomposition();
+          return {'T': schur.T, 'Q': schur.Q};
+        }),
       };
 
   static Map<String, dynamic> _geometryExtras() => {

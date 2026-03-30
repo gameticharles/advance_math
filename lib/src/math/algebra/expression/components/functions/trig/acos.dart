@@ -11,6 +11,9 @@ class Acos extends TrigonometricExpression {
   @override
   dynamic evaluate([dynamic arg]) {
     var eval = operand.evaluate(arg);
+    if (eval is Matrix) {
+      return eval.acos();
+    }
     if (eval is num || eval is Complex) {
       return acos(eval);
     }

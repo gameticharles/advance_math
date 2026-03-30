@@ -42,6 +42,11 @@ class Csc extends TrigonometricExpression {
   @override
   dynamic evaluate([dynamic arg]) {
     var val = operand.evaluate(arg);
+    if (val is Matrix) {
+      final res = val.csc();
+      if (n == 1) return res;
+      return MatrixOperationExtension(res).pow(n); // Using element-wise Matrix power
+    }
     if (val is num || val is Complex) {
       final res = csc(val);
       if (n == 1) return res;

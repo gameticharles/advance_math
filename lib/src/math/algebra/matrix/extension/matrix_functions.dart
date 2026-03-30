@@ -181,6 +181,174 @@ extension MatrixFunctions on Matrix {
     return result;
   }
 
+  /// Element-wise absolute value
+  Matrix abs() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = (this[i][j] as num).abs();
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise square root
+  Matrix sqrt() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = math.sqrt(this[i][j]);
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise nth root
+  Matrix nthRoot(int n) {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = math.pow(this[i][j], 1 / n);
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise cosecant
+  Matrix csc() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = 1 / math.sin(this[i][j]);
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise secant
+  Matrix sec() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = 1 / math.cos(this[i][j]);
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise cotangent
+  Matrix cot() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = 1 / math.tan(this[i][j]);
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise arc-secant
+  Matrix asec() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = math.acos(1 / this[i][j]);
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise arc-cosecant
+  Matrix acsc() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = math.asin(1 / this[i][j]);
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise arc-cotangent
+  Matrix acot() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = math.atan(1 / this[i][j]);
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise hyperbolic cosecant
+  Matrix csch() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = 1 / math.sinh(this[i][j]);
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise hyperbolic secant
+  Matrix sech() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = 1 / math.cosh(this[i][j]);
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise hyperbolic cotangent
+  Matrix coth() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = 1 / math.tanh(this[i][j]);
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise hyperbolic arc-cosecant
+  Matrix acsch() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        num val = this[i][j];
+        result[i][j] = math.log(1 / val + math.sqrt(1 / (val * val) + 1));
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise hyperbolic arc-secant
+  Matrix asech() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        num val = this[i][j];
+        result[i][j] = math.log(1 / val + math.sqrt(1 / (val * val) - 1));
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise hyperbolic arc-cotangent
+  Matrix acoth() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        num val = this[i][j];
+        result[i][j] = 0.5 * math.log((val + 1) / (val - 1));
+      }
+    }
+    return result;
+  }
+
   /// Raises this matrix to a given power.
   /// Uses eigenvalue decomposition for non-integer powers and binary exponentiation for integer powers.
   ///

@@ -45,6 +45,12 @@ class Log extends Expression {
     final baseValue = base.evaluate(arg);
     final operandValue = operand.evaluate(arg);
 
+    if (operandValue is Matrix) {
+      if (baseValue is! num) {
+        throw ArgumentError('Logarithm of a matrix with a non-scalar base is not supported.');
+      }
+      return operandValue.logn(baseValue);
+    }
     if (baseValue is Complex || operandValue is Complex) {
       var b = (baseValue is Complex) ? baseValue : Complex(baseValue);
       var v = (operandValue is Complex) ? operandValue : Complex(operandValue);
