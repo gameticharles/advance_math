@@ -9,7 +9,7 @@ class Ln extends Expression {
   dynamic evaluate([dynamic arg]) {
     var val = operand.evaluate(arg);
     if (val is Complex) {
-      return val.ln().simplify();
+      return val.ln();
     }
     return math.log(val);
   }
@@ -57,7 +57,7 @@ class Ln extends Expression {
     if (this == oldExpr) {
       return newExpr;
     }
-    return Abs(operand.substitute(oldExpr, newExpr));
+    return Ln(operand.substitute(oldExpr, newExpr));
   }
 
   @override

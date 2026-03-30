@@ -51,7 +51,15 @@ num sumUpTo(num start, num end, {num step = 1}) {
 /// ```dart
 /// print(abs(-5));  // Output: 5
 /// ```
-dynamic abs(dynamic x) => x.abs();
+dynamic abs(dynamic x) {
+  if (x is num) {
+    return x.abs();
+  } else if (x is Complex) {
+    return x.abs();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
+}
 
 /// Returns the square root of a number.
 ///
@@ -69,7 +77,7 @@ dynamic sqrt(dynamic x) {
   } else if (x is Complex) {
     return x.sqrt();
   } else {
-    throw ArgumentError('Input should be either num or Number');
+    throw ArgumentError('Input should be either num or Complex');
   }
 }
 
@@ -95,12 +103,12 @@ dynamic nthRoot(dynamic x, int nth) {
     if (x >= 0) {
       return math.pow(x, 1 / nth);
     } else {
-      return Complex(0, math.pow(-x, 1 / nth));
+      return Complex(x, 0).nthRoot(nth);
     }
   } else if (x is Complex) {
     return x.nthRoot(nth);
   } else {
-    throw ArgumentError('Input should be either num or Number');
+    throw ArgumentError('Input should be either num or Complex');
   }
 }
 
@@ -135,17 +143,20 @@ dynamic exp(dynamic x) {
 dynamic pow(dynamic x, dynamic exponent) {
   if (x is num) {
     if (exponent is num) {
-      return math.pow(x, exponent);
+      if (x >= 0) {
+        return math.pow(x, exponent);
+      } else {
+        return Complex(x).pow(exponent);
+      }
+    } else if (exponent is Complex) {
+      return Complex(x).pow(exponent);
     } else {
-      return Complex(x, 0).pow(exponent);
+      throw ArgumentError('Exponent should be either num or Complex');
     }
   } else if (x is Complex) {
-    if (exponent is Complex) {
-      return x.pow(exponent);
-    }
     return x.pow(exponent);
   } else {
-    throw ArgumentError('Input should be either num or Number');
+    throw ArgumentError('Input should be either num or Complex');
   }
 }
 
@@ -200,8 +211,8 @@ dynamic rect(double x) {
 /// ```dart
 /// print(sinc(1));    // Output: 0.8414709848078965 (approximate value of sin(1)/1)
 /// ```
-dynamic sinc(double x) {
-  if (x == 0) return 1;
+dynamic sinc(dynamic x) {
+  if (x == 0 || x == Complex.zero()) return 1;
   return sin(x) / x;
 }
 
@@ -241,8 +252,14 @@ dynamic sinc(double x) {
 dynamic mod(dynamic a, dynamic b) {
   if (a is int && b is int) {
     return a % b;
-  } else {
+  } else if (a is num && b is num) {
     return a - (a / b).floor() * b;
+  } else if (a is Complex || b is Complex) {
+    var ac = a is Complex ? a : Complex(a as num, 0);
+    var bc = b is Complex ? b : Complex(b as num, 0);
+    return ac - bc * (ac / bc).floor();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
   }
 }
 
@@ -376,7 +393,15 @@ BigInt bigIntNChooseRModPrime(int N, int R, int P) {
 /// ```dart
 /// print(floor(2.3));  // Output: 2
 /// ```
-int floor(dynamic x) => x.floor();
+dynamic floor(dynamic x) {
+  if (x is num) {
+    return x.floor();
+  } else if (x is Complex) {
+    return x.real.floor();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
+}
 
 /// Rounds a number up to the nearest integer.
 ///
@@ -384,7 +409,15 @@ int floor(dynamic x) => x.floor();
 /// ```dart
 /// print(ceil(2.3));  // Output: 3
 /// ```
-int ceil(dynamic x) => x.ceil();
+dynamic ceil(dynamic x) {
+  if (x is num) {
+    return x.ceil();
+  } else if (x is Complex) {
+    return x.real.ceil();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
+}
 
 /// Rounds the number [x] to the specified number of [decimalPlaces].
 ///
@@ -917,10 +950,16 @@ bool isArmstrongNumber(int n) {
 /// print(trunc(4.7));  // Output: 4
 /// print(trunc(-4.7)); // Output: -4
 /// ```
-double trunc(double x) {
-  if (x.isNaN) return double.nan;
-  if (x > 0) return x.floorToDouble();
-  return x.ceilToDouble();
+dynamic trunc(dynamic x) {
+  if (x is num) {
+    if (x.isNaN) return double.nan;
+    if (x > 0) return x.floorToDouble();
+    return x.ceilToDouble();
+  } else if (x is Complex) {
+    return x.real.truncateToDouble();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Returns the prime factors of the given integer [n].

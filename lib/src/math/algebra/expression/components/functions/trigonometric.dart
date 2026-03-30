@@ -7,84 +7,73 @@ class Trigonometric extends Expression {
   Trigonometric(this.functionName, this.operand);
 
   @override
-  double evaluate([dynamic arg]) {
-    final eval = operand.evaluate();
-    switch (functionName) {
-      case 'sin':
-        if (eval is Complex) {
-          return eval.sin().simplify();
-        }
-        return sin(eval);
-      case 'cos':
-        if (eval is Complex) {
-          return eval.cos().simplify();
-        }
-        return cos(eval);
-      case 'tan':
-        if (eval is Complex) {
-          return eval.tan().simplify();
-        }
-        return tan(eval);
-      case 'asin':
-        if (eval is Complex) {
-          return eval.asin().simplify();
-        }
-        return asin(eval);
-      case 'acos':
-        if (eval is Complex) {
-          return eval.acos().simplify();
-        }
-        return acos(eval);
-      case 'atan':
-        if (eval is Complex) {
-          return eval.atan().simplify();
-        }
-        return atan(eval);
-      case 'csc':
-        if (eval is Complex) {
-          final sine = eval.sin();
-          if (sine == Complex.zero()) {
-            return Complex.infinity().simplify();
-          }
-          return (Complex.one() / sine).simplify();
-        }
-        double sinValue = sin(eval);
-        if (sinValue == 0) {
-          throw Exception(
-              'Cosecant is undefined for operand value: ${operand.evaluate()}');
-        }
-        return 1 / sinValue;
-      case 'sec':
-        if (eval is Complex) {
-          final cosine = eval.cos();
-          if (cosine == Complex.zero()) {
-            return Complex.infinity().simplify();
-          }
-          return (Complex.one() / cosine).simplify();
-        }
-        double cosValue = cos(eval);
-        if (cosValue == 0) {
-          throw Exception(
-              'Secant is undefined for operand value: ${operand.evaluate()}');
-        }
-        return 1 / cosValue;
-      case 'cot':
-        if (eval is Complex) {
-          final tangent = eval.tan();
-          if (tangent == Complex.zero()) {
-            return Complex.infinity().simplify();
-          }
-          return (Complex.one() / tangent).simplify();
-        }
-        double tanValue = tan(eval);
-        if (tanValue == 0) {
-          throw Exception(
-              'Cotangent is undefined for operand value: ${operand.evaluate()}');
-        }
-        return 1 / tanValue;
-      default:
-        throw Exception('Unsupported trigonometric function: $functionName');
+  dynamic evaluate([dynamic arg]) {
+    final eval = operand.evaluate(arg);
+    if (eval is num || eval is Complex) {
+      switch (functionName.toLowerCase()) {
+        case 'sin':
+          return sin(eval);
+        case 'cos':
+          return cos(eval);
+        case 'tan':
+          return tan(eval);
+        case 'asin':
+          return asin(eval);
+        case 'acos':
+          return acos(eval);
+        case 'atan':
+          return atan(eval);
+        case 'csc':
+          return csc(eval);
+        case 'sec':
+          return sec(eval);
+        case 'cot':
+          return cot(eval);
+        case 'acsc':
+          return acsc(eval);
+        case 'asec':
+          return asec(eval);
+        case 'acot':
+          return acot(eval);
+        case 'sinh':
+          return sinh(eval);
+        case 'cosh':
+          return cosh(eval);
+        case 'tanh':
+          return tanh(eval);
+        case 'csch':
+          return csch(eval);
+        case 'sech':
+          return sech(eval);
+        case 'coth':
+          return coth(eval);
+        case 'asinh':
+          return asinh(eval);
+        case 'acosh':
+          return acosh(eval);
+        case 'atanh':
+          return atanh(eval);
+        case 'acsch':
+          return acsch(eval);
+        case 'asech':
+          return asech(eval);
+        case 'acoth':
+          return acoth(eval);
+        case 'vers':
+          return vers(eval);
+        case 'covers':
+          return covers(eval);
+        case 'havers':
+          return havers(eval);
+        case 'exsec':
+          return exsec(eval);
+        case 'excsc':
+          return excsc(eval);
+        default:
+          throw Exception('Unsupported trigonometric function: $functionName');
+      }
     }
+    return Trigonometric(functionName, eval);
   }
 
   @override
@@ -95,10 +84,9 @@ class Trigonometric extends Expression {
         return Trigonometric('cos', operand);
       case 'cos':
         // Note: Actually negative sine, but for simplicity, we keep it as sine here.
-        return Trigonometric('sin', operand);
+        return Negate(Trigonometric('sin', operand));
       case 'tan':
-        // Note: Actually sec^2, but for simplicity, we keep it as sec here.
-        return Trigonometric('sec', operand);
+        return Pow(Sec(operand), Literal(2));
       // Other differentiation rules can be added for csc, sec, and cot.
       default:
         throw Exception(
@@ -133,7 +121,8 @@ class Trigonometric extends Expression {
 
   @override
   Expression substitute(Expression oldExpr, Expression newExpr) {
-    return PredefinedFunctionExpression(
+    if (this == oldExpr) return newExpr;
+    return Trigonometric(
       functionName,
       operand.substitute(oldExpr, newExpr),
     );

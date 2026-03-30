@@ -11,14 +11,8 @@ class Acos extends TrigonometricExpression {
   @override
   dynamic evaluate([dynamic arg]) {
     var eval = operand.evaluate(arg);
-    if (eval is num) {
-      if (eval < -1 || eval > 1) {
-        throw ArgumentError('acos domain error: $eval not in [-1, 1]');
-      }
+    if (eval is num || eval is Complex) {
       return acos(eval);
-    }
-    if (eval is Complex) {
-      return eval.acos();
     }
     return Acos(eval);
   }

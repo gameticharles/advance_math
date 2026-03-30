@@ -6,7 +6,7 @@ class Abs extends Expression {
   Abs(this.operand);
 
   @override
-  num evaluate([dynamic arg]) {
+  dynamic evaluate([dynamic arg]) {
     return operand.evaluate(arg).abs();
   }
 

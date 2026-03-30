@@ -21,11 +21,8 @@ class Cos extends TrigonometricExpression {
   @override
   dynamic evaluate([dynamic arg]) {
     var eval = operand.evaluate(arg);
-    if (eval is num) {
+    if (eval is num || eval is Complex) {
       return cos(eval);
-    }
-    if (eval is Complex) {
-      return eval.cos();
     }
     return Cos(eval);
   }

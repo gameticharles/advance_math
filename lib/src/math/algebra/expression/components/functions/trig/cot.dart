@@ -6,22 +6,10 @@ class Cot extends TrigonometricExpression {
   @override
   dynamic evaluate([dynamic arg]) {
     var val = operand.evaluate(arg);
-    dynamic tangentValue;
-    if (val is Complex) {
-      tangentValue = val.tan();
-    } else {
-      tangentValue = tan(val);
+    if (val is num || val is Complex) {
+      return cot(val);
     }
-
-    if (tangentValue == 0 ||
-        (tangentValue is Complex && tangentValue == Complex.zero())) {
-      throw Exception('Cotangent is undefined for operand: $val');
-    }
-
-    if (tangentValue is Complex) {
-      return Complex.one() / tangentValue;
-    }
-    return 1 / tangentValue;
+    return Cot(val);
   }
 
   @override

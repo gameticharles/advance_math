@@ -20,6 +20,9 @@ final Map<String, dynamic> defaultContext = {
   'NaN': double.nan,
   'inf': double.infinity,
   'Infinity': double.infinity,
+  'i': Complex.i(),
+  'I': Complex.i(),
+  'goldenRatio': 1.618033988749895,
 
   // Physics Constants
   'speedOfLight': PhysicsConstants.speedOfLight,
@@ -52,13 +55,13 @@ final Map<String, dynamic> defaultContext = {
   // Basic Math functions
   'log': log,
   'ln': log,
+  'exp': (dynamic x) => exp(x),
+  'pow': (dynamic x, dynamic y) => pow(x, y),
   'abs': (dynamic x) => abs(x),
   'sqrt': (dynamic x) => sqrt(x),
   'cbrt': (dynamic x) => cbrt(x),
   'nthRoot': (dynamic x, dynamic n) =>
       nthRoot(x, n is Complex ? n.real.toInt() : (n as num).toInt()),
-  'exp': (dynamic x) => exp(x),
-  'pow': (dynamic x, dynamic y) => pow(x, y),
   'logBase': (dynamic b, dynamic x) => logBase(b, x),
   'log10': (dynamic x) => log10(x),
   'fact': (dynamic x) =>
@@ -69,9 +72,12 @@ final Map<String, dynamic> defaultContext = {
       factorial2(x is Complex ? x.real.toInt() : (x as num).toInt()),
   'doubleFactorial': (dynamic x) =>
       doubleFactorial(x is Complex ? x.real.toDouble() : (x as num).toDouble()),
-  'step': (dynamic x) => step((x is Complex ? x.real : x as num).toDouble()),
-  'rect': (dynamic x) => rect((x is Complex ? x.real : x as num).toDouble()),
-  'sign': (dynamic x) => sign((x is Complex ? x.real : x as num).toDouble()),
+  'step': (dynamic x) =>
+      step(x is Complex ? x.real.toDouble() : (x as num).toDouble()),
+  'rect': (dynamic x) =>
+      rect(x is Complex ? x.real.toDouble() : (x as num).toDouble()),
+  'sign': (dynamic x) =>
+      sign(x is Complex ? x.real.toDouble() : (x as num).toDouble()),
   'modF': (dynamic x) => modF((x is Complex ? x.real : x as num).toDouble()),
 
   'mod': (dynamic x, dynamic y) => mod(x, y),
@@ -224,54 +230,45 @@ final Map<String, dynamic> defaultContext = {
   'simplify': (dynamic exp) => Expression.parse(exp.toString()).simplify(),
 
   // Trigonometric functions
-  'sin': (dynamic x) => sin(x is Complex ? x : degToRad(x as num)),
-  'cos': (dynamic x) => cos(x is Complex ? x : degToRad(x as num)),
-  'tan': (dynamic x) => tan(x is Complex ? x : degToRad(x as num)),
-  'csc': (dynamic x) => csc(x is Complex ? x : degToRad(x as num)),
-  'sec': (dynamic x) => sec(x is Complex ? x : degToRad(x as num)),
-  'cot': (dynamic x) => cot(x is Complex ? x : degToRad(x as num)),
-  'asin': (dynamic x) =>
-      x is Complex ? asin(x) : radToDeg((asin(x) as Complex).simplify()),
-  'acos': (dynamic x) =>
-      x is Complex ? acos(x) : radToDeg((acos(x) as Complex).simplify()),
-  'atan': (dynamic x) =>
-      x is Complex ? atan(x) : radToDeg((atan(x) as Complex).simplify()),
-  'atan2': (dynamic a, dynamic b) => a is Complex || b is Complex
-      ? atan2(a, b)
-      : radToDeg(atan2(a as num, b as num)),
-  'asec': (dynamic x) =>
-      x is Complex ? asec(x) : radToDeg((asec(x) as Complex).simplify()),
-  'acsc': (dynamic x) =>
-      x is Complex ? acsc(x) : radToDeg((acsc(x) as Complex).simplify()),
-  'acot': (dynamic x) =>
-      x is Complex ? acot(x) : radToDeg((acot(x) as Complex).simplify()),
-  'sinh': (dynamic x) => sinh(x is Complex ? x : x as num),
-  'cosh': (dynamic x) => cosh(x is Complex ? x : x as num),
-  'tanh': (dynamic x) => tanh(x is Complex ? x : x as num),
-  'csch': (dynamic x) => csch(x is Complex ? x : x as num),
-  'sech': (dynamic x) => sech(x is Complex ? x : x as num),
-  'coth': (dynamic x) => coth(x is Complex ? x : x as num),
-  'asinh': (dynamic x) => asinh(x is Complex ? x : x as num),
-  'acosh': (dynamic x) => acosh(x is Complex ? x : x as num),
-  'atanh': (dynamic x) => atanh(x is Complex ? x : x as num),
-  'acsch': (dynamic x) => acsch(x is Complex ? x : x as num),
-  'asech': (dynamic x) => asech(x is Complex ? x : x as num),
-  'acoth': (dynamic x) => acoth(x is Complex ? x : x as num),
-  'vers': (dynamic x) => vers((x is Complex ? x.real : (x as num)).toDouble()),
-  'covers': (dynamic x) =>
-      covers((x is Complex ? x.real : (x as num)).toDouble()),
-  'havers': (dynamic x) =>
-      havers((x is Complex ? x.real : (x as num)).toDouble()),
-  'exsec': (dynamic x) =>
-      exsec((x is Complex ? x.real : (x as num)).toDouble()),
-  'excsc': (dynamic x) =>
-      excsc((x is Complex ? x.real : (x as num)).toDouble()),
+  'sin': (dynamic x) => sin(x),
+  'cos': (dynamic x) => cos(x),
+  'tan': (dynamic x) => tan(x),
+  'csc': (dynamic x) => csc(x),
+  'sec': (dynamic x) => sec(x),
+  'cot': (dynamic x) => cot(x),
+  'asin': (dynamic x) => asin(x),
+  'acos': (dynamic x) => acos(x),
+  'atan': (dynamic x) => atan(x),
+  'atan2': (dynamic a, dynamic b) => atan2(a, b),
+  'asec': (dynamic x) => asec(x),
+  'acsc': (dynamic x) => acsc(x),
+  'acot': (dynamic x) => acot(x),
+
+  'sinh': (dynamic x) => sinh(x),
+  'cosh': (dynamic x) => cosh(x),
+  'tanh': (dynamic x) => tanh(x),
+  'csch': (dynamic x) => csch(x),
+  'sech': (dynamic x) => sech(x),
+  'coth': (dynamic x) => coth(x),
+
+  'asinh': (dynamic x) => asinh(x),
+  'acosh': (dynamic x) => acosh(x),
+  'atanh': (dynamic x) => atanh(x),
+  'acsch': (dynamic x) => acsch(x),
+  'asech': (dynamic x) => asech(x),
+  'acoth': (dynamic x) => acoth(x),
+  'vers': (dynamic x) => vers(x),
+  'covers': (dynamic x) => covers(x),
+  'havers': (dynamic x) => havers(x),
+  'exsec': (dynamic x) => exsec(x),
+  'excsc': (dynamic x) => excsc(x),
 
   'sawtooth': (dynamic x) => sawtooth(x is Complex ? x.real : x as num),
   'squareWave': (dynamic x) =>
       squareWave(x is Complex ? x.real.toDouble() : (x as num).toDouble()),
   'triangleWave': (dynamic x) =>
       triangleWave(x is Complex ? x.real.toDouble() : (x as num).toDouble()),
+  'sinc': (dynamic x) => sinc(x),
 
   // Statistic functions
   'avg': (dynamic dat) => avg(dat),
@@ -298,22 +295,22 @@ final Map<String, dynamic> defaultContext = {
           r is Complex ? r.real.toInt() : (r as num).toInt())
       .length,
 
-  'mean': (dynamic dat) => mean(dat),
-  'average': (dynamic dat) => mean(dat),
-  'median': (dynamic dat) => median(dat),
-  'mode': (dynamic dat) => mode(dat),
-  'variance': (dynamic dat) => variance(dat),
-  'standardDeviation': (dynamic dat) => stdDev(dat),
-  'stdDev': (dynamic dat) => stdDev(dat),
-  'stdErrMean': (dynamic dat) => stdErrMean(dat),
+  'mean': (dynamic dat) => mean(_sanitizeList(dat)),
+  'average': (dynamic dat) => mean(_sanitizeList(dat)),
+  'median': (dynamic dat) => median(_sanitizeList(dat)),
+  'mode': (dynamic dat) => mode(_sanitizeList(dat)),
+  'variance': (dynamic dat) => variance(_sanitizeList(dat)),
+  'standardDeviation': (dynamic dat) => stdDev(_sanitizeList(dat)),
+  'stdDev': (dynamic dat) => stdDev(_sanitizeList(dat)),
+  'stdErrMean': (dynamic dat) => stdErrMean(_sanitizeList(dat)),
   'stdErrEst': (dynamic x, dynamic y) =>
       stdErrEst(_sanitizeList(x), _sanitizeList(y)),
-  'tValue': (dynamic dat) => tValue(dat),
-  'quartiles': (dynamic dat) => quartiles(dat),
-  'gcf': (dynamic dat) => gcd(dat),
-  'gcd': (dynamic dat) => gcd(dat),
+  'tValue': (dynamic dat) => tValue(_sanitizeList(dat)),
+  'quartiles': (dynamic dat) => quartiles(_sanitizeList(dat)),
+  'gcf': (dynamic dat) => gcd(_sanitizeList(dat)),
+  'gcd': (dynamic dat) => gcd(_sanitizeList(dat)),
 
-  'lcm': (dynamic dat) => lcm(dat),
+  'lcm': (dynamic dat) => lcm(_sanitizeList(dat)),
   'correlation': (dynamic x, dynamic y) =>
       correlation(_sanitizeList(x), _sanitizeList(y)),
   'confidenceInterval': (dynamic dat, dynamic confidence) => confidenceInterval(
@@ -325,7 +322,7 @@ final Map<String, dynamic> defaultContext = {
       regression(_sanitizeList(x), _sanitizeList(y)),
 
   // Missing Basic Math Functions
-  'sinc': (dynamic x) =>
+  'sinc_old': (dynamic x) =>
       sinc(x is Complex ? x.real.toDouble() : (x as num).toDouble()),
   'sumUpTo': (dynamic start, dynamic end, [dynamic step = 1]) => sumUpTo(
       start is Complex ? start.real : start as num,
@@ -429,11 +426,12 @@ final Map<String, dynamic> defaultContext = {
 };
 
 List<num> _sanitizeList(dynamic dat) {
-  if (dat is! List) return (dat as List<num>);
+  if (dat is! List) return <num>[];
   return dat
       .map((e) {
         if (e is Complex) return e.real;
-        return e as num;
+        if (e is num) return e;
+        return 0; // Fallback
       })
       .toList()
       .cast<num>();

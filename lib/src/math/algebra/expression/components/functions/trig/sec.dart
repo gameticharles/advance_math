@@ -6,10 +6,10 @@ class Sec extends TrigonometricExpression {
   @override
   dynamic evaluate([dynamic arg]) {
     var val = operand.evaluate(arg);
-    if (val is Complex) {
-      return Complex.one() / val.cos();
+    if (val is num || val is Complex) {
+      return sec(val);
     }
-    return 1 / cos(val);
+    return Sec(val);
   }
 
   @override

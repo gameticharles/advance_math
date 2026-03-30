@@ -308,7 +308,13 @@ dynamic acot(dynamic x) {
 /// print(sinh(Complex(1, 2))); // Output: -0.4890562590412937 + 1.4031192506220405i
 /// ```
 dynamic sinh(dynamic x) {
-  return x is num ? (exp(x) - exp(-x)) / 2 : x.sinh();
+  if (x is num) {
+    return (exp(x) - exp(-x)) / 2;
+  } else if (x is Complex) {
+    return x.sinh();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Returns the hyperbolic cosine of a number.
@@ -323,7 +329,13 @@ dynamic sinh(dynamic x) {
 /// print(cosh(Complex(1, 2))); // Output: -0.64214812471552 + 1.0686074213827783i
 /// ```
 dynamic cosh(dynamic x) {
-  return x is num ? (exp(x) + exp(-x)) / 2 : x.cosh();
+  if (x is num) {
+    return (exp(x) + exp(-x)) / 2;
+  } else if (x is Complex) {
+    return x.cosh();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Returns the hyperbolic tangent of a number.
@@ -540,8 +552,8 @@ dynamic acoth(dynamic x) {
 /// ```
 ///
 /// The output is `1.0` because the versine of π/2 (or 90 degrees) is 1.
-double vers(num x) {
-  return 1 - math.cos(x);
+dynamic vers(dynamic x) {
+  return x is num ? 1 - math.cos(x) : Complex.one() - cos(x);
 }
 
 /// Coversine function
@@ -557,8 +569,8 @@ double vers(num x) {
 /// ```
 ///
 /// The output is `0.0` because the coversine of π/2 (or 90 degrees) is 0.
-double covers(num x) {
-  return 1 - math.sin(x);
+dynamic covers(dynamic x) {
+  return x is num ? 1 - math.sin(x) : Complex.one() - sin(x);
 }
 
 /// Haversine function
@@ -574,8 +586,8 @@ double covers(num x) {
 /// ```
 ///
 /// The output is `0.0` because the haversine of π/2 (or 90 degrees) is 0.
-double havers(num x) {
-  return 0.5 * (1 - cos(x));
+dynamic havers(dynamic x) {
+  return x is num ? 0.5 * (1 - cos(x)) : Complex(0.5, 0) * (Complex.one() - cos(x));
 }
 
 /// Exsecant function
@@ -589,8 +601,8 @@ double havers(num x) {
 /// ```
 ///
 /// The output is `Infinity` because the exsecant of π/2 (or 90 degrees) is infinity (as sec(π/2) is infinity).
-double exsec(num x) {
-  return 1 / cos(x) - 1;
+dynamic exsec(dynamic x) {
+  return x is num ? 1 / cos(x) - 1 : Complex.one() / cos(x) - Complex.one();
 }
 
 /// Excosecant function
@@ -604,8 +616,8 @@ double exsec(num x) {
 /// ```
 ///
 /// The output is `0.0` because the excosecant of π/2 (or 90 degrees) is 0 (as csc(π/2) is 1).
-double excsc(num x) {
-  return 1 / sin(x) - 1;
+dynamic excsc(dynamic x) {
+  return x is num ? 1 / sin(x) - 1 : Complex.one() / sin(x) - Complex.one();
 }
 
 /// Sawtooth wave function

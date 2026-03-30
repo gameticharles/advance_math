@@ -13,6 +13,7 @@ final Map<String, dynamic> context1 = {
 final Map<String, dynamic> context = {...defaultContext, ...context1};
 
 void main(List<String> args) {
+  print(sinh(1));
   // Example 1: Handle only positional arguments
   dynamic superHeroes = VarArgsFunction((args, kwargs) {
     for (final superHero in args) {

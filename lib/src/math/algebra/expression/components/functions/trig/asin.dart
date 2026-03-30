@@ -11,14 +11,8 @@ class Asin extends TrigonometricExpression {
   @override
   dynamic evaluate([dynamic arg]) {
     var eval = operand.evaluate(arg);
-    if (eval is num) {
-      if (eval < -1 || eval > 1) {
-        throw ArgumentError('asin domain error: $eval not in [-1, 1]');
-      }
+    if (eval is num || eval is Complex) {
       return asin(eval);
-    }
-    if (eval is Complex) {
-      return eval.asin();
     }
     return Asin(eval);
   }

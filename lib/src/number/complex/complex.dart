@@ -9,7 +9,6 @@ import '../util/jenkins_hash.dart';
 
 part 'extensions/num.dart';
 part 'extensions/trigonometric.dart';
-part 'extensions/hyperbolic.dart';
 part 'extensions/operations.dart';
 part 'extensions/special_functions.dart';
 part 'imaginary.dart';

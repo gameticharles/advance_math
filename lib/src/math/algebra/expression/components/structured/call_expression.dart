@@ -11,22 +11,24 @@ class CallExpression extends Expression {
     var evCallee = callee.evaluate(arg);
     var aevArguments = arguments.map((e) => e.evaluate(arg)).toList();
 
-    // Check if the callee is a VarArgsFunction
+    // Check if the callee is a function-like object
     if (evCallee is VarArgsFunction) {
       return evCallee(aevArguments);
     }
 
-    try {
-      return Function.apply(evCallee, aevArguments);
-    } catch (e) {
-      // If the function expects a single List argument (varargs style),
-      // try passing the arguments as a list.
+    if (evCallee is Function) {
       try {
-        return Function.apply(evCallee, [aevArguments]);
-      } catch (_) {
+        return Function.apply(evCallee, aevArguments);
+      } on NoSuchMethodError catch (e) {
+        throw ExpressionEvaluatorException(
+            "Function call mismatched for '$callee': $e");
+      } catch (e) {
         rethrow;
       }
     }
+
+    throw ExpressionEvaluatorException(
+        "Identifier '$callee' evaluated to '${evCallee.runtimeType}' and is not a function.");
   }
 
   @override
