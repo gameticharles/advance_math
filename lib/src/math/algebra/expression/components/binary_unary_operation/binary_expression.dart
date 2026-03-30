@@ -13,7 +13,10 @@ class BinaryExpression extends Expression {
   dynamic evaluate([dynamic arg]) {
     // Helper to unwrap Complex to num when the imaginary part is zero
     dynamic unwrap(dynamic v) {
-      if (v is Complex && v.isReal) return v.simplify();
+      if (v is Complex && v.isReal) {
+        num val = v.real;
+        return val == val.toInt() ? val.toInt() : val;
+      }
       return v;
     }
 

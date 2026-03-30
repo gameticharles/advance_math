@@ -29,8 +29,9 @@ extension ComplexTrigonometricX<T extends Complex> on T {
     if (isNaN) {
       return Complex.nan();
     }
-    final realPart = math.sin(real) * math.cosh(imaginary);
-    final imagPart = math.cos(real) * math.sinh(imaginary);
+
+    final realPart = math.cosh(imaginary) * math.sin(real);
+    final imagPart = math.sinh(imaginary) * math.cos(real);
     return Complex(realPart, imagPart);
   }
 
@@ -60,8 +61,8 @@ extension ComplexTrigonometricX<T extends Complex> on T {
   Complex cos() {
     if (isNaN) return Complex.nan();
 
-    final realPart = math.cos(real) * math.cosh(imaginary);
-    final imagPart = -math.sin(real) * math.sinh(imaginary);
+    final realPart = math.cosh(imaginary) * math.cos(real);
+    final imagPart = -math.sinh(imaginary) * math.sin(real);
     return Complex(realPart, imagPart);
   }
 
@@ -102,9 +103,37 @@ extension ComplexTrigonometricX<T extends Complex> on T {
 
     final real2 = 2.0 * real;
     final imaginary2 = 2.0 * imaginary;
-    final d = math.cos(real2) + math.cosh(imaginary2);
+    final d = math.cosh(imaginary2) + math.cos(real2);
 
-    return Complex(math.sin(real2) / d, math.sinh(imaginary2) / d);
+    return Complex(Complex(math.sin(real2)) / d, math.sinh(imaginary2) / d);
+  }
+
+  /// Calculates the complex two-argument arctangent, atan2(this, other).
+  ///
+  /// This method computes the complex equivalent of the inverse tangent
+  /// function, treating `this` as the y-coordinate (or imaginary part of
+  /// the ratio) and [other] as the x-coordinate.
+  ///
+  /// It evaluates the mathematical formula:
+  /// atan2(a, b) = (1 / 2i) * ln((b + ai) / (b - ai))
+  /// where `a` is `this` complex number and `b` is [other].
+  ///
+  /// The [other] parameter can be either a [num] (which will be automatically
+  /// cast to a purely real complex number) or a [Complex] object.
+  ///
+  /// Returns a new [Complex] number representing the calculated angle.
+  Complex atan2(dynamic other) {
+    // Ensure both are of type Complex for consistency in calculations
+    Complex otherComplex = Complex(other);
+
+    // Using the formula: atan2(a, b) = (1/2i) * log((b + ai) / (b - ai))
+    Complex i = Complex(0, 1);
+
+    // Using Complex(1) to represent the '1' in 1/2i
+    Complex result = (Complex(1) / (i * 2)) *
+        ((otherComplex + i * this) / (otherComplex - i * this)).log();
+
+    return result;
   }
 
   /// ## Arccosine

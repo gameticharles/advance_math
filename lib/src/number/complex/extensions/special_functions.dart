@@ -85,7 +85,7 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
     final t = zMinusOne + Complex(_lanczosG + 0.5, 0);
 
     // Compute result = sqrt(2π) * t^(z-0.5) * e^(-t) * sum
-    final sqrt2Pi = Complex(math.sqrt(2.0 * math.pi), 0);
+    final sqrt2Pi = Complex(dmath.sqrt(2.0 * math.pi), 0);
     final tPower = t.pow(zMinusOne + Complex(0.5, 0));
     final expNegT = (-t).exp();
 
@@ -123,7 +123,7 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
       final lnSinPiZ = piZ.sin().log();
       final oneMinusZ = Complex(1, 0) - this;
       final lnGammaOneMinusZ = oneMinusZ.lnGamma();
-      return Complex(math.log(math.pi), 0) - lnSinPiZ - lnGammaOneMinusZ;
+      return Complex(dmath.log(math.pi), 0) - lnSinPiZ - lnGammaOneMinusZ;
     }
 
     // Lanczos approximation for Re(z) >= 0.5
@@ -141,7 +141,7 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
     final t = zMinusOne + Complex(_lanczosG + 0.5, 0);
 
     // Compute result = 0.5*ln(2π) + (z-0.5)*ln(t) - t + ln(sum)
-    final halfLn2Pi = Complex(0.5 * math.log(2.0 * math.pi), 0);
+    final halfLn2Pi = Complex(0.5 * dmath.log(2.0 * math.pi), 0);
     final lnT = t.log();
     final lnSum = sum.log();
 
@@ -239,7 +239,7 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
     // For small |z|, use the Taylor series expansion
     // erf(z) = (2/√π) * Σ ((-1)^n * z^(2n+1)) / (n! * (2n+1))
     if (abs() < 4.0) {
-      final twoOverSqrtPi = Complex(2.0 / math.sqrt(math.pi), 0);
+      final twoOverSqrtPi = Complex(2.0 / dmath.sqrt(math.pi), 0);
       Complex sum = Complex.zero();
       Complex term = this; // z^1 / 1
       sum = sum + term;
@@ -252,7 +252,7 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
         sum = sum + nextTerm;
 
         // Adaptive check: stop when term is negligible relative to sum
-        if (nextTerm.abs() < epsilon * sum.abs()) break;
+        if (nextTerm.abs() < sum.abs() * epsilon) break;
       }
 
       return twoOverSqrtPi * sum;
@@ -301,7 +301,7 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
 
   /// Taylor series for erf (used internally)
   Complex _erfTaylor({double epsilon = 1e-15, int maxIterations = 100}) {
-    final twoOverSqrtPi = Complex(2.0 / math.sqrt(math.pi), 0);
+    final twoOverSqrtPi = Complex(2.0 / dmath.sqrt(math.pi), 0);
     Complex sum = Complex.zero();
     Complex term = this;
     sum = sum + term;
@@ -312,7 +312,7 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
       term = term * (-zSquared) / Complex(n.toDouble(), 0);
       final nextTerm = term / Complex((2 * n + 1).toDouble(), 0);
       sum = sum + nextTerm;
-      if (nextTerm.abs() < epsilon * sum.abs()) break;
+      if (nextTerm.abs() < sum.abs() * epsilon) break;
     }
 
     return twoOverSqrtPi * sum;
@@ -323,7 +323,7 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
     // erfc(z) ≈ (e^(-z²) / (z√π)) * Σ ((-1)^n * (2n-1)!! / (2z²)^n)
     final zSquared = this * this;
     final expNegZSquared = (-zSquared).exp();
-    final prefactor = expNegZSquared / (this * Complex(math.sqrt(math.pi), 0));
+    final prefactor = expNegZSquared / (this * Complex(dmath.sqrt(math.pi), 0));
 
     Complex sum = Complex(1, 0);
     Complex term = Complex(1, 0);
@@ -332,7 +332,7 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
     for (int n = 1; n <= maxIterations; n++) {
       term = term * Complex(-(2 * n - 1).toDouble(), 0) / twoZSquared;
       sum = sum + term;
-      if (term.abs() < epsilon * sum.abs()) break;
+      if (term.abs() < sum.abs() * epsilon) break;
     }
 
     return prefactor * sum;
@@ -404,7 +404,7 @@ extension ComplexSpecialFunctionsX<T extends Complex> on T {
       eta = eta + term;
       // Basic convergence check
       if (eta.abs() > epsilon &&
-          term.abs() < (epsilon * 1e-5) * eta.abs() &&
+          term.abs() < eta.abs() * (epsilon * 1e-5) &&
           n > 20) {
         break;
       }

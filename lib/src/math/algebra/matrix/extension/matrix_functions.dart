@@ -349,6 +349,101 @@ extension MatrixFunctions on Matrix {
     return result;
   }
 
+  /// Element-wise versine
+  Matrix vers() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = 1 - math.cos(this[i][j]);
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise coversine
+  Matrix covers() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = 1 - math.sin(this[i][j]);
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise haversine
+  Matrix havers() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = 0.5 * (1 - math.cos(this[i][j]));
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise exsecant
+  Matrix exsec() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = 1 / math.cos(this[i][j]) - 1;
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise excosecant
+  Matrix excsc() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = 1 / math.sin(this[i][j]) - 1;
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise sawtooth wave
+  Matrix sawtooth() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = this[i][j] - math.floor(this[i][j]);
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise square wave
+  Matrix squareWave() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        result[i][j] = (this[i][j] % 2 < 1) ? -1 : 1;
+      }
+    }
+    return result;
+  }
+
+  /// Element-wise triangle wave
+  Matrix triangleWave() {
+    Matrix result = Matrix.zeros(rowCount, columnCount, isDouble: true);
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < columnCount; j++) {
+        num val = this[i][j] % 1;
+        if (val < 0.25) {
+          result[i][j] = 4 * val;
+        } else if (val < 0.75) {
+          result[i][j] = 2 - 4 * val;
+        } else {
+          result[i][j] = 4 * val - 4;
+        }
+      }
+    }
+    return result;
+  }
+
   /// Raises this matrix to a given power.
   /// Uses eigenvalue decomposition for non-integer powers and binary exponentiation for integer powers.
   ///

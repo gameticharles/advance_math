@@ -164,7 +164,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
     }
     int n = diagonal.length;
     List<List<dynamic>> data = List.generate(
-        n, (i) => List.generate(n, (j) => i == j ? diagonal[i] : 0));
+        n, (i) => List.generate(n, (j) => i == j ? Complex(diagonal[i]) : Complex.zero()));
     return Matrix(data);
   }
 
@@ -228,7 +228,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
     List<List<dynamic>> data = List.generate(
         rows,
         (_) => List.generate(cols,
-            (_) => sourceIndex < source.length ? source[sourceIndex++] : 0));
+            (_) => sourceIndex < source.length ? Complex(source[sourceIndex++]) : Complex.zero()));
     return Matrix(data);
   }
 
@@ -261,7 +261,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
     }
 
     List<List<dynamic>> data =
-        List.generate(numRows, (i) => List.filled(columns.length, 0));
+        List.generate(numRows, (i) => List.filled(columns.length, Complex.zero()));
     for (int j = 0; j < columns.length; j++) {
       for (int i = 0; i < numRows; i++) {
         data[i][j] = columns[j].getValueAt(i);
@@ -354,7 +354,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
         if (resize) {
           // Copy and resize rows
           for (List<dynamic> row in matrix) {
-            data.add(row + List<dynamic>.filled(commonSize - row.length, 0));
+            data.add(row + List<dynamic>.filled(commonSize - row.length, Complex.zero()));
           }
         } else {
           // Directly concatenate original rows
@@ -379,7 +379,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
             }
           } else {
             // Add padding row
-            data[i] += List<dynamic>.filled(commonSize, 0);
+            data[i] += List<dynamic>.filled(commonSize, Complex.zero());
           }
         }
       }
@@ -563,7 +563,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
 
     // Pre-compute the final size of the matrix and allocate memory at once.
     List<List<dynamic>> matrix = List.generate(
-        rows * blockSize, (_) => List<num>.filled(cols * blockSize, 0));
+        rows * blockSize, (_) => List<dynamic>.filled(cols * blockSize, Complex.zero()));
 
     // Re-order loops for more linear data access.
     for (int row = 0; row < blockSize; ++row) {
@@ -1156,15 +1156,15 @@ class Matrix extends IterableMixin<List<dynamic>> {
 
     if (k > 0) {
       for (int i = 0; i < n - k; i++) {
-        diagonal.add(data[i][i + k].simplify());
+        diagonal.add(data[i][i + k]);
       }
     } else if (k < 0) {
       for (int i = 0; i < n + k; i++) {
-        diagonal.add(data[i - k][i].simplify());
+        diagonal.add(data[i - k][i]);
       }
     } else {
       for (int i = 0; i < n; i++) {
-        diagonal.add(data[i][i].simplify());
+        diagonal.add(data[i][i]);
       }
     }
 

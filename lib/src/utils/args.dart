@@ -80,7 +80,7 @@ class VarArgsFunction<T> {
   /// var func = VarArgsFunction<int>((args, kwargs) => args.length);
   /// print(func(1, 2, 3)); // Outputs: 3
   /// ```
-  T call(dynamic args, {Map<String, dynamic> kwargs = const {}}) {
+  T call(dynamic args, {Map<String, dynamic> kwargs = const <String, dynamic>{}}) {
     try {
       // Handle different types of arguments
       List<dynamic> processedArgs;
@@ -164,7 +164,7 @@ class VarArgsFunction<T> {
         final newArgs = [...collectedArgs, arg];
         if (remaining <= 1) {
           // If we've collected all arguments, call the original function
-          return callback(newArgs, {});
+          return callback(newArgs, <String, dynamic>{});
         } else {
           // Otherwise, return a function that collects the next argument
           return curryHelper(newArgs, remaining - 1);
@@ -193,7 +193,7 @@ class VarArgsFunction<T> {
   /// ```
   VarArgsFunction<T> partial(
       [List<dynamic> preArgs = const [],
-      Map<String, dynamic> preKwargs = const {}]) {
+      Map<String, dynamic> preKwargs = const <String, dynamic>{}]) {
     return VarArgsFunction<T>((args, kwargs) {
       final combinedArgs = [...preArgs, ...args];
       final combinedKwargs = {...preKwargs, ...kwargs};

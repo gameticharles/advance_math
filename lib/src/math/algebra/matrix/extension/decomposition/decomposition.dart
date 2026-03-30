@@ -301,7 +301,7 @@ class MatrixDecomposition {
     Matrix Q = Matrix.eye(A.rowCount);
     Matrix R = A.copy();
 
-    for (int k = 0; k < math.min(A.rowCount, A.columnCount); k++) {
+    for (int k = 0; k < dmath.min(A.rowCount, A.columnCount); k++) {
       var columnVector = R.column(k).slice(k, A.rowCount);
       Matrix pk = _Utils.householderReflection(columnVector);
       Matrix P = Matrix.eye(A.rowCount);
@@ -701,7 +701,7 @@ class MatrixDecomposition {
         // Create S matrix with absolute eigenvalues on diagonal
         Matrix S = Matrix.zeros(_matrix.rowCount, _matrix.columnCount);
         for (int i = 0;
-            i < math.min(_matrix.rowCount, _matrix.columnCount);
+            i < dmath.min(_matrix.rowCount, _matrix.columnCount);
             i++) {
           S[i][i] = eig.D[i][i]; // Use absolute values for singular values
         }
@@ -764,7 +764,7 @@ class MatrixDecomposition {
 
     // Create S matrix with square roots of eigenvalues of A^T*A
     Matrix S = Matrix.zeros(_matrix.rowCount, _matrix.columnCount);
-    int minDim = math.min(_matrix.rowCount, _matrix.columnCount);
+    int minDim = dmath.min(_matrix.rowCount, _matrix.columnCount);
     for (int i = 0; i < minDim; i++) {
       S[i][i] = math.sqrt(eigV.D[i][i].abs());
     }
@@ -781,7 +781,7 @@ class MatrixDecomposition {
 
   // Helper method to sort singular values in descending order and adjust U and V accordingly
   void _sortSingularValues(Matrix S, Matrix U, Matrix V) {
-    int minDim = math.min(S.rowCount, S.columnCount);
+    int minDim = dmath.min(S.rowCount, S.columnCount);
 
     // Create list of indices and values for sorting
     List<MapEntry<int, dynamic>> singularValues = [];

@@ -392,7 +392,7 @@ class SingularValueDecomposition extends Decomposition {
     dynamic maxSingularValue = S[0][0];
     dynamic minSingularValue = maxSingularValue;
 
-    int minDim = math.min(S.rowCount, S.columnCount);
+    int minDim = dmath.min(S.rowCount, S.columnCount);
     for (int i = 0; i < minDim; i++) {
       if (S[i][i] != Complex.zero() && S[i][i].abs() < minSingularValue.abs()) {
         minSingularValue = S[i][i];

@@ -16,16 +16,18 @@ class Pow extends BinaryOperationsExpression {
 
     // If both evaluate to numbers, return the sum as a number
     if (leftEval is Matrix) {
-      return (leftEval ^ rightEval);
+      int exp = rightEval is Complex ? rightEval.real.toInt() : (rightEval as num).toInt();
+      return (leftEval ^ exp);
     }
     if (rightEval is Matrix) {
-      return (leftEval ^ rightEval);
+      int exp = leftEval is Complex ? leftEval.real.toInt() : (leftEval as num).toInt();
+      return (rightEval ^ exp);
     }
     if (leftEval is Complex || rightEval is Complex) {
-      return Complex(leftEval).pow(Complex(rightEval)).simplify();
+      return Complex(leftEval).pow(Complex(rightEval));
     }
     if (leftEval is num && rightEval is num) {
-      return pow(leftEval, rightEval);
+      return Complex(pow(leftEval, rightEval));
     }
 
     // If x is null and either operand contains a Variable, return the simplified version of the expression

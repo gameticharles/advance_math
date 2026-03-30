@@ -53,9 +53,11 @@ num sumUpTo(num start, num end, {num step = 1}) {
 /// ```
 dynamic abs(dynamic x) {
   if (x is num) {
-    return x.abs();
+    return Complex(x.abs());
   } else if (x is Complex) {
     return x.abs();
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).abs();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -68,14 +70,10 @@ dynamic abs(dynamic x) {
 /// print(sqrt(9));  // Output: 3.0
 /// ```
 dynamic sqrt(dynamic x) {
-  if (x is num) {
-    if (x >= 0) {
-      return math.sqrt(x);
-    } else {
-      return Complex(0, math.sqrt(-x));
-    }
-  } else if (x is Complex) {
-    return x.sqrt();
+  if (x is num || x is Complex) {
+    return Complex(x).sqrt();
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).sqrt();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -98,15 +96,11 @@ dynamic cbrt(dynamic x) {
 /// // The cube root of 8 will be:
 /// print(nthRoot(8, 3));  // Output: 2.0
 /// ```
-dynamic nthRoot(dynamic x, int nth) {
-  if (x is num) {
-    if (x >= 0) {
-      return math.pow(x, 1 / nth);
-    } else {
-      return Complex(x, 0).nthRoot(nth);
-    }
-  } else if (x is Complex) {
-    return x.nthRoot(nth);
+dynamic nthRoot(dynamic x, dynamic nth) {
+  if (x is num || x is Complex) {
+    return Complex(x).nthRoot(nth.toInt());
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).nthRoot(nth.toInt());
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -120,9 +114,11 @@ dynamic nthRoot(dynamic x, int nth) {
 /// ```
 dynamic exp(dynamic x) {
   if (x is num) {
-    return math.exp(x);
+    return Complex(math.exp(x));
   } else if (x is Complex) {
     return x.exp();
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).exp();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -141,20 +137,10 @@ dynamic exp(dynamic x) {
 /// print(pow(2, xxx));  // Output: 0.36691394948660344 + 1.9660554808224875i
 /// ```
 dynamic pow(dynamic x, dynamic exponent) {
-  if (x is num) {
-    if (exponent is num) {
-      if (x >= 0) {
-        return math.pow(x, exponent);
-      } else {
-        return Complex(x).pow(exponent);
-      }
-    } else if (exponent is Complex) {
-      return Complex(x).pow(exponent);
-    } else {
-      throw ArgumentError('Exponent should be either num or Complex');
-    }
-  } else if (x is Complex) {
-    return x.pow(exponent);
+  if (x is num || x is Complex) {
+    return Complex(x).pow(exponent);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).pow(exponent);
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -173,10 +159,10 @@ dynamic pow(dynamic x, dynamic exponent) {
 /// ```dart
 /// print(step(0.5));  // Output: 1
 /// ```
-double step(double x) {
-  if (x > 0) return 1;
-  if (x < 0) return 0;
-  return 0.5;
+Complex step(double x) {
+  if (x > 0) return Complex.one();
+  if (x < 0) return Complex.zero();
+  return Complex(0.5);
 }
 
 /// Rectangle function.
@@ -192,11 +178,11 @@ double step(double x) {
 /// ```dart
 /// print(rect(0.5));  // Output: 0.5
 /// ```
-dynamic rect(double x) {
+Complex rect(double x) {
   x = x.abs();
-  if (x == 0.5) return x;
-  if (x > 0.5) return 0;
-  return 1;
+  if (x == 0.5) return Complex(x);
+  if (x > 0.5) return Complex.zero();
+  return Complex.one();
 }
 
 /// Sinc function also called the "sampling function"
@@ -212,7 +198,7 @@ dynamic rect(double x) {
 /// print(sinc(1));    // Output: 0.8414709848078965 (approximate value of sin(1)/1)
 /// ```
 dynamic sinc(dynamic x) {
-  if (x == 0 || x == Complex.zero()) return 1;
+  if (x == 0 || x == Complex.zero()) return Complex.one();
   return sin(x) / x;
 }
 
@@ -235,8 +221,7 @@ dynamic sinc(dynamic x) {
 /// - Parameter [x]: The double value to be split.
 /// - Returns: A map with keys `fraction` and `integer`.
 ({double fraction, int integer}) modF(double x) {
-  var intP = floor(x);
-  x.floor();
+  var intP = x.floor();
   return (fraction: x - intP, integer: intP);
 }
 
@@ -289,8 +274,8 @@ dynamic modInv(num a, num m) {
   a = ((a % m) + m) % m;
 
   var v = egcd([a, m]).first;
-  num gcd = v[0];
-  num x = v[1];
+  dynamic gcd = v[0];
+  dynamic x = v[1];
 
   if (gcd != 1) return null;
   return ((x + m) % m) % m;
@@ -331,9 +316,9 @@ dynamic nChooseRModPrime(int N, int R, int P) {
   }
 
   return ((factorial[N] *
-          modInv(factorial[R], P) %
+          modInv(factorial[R], P).real %
           P *
-          modInv(factorial[N - R], P) %
+          modInv(factorial[N - R], P).real %
           P) %
       P);
 }
@@ -393,11 +378,11 @@ BigInt bigIntNChooseRModPrime(int N, int R, int P) {
 /// ```dart
 /// print(floor(2.3));  // Output: 2
 /// ```
-dynamic floor(dynamic x) {
+Complex floor(dynamic x) {
   if (x is num) {
-    return x.floor();
+    return Complex(x.floor());
   } else if (x is Complex) {
-    return x.real.floor();
+    return x.floor();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -409,11 +394,11 @@ dynamic floor(dynamic x) {
 /// ```dart
 /// print(ceil(2.3));  // Output: 3
 /// ```
-dynamic ceil(dynamic x) {
+Complex ceil(dynamic x) {
   if (x is num) {
-    return x.ceil();
+    return Complex(x.ceil());
   } else if (x is Complex) {
-    return x.real.ceil();
+    return x.ceil();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -434,16 +419,16 @@ dynamic ceil(dynamic x) {
 ///
 /// [x] is the number to be rounded.
 /// [decimalPlaces] specifies the number of decimal places to round to.
-dynamic round(dynamic x, [int decimalPlaces = 0]) {
+Complex round(dynamic x, [int decimalPlaces = 0]) {
   if (x is num) {
     if (decimalPlaces == 0) {
-      return x.round();
+      return Complex(x.round());
     } else {
-      return (x * math.pow(10, decimalPlaces)).round() /
-          math.pow(10, decimalPlaces);
+      return Complex((x * math.pow(10, decimalPlaces)).round() /
+          math.pow(10, decimalPlaces));
     }
   } else if (x is Complex) {
-    return x.roundTo(decimals: decimalPlaces).simplify();
+    return x.roundTo(decimals: decimalPlaces);
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -459,13 +444,12 @@ dynamic round(dynamic x, [int decimalPlaces = 0]) {
 /// ```
 dynamic max = VarArgsFunction((args, kwargs) {
   var list = _flattenArgs(args);
-  if (list.isEmpty) return 0;
+  if (list.isEmpty) return Complex(0);
   var nums = list.map((e) {
-    if (e is Complex && e.isReal && e.imaginary == 0) return e.real;
     return e;
   }).toList();
   return nums.reduce((curr, next) {
-    if (curr is num && next is num) return math.max(curr, next);
+    if (curr is num && next is num) return Complex(math.max(curr, next));
     // Fallback equality logic if needed or comparable
     // For now assume num or comparable
     return (curr as dynamic) > (next as dynamic) ? curr : next;
@@ -482,38 +466,34 @@ dynamic max = VarArgsFunction((args, kwargs) {
 /// ```
 dynamic min = VarArgsFunction((args, kwargs) {
   var list = _flattenArgs(args);
-  if (list.isEmpty) return 0;
+  if (list.isEmpty) return Complex(0);
   var nums = list.map((e) {
-    if (e is Complex && e.isReal && e.imaginary == 0) return e.real;
     return e;
   }).toList();
   return nums.reduce((curr, next) {
-    if (curr is num && next is num) return math.min(curr, next);
+    if (curr is num && next is num) return Complex(math.min(curr, next));
     return (curr as dynamic) < (next as dynamic) ? curr : next;
   });
 });
 
-/// Returns the hypotenuse or Euclidean norm, sqrt(xx + yy).
+/// Returns the hypotenuse or Euclidean norm, sqrt(|x|² + |y|²).
+///
+/// This calculates the Euclidean distance from the origin to the point (x, y).
+/// It correctly handles both real numbers and complex magnitudes, always
+/// returning a real number ([double]).
 ///
 /// Example:
 /// ```dart
 /// print(hypot(3, 4));  // Output: 5.0
 /// print(hypot(Complex(3, 0), Complex(0, 4))); // Output: 5.0
 /// ```
-dynamic hypot(dynamic x, dynamic y) {
-  if (x is num && y is num) {
-    return math.sqrt(x * x + y * y);
-  } else {
-    // Convert to Complex if needed
-    Complex cx = x is Complex ? x : Complex(x);
-    Complex cy = y is Complex ? y : Complex(y);
+num hypot(dynamic x, dynamic y) {
+  // Extract the absolute magnitude as a double
+  num normX = (x is Complex) ? x.abs().real : (x as num);
+  num normY = (y is Complex) ? y.abs().real : (y as num);
 
-    // Calculate x² + y²
-    Complex sumOfSquares = (cx * cx) + (cy * cy);
-
-    // Take the square root and simplify
-    return sqrt(sumOfSquares).simplify();
-  }
+  // Calculate the standard Euclidean norm using the real magnitudes
+  return math.sqrt((normX * normX) + (normY * normY));
 }
 
 /// Returns the sign of a number.
@@ -529,9 +509,9 @@ dynamic hypot(dynamic x, dynamic y) {
 /// ```
 dynamic sign(dynamic x) {
   if (x is num) {
-    return x < 0 ? -1 : (x > 0 ? 1 : 0);
+    return Complex(x < 0 ? -1 : (x > 0 ? 1 : 0));
   } else if (x is Complex) {
-    return x.sign;
+    return Complex(x.sign);
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -548,9 +528,9 @@ dynamic sign(dynamic x) {
 /// ```
 dynamic clamp(dynamic x, num min, num max) {
   if (x is num) {
-    return x < min ? min : (x > max ? max : x);
+    return Complex(x < min ? min : (x > max ? max : x));
   } else if (x is Complex) {
-    return x.clamp(min, max).simplify();
+    return x.clamp(min, max);
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -565,15 +545,14 @@ dynamic clamp(dynamic x, num min, num max) {
 /// ```
 dynamic lerp(dynamic a, dynamic b, num t) {
   if (a is num && b is num) {
-    return a + (b - a) * t;
+    return Complex(a + (b - a) * t);
   } else {
     // Convert to Complex if needed
     Complex ca = a is Complex ? a : Complex(a, 0);
     Complex cb = b is Complex ? b : Complex(b, 0);
 
     // Calculate a + (b - a) * t
-    Complex result = ca + ((cb - ca) * Complex(t, 0));
-    return result.simplify();
+    return ca + ((cb - ca) * Complex(t, 0));
   }
 }
 
@@ -616,13 +595,13 @@ dynamic lerp(dynamic a, dynamic b, num t) {
 /// print(pol(49.8963653545486, 25.42346798541462)); // {'r': 56.0, 'theta': 0.471238898038469}
 /// print(pol(49.8963653545486, 25.42346798541462, isDegrees: true)); // {'r': 56.0, 'theta': 27.000000000000004}
 /// ```
-({double r, double theta}) pol(num x, num y, {bool isDegrees = false}) {
-  double r = sqrt(x * x + y * y);
-  double theta = atan2(y, x);
+({dynamic r, dynamic theta}) pol(num x, num y, {bool isDegrees = false}) {
+  dynamic r = sqrt(x * x + y * y);
+  dynamic theta = atan2(y, x);
   if (isDegrees) {
-    theta = toDegrees(theta);
+    theta = toDegrees(theta.real);
   }
-  return (r: r, theta: theta);
+  return (r: r, theta: theta.toDouble());
 }
 
 /// Determines whether two floating-point numbers are approximately equal.
@@ -867,7 +846,7 @@ int nthPrime(int n) {
 /// print(isPerfectSquare(9)); // prints: true
 /// ```
 bool isPerfectSquare(int n) {
-  int x = sqrt(n).toInt();
+  dynamic x = sqrt(n).toInt();
   return x * x == n;
 }
 
@@ -878,7 +857,7 @@ bool isPerfectSquare(int n) {
 /// print(isPerfectCube(8)); // prints: true
 /// ```
 bool isPerfectCube(int n) {
-  int x = pow(n, 1 / 3).round();
+  dynamic x = pow(n, 1 / 3).round();
   return x * x * x == n;
 }
 
@@ -889,7 +868,7 @@ bool isPerfectCube(int n) {
 /// print(isFibonacci(8)); // prints: true
 /// ```
 bool isFibonacci(int n) {
-  int x = 5 * n * n;
+  dynamic x = 5 * n * n;
   return isPerfectSquare(x + 4) || isPerfectSquare(x - 4);
 }
 
@@ -1909,5 +1888,5 @@ bool isHappyNumber(int n) {
 /// ```
 double ldexp(num x, int exp) {
   // Simple implementation using pow, optimization possible with bit ops
-  return (x * pow(2, exp)).toDouble();
+  return (pow(2, exp) * x).toDouble();
 }

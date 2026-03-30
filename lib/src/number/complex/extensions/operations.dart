@@ -78,7 +78,7 @@ extension ComplexOperationX<T extends Complex> on T {
     // Compute the argument (phase) for the principal root
     final baseAngle = argument;
     final normalizedAngle =
-        baseAngle < 0 ? baseAngle + (2 * math.pi) : baseAngle;
+        baseAngle.real < 0 ? baseAngle.real + (2 * math.pi) : baseAngle.real;
     final nthPhi = normalizedAngle / absN;
 
     // For all roots, we need to compute each root with a different angle
@@ -86,7 +86,7 @@ extension ComplexOperationX<T extends Complex> on T {
       final slice = 2 * math.pi / absN;
       var roots = List<Complex>.generate(absN, (k) {
         final angle = nthPhi + k * slice;
-        final root = Complex.polar(nthRootOfAbs, angle);
+        final root = Complex.polar(nthRootOfAbs.real, angle);
 
         // If n is negative, return the reciprocal
         return isNegativeN ? ~root : root;
@@ -95,7 +95,7 @@ extension ComplexOperationX<T extends Complex> on T {
       return roots;
     } else {
       // Return only the principal root
-      final principalRoot = Complex.polar(nthRootOfAbs, nthPhi);
+      final principalRoot = Complex.polar(nthRootOfAbs.real, nthPhi);
 
       // If n is negative, return the reciprocal
       return isNegativeN ? ~principalRoot : principalRoot;
@@ -348,8 +348,7 @@ extension ComplexOperationX<T extends Complex> on T {
   /// [upperLimit] and whose imaginary portion is the same as the imaginary value in this Complex number.
   dynamic clamp(dynamic lowerLimit, dynamic upperLimit) {
     return Complex(real.clamp(lowerLimit, upperLimit),
-            imaginary.clamp(lowerLimit, upperLimit))
-        .simplify();
+        imaginary.clamp(lowerLimit, upperLimit));
   }
 
   /// Returns the floor of the real portion of this complex number.
@@ -409,7 +408,7 @@ extension ComplexOperationX<T extends Complex> on T {
       // Round both parts to integers
       // Return simplified version (num or Complex)
       return asComplex
-          ? Complex(real.round(), imaginary.round()).simplify()
+          ? Complex(real.round(), imaginary.round())
           : real.round();
     }
 
@@ -422,10 +421,7 @@ extension ComplexOperationX<T extends Complex> on T {
         ? imaginary
         : (imaginary * factor).round() / factor;
 
-    final roundedComplex = Complex(roundedReal, roundedImag);
-
-    // Return simplified version (num or Complex)
-    return roundedComplex.simplify();
+    return Complex(roundedReal, roundedImag);
   }
 
   /// Returns the real portion of this complex number, truncated to an Integer.
@@ -450,7 +446,7 @@ extension ComplexOperationX<T extends Complex> on T {
   /// ```dart
   /// Complex(1, 2).distanceTo(Complex(4, 6))  // 5.0
   /// ```
-  num distanceTo(Complex other) {
+  Complex distanceTo(Complex other) {
     return (this - other).abs();
   }
 
@@ -520,11 +516,11 @@ extension ComplexOperationX<T extends Complex> on T {
   Complex rotate(num angleRadians) {
     final mag = abs();
     final newAngle = argument + angleRadians;
-    return Complex.polar(mag, newAngle);
+    return Complex.polar(mag, newAngle.real);
   }
 
   /// Returns a complex number with the same magnitude but opposite phase.
   Complex flipPhase() {
-    return Complex.polar(abs(), argument + math.pi);
+    return Complex.polar(abs(), argument.real + math.pi);
   }
 }

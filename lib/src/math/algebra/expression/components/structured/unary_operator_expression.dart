@@ -21,8 +21,9 @@ class UnaryExpression extends Expression {
       if (operandVal is double && operandVal == operandVal.truncateToDouble()) {
         operandVal = operandVal.toInt();
       }
-      if (operandVal is int && operandVal >= 0) {
-        return factorial(operandVal);
+
+      if (operandVal >= 0) {
+        return factorial(operandVal.toInt());
       } else {
         throw Exception(
             'Factorial is only defined for non-negative integers, got: $operandVal (${operandVal.runtimeType})');

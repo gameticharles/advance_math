@@ -69,19 +69,20 @@ class Imaginary extends Complex {
 
   /// Returns the magnitude of this imaginary number (absolute value of coefficient).
   @override
-  num abs() => coefficient.abs();
+  Complex abs() => Complex(coefficient.abs());
 
   /// The complex modulus is the absolute value of this Imaginary number.
   @override
-  num get complexModulus => coefficient.abs();
+  Complex get complexModulus => Complex(coefficient.abs());
 
   /// The complex argument, or phase, of this imaginary number in radians.
   @override
-  num get complexArgument => coefficient < 0 ? -math.pi / 2.0 : math.pi / 2.0;
+  Complex get complexArgument =>
+      Complex(coefficient < 0 ? -math.pi / 2.0 : math.pi / 2.0);
 
   /// The phase is synonymous with the complex argument.
   @override
-  num get phase => complexArgument;
+  Complex get phase => complexArgument;
 
   /// If [obj] is an [Imaginary] number then the comparison is made in the imaginary dimension.
   /// For all other types of numbers the comparison is made in the real dimension, so this [Imaginary] number
@@ -111,19 +112,19 @@ class Imaginary extends Complex {
 
   /// The integer ceiling of a purely imaginary number is always zero.
   @override
-  num ceil() => 0;
+  Complex ceil() => Complex(0);
 
   /// The integer floor of a purely imaginary number is always zero.
   @override
-  int floor() => 0;
+  Complex floor() => Complex(0);
 
   /// The nearest integer of a purely imaginary number is always zero.
   @override
-  int round() => 0;
+  Complex round() => Complex(0);
 
   /// The integer resulting from truncation of a purely imaginary number is always zero.
   @override
-  int truncate() => 0;
+  Complex truncate() => Complex(0);
 
   /// Support [dart:convert] json.
   ///

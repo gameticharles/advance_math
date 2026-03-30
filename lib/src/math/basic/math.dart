@@ -279,8 +279,8 @@ class Random implements math.Random, AbstractRandomProvider {
   double nextGaussian({double mean = 0.0, double stddev = 1.0}) {
     double u1 = _random.nextDouble();
     double u2 = _random.nextDouble();
-    double z0 = sqrt(-2.0 * log(u1)) * cos(2.0 * pi * u2);
-    return mean + z0 * stddev;
+    final z0 = sqrt(log(u1) * -2.0) * cos((pi * u2) * 2.0);
+    return mean + z0.real * stddev;
   }
 
   /// Generates a random UUID (version 4).

@@ -5,6 +5,8 @@ part of 'expression.dart';
 final Map<String, dynamic> defaultContext =
     ExpressionContext.buildDefaultContext();
 
+int _toInt(dynamic v) => v is Complex ? v.real.toInt() : (v as num).toInt();
+
 /// A class that provides the default context for mathematical expressions.
 class ExpressionContext {
   /// Builds the default context by merging various specialized contexts.
@@ -98,49 +100,18 @@ class ExpressionContext {
         'rad2deg': AngleConstants.d180OverPi,
 
         // Basic Math functions
-        'log': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).log()
-            : (x is Complex ? x.log() : math.log(x as num)),
-        'ln': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).log()
-            : (x is Complex ? x.log() : math.log(x as num)),
-        'exp': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).exp()
-            : (x is Complex ? x.exp() : math.exp(x as num)),
-        'pow': (dynamic x, dynamic y) => x is Matrix
-            ? MatrixFunctions(x).pow(y is Complex ? y.real : y as num)
-            : (x is Complex
-                ? x.pow(y)
-                : (y is Complex
-                    ? Complex(x).pow(y)
-                    : (y is Matrix
-                        ? MatrixFunctions(y).pow(x as num)
-                        : math.pow(x as num, y as num)))),
-        'abs': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).abs()
-            : (x is Complex ? x.abs() : math.abs(x as num)),
-        'sqrt': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).sqrt()
-            : (x is Complex ? x.sqrt() : math.sqrt(x as num)),
-        'cbrt': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).nthRoot(3)
-            : (x is Complex ? x.nthRoot(3) : math.cbrt(x as num)),
-        'nthRoot': (dynamic x, dynamic n) => x is Matrix
-            ? MatrixFunctions(x)
-                .nthRoot((n is Complex ? n.real : n as num).toInt())
-            : (x is Complex
-                ? x.nthRoot(n is Complex ? n.real : n as num)
-                : (n is Complex
-                    ? Complex(x).pow(1 / n.real)
-                    : math.nthRoot(x as num, (n as num).toInt()))),
-        'logBase': (dynamic b, dynamic x) => x is Matrix
-            ? MatrixFunctions(x).logn((b is Complex ? b.real : b as num))
-            : (x is Complex
-                ? x.logBase(b is Complex ? b.real : b as num)
-                : math.logBase(b, x)),
-        'log10': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).logn(10)
-            : (x is Complex ? x.log10() : math.log10(x)),
+        'log': (dynamic x) => log(x),
+        'ln': (dynamic x) => log(x),
+        'exp': (dynamic x) => exp(x),
+        'pow': (dynamic x, dynamic y) => pow(x, y),
+        'abs': (dynamic x) => abs(x),
+        'sqrt': (dynamic x) => sqrt(x),
+
+        'cbrt': (dynamic x) => cbrt(x),
+        'nthRoot': (dynamic x, dynamic n) => nthRoot(x, n),
+        'logBase': (dynamic b, dynamic x) => logBase(b, x),
+        'log10': (dynamic x) => log10(x),
+
         'fact': (dynamic x) =>
             factorial(x is Complex ? x.real.toInt() : (x as num).toInt()),
         'factorial': (dynamic x) =>
@@ -171,10 +142,9 @@ class ExpressionContext {
                 n is Complex ? n.real.toInt() : (n as num).toInt(),
                 r is Complex ? r.real.toInt() : (r as num).toInt(),
                 p is Complex ? p.real.toInt() : (p as num).toInt()),
-        'floor': (dynamic x) => floor(x is Complex ? x.real : x as num),
-        'ceil': (dynamic x) => ceil(x is Complex ? x.real : x as num),
-        'hypot': (dynamic x, dynamic y) => hypot(
-            x is Complex ? x.real : x as num, y is Complex ? y.real : y as num),
+        'floor': (dynamic x) => x is Complex ? x.floor() : floor(x as num),
+        'ceil': (dynamic x) => x is Complex ? x.ceil() : ceil(x as num),
+        'hypot': (dynamic x, dynamic y) => hypot(x, y),
         // 'hypot': (dynamic x, dynamic y) => x is Complex
         // ? Complex.hypot(x, Complex(y))
         // : (y is Complex
@@ -184,23 +154,18 @@ class ExpressionContext {
           final dp = decimalPlaces is Complex
               ? decimalPlaces.real.toInt()
               : (decimalPlaces as num).toInt();
-          final xVal = x is Complex && x.isReal ? x.simplify() : x;
-          return round(xVal is num ? xVal : x, dp);
+          return round(x, dp);
         },
-        'roundDecimal': (dynamic x, dynamic n) => round(
-            x is Complex ? x.real : x as num,
-            n is Complex ? n.real.toInt() : (n as num).toInt()),
-        'roundTo': (dynamic x, dynamic n) => round(
-            x is Complex ? x.real : x as num,
-            n is Complex ? n.real.toInt() : (n as num).toInt()),
+        'roundDecimal': (dynamic x, dynamic n) =>
+            round(x, n is Complex ? n.real.toInt() : (n as num).toInt()),
+        'roundTo': (dynamic x, dynamic n) =>
+            round(x, n is Complex ? n.real.toInt() : (n as num).toInt()),
         'clamp': (dynamic x, dynamic min, dynamic max) => clamp(
-            x is Complex ? x.real : x as num,
+            x,
             min is Complex ? min.real : min as num,
             max is Complex ? max.real : max as num),
-        'lerp': (dynamic a, dynamic b, dynamic t) => lerp(
-            a is Complex ? a.real : a as num,
-            b is Complex ? b.real : b as num,
-            t is Complex ? t.real : t as num),
+        'lerp': (dynamic a, dynamic b, dynamic t) =>
+            lerp(a, b, t is Complex ? t.real : t as num),
         'rec': (dynamic r, dynamic theta) => rec(
             r is Complex ? r.real : r as num,
             theta is Complex ? theta.real : theta as num),
@@ -321,94 +286,42 @@ class ExpressionContext {
             Expression.parse(exp.toString()).simplify(),
 
         // Trigonometric functions
-        'sin': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).sin()
-            : (x is Complex ? x.sin() : math.sin(x as num)),
-        'cos': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).cos()
-            : (x is Complex ? x.cos() : math.cos(x as num)),
-        'tan': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).tan()
-            : (x is Complex ? x.tan() : math.tan(x as num)),
-        'csc': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).csc()
-            : (x is Complex ? x.csc() : math.csc(x)),
-        'sec': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).sec()
-            : (x is Complex ? x.sec() : math.sec(x)),
-        'cot': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).cot()
-            : (x is Complex ? x.cot() : math.cot(x)),
-        'asin': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).asin()
-            : (x is Complex ? x.asin() : math.asin(x as num)),
-        'acos': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).acos()
-            : (x is Complex ? x.acos() : math.acos(x as num)),
-        'atan': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).atan()
-            : (x is Complex ? x.atan() : math.atan(x as num)),
-        'atan2': (dynamic a, dynamic b) => a is Matrix
-            ? MatrixFunctions(a).atan2(b as Matrix)
-            : math.atan2(a as num, b as num),
-        'asec': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).asec()
-            : (x is Complex ? x.asec() : math.asec(x)),
-        'acsc': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).acsc()
-            : (x is Complex ? x.acsc() : math.acsc(x)),
-        'acot': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).acot()
-            : (x is Complex ? x.acot() : math.acot(x)),
+        'sin': (dynamic x) => sin(x),
+        'cos': (dynamic x) => cos(x),
+        'tan': (dynamic x) => tan(x),
+        'csc': (dynamic x) => csc(x),
+        'sec': (dynamic x) => sec(x),
+        'cot': (dynamic x) => cot(x),
+        'asin': (dynamic x) => asin(x),
+        'acos': (dynamic x) => acos(x),
+        'atan': (dynamic x) => atan(x),
+        'atan2': (dynamic a, dynamic b) => atan2(a, b),
+        'asec': (dynamic x) => asec(x),
+        'acsc': (dynamic x) => acsc(x),
+        'acot': (dynamic x) => acot(x),
 
-        'sinh': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).sinh()
-            : (x is Complex ? x.sinh() : math.sinh(x)),
-        'cosh': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).cosh()
-            : (x is Complex ? x.cosh() : math.cosh(x)),
-        'tanh': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).tanh()
-            : (x is Complex ? x.tanh() : math.tanh(x)),
-        'csch': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).csch()
-            : (x is Complex ? x.csch() : math.csch(x)),
-        'sech': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).sech()
-            : (x is Complex ? x.sech() : math.sech(x)),
-        'coth': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).coth()
-            : (x is Complex ? x.coth() : math.coth(x)),
+        'sinh': (dynamic x) => sinh(x),
+        'cosh': (dynamic x) => cosh(x),
+        'tanh': (dynamic x) => tanh(x),
+        'csch': (dynamic x) => csch(x),
+        'sech': (dynamic x) => sech(x),
+        'coth': (dynamic x) => coth(x),
 
-        'asinh': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).asinh()
-            : (x is Complex ? x.asinh() : math.asinh(x)),
-        'acosh': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).acosh()
-            : (x is Complex ? x.acosh() : math.acosh(x)),
-        'atanh': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).atanh()
-            : (x is Complex ? x.atanh() : math.atanh(x)),
-        'acsch': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).acsch()
-            : (x is Complex ? x.acsch() : math.acsch(x)),
-        'asech': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).asech()
-            : (x is Complex ? x.asech() : math.asech(x)),
-        'acoth': (dynamic x) => x is Matrix
-            ? MatrixFunctions(x).acoth()
-            : (x is Complex ? x.acoth() : math.acoth(x)),
+        'asinh': (dynamic x) => asinh(x),
+        'acosh': (dynamic x) => acosh(x),
+        'atanh': (dynamic x) => atanh(x),
+        'acsch': (dynamic x) => acsch(x),
+        'asech': (dynamic x) => asech(x),
+        'acoth': (dynamic x) => acoth(x),
         'vers': (dynamic x) => vers(x),
         'covers': (dynamic x) => covers(x),
         'havers': (dynamic x) => havers(x),
         'exsec': (dynamic x) => exsec(x),
         'excsc': (dynamic x) => excsc(x),
 
-        'sawtooth': (dynamic x) => sawtooth(x is Complex ? x.real : x as num),
-        'squareWave': (dynamic x) => squareWave(
-            x is Complex ? x.real.toDouble() : (x as num).toDouble()),
-        'triangleWave': (dynamic x) => triangleWave(
-            x is Complex ? x.real.toDouble() : (x as num).toDouble()),
+        'sawtooth': (dynamic x) => sawtooth(x),
+        'squareWave': (dynamic x) => squareWave(x),
+        'triangleWave': (dynamic x) => triangleWave(x),
         'sinc': (dynamic x) => sinc(x),
 
         // Missing Basic Math Functions
@@ -590,22 +503,22 @@ class ExpressionContext {
 
         // Constructors
         'zeros': VarArgsFunction(
-            (args, _) => Matrix.zeros(args[0] as int, args[1] as int)),
+            (args, _) => Matrix.zeros(_toInt(args[0]), _toInt(args[1]))),
         'ones': VarArgsFunction(
-            (args, _) => Matrix.ones(args[0] as int, args[1] as int)),
-        'eye': VarArgsFunction((args, _) => Matrix.eye(args[0] as int)),
+            (args, _) => Matrix.ones(_toInt(args[0]), _toInt(args[1]))),
+        'eye': VarArgsFunction((args, _) => Matrix.eye(_toInt(args[0]))),
         'diag': VarArgsFunction(
             (args, _) => Matrix.fromDiagonal(args.first as List)),
         'diagonalMatrix': VarArgsFunction(
             (args, _) => Matrix.fromDiagonal(args.first as List)),
         'rand_matrix': VarArgsFunction(
-            (args, _) => Matrix.random(args[0] as int, args[1] as int)),
-        'fill': VarArgsFunction(
-            (args, _) => Matrix.fill(args[0] as int, args[1] as int, args[2])),
+            (args, _) => Matrix.random(_toInt(args[0]), _toInt(args[1]))),
+        'fill': VarArgsFunction((args, _) =>
+            Matrix.fill(_toInt(args[0]), _toInt(args[1]), args[2])),
         'linspace': VarArgsFunction((args, _) => Matrix.linspace(
-              (args[0] as num).toInt(),
-              (args[1] as num).toInt(),
-              args.length > 2 ? args[2] as int : 50,
+              _toInt(args[0]),
+              _toInt(args[1]),
+              args.length > 2 ? _toInt(args[2]) : 50,
             )),
         'rowVector':
             VarArgsFunction((args, _) => RowMatrix(args.first as List)),
@@ -666,7 +579,7 @@ class ExpressionContext {
 
         // Manipulation
         'reshape': VarArgsFunction((args, _) =>
-            (args[0] as Matrix).reshape(args[1] as int, args[2] as int)),
+            (args[0] as Matrix).reshape(_toInt(args[1]), _toInt(args[2]))),
         'flatten':
             VarArgsFunction((args, _) => (args.first as Matrix).flatten()),
         'hcat': VarArgsFunction((args, _) {
@@ -689,14 +602,14 @@ class ExpressionContext {
 
         // Element access helpers
         'row': VarArgsFunction(
-            (args, _) => (args[0] as Matrix).row(args[1] as int)),
+            (args, _) => (args[0] as Matrix).row(_toInt(args[1]))),
         'col': VarArgsFunction(
-            (args, _) => (args[0] as Matrix).column(args[1] as int)),
+            (args, _) => (args[0] as Matrix).column(_toInt(args[1]))),
 
         // Stats
         'mat_mean': VarArgsFunction((args, _) {
           final m = args.first as Matrix;
-          final axis = args.length > 1 ? args[1] as int? : null;
+          final axis = args.length > 1 ? _toInt(args[1]) : null;
           if (axis == 0) {
             return List.generate(
                 m.columnCount,
@@ -714,17 +627,17 @@ class ExpressionContext {
         }),
         'mat_sum': VarArgsFunction((args, _) {
           final m = args.first as Matrix;
-          final axis = args.length > 1 ? args[1] as int? : null;
+          final axis = args.length > 1 ? _toInt(args[1]) : null;
           return m.sum(axis: axis);
         }),
         'mat_max': VarArgsFunction((args, _) {
           final m = args.first as Matrix;
-          final axis = args.length > 1 ? args[1] as int? : null;
+          final axis = args.length > 1 ? _toInt(args[1]) : null;
           return m.max(axis: axis);
         }),
         'mat_min': VarArgsFunction((args, _) {
           final m = args.first as Matrix;
-          final axis = args.length > 1 ? args[1] as int? : null;
+          final axis = args.length > 1 ? _toInt(args[1]) : null;
           return m.min(axis: axis);
         }),
         'mat_var':
@@ -875,12 +788,12 @@ class ExpressionContext {
         'real': VarArgsFunction((args, _) => (args.first as Complex).real),
         'imag': VarArgsFunction((args, _) => (args.first as Complex).imaginary),
         'modulus': VarArgsFunction((args, _) => (args.first as Complex).abs()),
-        'arg': VarArgsFunction((args, _) => (args.first as Complex).argument()),
+        'arg': VarArgsFunction((args, _) => (args.first as Complex).argument),
         'conj': VarArgsFunction((args, _) => (args.first as Complex).conjugate),
 
         'polar': VarArgsFunction((args, _) {
           final c = args.first as Complex;
-          return {'r': c.abs(), 'theta': c.argument()};
+          return {'r': c.abs(), 'theta': c.argument};
         }),
         'from_polar': VarArgsFunction((args, kwargs) {
           final r = ((kwargs['r'] ?? args[0]) as num).toDouble();
@@ -989,6 +902,14 @@ class ExpressionContext {
         'regression': regression,
       };
 
+  static Polynomial _toPoly(dynamic p) {
+    if (p is Polynomial) {
+      // Re-dispatch through fromList to ensure we have the most specific subclass (Quadratic, etc.)
+      return Polynomial.fromList(p.coefficients, variable: p.variable);
+    }
+    return Polynomial.fromString(p.toString());
+  }
+
   static Map<String, dynamic> _polynomialExtras() => {
         ..._sharedExtras(),
         'quadratic': VarArgsFunction((args, kwargs) {
@@ -1014,38 +935,60 @@ class ExpressionContext {
         }),
         'poly': VarArgsFunction(
             (args, _) => Polynomial.fromString(args.first.toString())),
+        'poly_from_list': VarArgsFunction((args, _) {
+          final list = args[0] as List;
+          final varName = args.length > 1 ? args[1].toString() : 'x';
+          return Polynomial.fromList(list, variable: Variable(varName));
+        }),
+        'poly_gcd': gcd,
+        'poly_lcm': lcm,
+        'poly_expand':
+            VarArgsFunction((args, _) => _toPoly(args.first).expand()),
+        'poly_discriminant': VarArgsFunction((args, context) {
+          return _toPoly(args[0]).discriminant().evaluate(context);
+        }),
         'vertex': VarArgsFunction((args, _) {
           final p = args.first;
           if (p is Quadratic) return p.vertex();
-          throw ArgumentError('vertex() requires a Quadratic polynomial');
+          return _toPoly(p)
+              .roots(); // Fallback to roots if not quadratic? No, vertex is quad specific.
         }),
-        'factorize': VarArgsFunction((args, _) {
-          final p = args.first;
-          if (p is Polynomial) return p.factorizeString();
-          return Polynomial.fromString(p.toString()).factorizeString();
-        }),
-        'differentiate': VarArgsFunction((args, _) {
-          final p = args.first;
-          if (p is Polynomial) return p.differentiate();
-          return Polynomial.fromString(p.toString()).differentiate();
-        }),
-        'poly_integrate': VarArgsFunction((args, _) {
-          final p = args.first;
-          if (p is Polynomial) return p.integrate();
-          return Polynomial.fromString(p.toString()).integrate();
-        }),
+        'coeffs':
+            VarArgsFunction((args, _) => _toPoly(args.first).coefficients),
+        'factorize':
+            VarArgsFunction((args, _) => _toPoly(args.first).factorizeString()),
+        'differentiate':
+            VarArgsFunction((args, _) => _toPoly(args.first).differentiate()),
+        'poly_integrate':
+            VarArgsFunction((args, _) => _toPoly(args.first).integrate()),
         'evaluate': VarArgsFunction((args, _) {
           final p = args[0];
           final x = args[1];
-          if (p is Polynomial) return p.evaluate(x);
-          return Polynomial.fromString(p.toString()).evaluate(x);
+          return _toPoly(p).evaluate(x);
         }),
-        'degree': VarArgsFunction((args, _) {
+        'degree': VarArgsFunction((args, _) => _toPoly(args.first).degree),
+        'deg': VarArgsFunction((args, _) => _toPoly(args.first).degree),
+        'roots': (dynamic exp) => _toPoly(exp).roots(),
+        'isPoly': (dynamic exp) => Polynomial.isPolynomial(exp.toString()),
+
+        // Quadratic specific properties
+        'quad_sum_roots': VarArgsFunction((args, context) {
+          final p = _toPoly(args[0]);
+          if (p is Quadratic) return p.sumOfRoots().evaluate(context);
+          throw ArgumentError('Expected a quadratic polynomial');
+        }),
+        'quad_prod_roots': VarArgsFunction((args, context) {
+          final p = _toPoly(args[0]);
+          if (p is Quadratic) return p.productOfRoots().evaluate(context);
+          throw ArgumentError('Expected a quadratic polynomial');
+        }),
+        'quad_opening': VarArgsFunction((args, _) {
           final p = args.first;
-          if (p is Polynomial) return p.degree;
-          return Polynomial.fromString(p.toString()).degree;
+          if (p is Quadratic) return p.directionOfOpening();
+          final poly = _toPoly(p);
+          if (poly is Quadratic) return poly.directionOfOpening();
+          throw ArgumentError('quad_opening() expects a Quadratic polynomial');
         }),
-        'roots': (dynamic exp) => Polynomial.fromString(exp.toString()).roots(),
       };
 }
 

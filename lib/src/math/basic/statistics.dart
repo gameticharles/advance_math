@@ -12,8 +12,24 @@ List<dynamic> _flattenArgs(List<dynamic> args) {
 List<num> _getArgsParams(List<dynamic> args) {
   return _flattenArgs(args).map((e) {
     if (e is Complex) return e.real;
+    if (e is String) {
+      try {
+        return num.parse(e);
+      } catch (_) {
+        // Handle symbol string by letting it fail later or return 0
+        return 0;
+      }
+    }
     return e as num;
   }).toList();
+}
+
+Polynomial _toPoly(dynamic p) {
+  if (p is Polynomial) {
+    // Re-dispatch through fromList to ensure we have the most specific subclass (Quadratic, etc.)
+    return Polynomial.fromList(p.coefficients, variable: p.variable);
+  }
+  return Polynomial.fromString(p.toString());
 }
 
 List<num> _toNumList(dynamic dat) {
@@ -98,9 +114,10 @@ dynamic sum = VarArgsFunction((args, kwargs) => _sum(_flattenArgs(args)));
 /// Example:
 /// ```dart
 /// print(mean([1, 2, 3, 4, 5])); // prints: 3.0
-/// print(mean(1, 2, 3, 4, 5));   // prints: 3.0
+/// print(mean(1, 2, 3, 4, 5));   // prints: Complex:<3 + 0i>
 /// ```
-dynamic mean = VarArgsFunction((args, kwargs) => _mean(_getArgsParams(args)));
+dynamic mean =
+    VarArgsFunction((args, kwargs) => Complex(_mean(_getArgsParams(args)), 0));
 
 /// Alias for mean.
 dynamic average = mean;
@@ -120,12 +137,12 @@ dynamic avg = mean;
 /// ```
 dynamic median = VarArgsFunction((args, kwargs) {
   List<num> list = _getArgsParams(args);
-  if (list.isEmpty) return 0;
+  if (list.isEmpty) return Complex(0);
   list.sort();
   if (list.length % 2 == 1) {
-    return list[list.length ~/ 2];
+    return Complex(list[list.length ~/ 2]);
   } else {
-    return (list[list.length ~/ 2 - 1] + list[list.length ~/ 2]) / 2;
+    return Complex((list[list.length ~/ 2 - 1] + list[list.length ~/ 2]) / 2);
   }
 });
 
@@ -150,7 +167,7 @@ dynamic mode = VarArgsFunction((args, kwargs) {
   var maxFreq = freqMap.values.reduce(math.max);
   return freqMap.entries
       .where((entry) => entry.value == maxFreq)
-      .map((entry) => entry.key)
+      .map((entry) => Complex(entry.key))
       .toList();
 });
 
@@ -162,8 +179,8 @@ dynamic mode = VarArgsFunction((args, kwargs) {
 /// ```dart
 /// print(variance(1, 2, 3, 4, 5)); // 2.5
 /// ```
-dynamic variance =
-    VarArgsFunction((args, kwargs) => _variance(_getArgsParams(args)));
+dynamic variance = VarArgsFunction(
+    (args, kwargs) => Complex(_variance(_getArgsParams(args)), 0));
 
 /// Returns the standard deviation of a list of numbers.
 ///
@@ -173,8 +190,8 @@ dynamic variance =
 /// ```dart
 /// print(stdDev(1, 2, 3, 4, 5)); // ~1.58
 /// ```
-dynamic stdDev =
-    VarArgsFunction((args, kwargs) => _stdDev(_getArgsParams(args)));
+dynamic stdDev = VarArgsFunction(
+    (args, kwargs) => Complex(_stdDev(_getArgsParams(args)), 0));
 
 /// Returns the standard deviation of a list of numbers.
 dynamic standardDeviation = stdDev;
@@ -185,8 +202,8 @@ dynamic standardDeviation = stdDev;
 /// ```dart
 /// print(stdErrMean(1, 2, 3, 4, 5)); // ~0.707
 /// ```
-dynamic stdErrMean =
-    VarArgsFunction((args, kwargs) => _stdErrMean(_getArgsParams(args)));
+dynamic stdErrMean = VarArgsFunction(
+    (args, kwargs) => Complex(_stdErrMean(_getArgsParams(args)), 0));
 
 /// Standard error of estimate.
 /// Expects two lists: stdErrEst(List x, List y) or flattened if appropriate (though intended for paired data).
@@ -210,7 +227,7 @@ dynamic stdErrEst = VarArgsFunction((args, kwargs) {
   for (int i = 0; i < x.length; i++) {
     numerator += math.pow(y[i] - meanY - (x[i] - meanX), 2);
   }
-  return math.sqrt(numerator / (x.length - 2));
+  return Complex(math.sqrt(numerator / (x.length - 2)));
 });
 
 /// Returns the t-Value of the list.
@@ -221,8 +238,8 @@ dynamic stdErrEst = VarArgsFunction((args, kwargs) {
 /// ```
 dynamic tValue = VarArgsFunction((args, kwargs) {
   List<num> list = _getArgsParams(args);
-  if (list.isEmpty || list.length == 1) return 0;
-  return _mean(list) / _stdErrMean(list);
+  if (list.isEmpty || list.length == 1) return Complex(0);
+  return Complex(_mean(list) / _stdErrMean(list));
 });
 
 /// Returns the 1st, 2nd, and 3rd quartiles of a list of numbers.
@@ -239,7 +256,7 @@ dynamic quartiles = VarArgsFunction((args, kwargs) {
   num q1 = _median(list.sublist(0, list.length ~/ 2));
   num q2 = _median(list);
   num q3 = _median(list.sublist((list.length + 1) ~/ 2));
-  return [q1, q2, q3];
+  return [Complex(q1), Complex(q2), Complex(q3)];
 });
 
 num _median(List<num> list) {
@@ -439,16 +456,17 @@ dynamic gcf = VarArgsFunction((args, kwargs) {
   for (int i = 1; i < numbers.length; i++) {
     result = ggcf(result, numbers[i]);
   }
-  return result;
+  return Complex(result);
 });
 
-/// Returns the greatest common divisor of a list of numbers.
-///
-/// Example:
-/// ```dart
-/// print(gcd(48, 18, 24));  // Output: 6
-/// ```
-dynamic gcd = VarArgsFunction((args, kwargs) {
+dynamic gcd = VarArgsFunction((args, _) {
+  if (args.length == 2 &&
+      args.any((e) =>
+          e is! num && e is! Complex ||
+          (e is String && e.contains(RegExp(r'[a-zA-Z]'))))) {
+    return _toPoly(args[0]).gcd(_toPoly(args[1]));
+  }
+
   List<num> numbers = _getArgsParams(args);
   if (numbers.isEmpty) {
     throw ArgumentError('List of numbers cannot be empty.');
@@ -460,6 +478,7 @@ dynamic gcd = VarArgsFunction((args, kwargs) {
 
   for (var b in numbers) {
     while (true) {
+      if (b == 0) break;
       a %= b;
       if (a == 0) {
         a = b;
@@ -470,7 +489,7 @@ dynamic gcd = VarArgsFunction((args, kwargs) {
     }
   }
 
-  return a;
+  return Complex(a);
 });
 
 /// Extended Euclidean algorithm.
@@ -484,10 +503,10 @@ dynamic gcd = VarArgsFunction((args, kwargs) {
 dynamic egcd = VarArgsFunction((args, kwargs) {
   List<num> numbers = _getArgsParams(args);
 
-  List<List<num>> results = [];
+  List<List<Complex>> results = [];
 
   // Helper function to compute egcd for a pair of numbers
-  List<num> egcdPair(num a, num b) {
+  List<Complex> egcdPair(num a, num b) {
     num x = 1, y = 0, x1 = 0, y1 = 1;
     while (b != 0) {
       num q = a ~/ b;
@@ -501,7 +520,7 @@ dynamic egcd = VarArgsFunction((args, kwargs) {
       a = b;
       b = r;
     }
-    return [a, x, y];
+    return [Complex(a), Complex(x), Complex(y)];
   }
 
   // Iterate through pairs of numbers and compute egcd using the iterative function
@@ -512,13 +531,14 @@ dynamic egcd = VarArgsFunction((args, kwargs) {
   return results;
 });
 
-/// Returns the least common multiple of numbers.
-///
-/// Example:
-/// ```dart
-/// print(lcm(15, 20));  // Output: 60
-/// ```
-dynamic lcm = VarArgsFunction((args, kwargs) {
+dynamic lcm = VarArgsFunction((args, _) {
+  if (args.length == 2 &&
+      args.any((e) =>
+          e is! num && e is! Complex ||
+          (e is String && e.contains(RegExp(r'[a-zA-Z]'))))) {
+    return _toPoly(args[0]).lcm(_toPoly(args[1]));
+  }
+
   List<num> numbers = _getArgsParams(args);
   if (numbers.isEmpty) {
     throw ArgumentError('List of numbers cannot be empty.');
@@ -528,7 +548,8 @@ dynamic lcm = VarArgsFunction((args, kwargs) {
     if (a == 0 || b == 0) {
       return 0;
     } else {
-      return (a * b) / (gcd(a, b) as num);
+      final g = (gcd as VarArgsFunction).callback([a, b], <String, dynamic>{});
+      return (a * b) / (g is Complex ? g.real : g as num);
     }
   }
 
@@ -536,7 +557,7 @@ dynamic lcm = VarArgsFunction((args, kwargs) {
   for (int i = 1; i < numbers.length; i++) {
     result = llcm(result, numbers[i]);
   }
-  return result;
+  return Complex(result);
 });
 
 /// Returns the correlation of two lists.
@@ -549,7 +570,7 @@ dynamic correlation = VarArgsFunction((args, kwargs) {
   if (args.length != 2 || args[0] is! List || args[1] is! List) {
     throw ArgumentError('correlation requires two lists: x and y');
   }
-  return _correlation(_toNumList(args[0]), _toNumList(args[1]));
+  return Complex(_correlation(_toNumList(args[0]), _toNumList(args[1])));
 });
 
 /// Returns the confidence interval of a list of numbers.
@@ -574,8 +595,8 @@ dynamic confidenceInterval = VarArgsFunction((args, kwargs) {
 
   num sampleMean = _mean(data);
   num stdErr = _stdErrMean(data);
-  num margin = (tValue(data) as num) * stdErr;
-  return [sampleMean - margin, sampleMean + margin];
+  num margin = (tValue.callback(data, <String, dynamic>{}) as Complex).real * stdErr;
+  return [Complex(sampleMean - margin), Complex(sampleMean + margin)];
 });
 
 /// Returns slope and intercept of two datasets.
@@ -597,7 +618,7 @@ dynamic regression = VarArgsFunction((args, kwargs) {
   num m = _correlation(x, y) * (_stdDev(y) / _stdDev(x));
   num b = meanY - m * meanX;
 
-  return [m, b];
+  return [Complex(m), Complex(b)];
 });
 
 /// A collection of statistical functions.
@@ -607,18 +628,21 @@ class Statistics {
       (_flattenArgs(args).isNotEmpty) ? _mean(_getArgsParams(args)) : 0;
 
   /// Returns the median of a list of numbers.
-  static dynamic median(List<dynamic> args) =>
-      _flattenArgs(args).isNotEmpty ? (median as VarArgsFunction).callback(args, {}) : 0;
+  static dynamic median(List<dynamic> args) => _flattenArgs(args).isNotEmpty
+      ? (median as VarArgsFunction).callback(args, <String, dynamic>{})
+      : 0;
 
   /// Returns the mode of a list of numbers.
-  static dynamic mode(List<dynamic> args) => (mode as VarArgsFunction).callback(args, {});
+  static dynamic mode(List<dynamic> args) =>
+      (mode as VarArgsFunction).callback(args, <String, dynamic>{});
 
   /// Returns the variance of a list of numbers.
-  static dynamic variance(List<dynamic> args) => (variance as VarArgsFunction).callback(args, {});
+  static dynamic variance(List<dynamic> args) =>
+      (variance as VarArgsFunction).callback(args, <String, dynamic>{});
 
   /// Returns the standard deviation of a list of numbers.
-  static dynamic stdDev(List<dynamic> args) => (stdDev as VarArgsFunction).callback(args, {});
-
+  static dynamic stdDev(List<dynamic> args) =>
+      (stdDev as VarArgsFunction).callback(args, <String, dynamic>{});
 
   /// Returns the quartiles of a list of numbers.
   static List<num> quartiles(List<num> list) => _quartiles(list);
@@ -637,7 +661,10 @@ class Statistics {
     if (x.length != y.length || x.isEmpty) return 0.0;
     final mx = x.reduce((a, b) => a + b) / x.length;
     final my = y.reduce((a, b) => a + b) / y.length;
-    return x.asMap().entries.fold(0.0, (s, e) => s + (e.value - mx) * (y[e.key] - my)) / x.length;
+    return x
+            .asMap()
+            .entries
+            .fold(0.0, (s, e) => s + (e.value - mx) * (y[e.key] - my)) /
+        x.length;
   }
 }
-

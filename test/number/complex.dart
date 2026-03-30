@@ -224,7 +224,7 @@ void main() {
     group('Properties and Methods', () {
       test('Modulus', () {
         final c = Complex(2, 5);
-        expect(c.modulus, closeTo(c.complexModulus, 1.0e-9));
+        expect(c.modulus, closeTo(c.complexModulus.real, 1.0e-9));
         expect(c.modulus, closeTo(math.sqrt(29), 1.0e-9));
         // expect(c.modulus, c.complexModulus);
         // expect(c.modulus, math.sqrt(29));
@@ -286,7 +286,7 @@ void main() {
 
   test('Abs', () {
     var z = Complex(3.0, 4.0);
-    expect(5.0, closeTo(z.abs(), 1.0e-5));
+    expect(5.0, closeTo(z.abs().real, 1.0e-5));
   });
 
   test('AbsNaN', () {
@@ -1446,41 +1446,40 @@ void main() {
 
   test('argument', () {
     var z = Complex(1, 0);
-    expect(0.0, closeTo(z.argument, 1.0e-12));
+    expect(0.0, closeTo(z.argument.real, 1.0e-12));
 
     z = Complex(1, 1);
-    expect(math.pi / 4, closeTo(z.argument, 1.0e-12));
+    expect(math.pi / 4, closeTo(z.argument.real, 1.0e-12));
 
     z = Complex(0, 1);
-    expect(math.pi / 2, closeTo(z.argument, 1.0e-12));
+    expect(math.pi / 2, closeTo(z.argument.real, 1.0e-12));
 
     z = Complex(-1, 1);
-    expect(3 * math.pi / 4, closeTo(z.argument, 1.0e-12));
+    expect(3 * math.pi / 4, closeTo(z.argument.real, 1.0e-12));
 
     z = Complex(-1, 0);
-    expect(math.pi, closeTo(z.argument, 1.0e-12));
+    expect(math.pi, closeTo(z.argument.real, 1.0e-12));
 
     z = Complex(-1, -1);
-    expect(-3 * math.pi / 4, closeTo(z.argument, 1.0e-12));
+    expect(-3 * math.pi / 4, closeTo(z.argument.real, 1.0e-12));
 
     z = Complex(0, -1);
-    expect(-math.pi / 2, closeTo(z.argument, 1.0e-12));
+    expect(-math.pi / 2, closeTo(z.argument.real, 1.0e-12));
 
     z = Complex(1, -1);
-    expect(-math.pi / 4, closeTo(z.argument, 1.0e-12));
+    expect(-math.pi / 4, closeTo(z.argument.real, 1.0e-12));
   });
 
   /// Verify atan2-style handling of infinite parts
-
   test('argumentInf', () {
-    expect(math.pi / 4, closeTo(infInf.argument, 1.0e-12));
-    expect(math.pi / 2, closeTo(oneInf.argument, 1.0e-12));
-    expect(0.0, closeTo(infOne.argument, 1.0e-12));
-    expect(math.pi / 2, closeTo(zeroInf.argument, 1.0e-12));
-    expect(0.0, closeTo(infZero.argument, 1.0e-12));
-    expect(math.pi, closeTo(negInfOne.argument, 1.0e-12));
-    expect(-3.0 * math.pi / 4, closeTo(negInfNegInf.argument, 1.0e-12));
-    expect(-math.pi / 2, closeTo(oneNegInf.argument, 1.0e-12));
+    expect(math.pi / 4, closeTo(infInf.argument.real, 1.0e-12));
+    expect(math.pi / 2, closeTo(oneInf.argument.real, 1.0e-12));
+    expect(0.0, closeTo(infOne.argument.real, 1.0e-12));
+    expect(math.pi / 2, closeTo(zeroInf.argument.real, 1.0e-12));
+    expect(0.0, closeTo(infZero.argument.real, 1.0e-12));
+    expect(math.pi, closeTo(negInfOne.argument.real, 1.0e-12));
+    expect(-3.0 * math.pi / 4, closeTo(negInfNegInf.argument.real, 1.0e-12));
+    expect(-math.pi / 2, closeTo(oneNegInf.argument.real, 1.0e-12));
   });
 
   /// Verify that either part NaN results in NaN

@@ -149,14 +149,22 @@ class Quadratic extends Polynomial {
   /// print(quad2.directionOfOpening()); // Output: "Downwards"
   /// ```
   String directionOfOpening() {
-    if (a is Literal && (a as Literal).value is num) {
-      if (((a as Literal).value as num) > 0) {
-        return "Upwards";
-      } else if (((a as Literal).value as num) < 0) {
-        return "Downwards";
+    num? val;
+    if (a is Literal) {
+      final v = (a as Literal).value;
+      if (v is num) {
+        val = v;
+      } else if (v is Complex && v.imaginary == 0) {
+        val = v.real;
       }
     }
-    return "Unknown (Symbolic or Complex coefficient)";
+
+    if (val != null) {
+      if (val > 0) return "Upwards";
+      if (val < 0) return "Downwards";
+    }
+
+    return "Unknown";
   }
 
   @override

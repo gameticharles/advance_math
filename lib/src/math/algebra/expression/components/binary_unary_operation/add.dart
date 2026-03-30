@@ -22,13 +22,13 @@ class Add extends BinaryOperationsExpression {
       return (leftEval + rightEval);
     }
     if (leftEval is Complex) {
-      return (leftEval + rightEval).simplify();
+      return (leftEval + rightEval);
     }
     if (rightEval is Complex) {
-      return (rightEval + leftEval).simplify();
+      return (rightEval + leftEval);
     }
     if (leftEval is num && rightEval is num) {
-      return leftEval + rightEval;
+      return Complex(leftEval + rightEval);
     }
 
     // If x is null and either operand contains a Variable, return the simplified version of the expression

@@ -94,7 +94,7 @@ class Fraction extends Double {
   ///
   /// For example, the fraction 4/8 would be simplified to 1/2.
   Number simplify() {
-    num gcdValue = gcd([numerator, denominator]);
+    final gcdValue = gcd([numerator, denominator]);
     return Number.simplifyType(
         Fraction(numerator ~/ gcdValue, denominator ~/ gcdValue));
   }

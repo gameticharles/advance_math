@@ -57,7 +57,7 @@ void main() async {
   // It will NEVER return 43, because 43 is not in the step sequence.
 
   // Emits a number every 1 second (Countdown)
-  final countdown = Range(10, 0, -1);
+  final countdown = Range(3, 0, -1);
   await for (final n in countdown.toStream(interval: Duration(seconds: 1))) {
     print("T-minus $n");
   }
@@ -118,10 +118,6 @@ void main() async {
 
   double result = numIntegrate(functionToEvaluate, 0, 2);
   print(result); // Output: Approximate value of the integral of x^2 from 0 to 2
-
-  print(Fraction(5, 15).simplify());
-  print(Fraction.tryParse("4 8/2")!.simplify());
-  print(Fraction.tryParse("4 8/2")!.isImproper());
 
   printLine("Random");
 
@@ -268,7 +264,7 @@ void main() async {
   //Output: [[A, B], [A, C], [A, D], [B, C], [B, D], [C, D]]
 
   var minCombo = combinations(4, 3, simplify: true, func: (comb) {
-    List<num> result = [];
+    List result = [];
     for (int i = 0; i < comb.length - 1; i++) {
       result.add(min(comb[i], comb[i + 1]));
     }

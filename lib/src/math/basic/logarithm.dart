@@ -11,14 +11,21 @@ part of 'math.dart';
 /// ```dart
 /// print(log10(Complex(1, 2))); // Output: 0.3494850021680094 + 0.480828578784234i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(log10(Matrix([[1, 2], [3, 4]])));  // Output: [[0.6931471805599453, 1.039720770839918], [1.559581156259877, 1.7404683910198387]]
+/// ```
 dynamic log10(dynamic x) {
   if (x is num || x is Decimal) {
     num nx = x is! num ? (x as Decimal).toDouble() : x;
     return math.log(nx) / math.ln10;
   } else if (x is Complex || x is Imaginary) {
     Complex nx = x is Complex ? x : Complex(0, x);
-    Complex lnZ = Complex(math.log(nx.magnitude), nx.argument);
+    Complex lnZ = Complex(math.log(nx.magnitude), nx.argument.real);
     return lnZ / math.log(10);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).logn(10);
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -39,6 +46,11 @@ dynamic log10(dynamic x) {
 /// ```dart
 /// print(log(math.e));  // Output: 1.0
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(log(Matrix([[1, 2], [3, 4]])));  // Output: [[0.6931471805599453, 1.039720770839918], [1.559581156259877, 1.7404683910198387]]
+/// ```
 dynamic log(dynamic x, [dynamic b]) {
   if (x is num || x is Decimal) {
     num nx = x is! num ? (x as Decimal).toDouble() : x;
@@ -48,7 +60,7 @@ dynamic log(dynamic x, [dynamic b]) {
     return b != null ? math.log(nx) / math.log(b) : math.log(nx);
   } else if (x is Complex || x is Imaginary) {
     Complex nx = x is Complex ? x : Complex(0, x);
-    Complex lnZ = Complex(math.log(nx.magnitude), nx.argument);
+    Complex lnZ = Complex(math.log(nx.magnitude), nx.argument.real);
     if (b == null) {
       return lnZ;
     } else if (b is num) {
@@ -61,6 +73,8 @@ dynamic log(dynamic x, [dynamic b]) {
     } else {
       throw ArgumentError('Invalid base type for log');
     }
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).log();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -82,6 +96,11 @@ dynamic log(dynamic x, [dynamic b]) {
 /// print(logBase(Complex(2, 2), 2));  // Output: 0.4244610654378757 - 0.32063506912468864i
 /// print(logBase(Complex(2, 2), Complex(1, 2)));  // Output: 1.004927367132127 + 0.30573651908857313i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(logBase(2, Matrix([[1, 2], [3, 4]])));  // Output: [[0.6931471805599453, 1.039720770839918], [1.559581156259877, 1.7404683910198387]]
+/// ```
 dynamic logBase(dynamic base, dynamic x) {
   if ((base is num || base is Decimal) && x is num) {
     num nBase = base is! num ? (base as Decimal).toDouble() : base;
@@ -101,10 +120,13 @@ dynamic logBase(dynamic base, dynamic x) {
             ? Complex(0, x)
             : Complex(x, 0);
 
-    Complex lnBase = Complex(math.log(cBase.magnitude), cBase.argument);
-    Complex lnX = Complex(math.log(cx.magnitude), cx.argument);
+    Complex lnBase =
+        Complex(math.log(cBase.magnitude), cBase.argument.real);
+    Complex lnX = Complex(math.log(cx.magnitude), cx.argument.real);
 
     return lnX / lnBase;
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).logn(base is Complex ? base.real : base as num);
   } else {
     throw ArgumentError('Inputs should be either num or Complex');
   }

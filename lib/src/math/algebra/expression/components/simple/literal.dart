@@ -21,6 +21,7 @@ class Literal extends Expression {
           (key is Expression) ? key.evaluate(arg) : key,
           (value is Expression) ? value.evaluate(arg) : value));
     }
+    if (value is num) return Complex(value);
     return value;
   }
 

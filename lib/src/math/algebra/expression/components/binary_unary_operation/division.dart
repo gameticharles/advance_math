@@ -30,16 +30,15 @@ class Divide extends BinaryOperationsExpression {
     if (rightEval is Matrix) {
       return (leftEval / rightEval);
     }
-    // If both evaluate to numbers, return the sum as a number
     if (leftEval is num && rightEval is num) {
-      return leftEval / rightEval;
+      return Complex(leftEval / rightEval);
     }
 
     if (leftEval is Complex || rightEval is Complex) {
       if (Complex(rightEval) == Complex.zero()) {
         throw Exception('Division by zero!');
       }
-      return (Complex(leftEval) / Complex(rightEval)).simplify();
+      return (Complex(leftEval) / Complex(rightEval));
     }
 
     // If x is null and either operand contains a Variable, return the simplified version of the expression

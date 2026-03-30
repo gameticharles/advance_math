@@ -14,13 +14,19 @@ part of 'math.dart';
 ///
 /// print(z_sin); // Output: 1.0 + 0.0i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(sin(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic sin(dynamic x) {
   if (x is num) {
     return math.sin(x);
   } else if (x is Complex) {
     // Using the identity: sin(a + bi) = sin(a)cosh(b) + i*cos(a)sinh(b)
-    return Complex(math.sin(x.real) * cosh(x.imaginary),
-        math.cos(x.real) * sinh(x.imaginary));
+    return x.sin();
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).sin();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -40,13 +46,19 @@ dynamic sin(dynamic x) {
 ///
 /// print(z_cos); // Output: 1.0 + 0.0i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(cos(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic cos(dynamic x) {
   if (x is num) {
     return math.cos(x);
   } else if (x is Complex) {
     // Using the identity: cos(a + bi) = cos(a)cosh(b) - i*sin(a)sinh(b)
-    return Complex(math.cos(x.real) * cosh(x.imaginary),
-        -math.sin(x.real) * sinh(x.imaginary));
+    return x.cos();
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).cos();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -66,11 +78,18 @@ dynamic cos(dynamic x) {
 ///
 /// print(z_cos); // Output: 1.0 + 0.0i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(tan(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic tan(dynamic x) {
   if (x is num) {
     return math.tan(x);
   } else if (x is Complex) {
     return sin(x) / cos(x);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).tan();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -87,8 +106,21 @@ dynamic tan(dynamic x) {
 /// ```dart
 /// print(sec(Complex(1, 2))); // Output: 0.15117629826557724 + 0.22697367539372162i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(sec(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic sec(dynamic x) {
-  return x is num ? 1 / cos(x) : Complex(1, 0) / cos(x);
+  if (x is num) {
+    return 1 / cos(x);
+  } else if (x is Complex) {
+    return Complex(1, 0) / cos(x);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).sec();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Returns the cosecant of a number in radians.
@@ -102,8 +134,21 @@ dynamic sec(dynamic x) {
 /// ```dart
 /// print(csc(Complex(1, 2))); // Output: 0.22837506559968657 - 0.1413630216124078i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(csc(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic csc(dynamic x) {
-  return x is num ? 1 / sin(x) : Complex(1, 0) / sin(x);
+  if (x is num) {
+    return 1 / sin(x);
+  } else if (x is Complex) {
+    return Complex(1, 0) / sin(x);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).csc();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Returns the cotangent of a number in radians.
@@ -117,8 +162,21 @@ dynamic csc(dynamic x) {
 /// ```dart
 /// print(cot(Complex(1, 2))); // Output: 0.032797755533752505 - 0.984329226458191i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(cot(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic cot(dynamic x) {
-  return x is num ? 1 / tan(x) : Complex(1, 0) / tan(x);
+  if (x is num) {
+    return 1 / tan(x);
+  } else if (x is Complex) {
+    return Complex(1, 0) / tan(x);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).cot();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Returns the arcsine of a number in radians.
@@ -131,6 +189,11 @@ dynamic cot(dynamic x) {
 /// Example 2:
 /// ```dart
 /// print(asin(Complex(1, 2))); // Output: 0.4270785863924768 + 1.5285709194809995i
+/// ```
+///
+/// Example 3:
+/// ```dart
+/// print(asin(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic asin(dynamic x) {
   if (x is num) {
@@ -147,6 +210,8 @@ dynamic asin(dynamic x) {
     // Using the formula: asin(z) = -i * log(iz + sqrt(1 - z^2))
     return -Complex(0, 1) *
         log(Complex(0, 1) * x + sqrt(Complex(1, 0) - x * x));
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).asin();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -163,6 +228,11 @@ dynamic asin(dynamic x) {
 /// ```dart
 /// print(acos(Complex(1, 2))); // Output: 1.1437177404024204 - 1.528570919480998i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(acos(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic acos(dynamic x) {
   if (x is num) {
     if (x >= -1 && x <= 1) {
@@ -178,6 +248,8 @@ dynamic acos(dynamic x) {
     // Using the formula: acos(z) = -i * log(z + i * sqrt(1 - z^2))
     return -Complex(0, 1) *
         log(x + Complex(0, 1) * sqrt(Complex(1, 0) - x * x));
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).acos();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -194,6 +266,11 @@ dynamic acos(dynamic x) {
 /// ```dart
 /// print(atan(Complex(1, 2))); // Output: 1.3389725222944935 + 0.4023594781085251i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(atan(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic atan(dynamic x) {
   if (x is num) {
     return math.atan(x);
@@ -203,6 +280,8 @@ dynamic atan(dynamic x) {
     dynamic result = (i / (Complex(2, 0))) *
         (log(Complex(1, 0) - i * x) - log(Complex(1, 0) + i * x));
     return result;
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).atan();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -226,19 +305,21 @@ dynamic atan(dynamic x) {
 /// print(atan2(3, 4));  // Output: 0.6435011087932843868028
 /// // atan(3 / 4) = 0.6435011087932843868028
 /// ```
+///
+/// Example 2:
+/// ```dart
+/// print(atan2(Complex(1, 2), Complex(3, 4))); // Output: 1.3389725222944935 + 0.4023594781085251i
+/// ```
+///
+/// Example 3:
+/// ```dart
+/// print(atan2(Matrix.identity(2), Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic atan2(dynamic a, dynamic b) {
-  if (a is num && b is num) {
-    return math.atan2(a, b);
+  if (a is Matrix && b is Matrix) {
+    return MatrixFunctions(a).atan2(b);
   } else {
-    // Ensure both are of type Complex for consistency in calculations
-    Complex aComplex = (a is num) ? Complex(a, 0) : a;
-    Complex bComplex = (b is num) ? Complex(b, 0) : b;
-
-    // Using the formula: atan2(a, b) = (1/2i) * log((b + ai) / (b - ai))
-    Complex i = Complex(0, 1);
-    dynamic result = (Complex.zero() / (i * 2)) *
-        log((bComplex + i * aComplex) / (bComplex - i * aComplex));
-    return result;
+    return Complex(a).atan2(Complex(b));
   }
 }
 
@@ -253,12 +334,23 @@ dynamic atan2(dynamic a, dynamic b) {
 /// ```dart
 /// print(asec(Complex(1, 2))); // Output: 1.3844782726870812 + 0.3965682301123288i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(asec(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic asec(dynamic x) {
-  if (x.abs() < 1) {
-    throw ArgumentError(
-        'Invalid input for asec: absolute value of input must be >= 1');
+  if (x is num || x is Complex) {
+    if (x.abs() < 1) {
+      throw ArgumentError(
+          'Invalid input for asec: absolute value of input must be >= 1');
+    }
+    return Complex(x).asec();
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).asec();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
   }
-  return x is num ? math.acos(1 / x) : acos(Complex(1, 0) / x);
 }
 
 /// Returns the arccosecant (inverse of the cosecant) of `x`.
@@ -272,12 +364,23 @@ dynamic asec(dynamic x) {
 /// ```dart
 /// print(acsc(Complex(1, 2))); // Output: 0.18631805410781554 - 0.39656823011232917i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(acsc(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic acsc(dynamic x) {
-  if (x.abs() < 1) {
-    throw ArgumentError(
-        'Invalid input for acsc: absolute value of input must be >= 1');
+  if (x is num || x is Complex) {
+    if (x.abs() < 1) {
+      throw ArgumentError(
+          'Invalid input for acsc: absolute value of input must be >= 1');
+    }
+    return Complex(x).acsc();
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).acsc();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
   }
-  return x is num ? math.asin(1 / x) : asin(Complex(1, 0) / x);
 }
 
 /// Returns the arccotangent (inverse of the cotangent) of `x`.
@@ -291,9 +394,20 @@ dynamic acsc(dynamic x) {
 /// ```dart
 /// print(acot(Complex(1, 2))); // Output: 0.23182380450040307 - 0.402359478108525i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(acot(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic acot(dynamic x) {
-  //pi / 2 - math.atan(x)
-  return x is num ? atan(1 / x) : atan(Complex(1, 0) / x);
+  if (x is num || x is Complex) {
+    //pi / 2 - math.atan(x)
+    return Complex(x).acot();
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).acot();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Returns the hyperbolic sine of a number.
@@ -307,11 +421,18 @@ dynamic acot(dynamic x) {
 /// ```dart
 /// print(sinh(Complex(1, 2))); // Output: -0.4890562590412937 + 1.4031192506220405i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(sinh(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic sinh(dynamic x) {
   if (x is num) {
     return (exp(x) - exp(-x)) / 2;
   } else if (x is Complex) {
     return x.sinh();
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).sinh();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -328,11 +449,18 @@ dynamic sinh(dynamic x) {
 /// ```dart
 /// print(cosh(Complex(1, 2))); // Output: -0.64214812471552 + 1.0686074213827783i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(cosh(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic cosh(dynamic x) {
   if (x is num) {
     return (exp(x) + exp(-x)) / 2;
   } else if (x is Complex) {
     return x.cosh();
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).cosh();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -349,7 +477,20 @@ dynamic cosh(dynamic x) {
 /// ```dart
 /// print(tanh(Complex(1, 2))); // Output: 1.16673625724092 - 0.24345820118572517i
 /// ```
-dynamic tanh(dynamic x) => sinh(x) / cosh(x);
+///
+/// Example 3:
+/// ```dart
+/// print(tanh(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
+dynamic tanh(dynamic x) {
+  if (x is num || x is Complex) {
+    return sinh(x) / cosh(x);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).tanh();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
+}
 
 /// Returns the hyperbolic secant of a number.
 ///
@@ -362,8 +503,19 @@ dynamic tanh(dynamic x) => sinh(x) / cosh(x);
 /// ```dart
 /// print(sech(Complex(1, 2))); // Output: -0.41314934426694 - 0.6875274386554789i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(sech(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic sech(dynamic x) {
-  return Complex(1, 0) / cosh(x);
+  if (x is num || x is Complex) {
+    return Complex(1, 0) / cosh(x);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).sech();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Returns the hyperbolic cosecant of a number.
@@ -377,8 +529,19 @@ dynamic sech(dynamic x) {
 /// ```dart
 /// print(csch(Complex(1, 2))); // Output: -0.22150093085050945 - 0.6354937992539i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(csch(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic csch(dynamic x) {
-  return Complex(1, 0) / sinh(x);
+  if (x is num || x is Complex) {
+    return Complex(1, 0) / sinh(x);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).csch();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Returns the hyperbolic cotangent of a number.
@@ -392,8 +555,19 @@ dynamic csch(dynamic x) {
 /// ```dart
 /// print(coth(Complex(1, 2))); // Output: 0.8213297974938517 + 0.17138361290918497i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(coth(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic coth(dynamic x) {
-  return Complex(1, 0) / tanh(x);
+  if (x is num || x is Complex) {
+    return Complex(1, 0) / tanh(x);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).coth();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Returns the inverse hyperbolic sine (asinh) of the number.
@@ -407,11 +581,18 @@ dynamic coth(dynamic x) {
 /// ```dart
 /// print(asinh(Complex(1, 2))); // Output: 1.469351744312242 + 1.0634400235775333i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(asinh(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic asinh(dynamic x) {
   if (x is num) {
     return log(x + sqrt(x * x + 1));
   } else if (x is Complex) {
     return log(x + (x * x + 1).sqrt());
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).asinh();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -430,6 +611,11 @@ dynamic asinh(dynamic x) {
 /// ```dart
 /// print(acosh(Complex(1, 2))); // Output: 1.4436354751788103 + 1.0172219678978514i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(acosh(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic acosh(dynamic x) {
   if (x is num) {
     if (x < 1) {
@@ -437,7 +623,9 @@ dynamic acosh(dynamic x) {
     }
     return log(x + sqrt(x * x - 1));
   } else if (x is Complex) {
-    return log(x + (x * x - 1).sqrt());
+    return Complex(x).acosh();
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).acosh();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -456,6 +644,11 @@ dynamic acosh(dynamic x) {
 /// ```dart
 /// print(atanh(Complex(1, 2))); // Output: 0.2290726832688049 + 1.1780972450961724i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(atanh(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic atanh(dynamic x) {
   if (x is num) {
     if (x <= -1 || x >= 1) {
@@ -464,6 +657,8 @@ dynamic atanh(dynamic x) {
     return 0.5 * log((1 + x) / (1 - x));
   } else if (x is Complex) {
     return (log((Complex(1) + x) / (Complex(1) - x))) * 0.5;
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).atanh();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -480,6 +675,11 @@ dynamic atanh(dynamic x) {
 /// ```dart
 /// print(asech(Complex(1, 2))); // Output: 0.2222134255743621 - 1.153432321521422i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(asech(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic asech(dynamic x) {
   if (x is num) {
     if (x <= 0 || x > 1) {
@@ -488,6 +688,8 @@ dynamic asech(dynamic x) {
     return math.log((1 + math.sqrt(1 - x * x)) / x);
   } else if (x is Complex) {
     return acosh(Complex(1, 0) / x);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).asech();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -504,11 +706,18 @@ dynamic asech(dynamic x) {
 /// ```dart
 /// print(acsch(Complex(1, 2))); // Output: 0.21798993831344444 - 0.4522784461536737i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(acsch(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic acsch(dynamic x) {
   if (x is num) {
     return math.log(1 / x + math.sqrt(1 / (x * x) + 1));
   } else if (x is Complex) {
     return asinh(Complex(1, 0) / x);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).acsch();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -525,6 +734,11 @@ dynamic acsch(dynamic x) {
 /// ```dart
 /// print(acoth(Complex(1, 2))); // Output: 0.2290726832688049 - 0.39269908169872414i
 /// ```
+///
+/// Example 3:
+/// ```dart
+/// print(acoth(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic acoth(dynamic x) {
   if (x is num) {
     if (x.abs() <= 1) {
@@ -534,6 +748,8 @@ dynamic acoth(dynamic x) {
     return 0.5 * log((x + 1) / (x - 1));
   } else if (x is Complex) {
     return atanh(Complex(1, 0) / x);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).acoth();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -552,8 +768,19 @@ dynamic acoth(dynamic x) {
 /// ```
 ///
 /// The output is `1.0` because the versine of π/2 (or 90 degrees) is 1.
+///
+/// Example 2:
+/// ```dart
+/// print(vers(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic vers(dynamic x) {
-  return x is num ? 1 - math.cos(x) : Complex.one() - cos(x);
+  if (x is num || x is Complex) {
+    return x is num ? 1 - math.cos(x) : Complex.one() - cos(x);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).vers();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Coversine function
@@ -567,10 +794,20 @@ dynamic vers(dynamic x) {
 /// print(covers(math.pi / 4));  // Output: 0.29289321881345254
 /// print(covers(math.pi / 6));  // Output: 0.5
 /// ```
-///
 /// The output is `0.0` because the coversine of π/2 (or 90 degrees) is 0.
+///
+/// Example 2:
+/// ```dart
+/// print(covers(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic covers(dynamic x) {
-  return x is num ? 1 - math.sin(x) : Complex.one() - sin(x);
+  if (x is num || x is Complex) {
+    return x is num ? 1 - math.sin(x) : Complex.one() - sin(x);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).covers();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Haversine function
@@ -585,9 +822,22 @@ dynamic covers(dynamic x) {
 /// print(havers(math.pi / 6));  // Output: 0.06698729810778065
 /// ```
 ///
-/// The output is `0.0` because the haversine of π/2 (or 90 degrees) is 0.
+/// The output is `0.5` because the haversine of π/2 (or 90 degrees) is 0.5.
+///
+/// Example 2:
+/// ```dart
+/// print(havers(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic havers(dynamic x) {
-  return x is num ? 0.5 * (1 - cos(x)) : Complex(0.5, 0) * (Complex.one() - cos(x));
+  if (x is num || x is Complex) {
+    return x is num
+        ? 0.5 * (1 - cos(x))
+        : Complex(0.5, 0) * (Complex.one() - cos(x));
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).havers();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Exsecant function
@@ -601,8 +851,19 @@ dynamic havers(dynamic x) {
 /// ```
 ///
 /// The output is `Infinity` because the exsecant of π/2 (or 90 degrees) is infinity (as sec(π/2) is infinity).
+///
+/// Example 2:
+/// ```dart
+/// print(exsec(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic exsec(dynamic x) {
-  return x is num ? 1 / cos(x) - 1 : Complex.one() / cos(x) - Complex.one();
+  if (x is num || x is Complex) {
+    return x is num ? 1 / cos(x) - 1 : Complex.one() / cos(x) - Complex.one();
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).exsec();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Excosecant function
@@ -616,8 +877,19 @@ dynamic exsec(dynamic x) {
 /// ```
 ///
 /// The output is `0.0` because the excosecant of π/2 (or 90 degrees) is 0 (as csc(π/2) is 1).
+///
+/// Example 2:
+/// ```dart
+/// print(excsc(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
 dynamic excsc(dynamic x) {
-  return x is num ? 1 / sin(x) - 1 : Complex.one() / sin(x) - Complex.one();
+  if (x is num || x is Complex) {
+    return x is num ? 1 / sin(x) - 1 : Complex.one() / sin(x) - Complex.one();
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).excsc();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Sawtooth wave function
@@ -631,8 +903,21 @@ dynamic excsc(dynamic x) {
 /// ```
 ///
 /// The output is `0.7` because the fractional part of `2.7` is `0.7`.
-double sawtooth(num x) {
-  return (x - x.floor()).toDouble();
+///
+/// Example 2:
+/// ```dart
+/// print(sawtooth(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
+dynamic sawtooth(dynamic x) {
+  if (x is num) {
+    return (x - x.floor()).toDouble();
+  } else if (x is Complex) {
+    return sawtooth(x.real);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).sawtooth();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Square wave function
@@ -646,8 +931,21 @@ double sawtooth(num x) {
 /// ```
 ///
 /// The output for `2.7` is `1.0` and for `3.2` is `-1.0` because the square wave function oscillates between `1.0` and `-1.0`.
-int squareWave(double x) {
-  return (x % 2 < 1) ? -1 : 1;
+///
+/// Example 2:
+/// ```dart
+/// print(squareWave(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
+dynamic squareWave(dynamic x) {
+  if (x is num) {
+    return (x % 2 < 1) ? -1 : 1;
+  } else if (x is Complex) {
+    return squareWave(x.real);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).squareWave();
+  } else {
+    throw ArgumentError('Input should be either num or Complex');
+  }
 }
 
 /// Triangle wave function
@@ -661,13 +959,26 @@ int squareWave(double x) {
 /// ```
 ///
 /// The output for `2.7` is `-0.8` and for `0.8` is `-0.6` because the triangle wave function oscillates in a triangle shape.
-double triangleWave(double x) {
-  x %= 1;
-  if (x < 0.25) {
-    return 4 * x;
-  } else if (x < 0.75) {
-    return -4 * x + 2;
+///
+/// Example 2:
+/// ```dart
+/// print(triangleWave(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
+/// ```
+dynamic triangleWave(dynamic x) {
+  if (x is num) {
+    x %= 1;
+    if (x < 0.25) {
+      return 4 * x;
+    } else if (x < 0.75) {
+      return -4 * x + 2;
+    } else {
+      return 4 * x - 4;
+    }
+  } else if (x is Complex) {
+    return triangleWave(x.real);
+  } else if (x is Matrix) {
+    return MatrixFunctions(x).triangleWave();
   } else {
-    return 4 * x - 4;
+    throw ArgumentError('Input should be either num or Complex');
   }
 }

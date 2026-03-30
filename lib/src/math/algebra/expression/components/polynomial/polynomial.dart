@@ -288,7 +288,7 @@ class Polynomial extends Expression {
         coefficients[maxDegree - i] = terms[i] ?? Literal(0);
       }
 
-      return Polynomial(coefficients, variable: variable);
+      return Polynomial.fromList(coefficients, variable: variable);
     } catch (e) {
       // Handle exceptions and rethrow a formatted exception message
       // print('DEBUG: Polynomial.fromString throwing exception: $e');
@@ -711,7 +711,7 @@ class Polynomial extends Expression {
     var buffer = StringBuffer();
     for (var i = 0; i < coefficients.length; i++) {
       final coeff = coefficients[i];
-      if (coeff is Literal && coeff.value == Complex.zero()) {
+      if (coeff is Literal && (coeff.value == Complex.zero() || coeff.value == 0)) {
         continue;
       }
 
@@ -728,6 +728,12 @@ class Polynomial extends Expression {
             isNegative = true;
             absCoeff = Literal(Complex(-c.real, 0));
           }
+        }
+      } else if (coeff is Literal && coeff.value is num) {
+        num n = coeff.value as num;
+        if (n < 0) {
+          isNegative = true;
+          absCoeff = Literal(-n);
         }
       } else if (coeff is UnaryExpression && coeff.operator == '-') {
         isNegative = true;
@@ -747,9 +753,10 @@ class Polynomial extends Expression {
       }
 
       // Print coefficient
-      if (absCoeff is Literal &&
-          absCoeff.value == Complex.one() &&
-          termDegree != 0) {
+      bool isOne = (absCoeff is Literal &&
+          (absCoeff.value == Complex.one() || absCoeff.value == 1));
+
+      if (isOne && termDegree != 0) {
         // Don't print 1 if variable follows
       } else {
         buffer.write(absCoeff);

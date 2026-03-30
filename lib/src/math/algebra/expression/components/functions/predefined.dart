@@ -7,10 +7,10 @@ class PredefinedFunctionExpression extends Expression {
   PredefinedFunctionExpression(this.functionName, this.operand);
 
   @override
-  double evaluate([dynamic arg]) {
+  dynamic evaluate([dynamic arg]) {
     switch (functionName) {
       case 'sqrt':
-        return sqrt(operand.evaluate());
+        return sqrt(operand.evaluate(arg));
       // You can add more predefined functions here.
       default:
         throw Exception('Unsupported function: $functionName');

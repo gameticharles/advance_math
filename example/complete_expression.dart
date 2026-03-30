@@ -104,10 +104,10 @@ void basicArithmeticExamples() {
   demoEval('1 - -2', description: 'Double negative');
 
   printSection('Implicit Multiplication (requires explicit *)');
-  demo('2*x', description: '2 × x');
-  demo('sin(2*x)', description: 'sin(2x)');
-  demo('2*sin(x) + 4*sin(x)', description: 'Combining like terms');
-  demo('sin(x) + sin(x)');
+  demoEval('2*x', description: '2 × x');
+  demoEval('sin(2*x)', description: 'sin(2x)');
+  demoEval('2*sin(x) + 4*sin(x)', description: 'Combining like terms');
+  demoEval('sin(x) + sin(x)');
 
   printSection('Complex Expressions');
   // Note: sqrt, cbrt, log10, ln are in defaultContext but don't work through Expression.parse
@@ -125,15 +125,15 @@ void algebraExamples() {
   printHeader('2. ALGEBRAIC OPERATIONS');
 
   printSection('GCD (Greatest Common Divisor)');
-  demo('gcd(18, 12, 6)', description: 'GCD of integers');
-  demo('gcd(x^2+2*x+1, x+1)', description: 'GCD of polynomials');
-  demo('gcd(2*x^2+8*x+5, 6*x^9+24*x^8+15*x^7+6*x^2+24*x+15)');
-  demo('gcd(1/2, 1/3, 1/4)', description: 'GCD of fractions');
+  demoEval('gcd(18, 12, 6)', description: 'GCD of integers');
+  demoEval('gcd(x^2+2*x+1, x+1)', description: 'GCD of polynomials');
+  demoEval('gcd(2*x^2+8*x+5, 6*x^9+24*x^8+15*x^7+6*x^2+24*x+15)');
+  demoEval('gcd(1/2, 1/3, 1/4)', description: 'GCD of fractions');
 
   printSection('LCM (Least Common Multiple)');
   demoEval('lcm(18, 12, 6)', description: 'LCM of integers');
   demoEval('lcm(3, 5, 7)');
-  demo('lcm(x^2+2*x+1, x+1)', description: 'LCM of polynomials');
+  demoEval('lcm(x^2+2*x+1, x+1)', description: 'LCM of polynomials');
   demoEval('lcm(1/2, 1/3, 1/4)', description: 'LCM of fractions');
 
   printSection('Factorization');
@@ -144,19 +144,19 @@ void algebraExamples() {
   demo('factor(64*x^3+125)', description: 'Sum of cubes');
 
   printSection('Prime Factorization');
-  demo('pfactor(100)', description: 'Prime factors of 100');
-  demo('pfactor(8)', description: 'Prime factors of 8');
-  demo('pfactor(999999999999)', description: 'Large number prime factors');
+  demoEval('pfactor(100)', description: 'Prime factors of 100');
+  demoEval('pfactor(8)', description: 'Prime factors of 8');
+  demoEval('pfactor(999999999999)', description: 'Large number prime factors');
 
   printSection('Polynomial Degree');
-  demo('deg(x^2+2*x+x^5)', description: 'Degree of polynomial');
-  demo('deg(x^2+2*x+cos(x))', description: 'Mixed polynomial');
-  demo('deg(a*x^2+b*x+c, x)', description: 'Degree with respect to x');
+  demoEval('deg(x^2+2*x+x^5)', description: 'Degree of polynomial');
+  demoEval('deg(x^2+2*x+cos(x))', description: 'Mixed polynomial');
+  demoEval('deg(a*x^2+b*x+c, x)', description: 'Degree with respect to x');
 
   printSection('Coefficient Extraction');
-  demo('coeffs(x^2+2*x+1, x)', description: 'Get coefficients');
-  demo('coeffs(a*b*x^2+c*x+d, x)');
-  demo('coeffs(t*x, x)');
+  demoEval('coeffs(x^2+2*x+1, x)', description: 'Get coefficients');
+  demoEval('coeffs(a*b*x^2+c*x+d, x)');
+  demoEval('coeffs(t*x, x)');
 
   printSection('Polynomial Roots (Future Feature)');
   print(
@@ -173,11 +173,11 @@ void algebraExamples() {
   print('  div(2*x^2+2*x+1, x+1) => (Returns expression, not simplified)');
 
   printSection('Simplification');
-  demo('simplify(sin(x)^2+cos(x)^2)', description: 'Trig identity');
-  demo('simplify((x^2+4*x-45)/(x^2+x-30))',
+  demoEval('simplify(sin(x)^2+cos(x)^2)', description: 'Trig identity');
+  demoEval('simplify((x^2+4*x-45)/(x^2+x-30))',
       description: 'Rational simplification');
-  demo('simplify(1/(x-1)+1/(1-x))', description: 'Combine fractions');
-  demo('simplify((x-1)/(1-x))', description: 'Factor and cancel');
+  demoEval('simplify(1/(x-1)+1/(1-x))', description: 'Combine fractions');
+  demoEval('simplify((x-1)/(1-x))', description: 'Factor and cancel');
 }
 
 // ============================================================================
@@ -292,19 +292,19 @@ void advancedExamples() {
   printHeader('5. ADVANCED FEATURES');
 
   printSection('Hyperbolic Functions');
-  demo('cosh(x)', description: 'Hyperbolic cosine');
-  demo('sinh(x)', description: 'Hyperbolic sine');
-  demo('tanh(x)', description: 'Hyperbolic tangent');
-  demo('2*cosh(x)+cosh(x)', description: 'Combining hyperbolic terms');
-  demo('cosh(x)*cosh(x)', description: 'cosh² x');
-  demo('y*tanh(x)*tanh(x)', description: 'y tanh² x');
+  demoEval('cosh(x)', description: 'Hyperbolic cosine');
+  demoEval('sinh(x)', description: 'Hyperbolic sine');
+  demoEval('tanh(x)', description: 'Hyperbolic tangent');
+  demoEval('2*cosh(x)+cosh(x)', description: 'Combining hyperbolic terms');
+  demoEval('cosh(x)*cosh(x)', description: 'cosh² x');
+  demoEval('y*tanh(x)*tanh(x)', description: 'y tanh² x');
 
   printSection('Inverse Trigonometric Functions (Future Features)');
   print('  ∫ asin(ax) dx => (Not yet implemented)');
 
   printSection('Complex Numbers');
-  demo('gcd(-20+16*i, -10+8*i)', description: 'GCD of complex numbers');
-  demo('lcm(-20+16*i, -10+8*i)', description: 'LCM of complex numbers');
+  demoEval('gcd(-20+16*i, -10+8*i)', description: 'GCD of complex numbers');
+  demoEval('lcm(-20+16*i, -10+8*i)', description: 'LCM of complex numbers');
   // Complex roots not yet fully supported
   print('  x² + 1 = 0 (complex roots) => (Returns empty array - needs fix)');
 
@@ -321,9 +321,10 @@ void advancedExamples() {
   demoEval('5P3', description: '5 permute 3 - permutation operator');
 
   printSection('Trigonometric Identities');
-  demo('simplify(sin(x)^2+cos(x)^2)', description: 'Pythagorean identity');
-  demo('simplify(1/2*sin(x^2)^2+cos(x^2)^2)', description: 'Half-angle form');
-  demo('simplify(tan(x)*csc(x))', description: 'Simplify trig expression');
+  demoEval('simplify(sin(x)^2+cos(x)^2)', description: 'Pythagorean identity');
+  demoEval('simplify(1/2*sin(x^2)^2+cos(x^2)^2)',
+      description: 'Half-angle form');
+  demoEval('simplify(tan(x)*csc(x))', description: 'Simplify trig expression');
 
   printSection('Matrix & Vector Operations (if supported)');
   // These would require matrix/vector expression support

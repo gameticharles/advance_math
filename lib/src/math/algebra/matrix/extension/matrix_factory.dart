@@ -28,11 +28,11 @@ class MatrixFactory {
 
     for (int i = 0; i < n; i++) {
       if (i - 1 >= 0) {
-        data[i][i - 1] = a;
+        data[i][i - 1] = Complex(a);
       }
-      data[i][i] = b;
+      data[i][i] = Complex(b);
       if (i + 1 < n) {
-        data[i][i + 1] = c;
+        data[i][i + 1] = Complex(c);
       }
     }
 
@@ -277,7 +277,7 @@ class MatrixFactory {
               final value = isDouble
                   ? random.nextDouble() * (max - min) + min
                   : random.nextInt(max.toInt() - min.toInt()) + min.toInt();
-              data[i][j] = value;
+              data[i][j] = Complex(value);
             } else {
               final realPart = isDouble
                   ? random.nextDouble() * (max - min) + min

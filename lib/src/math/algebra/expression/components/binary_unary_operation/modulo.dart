@@ -14,10 +14,10 @@ class Modulo extends BinaryOperationsExpression {
 
     // If both evaluate to numbers, return the modulo as a number
     if (leftEval is Complex || rightEval is Complex) {
-      return (Complex(leftEval) % Complex(rightEval)).simplify();
+      return (Complex(leftEval) % Complex(rightEval));
     }
     if (leftEval is num && rightEval is num) {
-      return leftEval % rightEval;
+      return Complex(leftEval % rightEval);
     }
 
     // If x is null and either operand contains a Variable, return the simplified version of the expression

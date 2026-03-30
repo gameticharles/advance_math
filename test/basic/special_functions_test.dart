@@ -15,7 +15,7 @@ void main() {
 
     test('gamma handles num and Complex', () {
       expect(gamma(5), closeTo(24.0, 1e-10)); // 4!
-      expect(gamma(0.5), closeTo(sqrt(pi), 1e-10));
+      expect(gamma(0.5), closeTo(sqrt(pi).toDouble(), 1e-10));
       expect(gamma(Complex(5, 0)), equals(Complex(5, 0).gamma()));
     });
 

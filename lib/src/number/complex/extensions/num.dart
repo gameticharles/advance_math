@@ -101,16 +101,16 @@ extension NumComplexExtension on num {
   }
 
   /// Compares this number with a complex number (magnitude comparison)
-  bool operator >(Complex other) => abs() > other.abs();
+  bool operator >(Complex other) => abs() > other.abs().real;
 
   /// Compares this number with a complex number (magnitude comparison)
-  bool operator >=(Complex other) => abs() >= other.abs();
+  bool operator >=(Complex other) => abs() >= other.abs().real;
 
   /// Compares this number with a complex number (magnitude comparison)
-  bool operator <(Complex other) => abs() < other.abs();
+  bool operator <(Complex other) => abs() < other.abs().real;
 
   /// Compares this number with a complex number (magnitude comparison)
-  bool operator <=(Complex other) => abs() <= other.abs();
+  bool operator <=(Complex other) => abs() <= other.abs().real;
 
   Complex get c => Complex(this, 0);
 
