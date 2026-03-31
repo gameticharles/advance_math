@@ -462,7 +462,13 @@ dynamic gcf = VarArgsFunction((args, kwargs) {
   return Complex(result);
 });
 
-dynamic gcd = VarArgsFunction((args, _) {
+/// Returns the greatest common divisor (GCD) of a list of numbers.
+///
+/// Example:
+/// ```dart
+/// print(gcd([12, 18, 24])); // 6
+/// ```
+dynamic gcd = VarArgsFunction((args, kwargs) {
   if (args.length == 2 &&
       args.any((e) =>
           e is! num && e is! Complex ||
@@ -534,7 +540,7 @@ dynamic egcd = VarArgsFunction((args, kwargs) {
   return results;
 });
 
-dynamic lcm = VarArgsFunction((args, _) {
+dynamic lcm = VarArgsFunction((args, kwargs) {
   if (args.length == 2 &&
       args.any((e) =>
           e is! num && e is! Complex ||
@@ -598,7 +604,8 @@ dynamic confidenceInterval = VarArgsFunction((args, kwargs) {
 
   num sampleMean = _mean(data);
   num stdErr = _stdErrMean(data);
-  num margin = (tValue.callback(data, <String, dynamic>{}) as Complex).real * stdErr;
+  num margin =
+      (tValue.callback(data, <String, dynamic>{}) as Complex).real * stdErr;
   return [Complex(sampleMean - margin), Complex(sampleMean + margin)];
 });
 
