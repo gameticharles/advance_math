@@ -141,14 +141,13 @@ class Polygon extends PlaneGeometry {
 
     for (int i = 1; i <= n; i++) {
       Point p2 = vertices![i % n];
-      if (point.y > min(p1[1], p2[1])) {
-        if (point.y <= max(p1[1], p2[1])) {
-          if (point.x <= max(p1[0], p2[0])) {
-            if (p1[1] != p2[1]) {
-              xinters =
-                  (point.y - p1[1]) * (p2[0] - p1[0]) / (p2[1] - p1[1]) + p1[0];
+      if (point.y > min(p1.y, p2.y)) {
+        if (point.y <= max(p1.y, p2.y)) {
+          if (point.x <= max(p1.x, p2.x)) {
+            if (p1.y != p2.y) {
+              xinters = (point.y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x;
             }
-            if (p1[0] == p2[0] || point.x <= xinters) {
+            if (p1.x == p2.x || point.x <= xinters) {
               inside = !inside;
             }
           }
@@ -498,9 +497,9 @@ class Polygon extends PlaneGeometry {
   /// print("Area of the polygon: ${area.toStringAsFixed(6)}");
   /// ```
   double greensTheorem() {
-    List<num> x = vertices!.map((vertex) => vertex.x).toList();
-    List<num> y = vertices!.map((vertex) => vertex.y).toList();
-    double area = 0.0;
+    List<dynamic> x = vertices!.map((vertex) => vertex.x).toList();
+    List<dynamic> y = vertices!.map((vertex) => vertex.y).toList();
+    dynamic area = 0.0;
 
     for (int i = 0; i < vertices!.length - 1; i++) {
       area += (x[i] * y[i + 1]) - (x[i + 1] * y[i]);
@@ -508,7 +507,7 @@ class Polygon extends PlaneGeometry {
     // the following line completes the loop by connecting the last vertex to the first
     area += (x.last * y.first) - (x.first * y.last);
 
-    return 0.5 * area.abs();
+    return area.abs() * 0.5;
   }
 
   /// Calculate the area of a triangle given its vertices.

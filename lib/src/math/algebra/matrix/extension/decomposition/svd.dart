@@ -107,7 +107,7 @@ class SVD {
         if ((k < nct) && (_s[0][k] != Complex.zero())) {
           // Apply the transformation.
 
-          dynamic t = Complex.zero();
+          Complex t = Complex.zero();
           for (var i = k; i < _m; i++) {
             t += A[i][k] * A[i][j];
           }
@@ -203,7 +203,7 @@ class SVD {
       for (var k = nct - 1; k >= 0; k--) {
         if (_s[0][k] != Complex.zero()) {
           for (var j = k + 1; j < nu; j++) {
-            dynamic t = Complex.zero();
+            Complex t = Complex.zero();
             for (var i = k; i < _m; i++) {
               t += _u[i][k] * _u[i][j];
             }
@@ -234,7 +234,7 @@ class SVD {
       for (var k = _n - 1; k >= 0; k--) {
         if ((k < nrt) && (e[0][k] != Complex.zero())) {
           for (var j = k + 1; j < nu; j++) {
-            dynamic t = Complex.zero();
+            Complex t = Complex.zero();
             for (var i = k + 1; i < _n; i++) {
               t += _v[i][k] * _v[i][j];
             }
@@ -302,8 +302,8 @@ class SVD {
           if (ks == k) {
             break;
           }
-          var t = (ks != p ? (e[0][ks].abs()) : 0) +
-              (ks != k + 1 ? e[0][ks - 1].abs() : 0);
+          var t = (ks != p ? (e[0][ks].abs()) : Complex.zero()) +
+              (ks != k + 1 ? e[0][ks - 1].abs() : Complex.zero());
           if (Complex(_s[0][ks].abs()) <= (tiny + (eps * Complex(t)))) {
             _s[0][ks] = Complex.zero();
             break;
@@ -379,14 +379,13 @@ class SVD {
           {
             // Calculate the shift.
 
-            var scale = dmath.max(
-                dmath.max(
-                    dmath.max(
-                        dmath.max((_s[0][p - 1].abs() as num),
-                            (_s[0][p - 2].abs() as num)),
-                        (e[0][p - 2].abs() as num)),
-                    (_s[0][k].abs() as num)),
-                (e[0][k].abs() as num));
+            var scale = math.max(
+                math.max(
+                    math.max(
+                        math.max((_s[0][p - 1].abs()), (_s[0][p - 2].abs())),
+                        (e[0][p - 2].abs())),
+                    (_s[0][k].abs())),
+                (e[0][k].abs()));
             var sp = _s[0][p - 1] / scale;
             var spm1 = _s[0][p - 2] / scale;
             var epm1 = e[0][p - 2] / scale;
@@ -528,24 +527,8 @@ class SVD {
 
   // Modified hypotenuse function to properly handle Complex numbers
   dynamic hypotenuse(dynamic x, dynamic y) {
-    // Handle the case when both are Complex
-    if (x is Complex && y is Complex) {
-      return Complex(math.sqrt(math.pow(x.abs(), 2) + math.pow(y.abs(), 2)), 0);
-    }
-
-    // Handle the case when one is Complex
-    if (x is Complex) {
-      return Complex(
-          math.sqrt(math.pow(x.abs(), 2) + math.pow(y as num, 2)), 0);
-    }
-
-    if (y is Complex) {
-      return Complex(
-          math.sqrt(math.pow(x as num, 2) + math.pow(y.abs(), 2)), 0);
-    }
-
-    // Original implementation for numeric values
-    return math.sqrt(math.pow(x as num, 2) + math.pow(y as num, 2));
+    // Robust implementation that handles both num and Complex
+    return math.sqrt(x * x + y * y);
   }
 
   /// Return the left singular vectors

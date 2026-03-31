@@ -167,7 +167,8 @@ extension VectorOperations on Vector {
           'Neither the Vector nor the other Vector can be zero');
     }
 
-    return cross(other).magnitude < (1e-10);
+    // Two vectors are parallel if their cross product has a magnitude of 0.
+    return cross(other).magnitude < 1e-10;
   }
 
   /// Checks if this [Vector] is perpendicular to [other].
@@ -191,7 +192,10 @@ extension VectorOperations on Vector {
           'Neither the Vector nor the other Vector can be zero');
     }
 
-    return dot(other).abs() < Complex(1e-10);
+    // Two vectors are perpendicular if their dot product is 0.
+    final dotProduct = dot(other);
+    return (dotProduct is Complex ? dotProduct.abs() : dotProduct.abs()) <
+        1e-10;
   }
 
   /// Rounds each element in the vector to the specified number of decimal places.
@@ -289,7 +293,7 @@ extension VectorOperations on Vector {
   /// ```
   /// Explanation:
   /// The vector `[3, 4]` has a norm of 5 because sqrt(3*3 + 4*4) = sqrt(9 + 16) = sqrt(25) = 5.
-  dynamic norm([Norm normType = Norm.frobenius]) {
+  Complex norm([Norm normType = Norm.frobenius]) {
     switch (normType) {
       case Norm.frobenius:
         return math
@@ -301,10 +305,9 @@ extension VectorOperations on Vector {
             .map((value) => value.abs())
             .reduce((a, b) => math.max(a, b));
       case Norm.hamming:
-        return _data.where((value) => value != 0).length;
+        return Complex(_data.where((value) => value != 0).length);
       case Norm.cosine:
-        final magnitude =
-            math.sqrt(_data.map((v) => v * v).reduce((a, b) => a + b));
+        final magnitude = norm(Norm.frobenius);
         final vDot = dot(this);
         return vDot / magnitude;
       // The below norms need more context to implement.

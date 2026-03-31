@@ -1,5 +1,6 @@
 library geometry;
 
+import 'dart:math' as math;
 import '/advance_math.dart';
 
 // Utils

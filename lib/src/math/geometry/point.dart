@@ -9,13 +9,13 @@ part of 'geometry.dart';
 /// circles, and polygons.
 class Point extends Vector {
   /// The x-coordinate of the point.
-  num x;
+  dynamic x;
 
   /// The y-coordinate of the point.
-  num y;
+  dynamic y;
 
   /// The z-coordinate of the point. If the point is 2D, this value is null.
-  num? z;
+  dynamic z;
 
   /// Constructor for creating a new `Point`.
   ///
@@ -69,7 +69,8 @@ class Point extends Vector {
   /// var p = Point.fromSphericalCoordinates(5, toRadians(53.13), toRadians(30));
   /// print(p); // Output: Point(1.50, 1.999997320371271, 4.330127018922194)
   /// ```
-  factory Point.fromSphericalCoordinates(num r, num theta, num phi) {
+  factory Point.fromSphericalCoordinates(
+      dynamic r, dynamic theta, dynamic phi) {
     var x = r * sin(phi) * cos(theta);
     var y = r * sin(phi) * sin(theta);
     var z = r * cos(phi);
@@ -106,7 +107,7 @@ class Point extends Vector {
   /// ```
   ///
   /// Throws an [ArgumentError] if `coords` contains fewer than 2 or more than 3 numbers.
-  factory Point.fromList(List<num> coords) {
+  factory Point.fromList(List<dynamic> coords) {
     if (coords.length < 2 || coords.length > 3) {
       throw ArgumentError('List must contain 2 or 3 numbers.');
     }
@@ -206,7 +207,7 @@ class Point extends Vector {
   /// ```
   ///
   /// Returns a new `Point`.
-  Point operator *(num scalar) =>
+  Point operator *(dynamic scalar) =>
       Point(x * scalar, y * scalar, z != null ? z! * scalar : null);
 
   /// Overrides the division (/) operator.
@@ -222,7 +223,7 @@ class Point extends Vector {
   /// ```
   ///
   /// Returns a new `Point`.
-  Point operator /(num scalar) {
+  Point operator /(dynamic scalar) {
     if (scalar == 0) throw ArgumentError('Cannot divide by zero.');
     return Point(x / scalar, y / scalar, z != null ? z! / scalar : null);
   }
@@ -357,7 +358,7 @@ class Point extends Vector {
   /// var point = Point(1, 2, 3);
   /// print(point.move(1, -1, 2)); // Output: Point(2, 1, 5)
   /// ```
-  Point move(num dx, num dy, [num? dz]) {
+  Point move(dynamic dx, dynamic dy, [dynamic dz]) {
     var xNew = x + dx;
     var yNew = y + dy;
     var zNew = z != null ? z! + dz! : null;
@@ -375,7 +376,7 @@ class Point extends Vector {
   /// var point = Point(1, 2, 3);
   /// print(point.scale(2)); // Output: Point(2, 4, 6)
   /// ```
-  Point scale(num factor) {
+  Point scale(dynamic factor) {
     var xNew = x * factor;
     var yNew = y * factor;
     var zNew = z != null ? z! * factor : null;
@@ -470,7 +471,7 @@ class Point extends Vector {
   /// ```
   ///
   /// Returns a `List<num>` with `r` as the first element and `theta` as the second.
-  (num, Angle) polarCoordinates() {
+  (dynamic, Angle) polarCoordinates() {
     if (z != null) {
       throw Exception("Polar coordinates are not supported for 3D points.");
     }
@@ -492,11 +493,11 @@ class Point extends Vector {
   /// ```
   ///
   /// Returns the slope as a `double`.
-  double slopeTo(Point otherPoint) {
+  Complex slopeTo(Point otherPoint) {
     var dy = otherPoint.y - y;
     var dx = otherPoint.x - x;
     if (dx == 0) {
-      return double.infinity; // Vertical line: slope is undefined
+      return Complex.infinity(); // Vertical line: slope is undefined
     }
     return dy / dx;
   }
@@ -654,11 +655,11 @@ class Point extends Vector {
   /// ```
   ///
   /// Returns the area as a `double`.
-  double triangleArea(Point point1, Point point2) {
+  Complex triangleArea(Point point1, Point point2) {
     var area = 0.5 *
         ((point1.x - x) * (point2.y - y) - (point1.y - y) * (point2.x - x))
             .abs();
-    return area;
+    return Complex(area);
   }
 
   /// Checks if this point is inside a polygon or on its boundary.

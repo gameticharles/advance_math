@@ -364,7 +364,7 @@ class Matrix extends IterableMixin<List<dynamic>> {
       return Matrix(data);
     } else {
       // axis == 1
-      int maxRows = matrices.map((matrix) => matrix.rowCount).reduce(math.max);
+      int maxRows = matrices.map((matrix) => matrix.rowCount).reduce(dmath.max);
       List<List<dynamic>> data = List.generate(maxRows, (_) => []);
       for (Matrix matrix in matrices) {
         for (int i = 0; i < maxRows; i++) {

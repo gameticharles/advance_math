@@ -55,7 +55,7 @@ class _Utils {
   }
 
   ///Convert a dynamic list to double list
-  static List<dynamic> toSDList(List<dynamic> list) {
+  static List<Complex> toSDList(List<dynamic> list) {
     return list.map((e) {
       if (e is num || e is Complex) {
         return e is Complex ? e : Complex.parse(e.toString());
@@ -214,7 +214,7 @@ class _Utils {
 
     for (var row in m.toList()) {
       row.asMap().forEach((index, element) => columnWidths[index] =
-          math.max(columnWidths[index], element.toString().length).toInt());
+          dmath.max(columnWidths[index], element.toString().length));
     }
 
     rows = m

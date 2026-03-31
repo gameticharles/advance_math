@@ -69,7 +69,7 @@ extension ListVector on List<num> {
   List<dynamic> roll(dynamic shift) => Vector(this).roll(shift).toList();
 
   /// Calculates the dot product of the list with another list or vector.
-  double dot(dynamic other) =>
+  dynamic dot(dynamic other) =>
       Vector(this).dot(other is num ? Vector(other) : other);
 }
 

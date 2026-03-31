@@ -225,8 +225,9 @@ extension ComplexOperationX<T extends Complex> on T {
     //   return b * math.sqrt(1 + r * r);
     // }
 
-    final value = math.sqrt(real * real + imaginary * imaginary) as num;
-    return value.toInt() == value ? value.toInt() : value.toDouble();
+    // Magnitude is always a real number: sqrt(a^2 + b^2)
+    final value = dmath.sqrt(real * real + imaginary * imaginary);
+    return value.toInt() == value ? value.toInt() : value;
   }
 
   /// Calculates the natural logarithm of the complex number.

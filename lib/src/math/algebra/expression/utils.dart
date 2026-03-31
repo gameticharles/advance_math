@@ -6,6 +6,10 @@ final Map<String, dynamic> defaultContext =
     ExpressionContext.buildDefaultContext();
 
 int _toInt(dynamic v) => v is Complex ? v.real.toInt() : (v as num).toInt();
+num _toNum(dynamic v) => v is Complex ? v.real : (v as num);
+double _toDouble(dynamic v) =>
+    v is Complex ? v.real.toDouble() : (v as num).toDouble();
+Point _toPoint(dynamic v) => v is Point ? v : (v as Vector).toPoint();
 
 List<dynamic> _flattenArgs(List<dynamic> args) {
   if (args.isEmpty) return [];
@@ -53,7 +57,9 @@ class ExpressionContext {
               : (e is Complex ? e.real.toDouble() : 0.0))
           .toList();
     }
-    return [(args as num).toDouble()];
+    return [
+      args is Complex ? args.real.toDouble() : (args as num).toDouble()
+    ];
   }
 
   /// Provides common constants and basic mathematical functions.
@@ -520,12 +526,14 @@ class ExpressionContext {
             return args.last;
           }
         }),
+        // coalesce(val1, val2, ...)
         'coalesce': VarArgsFunction((args, _) {
           for (var arg in args) {
             if (arg != null) return arg;
           }
           return null;
         }),
+        // choose(index, val1, val2, ...)
         'choose': VarArgsFunction((args, _) {
           if (args.isEmpty) {
             throw ArgumentError('choose() requires at least one argument');
@@ -536,6 +544,7 @@ class ExpressionContext {
           }
           return args[index];
         }),
+        // cond(test1, val1, test2, val2, ..., defaultVal)
         'cond': VarArgsFunction((args, _) {
           for (int i = 0; i < args.length - 1; i += 2) {
             final test = args[i];
@@ -622,8 +631,8 @@ class ExpressionContext {
             )),
         'randomVector': VarArgsFunction((args, _) => Vector.random(
               _toInt(args[0]),
-              min: args.length > 1 ? (args[1] as num).toDouble() : 0.0,
-              max: args.length > 2 ? (args[2] as num).toDouble() : 1.0,
+              min: args.length > 1 ? _toDouble(args[1]) : 0.0,
+              max: args.length > 2 ? _toDouble(args[2]) : 1.0,
             )),
         'dot': VarArgsFunction(
             (args, _) => (args[0] as Vector).dot(args[1] as Vector)),
@@ -654,8 +663,15 @@ class ExpressionContext {
             VarArgsFunction((args, _) => (args.first as Vector).normalize()),
         'normalize':
             VarArgsFunction((args, _) => (args.first as Vector).normalize()),
-        'distance': VarArgsFunction(
-            (args, _) => (args[0] as Vector).distance(args[1] as Vector)),
+        'distance': VarArgsFunction((args, _) {
+          final first = args[0];
+          final second = args[1];
+          if (first is Point && second is Point) return first.distanceTo(second);
+          if (first is Vector && second is Vector) {
+            return first.distance(second);
+          }
+          throw ArgumentError('distance() expects two Points or two Vectors');
+        }),
         'zerosVector': VarArgsFunction((args, _) => Vector(_toInt(args[0]))),
         'onesVector': VarArgsFunction(
             (args, _) => Vector(List.filled(_toInt(args[0]), 1))),
@@ -933,23 +949,22 @@ class ExpressionContext {
         }),
 
         'circle': VarArgsFunction((args, kwargs) {
-          final center = kwargs['center'] ?? args[0] as Point;
-          final radius =
-              ((kwargs['r'] ?? kwargs['radius'] ?? args[1]) as num).toDouble();
+          final center = kwargs['center'] ?? _toPoint(args[0]);
+          final radius = _toDouble(kwargs['r'] ?? kwargs['radius'] ?? args[1]);
           return Circle(radius, center: center);
         }),
 
         'triangle': VarArgsFunction((args, kwargs) {
-          final a = ((kwargs['a'] ?? args[0]) as num);
-          final b = ((kwargs['b'] ?? args[1]) as num);
-          final c = ((kwargs['c'] ?? args[2]) as num);
+          final a = _toNum(kwargs['a'] ?? args[0]);
+          final b = _toNum(kwargs['b'] ?? args[1]);
+          final c = _toNum(kwargs['c'] ?? args[2]);
           return Triangle(a: a, b: b, c: c);
         }),
 
         'triangle_pts': VarArgsFunction((args, _) => Triangle(
-              A: args[0] as Point,
-              B: args[1] as Point,
-              C: args[2] as Point,
+              A: _toPoint(args[0]),
+              B: _toPoint(args[1]),
+              C: _toPoint(args[2]),
             )),
 
         'polygon': VarArgsFunction((args, _) {
@@ -958,15 +973,15 @@ class ExpressionContext {
         }),
 
         'reg_polygon': VarArgsFunction((args, kwargs) => RegularPolygon(
-              numSides: (kwargs['n'] ?? args[0]) as int,
-              sideLength: ((kwargs['side'] ?? args[1]) as num).toDouble(),
+              numSides: _toInt(kwargs['n'] ?? args[0]),
+              sideLength: _toDouble(kwargs['side'] ?? args[1]),
             )),
 
         'line': VarArgsFunction((args, _) {
-          if (args[0] is Point) {
-            return Line(p1: args[0] as Point, p2: args[1] as Point);
+          if (args[0] is Point || args[0] is Vector) {
+            return Line(p1: _toPoint(args[0]), p2: _toPoint(args[1]));
           }
-          return Line(gradient: args[0], intercept: args[1]);
+          return Line(gradient: _toNum(args[0]), intercept: _toNum(args[1]));
         }),
 
         'area': VarArgsFunction((args, _) {
@@ -992,20 +1007,19 @@ class ExpressionContext {
         'circumference':
             VarArgsFunction((args, _) => (args.first as Circle).circumference),
 
-        'distance': VarArgsFunction(
-            (args, _) => (args[0] as Point).distanceTo(args[1] as Point)),
+        // 'distance' is handled in Vector extras to handle both Points and Vectors
         'midpoint': VarArgsFunction(
-            (args, _) => (args[0] as Point).midpointTo(args[1] as Point)),
+            (args, _) => _toPoint(args[0]).midpointTo(_toPoint(args[1]))),
         'centroid':
             VarArgsFunction((args, _) => (args.first as Polygon).centroid()),
         'bearing': VarArgsFunction(
-            (args, _) => (args[0] as Point).bearingTo(args[1] as Point)),
+            (args, _) => _toPoint(args[0]).bearingTo(_toPoint(args[1]))),
         'slope': VarArgsFunction(
-            (args, _) => (args[0] as Point).slopeTo(args[1] as Point)),
+            (args, _) => _toPoint(args[0]).slopeTo(_toPoint(args[1]))),
 
         'is_inside': VarArgsFunction((args, _) {
           final shape = args[0];
-          final pt = args[1] as Point;
+          final pt = _toPoint(args[1]);
           if (shape is Circle) return shape.isPointInside(pt);
           if (shape is Polygon) return shape.isPointInsidePolygon(pt);
           throw ArgumentError('is_inside() expects (Circle/Polygon, Point)');

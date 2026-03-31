@@ -275,20 +275,20 @@ class Vector extends IterableMixin<dynamic> {
   /// ```
   /// 5.196152422706632
   /// ```
-  dynamic distance(Vector other,
+  Complex distance(Vector other,
       {DistanceType distance = DistanceType.frobenius}) {
     if (length != other.length) {
       throw ArgumentError(
           "Vectors must have the same length for distance calculation.");
     }
 
-    dynamic sumSquare = Complex.zero();
-    dynamic sumAbs = Complex.zero();
-    dynamic maxAbs = Complex.zero();
-    dynamic dotProduct = Complex.zero();
-    dynamic sumSquare1 = Complex.zero();
-    dynamic sumSquare2 = Complex.zero();
-    dynamic hammingDistance = Complex.zero();
+    Complex sumSquare = Complex.zero();
+    Complex sumAbs = Complex.zero();
+    Complex maxAbs = Complex.zero();
+    Complex dotProduct = Complex.zero();
+    Complex sumSquare1 = Complex.zero();
+    Complex sumSquare2 = Complex.zero();
+    Complex hammingDistance = Complex.zero();
 
     for (int i = 0; i < _data.length; i++) {
       final diff = _data[i] - other[i];
@@ -312,7 +312,7 @@ class Vector extends IterableMixin<dynamic> {
         return maxAbs;
       case DistanceType.mahalanobis:
         // We need a covariance matrix and its inverse to compute Mahalanobis distance
-        return double.nan; // placeholder value indicating unimplemented
+        return Complex.nan(); // placeholder value indicating unimplemented
       case DistanceType.cosine:
         final magnitude1 = math.sqrt(sumSquare1);
         final magnitude2 = math.sqrt(sumSquare2);
@@ -398,13 +398,13 @@ class Vector extends IterableMixin<dynamic> {
       throw Exception(
           "Vector must be 3D for conversion to Spherical coordinates");
     }
-    dynamic x = _data[0];
-    dynamic y = _data[1];
-    dynamic z = _data[2];
-    dynamic r = math.sqrt(x * x + y * y + z * z);
-    dynamic theta = math.acos(z / r);
-    dynamic phi = math.atan2(y, x);
-    return [r, theta, phi];
+    Complex x = _data[0];
+    Complex y = _data[1];
+    Complex z = _data[2];
+    Complex r = math.sqrt(x * x + y * y + z * z);
+    Complex theta = math.acos(z / r);
+    Complex phi = math.atan2(y, x);
+    return [r.toNum(), theta.toNum(), phi.toNum()];
   }
 
   /// Converts the Vector from Cartesian to Cylindrical coordinates.
@@ -425,12 +425,12 @@ class Vector extends IterableMixin<dynamic> {
       throw Exception(
           "Vector must be 3D for conversion to Cylindrical coordinates");
     }
-    dynamic x = _data[0];
-    dynamic y = _data[1];
-    dynamic z = _data[2];
-    dynamic rho = math.sqrt(x * x + y * y);
-    dynamic phi = math.atan2(y, x);
-    return [rho, phi, z];
+    Complex x = _data[0];
+    Complex y = _data[1];
+    Complex z = _data[2];
+    Complex rho = math.sqrt(x * x + y * y);
+    Complex phi = math.atan2(y, x);
+    return [rho.toNum(), phi.toNum(), z.toNum()];
   }
 
   /// Converts the Vector from Cartesian to Polar coordinates.
@@ -452,11 +452,11 @@ class Vector extends IterableMixin<dynamic> {
     if (length != 2) {
       throw Exception("Vector must be 2D for conversion to Polar coordinates");
     }
-    dynamic x = _data[0];
-    dynamic y = _data[1];
-    dynamic r = math.sqrt(x * x + y * y);
-    dynamic theta = math.atan2(y, x);
-    return [r, theta];
+    Complex x = _data[0];
+    Complex y = _data[1];
+    Complex r = math.sqrt(x * x + y * y);
+    Complex theta = math.atan2(y, x);
+    return [r.toNum(), theta.toNum()];
   }
 
   // @override  //performance optimization

@@ -382,8 +382,8 @@ extension MatrixOperationExtension on Matrix {
       case Rescale.row:
         for (int i = 0; i < rowCount; i++) {
           var row = _Utils.toSDList(_data[i]);
-          var maxElement = row.reduce(math.max);
-          var minElement = row.reduce(math.min);
+          var maxElement = row.reduce((a, b) => math.max(a, b));
+          var minElement = row.reduce((a, b) => math.min(a, b));
 
           for (int j = 0; j < columnCount; j++) {
             rescaledMatrix[i][j] =
@@ -395,8 +395,8 @@ extension MatrixOperationExtension on Matrix {
       case Rescale.column:
         for (int j = 0; j < columnCount; j++) {
           var col = _Utils.toSDList(column(j).asList);
-          var maxElement = col.reduce(math.max);
-          var minElement = col.reduce(math.min);
+          var maxElement = col.reduce((a, b) => math.max(a, b));
+          var minElement = col.reduce((a, b) => math.min(a, b));
 
           for (int i = 0; i < rowCount; i++) {
             rescaledMatrix[i][j] =
@@ -699,7 +699,7 @@ extension MatrixOperationExtension on Matrix {
                 .reduce((value, element) => value + element))
             .toList();
       case 2:
-        int diagonalLength = math.min(rowCount, columnCount);
+        int diagonalLength = dmath.min(rowCount, columnCount);
         dynamic diagonalSum = Complex.zero();
         for (int i = 0; i < diagonalLength; i++) {
           diagonalSum += absolute ? _data[i][i].abs() : _data[i][i];
@@ -1212,7 +1212,8 @@ extension MatrixOperationExtension on Matrix {
   dynamic _spectralNorm() {
     var singularValues = decomposition.singularValueDecomposition();
 
-    return _Utils.toSDList(singularValues.S.diagonal()).reduce(math.max);
+    return _Utils.toSDList(singularValues.S.diagonal())
+        .reduce((a, b) => math.max(a, b));
   }
 
   /// Computes the trace norm (also known as nuclear norm) of the matrix,

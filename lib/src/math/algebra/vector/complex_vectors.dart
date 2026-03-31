@@ -112,12 +112,12 @@ class ComplexVector {
   /// print(v.norm());  // Output: 3.7416573867739413
   /// ```
   double norm() {
-    double sum = 0;
+    num sum = 0;
     for (int i = 0; i < length; i++) {
       sum += ((this[i] as Complex).real * (this[i] as Complex).real) +
           ((this[i] as Complex).imaginary * (this[i] as Complex).imaginary);
     }
-    return math.sqrt(sum);
+    return math.sqrt(sum).real.toDouble();
   }
 
   /// Returns a normalized version of this vector (a vector of length 1 in the same direction).

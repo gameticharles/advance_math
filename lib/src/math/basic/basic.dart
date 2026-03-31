@@ -197,7 +197,7 @@ Complex rect(double x) {
 /// ```dart
 /// print(sinc(1));    // Output: 0.8414709848078965 (approximate value of sin(1)/1)
 /// ```
-dynamic sinc(dynamic x) {
+Complex sinc(dynamic x) {
   if (x == 0 || x == Complex.zero()) return Complex.one();
   return sin(x) / x;
 }
@@ -379,10 +379,8 @@ BigInt bigIntNChooseRModPrime(int N, int R, int P) {
 /// print(floor(2.3));  // Output: 2
 /// ```
 Complex floor(dynamic x) {
-  if (x is num) {
-    return Complex(x.floor());
-  } else if (x is Complex) {
-    return x.floor();
+  if (x is num || x is Complex) {
+    return Complex(x).floor();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -395,10 +393,8 @@ Complex floor(dynamic x) {
 /// print(ceil(2.3));  // Output: 3
 /// ```
 Complex ceil(dynamic x) {
-  if (x is num) {
-    return Complex(x.ceil());
-  } else if (x is Complex) {
-    return x.ceil();
+  if (x is num || x is Complex) {
+    return Complex(x).ceil();
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -526,11 +522,9 @@ dynamic sign(dynamic x) {
 /// print(clamp(10, 1, 5));  // Output: 5
 /// print(clamp(Complex(10, 7), 1, 5)); // Output: Complex(5, 5)
 /// ```
-dynamic clamp(dynamic x, num min, num max) {
-  if (x is num) {
-    return Complex(x < min ? min : (x > max ? max : x));
-  } else if (x is Complex) {
-    return x.clamp(min, max);
+Complex clamp(dynamic x, dynamic min, dynamic max) {
+  if (x is num || x is Complex) {
+    return Complex(x).clamp(min, max);
   } else {
     throw ArgumentError('Input should be either num or Complex');
   }
@@ -543,17 +537,13 @@ dynamic clamp(dynamic x, num min, num max) {
 /// print(lerp(0, 10, 0.5));  // Output: 5.0
 /// print(lerp(Complex(0, 0), Complex(10, 20), 0.5)); // Output: Complex(5, 10)
 /// ```
-dynamic lerp(dynamic a, dynamic b, num t) {
-  if (a is num && b is num) {
-    return Complex(a + (b - a) * t);
-  } else {
-    // Convert to Complex if needed
-    Complex ca = a is Complex ? a : Complex(a, 0);
-    Complex cb = b is Complex ? b : Complex(b, 0);
+Complex lerp(dynamic a, dynamic b, dynamic t) {
+  // Convert to Complex if needed
+  Complex ca = Complex(a);
+  Complex cb = Complex(b);
 
-    // Calculate a + (b - a) * t
-    return ca + ((cb - ca) * Complex(t, 0));
-  }
+  // Calculate a + (b - a) * t
+  return ca + ((cb - ca) * Complex(t));
 }
 
 /// Converts polar coordinates (r, theta) to rectangular coordinates (x, y).
@@ -571,12 +561,13 @@ dynamic lerp(dynamic a, dynamic b, num t) {
 /// print(rec(56, degToRad(27))); // {'x': 49.8963653545486, 'y': 25.42346798541462}
 /// print(rec(56, 27, isDegrees: true)); // {'x': 49.8963653545486, 'y': 25.42346798541462}
 /// ```
-({double x, double y}) rec(num r, num theta, {bool isDegrees = false}) {
+({Complex x, Complex y}) rec(dynamic r, dynamic theta,
+    {bool isDegrees = false}) {
   if (isDegrees) {
-    theta = toRadians(theta);
+    theta = theta * (math.pi / 180);
   }
-  double x = r.toDouble() * cos(theta);
-  double y = r.toDouble() * sin(theta);
+  Complex x = Complex(r) * Complex(cos(theta));
+  Complex y = Complex(r) * Complex(sin(theta));
   return (x: x, y: y);
 }
 
@@ -595,13 +586,17 @@ dynamic lerp(dynamic a, dynamic b, num t) {
 /// print(pol(49.8963653545486, 25.42346798541462)); // {'r': 56.0, 'theta': 0.471238898038469}
 /// print(pol(49.8963653545486, 25.42346798541462, isDegrees: true)); // {'r': 56.0, 'theta': 27.000000000000004}
 /// ```
-({dynamic r, dynamic theta}) pol(num x, num y, {bool isDegrees = false}) {
-  dynamic r = sqrt(x * x + y * y);
-  dynamic theta = atan2(y, x);
+({Complex r, Complex theta}) pol(dynamic x, dynamic y,
+    {bool isDegrees = false}) {
+  Complex cx = Complex(x);
+  Complex cy = Complex(y);
+  Complex r = sqrt(cx * cx + cy * cy);
+  Complex theta = atan2(cy, cx);
+
   if (isDegrees) {
-    theta = toDegrees(theta.real);
+    theta = theta * (180 / math.pi);
   }
-  return (r: r, theta: theta.toDouble());
+  return (r: r, theta: theta);
 }
 
 /// Determines whether two floating-point numbers are approximately equal.
