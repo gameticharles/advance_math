@@ -783,7 +783,9 @@ extension MatrixStructure on Matrix {
     return true;
   }
 
-  /// Checks if the matrix is a skew symmetric matrix.
+  /// Checks if the matrix is a skew-symmetric matrix (A^T = -A).
+  ///
+  /// Uses a [tolerance] to account for floating-point calculation inaccuracies.
   ///
   /// Example:
   /// ```dart
@@ -794,8 +796,14 @@ extension MatrixStructure on Matrix {
   /// print(F.isSkewSymmetricMatrix()); // Output: true
   /// ```
   bool isSkewSymmetricMatrix({num tolerance = 1e-10}) {
-    if (rowCount != columnCount) return false;
+    if (!isSquareMatrix()) return false;
+
     for (int i = 0; i < rowCount; i++) {
+      // Rule 1: The main diagonal MUST be 0 (checked safely with tolerance)
+      if (this[i][i].abs() > tolerance) return false;
+
+      // Rule 2: Mirrored elements must be negatives of each other.
+      // We only loop j up to i (the lower triangle) to save 50% computation time!
       for (int j = 0; j < i; j++) {
         if ((this[i][j] + this[j][i]).abs() > tolerance) {
           return false;

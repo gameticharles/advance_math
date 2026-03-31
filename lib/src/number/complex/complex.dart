@@ -317,6 +317,11 @@ class Complex implements Comparable<dynamic> {
       : real = double.infinity,
         imaginary = double.infinity;
 
+  /// Constructs a complex number that represents max infinte.
+  Complex.maxFinite()
+      : real = double.maxFinite,
+        imaginary = double.maxFinite;
+
   /// Constructs a complex number that represents infinity.
   Complex.negativeInfinity()
       : real = double.negativeInfinity,

@@ -37,22 +37,24 @@ extension MatrixStatsExtension on Matrix {
 
     switch (axis) {
       case 0:
-        return List<dynamic>.generate(_data[0].length,
-            (i) => _data.map((row) => row[i]).reduce((a, b) => math.min(a, b)));
+        return List<dynamic>.generate(cols, (j) {
+          return _data
+              .map((row) => row[j])
+              .reduce((a, b) => (Complex(a) < Complex(b)) ? a : b);
+        });
       case 1:
         return _data
-            .map((row) => row.reduce((a, b) => math.min(a, b)))
+            .map((row) => row.reduce((a, b) => (Complex(a) < Complex(b)) ? a : b))
             .toList();
       default:
         dynamic minValue = _data[0][0];
-
         for (var row in _data) {
-          dynamic rowMin = row.reduce((a, b) => math.min(a, b));
+          dynamic rowMin =
+              row.reduce((a, b) => (Complex(a) < Complex(b)) ? a : b);
           if (Complex(rowMin) < Complex(minValue)) {
             minValue = rowMin;
           }
         }
-
         return minValue;
     }
   }
@@ -163,14 +165,14 @@ extension MatrixStatsExtension on Matrix {
   /// print(minIndices); // Output: [1, 1] (since the minimum value is 5)
   /// ```
   List<int> findMinInMatrixRegion(int startRow, int startCol) {
-    num minValue = double.maxFinite;
+    var minValue = Complex.maxFinite();
     int minRow = startRow;
     int minCol = startCol;
 
     for (int i = startRow; i < rowCount; i++) {
       for (int j = startCol; j < columnCount; j++) {
         if (this[i][j].abs() < minValue) {
-          minValue = Complex(this[i][j]).abs().real;
+          minValue = Complex(this[i][j]).abs();
           minRow = i;
           minCol = j;
         }
@@ -194,11 +196,13 @@ extension MatrixStatsExtension on Matrix {
   /// final mins = matrix.columnMins();
   /// print(mins);  // Output: [1, 2]
   /// ```
-  List<double> columnMins() {
-    List<double> mins = List.filled(columnCount, double.infinity);
+  List<Complex> columnMins() {
+    List<Complex> mins = List.filled(columnCount, Complex.infinity());
     for (var row in _data) {
       for (int j = 0; j < columnCount; j++) {
-        mins[j] = Complex(math.min(mins[j], row[j])).real.toDouble();
+        if (Complex(row[j]) < mins[j]) {
+          mins[j] = Complex(row[j]);
+        }
       }
     }
     return mins;
@@ -218,11 +222,13 @@ extension MatrixStatsExtension on Matrix {
   /// final maxs = matrix.columnMaxs();
   /// print(maxs);  // Output: [5, 6]
   /// ```
-  List<double> columnMaxs() {
-    List<double> maxs = List.filled(columnCount, double.negativeInfinity);
+  List<Complex> columnMaxs() {
+    List<Complex> maxs = List.filled(columnCount, Complex.negativeInfinity());
     for (var row in _data) {
       for (int j = 0; j < columnCount; j++) {
-        maxs[j] = Complex(math.max(maxs[j], row[j])).real.toDouble();
+        if (Complex(row[j]) > maxs[j]) {
+          maxs[j] = Complex(row[j]);
+        }
       }
     }
     return maxs;
@@ -242,8 +248,8 @@ extension MatrixStatsExtension on Matrix {
   /// final means = matrix.columnMeans();
   /// print(means);  // Output: [3.0, 4.0]
   /// ```
-  List<double> columnMeans() {
-    List<double> sums = List.filled(columnCount, 0.0);
+  List<Complex> columnMeans() {
+    List<Complex> sums = List.filled(columnCount, Complex.zero());
     for (var row in _data) {
       for (int j = 0; j < columnCount; j++) {
         sums[j] += row[j];
@@ -267,16 +273,17 @@ extension MatrixStatsExtension on Matrix {
   /// print(stdDevs);  // Output: [1.632993161855452, 1.632993161855452]
   /// ```
   List<dynamic> columnStdDevs() {
-    List<double> means = columnMeans();
-    List<double> variances = List.filled(columnCount, 0.0);
+    List<Complex> means = columnMeans();
+    List<Complex> variances = List.filled(columnCount, Complex.zero());
 
     for (var row in _data) {
       for (int j = 0; j < columnCount; j++) {
-        variances[j] += math.pow(row[j] - means[j], 2);
+        var diff = Complex(row[j]) - means[j];
+        variances[j] += diff * diff;
       }
     }
 
-    return variances.map((variance) => math.sqrt(variance / rowCount)).toList();
+    return variances.map((variance) => (variance / Complex(rowCount)).sqrt()).toList();
   }
 
   /// Calculates the minimum value for each row in the matrix.
@@ -294,7 +301,9 @@ extension MatrixStatsExtension on Matrix {
   /// print(mins);  // Output: [1, 3, 5]
   /// ```
   List<dynamic> rowMins() {
-    return _data.map((row) => row.reduce((a, b) => math.min(a, b))).toList();
+    return _data
+        .map((row) => row.reduce((a, b) => (Complex(a) < Complex(b)) ? a : b))
+        .toList();
   }
 
   /// Calculates the maximum value for each row in the matrix.
@@ -312,7 +321,9 @@ extension MatrixStatsExtension on Matrix {
   /// print(maxs);  // Output: [2, 4, 6]
   /// ```
   List<dynamic> rowMaxs() {
-    return _data.map((row) => row.reduce((a, b) => math.max(a, b))).toList();
+    return _data
+        .map((row) => row.reduce((a, b) => (Complex(a) > Complex(b)) ? a : b))
+        .toList();
   }
 
   /// Calculates the mean value for each row in the matrix.
@@ -329,10 +340,9 @@ extension MatrixStatsExtension on Matrix {
   /// final means = matrix.rowMeans();
   /// print(means);  // Output: [1.5, 3.5, 5.5]
   /// ```
-  List<double> rowMeans() {
+  List<Complex> rowMeans() {
     return _data
-        .map((row) =>
-            (Complex(row.reduce((a, b) => a + b) / row.length).real.toDouble()))
+        .map((row) => (Complex(row.reduce((a, b) => a + b) / row.length)))
         .toList();
   }
 
@@ -352,11 +362,14 @@ extension MatrixStatsExtension on Matrix {
   /// ```
   List<dynamic> rowStdDevs() {
     return _data.map((row) {
-      double mean = row.reduce((a, b) => a + b) / row.length;
-      double variance =
-          row.map((x) => math.pow(x - mean, 2)).reduce((a, b) => a + b) /
-              row.length;
-      return math.sqrt(variance);
+      var mean = Complex(row.reduce((a, b) => a + b) / row.length);
+      var sumSqDiff = Complex.zero();
+      for (var element in row) {
+        var diff = Complex(element) - mean;
+        sumSqDiff += diff * diff;
+      }
+      var variance = sumSqDiff / Complex(row.length);
+      return variance.sqrt();
     }).toList();
   }
 
@@ -411,6 +424,7 @@ extension MatrixStatsExtension on Matrix {
       if (rank == cols) {
         break;
       }
+      if (rank >= cols) break; // Extra safety
     }
 
     return rank;
@@ -480,7 +494,7 @@ extension MatrixStatsExtension on Matrix {
   /// print(matrix.standardDeviation()); // Output: 1.118033988749895
   /// ```
   dynamic standardDeviation() {
-    return math.sqrt(variance());
+    return variance().sqrt();
   }
 
   /// Returns the covariance matrix of the input matrix.
@@ -509,7 +523,7 @@ extension MatrixStatsExtension on Matrix {
       for (int i = 0; i < n; i++) {
         sum += _data[i][j];
       }
-      means.add(List.filled(n, sum / n));
+      means.add(List.filled(n, Complex(sum / n)));
     }
 
     List<List<dynamic>> centeredData = [];
@@ -521,8 +535,8 @@ extension MatrixStatsExtension on Matrix {
       centeredData.add(row);
     }
 
-    List<List<dynamic>> covMatrix =
-        List.generate(dimensions, (_) => List<double>.filled(dimensions, 0));
+    List<List<dynamic>> covMatrix = List.generate(
+        dimensions, (_) => List<Complex>.filled(dimensions, Complex.zero()));
 
     for (int i = 0; i < dimensions; i++) {
       for (int j = 0; j < dimensions; j++) {
@@ -549,18 +563,23 @@ extension MatrixStatsExtension on Matrix {
   /// ```
   Matrix pearsonCorrelationCoefficient() {
     Matrix covMatrix = covarianceMatrix();
-    List<double> stdDevs = [];
+    int dimensions = covMatrix.rowCount;
+    List<Complex> stdDevs = [];
 
-    for (int i = 0; i < covMatrix.rowCount; i++) {
-      stdDevs.add(math.sqrt(covMatrix[i][i]));
+    for (int i = 0; i < dimensions; i++) {
+      stdDevs.add(Complex(covMatrix[i][i]).sqrt());
     }
 
-    List<List<double>> correlationMatrix =
-        List.generate(rowCount, (_) => List<double>.filled(columnCount, 0));
+    List<List<Complex>> correlationMatrix = List.generate(
+        dimensions, (_) => List<Complex>.filled(dimensions, Complex.zero()));
 
-    for (int i = 0; i < rowCount; i++) {
-      for (int j = 0; j < columnCount; j++) {
-        correlationMatrix[i][j] = covMatrix[i][j] / (stdDevs[i] * stdDevs[j]);
+    for (int i = 0; i < dimensions; i++) {
+      for (int j = 0; j < dimensions; j++) {
+        if (stdDevs[i] == Complex.zero() || stdDevs[j] == Complex.zero()) {
+          correlationMatrix[i][j] = (i == j) ? Complex.one() : Complex.zero();
+        } else {
+          correlationMatrix[i][j] = covMatrix[i][j] / (stdDevs[i] * stdDevs[j]);
+        }
       }
     }
 
@@ -581,15 +600,15 @@ extension MatrixStatsExtension on Matrix {
 
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
-        Complex diff = _data[i][j] - meanValue;
-        sum += math.pow(diff, 3);
+        Complex diff = Complex(_data[i][j]) - meanValue;
+        sum += diff.pow(3);
         count++;
       }
     }
 
-    Complex skewness = sum / count;
-    Complex standardDeviationCubed = math.pow(standardDeviation(), 3);
-    return skewness / standardDeviationCubed;
+    Complex skewValue = sum / Complex(count);
+    Complex standardDeviationCubed = (Complex(standardDeviation())).pow(3);
+    return skewValue / standardDeviationCubed;
   }
 
   /// Returns the kurtosis of the elements in the matrix.
@@ -606,15 +625,15 @@ extension MatrixStatsExtension on Matrix {
 
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < columnCount; j++) {
-        Complex diff = _data[i][j] - meanValue;
-        sum += math.pow(diff, 4);
+        Complex diff = Complex(_data[i][j]) - meanValue;
+        sum += diff.pow(4);
         count++;
       }
     }
 
-    Complex kurtosis = sum / count;
-    Complex standardDeviationFourth = math.pow(standardDeviation(), 4);
-    return kurtosis / standardDeviationFourth - 3;
+    Complex kurtValue = sum / Complex(count);
+    Complex standardDeviationFourth = (Complex(standardDeviation())).pow(4);
+    return kurtValue / standardDeviationFourth - Complex(3);
   }
 
   /// Returns the row echelon form (REF) of the current matrix.

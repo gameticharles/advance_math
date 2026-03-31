@@ -258,34 +258,70 @@ extension MatrixManipulationExtension on Matrix {
     return Matrix(newData);
   }
 
-  /// Removes the columns at the specified indices from the matrix.
+  /// Removes one or multiple columns from the matrix at the specified indices.
   ///
-  /// [columnIndices]: A list of indices of the columns to be removed.
+  /// This method creates a new matrix with the specified columns excluded.
+  /// It accepts either a single integer or a list of integers, ensuring
+  /// backward compatibility with older implementations.
   ///
-  /// Returns a new matrix with the specified columns removed.
+  /// [columnIndices] can be:
+  /// * An `int` representing a single column index to remove.
+  /// * A `List<int>` representing multiple column indices to remove.
+  ///
+  /// Throws an [ArgumentError] if [columnIndices] is neither an `int` nor a `List`,
+  /// and throws a [RangeError] if any of the provided indices are out of bounds
+  /// (less than 0 or greater than or equal to [columnCount]).
   ///
   /// Example:
   /// ```dart
   /// var matrix = Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
-  /// var matrixWithoutColumns = matrix.removeColumns([0, 2]);
-  /// print(matrixWithoutColumns);
+  ///
+  /// // Remove a single column (index 1) using an int
+  /// var matrixWithoutCol1 = matrix.removeColumns(1);
+  /// print(matrixWithoutCol1);
+  /// // Output:
+  /// // 1  3
+  /// // 4  6
+  /// // 7  9
+  ///
+  /// // Remove multiple columns (indices 0 and 2) using a List
+  /// var matrixWithoutCols0And2 = matrix.removeColumns([0, 2]);
+  /// print(matrixWithoutCols0And2);
   /// // Output:
   /// // 2
   /// // 5
   /// // 8
   /// ```
-  Matrix removeColumns(List<int> columnIndices) {
-    columnIndices.sort((a, b) => b.compareTo(a));
+  Matrix removeColumns(dynamic columnIndices) {
+    Set<int> indicesToRemove;
 
-    List<List<dynamic>> newData = List.generate(
-        rowCount,
-        (_) => List<dynamic>.filled(columnCount - columnIndices.length, null,
-            growable: false));
+    // Handle backward compatibility for dynamic inputs
+    if (columnIndices is int) {
+      indicesToRemove = {columnIndices};
+    } else if (columnIndices is List) {
+      // Safely cast to int and convert to a Set for O(1) lightning-fast lookups
+      indicesToRemove = columnIndices.cast<int>().toSet();
+    } else {
+      throw ArgumentError('columnIndices must be an int or a List<int>');
+    }
+
+    // Validate that all indices are within the matrix bounds
+    for (int index in indicesToRemove) {
+      if (index < 0 || index >= columnCount) {
+        throw RangeError.index(
+            index, this, 'columnIndices', 'Column index out of range');
+      }
+    }
+
+    int newColumnCount = columnCount - indicesToRemove.length;
+
+    List<List<dynamic>> newData = List.generate(rowCount,
+        (_) => List<dynamic>.filled(newColumnCount, null, growable: false));
 
     for (int i = 0; i < rowCount; i++) {
       int k = 0;
       for (int j = 0; j < columnCount; j++) {
-        if (columnIndices.contains(j)) continue;
+        if (indicesToRemove.contains(j)) continue;
         newData[i][k++] = this[i][j];
       }
     }
@@ -451,29 +487,35 @@ extension MatrixManipulationExtension on Matrix {
   /// print(matrix);
   /// // Output:
   /// // Matrix: 2x4
-  /// // ┌ 1 2 5 7 ┐
-  /// // └ 3 4 6 8 ┘
+  /// // ┌ 1 2 5 6 ┐
+  /// // └ 3 4 7 8 ┘
   /// ```
   Matrix appendColumns(dynamic newColumns) {
     List<List<dynamic>> columnsToAdd;
+
     if (newColumns is Matrix) {
-      columnsToAdd = newColumns.transpose().toList();
-    } else if (newColumns is List<List<dynamic>>) {
-      columnsToAdd = newColumns;
+      // Standard Matrix Augmentation: Attach exactly as it is shaped
+      columnsToAdd = newColumns.toList();
+    } else if (newColumns is List<List<dynamic>> || newColumns is List<List>) {
+      // If the user passes raw lists, treat them as a list of vertical columns.
+      // We transpose it here so it's easy to add row-by-row later.
+      columnsToAdd = List.generate(newColumns[0].length,
+          (i) => List.generate(newColumns.length, (j) => newColumns[j][i]));
     } else {
-      throw Exception('Invalid input type');
+      throw ArgumentError(
+          'Invalid input type. Must be Matrix or List<List<dynamic>>');
     }
 
-    if (rowCount != columnsToAdd[0].length) {
-      throw Exception(
+    // Validate heights match
+    if (rowCount != columnsToAdd.length) {
+      throw ArgumentError(
           'The new columns must have the same number of rows as the matrix');
     }
-    var newData = List<List<dynamic>>.from(_data);
 
+    // Deep copy and merge using the spread operator
+    List<List<dynamic>> newData = [];
     for (int i = 0; i < rowCount; i++) {
-      for (int j = 0; j < columnsToAdd.length; j++) {
-        newData[i].add(columnsToAdd[j][i]);
-      }
+      newData.add([..._data[i], ...columnsToAdd[i]]);
     }
 
     return Matrix(newData);
@@ -541,7 +583,8 @@ extension MatrixManipulationExtension on Matrix {
   /// // 5  0
   /// ```
   Matrix replace(List<int> rowIndices, List<int> colIndices, dynamic value) {
-    List<List<dynamic>> newData = List.from(toList());
+    List<List<dynamic>> newData =
+        List.generate(rowCount, (i) => List.from(_data[i]));
     for (int row in rowIndices) {
       if (row >= rowCount || row < 0) {
         throw Exception('Invalid row index');
@@ -627,7 +670,10 @@ extension MatrixManipulationExtension on Matrix {
   /// // 5  6
   /// ```
   Matrix copy() {
-    return Matrix.fromList(_data);
+    // Creates a brand new list in memory for every row
+    List<List<dynamic>> copiedData =
+        _data.map((row) => List<dynamic>.from(row)).toList();
+    return Matrix(copiedData);
   }
 
   /// Copies the elements from another matrix into this matrix.
@@ -677,13 +723,11 @@ extension MatrixManipulationExtension on Matrix {
     }
 
     if (resize && !retainSize) {
-      _data = List.generate(other.rowCount,
-          (i) => List.filled(other.columnCount, Complex.zero()));
-    }
-
-    if (!resize && retainSize) {
-      num copyRowCount = math.min(rowCount, other.rowCount);
-      num copyColumnCount = math.min(columnCount, other.columnCount);
+      // Deep copy the other matrix's data directly
+      _data = other._data.map((row) => List<dynamic>.from(row)).toList();
+    } else if (!resize && retainSize) {
+      int copyRowCount = math.min(rowCount, other.rowCount).toInt();
+      int copyColumnCount = math.min(columnCount, other.columnCount).toInt();
 
       for (int i = 0; i < copyRowCount; i++) {
         for (int j = 0; j < copyColumnCount; j++) {
@@ -694,7 +738,6 @@ extension MatrixManipulationExtension on Matrix {
       if (rowCount != other.rowCount || columnCount != other.columnCount) {
         throw Exception("Matrices have different shapes");
       }
-
       for (int i = 0; i < rowCount; i++) {
         for (int j = 0; j < columnCount; j++) {
           this[i][j] = other[i][j];

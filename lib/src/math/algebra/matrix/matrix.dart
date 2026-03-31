@@ -164,7 +164,9 @@ class Matrix extends IterableMixin<List<dynamic>> {
     }
     int n = diagonal.length;
     List<List<dynamic>> data = List.generate(
-        n, (i) => List.generate(n, (j) => i == j ? Complex(diagonal[i]) : Complex.zero()));
+        n,
+        (i) => List.generate(
+            n, (j) => i == j ? Complex(diagonal[i]) : Complex.zero()));
     return Matrix(data);
   }
 
@@ -227,8 +229,11 @@ class Matrix extends IterableMixin<List<dynamic>> {
     }
     List<List<dynamic>> data = List.generate(
         rows,
-        (_) => List.generate(cols,
-            (_) => sourceIndex < source.length ? Complex(source[sourceIndex++]) : Complex.zero()));
+        (_) => List.generate(
+            cols,
+            (_) => sourceIndex < source.length
+                ? Complex(source[sourceIndex++])
+                : Complex.zero()));
     return Matrix(data);
   }
 
@@ -260,8 +265,8 @@ class Matrix extends IterableMixin<List<dynamic>> {
       }
     }
 
-    List<List<dynamic>> data =
-        List.generate(numRows, (i) => List.filled(columns.length, Complex.zero()));
+    List<List<dynamic>> data = List.generate(
+        numRows, (i) => List.filled(columns.length, Complex.zero()));
     for (int j = 0; j < columns.length; j++) {
       for (int i = 0; i < numRows; i++) {
         data[i][j] = columns[j].getValueAt(i);
@@ -354,7 +359,8 @@ class Matrix extends IterableMixin<List<dynamic>> {
         if (resize) {
           // Copy and resize rows
           for (List<dynamic> row in matrix) {
-            data.add(row + List<dynamic>.filled(commonSize - row.length, Complex.zero()));
+            data.add(row +
+                List<dynamic>.filled(commonSize - row.length, Complex.zero()));
           }
         } else {
           // Directly concatenate original rows
@@ -487,10 +493,6 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// // └ 0 0 3 ┘
   /// ```
   factory Matrix.scalar(int size, dynamic value) {
-    if (value is! num) {
-      throw ArgumentError('Value must be a number (int or double)');
-    }
-
     return Matrix.factory.create(MatrixType.identity, size, size,
         value: value, isDouble: value is double);
   }
@@ -562,8 +564,8 @@ class Matrix extends IterableMixin<List<dynamic>> {
     }
 
     // Pre-compute the final size of the matrix and allocate memory at once.
-    List<List<dynamic>> matrix = List.generate(
-        rows * blockSize, (_) => List<dynamic>.filled(cols * blockSize, Complex.zero()));
+    List<List<dynamic>> matrix = List.generate(rows * blockSize,
+        (_) => List<dynamic>.filled(cols * blockSize, Complex.zero()));
 
     // Re-order loops for more linear data access.
     for (int row = 0; row < blockSize; ++row) {

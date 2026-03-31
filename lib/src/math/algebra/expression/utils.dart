@@ -57,9 +57,7 @@ class ExpressionContext {
               : (e is Complex ? e.real.toDouble() : 0.0))
           .toList();
     }
-    return [
-      args is Complex ? args.real.toDouble() : (args as num).toDouble()
-    ];
+    return [args is Complex ? args.real.toDouble() : (args as num).toDouble()];
   }
 
   /// Provides common constants and basic mathematical functions.
@@ -666,7 +664,9 @@ class ExpressionContext {
         'distance': VarArgsFunction((args, _) {
           final first = args[0];
           final second = args[1];
-          if (first is Point && second is Point) return first.distanceTo(second);
+          if (first is Point && second is Point) {
+            return first.distanceTo(second);
+          }
           if (first is Vector && second is Vector) {
             return first.distance(second);
           }
@@ -675,6 +675,53 @@ class ExpressionContext {
         'zerosVector': VarArgsFunction((args, _) => Vector(_toInt(args[0]))),
         'onesVector': VarArgsFunction(
             (args, _) => Vector(List.filled(_toInt(args[0]), 1))),
+
+        // New properties and tests
+        'isZeroVector':
+            VarArgsFunction((args, _) => (args.first as Vector).isZero()),
+        'isUnitVector':
+            VarArgsFunction((args, _) => (args.first as Vector).isUnit()),
+
+        // New transformations
+        'flipVector':
+            VarArgsFunction((args, _) => (args.first as Vector).flip()),
+        'reverseVector':
+            VarArgsFunction((args, _) => (args.first as Vector).flip()),
+        'subVector': VarArgsFunction((args, _) {
+          final v = args[0] as Vector;
+          final start = _toInt(args[1]);
+          final end = args.length > 2 ? _toInt(args[2]) : null;
+          return v.subVector(start: start, end: end);
+        }),
+        'rollVector': VarArgsFunction(
+            (args, _) => (args[0] as Vector).roll(_toInt(args[1]))),
+
+        // New conversions
+        'toDiagonal':
+            VarArgsFunction((args, _) => (args.first as Vector).toDiagonal()),
+        'toMatrix': VarArgsFunction((args, _) =>
+            (args[0] as Vector).toMatrix(_toInt(args[1]), _toInt(args[2]))),
+        'toPoint':
+            VarArgsFunction((args, _) => (args.first as Vector).toPoint()),
+
+        // New math operations
+        'roundVector': VarArgsFunction((args, _) =>
+            (args[0] as Vector).round(args.length > 1 ? _toInt(args[1]) : 0)),
+        'scaleVector':
+            VarArgsFunction((args, _) => (args[0] as Vector).scale(args[1])),
+        'rescaleVector':
+            VarArgsFunction((args, _) => (args.first as Vector).rescale()),
+        'meanVector':
+            VarArgsFunction((args, _) => (args.first as Vector).mean()),
+        'medianVector':
+            VarArgsFunction((args, _) => (args.first as Vector).median()),
+        'sumVector': VarArgsFunction((args, _) => (args.first as Vector).sum()),
+        'productVector':
+            VarArgsFunction((args, _) => (args.first as Vector).product()),
+        'expVector': VarArgsFunction((args, _) => (args.first as Vector).exp()),
+        'absVector': VarArgsFunction((args, _) => (args.first as Vector).abs()),
+        'powVector': VarArgsFunction(
+            (args, _) => (args[0] as Vector).pow(_toNum(args[1]))),
       };
 
   static Map<String, dynamic> _numberExtras() => {
@@ -765,6 +812,17 @@ class ExpressionContext {
             VarArgsFunction((args, _) => RowMatrix(args.first as List)),
         'colVector':
             VarArgsFunction((args, _) => ColumnMatrix(args.first as List)),
+        'magic': VarArgsFunction((args, _) => Matrix.magic(_toInt(args[0]))),
+        'scalarMatrix': VarArgsFunction(
+            (args, _) => Matrix.scalar(_toInt(args[0]), args[1])),
+        'arrange': VarArgsFunction((args, _) => Matrix.arrange(
+              _toInt(args[0]),
+              start: args.length > 1 ? _toInt(args[1]) : 0,
+              step: args.length > 2 ? _toInt(args[2]) : 1,
+              isColumn: args.length > 3 ? args[3] as bool : false,
+            )),
+        'copyMatrix':
+            VarArgsFunction((args, _) => (args.first as Matrix).copy()),
 
         // Properties
         'det':
@@ -833,6 +891,45 @@ class ExpressionContext {
             (args, _) => (args.first as Matrix).isUpperTriangular()),
         'isLowerTriangular': VarArgsFunction(
             (args, _) => (args.first as Matrix).isLowerTriangular()),
+        'isMagic': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isMagicMatrix()),
+        'isAlmostEqual': VarArgsFunction((args, _) => (args[0] as Matrix)
+            .isAlmostEqual(args[1] as Matrix,
+                tolerance: args.length > 2 ? args[2] as num : 1e-10)),
+        'isUnitary': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isUnitaryMatrix()),
+        'isBidiagonal': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isBidiagonalMatrix()),
+        'isToeplitz': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isToeplitzMatrix()),
+        'isHankel': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isHankelMatrix()),
+        'isCirculant': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isCirculantMatrix()),
+        'isVandermonde': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isVandermondeMatrix()),
+        'isPermutation': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isPermutationMatrix()),
+        'isHermitian': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isHermitianMatrix()),
+        'isSparse': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isSparseMatrix()),
+        'isFullRank':
+            VarArgsFunction((args, _) => (args.first as Matrix).isFullRank()),
+        'isNullMatrix':
+            VarArgsFunction((args, _) => (args.first as Matrix).isNullMatrix()),
+        'isZeroMatrix':
+            VarArgsFunction((args, _) => (args.first as Matrix).isZeroMatrix()),
+        'isHorizontal': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isHorizontalMatrix()),
+        'isVertical': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isVerticalMatrix()),
+        'isSkewSymmetric': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isSkewSymmetricMatrix()),
+        'isNegativeDefinite': VarArgsFunction(
+            (args, _) => (args.first as Matrix).isNegativeDefiniteMatrix()),
+        'matrixProperties': VarArgsFunction(
+            (args, _) => (args.first as Matrix).matrixProperties()),
 
         // Manipulation
         'reshape': VarArgsFunction((args, _) =>
@@ -856,6 +953,41 @@ class ExpressionContext {
           final b = args[1] as Matrix;
           return A.linear.solve(b);
         }),
+        'removeRow': VarArgsFunction(
+            (args, _) => (args[0] as Matrix).removeRow(_toInt(args[1]))),
+        'removeRows': VarArgsFunction((args, _) =>
+            (args[0] as Matrix).removeRows((args[1] as List).cast<int>())),
+        'removeCol': VarArgsFunction(
+            (args, _) => (args[0] as Matrix).removeColumn(_toInt(args[1]))),
+        'removeCols': VarArgsFunction((args, _) =>
+            (args[0] as Matrix).removeColumns((args[1] as List).cast<int>())),
+        'setRow': VarArgsFunction((args, _) =>
+            (args[0] as Matrix).setRow(_toInt(args[1]), args[2] as List)),
+        'setCol': VarArgsFunction((args, _) =>
+            (args[0] as Matrix).setColumn(_toInt(args[1]), args[2] as List)),
+        'insertRow': VarArgsFunction((args, _) =>
+            (args[0] as Matrix).insertRow(_toInt(args[1]), args[2] as List)),
+        'insertCol': VarArgsFunction((args, _) =>
+            (args[0] as Matrix).insertColumn(_toInt(args[1]), args[2] as List)),
+        'appendRows': VarArgsFunction(
+            (args, _) => (args[0] as Matrix).appendRows(args[1])),
+        'appendCols': VarArgsFunction(
+            (args, _) => (args[0] as Matrix).appendColumns(args[1])),
+        'augment':
+            VarArgsFunction((args, _) => (args[0] as Matrix).augment(args[1])),
+        'mat_sort': VarArgsFunction((args, _) => (args[0] as Matrix).sort(
+              columnIndices:
+                  args.length > 1 ? (args[1] as List).cast<int>() : null,
+              ascending: args.length > 2 ? args[2] as bool : true,
+            )),
+        'mat_flip': VarArgsFunction((args, _) => (args[0] as Matrix)
+            .flip(axis: args.length > 1 ? _toInt(args[1]) : 0)),
+        'slice': VarArgsFunction((args, _) => (args[0] as Matrix).slice(
+              _toInt(args[1]),
+              _toInt(args[2]),
+              args.length > 3 ? _toInt(args[3]) : 0,
+              args.length > 4 ? _toInt(args[4]) : null,
+            )),
 
         // Element access helpers
         'row': VarArgsFunction(
@@ -903,6 +1035,34 @@ class ExpressionContext {
             (args, _) => (args.first as Matrix).standardDeviation()),
         'mat_median':
             VarArgsFunction((args, _) => (args.first as Matrix).median()),
+        'colMins':
+            VarArgsFunction((args, _) => (args.first as Matrix).columnMins()),
+        'colMaxs':
+            VarArgsFunction((args, _) => (args.first as Matrix).columnMaxs()),
+        'colMeans':
+            VarArgsFunction((args, _) => (args.first as Matrix).columnMeans()),
+        'colStdDevs': VarArgsFunction(
+            (args, _) => (args.first as Matrix).columnStdDevs()),
+        'rowMins':
+            VarArgsFunction((args, _) => (args.first as Matrix).rowMins()),
+        'rowMaxs':
+            VarArgsFunction((args, _) => (args.first as Matrix).rowMaxs()),
+        'rowMeans':
+            VarArgsFunction((args, _) => (args.first as Matrix).rowMeans()),
+        'rowStdDevs':
+            VarArgsFunction((args, _) => (args.first as Matrix).rowStdDevs()),
+        'matCovariance': VarArgsFunction(
+            (args, _) => (args.first as Matrix).covarianceMatrix()),
+        'matCorrelation': VarArgsFunction((args, _) =>
+            (args.first as Matrix).pearsonCorrelationCoefficient()),
+        'skewness':
+            VarArgsFunction((args, _) => (args.first as Matrix).skewness()),
+        'kurtosis':
+            VarArgsFunction((args, _) => (args.first as Matrix).kurtosis()),
+        'cumsum': VarArgsFunction((args, _) => (args.first as Matrix).cumsum(
+              continuous: args.length > 1 ? args[1] as bool : false,
+              axis: args.length > 2 ? _toInt(args[2]) : null,
+            )),
 
         // Decompositions (as Maps for easy access)
         'lu': VarArgsFunction((args, _) {
@@ -1176,25 +1336,25 @@ class ExpressionContext {
   static Map<String, dynamic> _polynomialExtras() => {
         ..._sharedExtras(),
         'quadratic': VarArgsFunction((args, kwargs) {
-          final a = (kwargs['a'] ?? args[0]) as num;
-          final b = (kwargs['b'] ?? args[1]) as num;
-          final c = (kwargs['c'] ?? args[2]) as num;
-          return Quadratic.num(a: a, b: b, c: c);
+          final a = (kwargs['a'] ?? args[0]);
+          final b = (kwargs['b'] ?? args[1]);
+          final c = (kwargs['c'] ?? args[2]);
+          return Quadratic(a: a, b: b, c: c);
         }),
         'cubic': VarArgsFunction((args, kwargs) {
-          final a = (kwargs['a'] ?? args[0]) as num;
-          final b = (kwargs['b'] ?? args[1]) as num;
-          final c = (kwargs['c'] ?? args[2]) as num;
-          final d = (kwargs['d'] ?? args[3]) as num;
-          return Cubic.num(a: a, b: b, c: c, d: d);
+          final a = (kwargs['a'] ?? args[0]);
+          final b = (kwargs['b'] ?? args[1]);
+          final c = (kwargs['c'] ?? args[2]);
+          final d = (kwargs['d'] ?? args[3]);
+          return Cubic(a: a, b: b, c: c, d: d);
         }),
         'quartic': VarArgsFunction((args, kwargs) {
-          final a = (kwargs['a'] ?? args[0]) as num;
-          final b = (kwargs['b'] ?? args[1]) as num;
-          final c = (kwargs['c'] ?? args[2]) as num;
-          final d = (kwargs['d'] ?? args[3]) as num;
-          final e = (kwargs['e'] ?? args[4]) as num;
-          return Quartic.num(a: a, b: b, c: c, d: d, e: e);
+          final a = (kwargs['a'] ?? args[0]);
+          final b = (kwargs['b'] ?? args[1]);
+          final c = (kwargs['c'] ?? args[2]);
+          final d = (kwargs['d'] ?? args[3]);
+          final e = (kwargs['e'] ?? args[4]);
+          return Quartic(a: a, b: b, c: c, d: d, e: e);
         }),
         'poly': VarArgsFunction(
             (args, _) => Polynomial.fromString(args.first.toString())),

@@ -106,61 +106,85 @@ class Vector extends IterableMixin<dynamic> {
 
   /// Creates a row Vector with equally spaced values between the start and end values (inclusive).
   ///
-  /// [start]: Start value.
-  /// [end]: End value.
+  /// [start]: Start value (can be int or double).
+  /// [end]: End value (can be int or double).
   /// [number]: Number of equally spaced points. Default is 50.
   ///
   /// Example:
   /// ```dart
-  /// var m = Vector.linespace(0, 10, 3);
+  /// var m = Vector.linspace(0, 10, 3);
   /// print(m);
   /// // Output:
   /// // Matrix: 1x3
   /// // [ 0 5 10 ]
   /// ```
-  factory Vector.linspace(int start, int end, [int number = 50]) {
-    if (start.runtimeType != end.runtimeType) {
-      throw Exception('Start and end must be of the same type');
-    }
-
+  factory Vector.linspace(num start, num end, [int number = 50]) {
     if (number <= 0) {
-      throw Exception('Number must be a positive integer');
+      throw ArgumentError('Number of points must be a positive integer');
     }
 
-    dynamic step = Complex((end - start) / (number - 1));
-    List data = [];
-    for (int i = 0; i < number; i++) {
-      data.add(start + i * step);
+    // Handle the edge case where the user only wants 1 point
+    if (number == 1) {
+      return Vector.fromList([Complex(start)]);
     }
+
+    // Calculate the step as a standard double for performance
+    double step = (end - start) / (number - 1);
+    List<Complex> data = [];
+
+    // Calculate all elements EXCEPT the last one
+    for (int i = 0; i < number - 1; i++) {
+      double value = start + (i * step);
+      data.add(Complex(value));
+    }
+
+    // Explicitly add the exact 'end' value to prevent floating-point inaccuracies
+    data.add(Complex(end));
 
     return Vector.fromList(data);
   }
 
   /// Creates a Vector with values in the specified range, incremented by the specified step size.
   ///
-  /// [end]: End value (exclusive).
-  /// [start]: Start value. Default is 0.
-  /// [step]: Step size. Default is 1.
+  /// [end]: End value (exclusive). Can be int or double.
+  /// [start]: Start value. Default is 0. Can be int or double.
+  /// [step]: Step size. Default is 1. Can be positive or negative.
   ///
   /// Example:
   /// ```dart
-  /// var m = Vector.range(6,  start: 1, step: 2);
-  /// print(m);
-  /// // Output:
-  /// // [1, 3, 5]
+  /// print(Vector.range(6, start: 1, step: 2));
+  /// // Output: [ 1, 3, 5 ]
+  ///
+  /// print(Vector.range(0, start: 5, step: -1));
+  /// // Output: [ 5, 4, 3, 2, 1 ]
   /// ```
-  factory Vector.range(int end, {int start = 0, int step = 1}) {
-    if (start >= end) {
-      throw Exception('Start must be less than end');
+  factory Vector.range(num end, {num start = 0, num step = 1}) {
+    if (step == 0) {
+      throw ArgumentError('Step size cannot be zero');
     }
 
-    if (step <= 0) {
-      throw Exception('Step must be a positive integer');
+    // Validate bounds for positive steps
+    if (step > 0 && start >= end) {
+      throw ArgumentError('Start must be less than end when step is positive');
     }
 
-    List range = [];
-    for (int i = start; i < end; i += step) {
-      range.add(Complex(i));
+    // Validate bounds for negative steps
+    if (step < 0 && start <= end) {
+      throw ArgumentError(
+          'Start must be greater than end when step is negative');
+    }
+
+    // Calculate the total number of elements upfront to avoid floating-point loop drift.
+    // .ceil() guarantees we stop just before the 'end' value.
+    int count = ((end - start) / step).ceil();
+
+    // Explicitly define the list type for better performance
+    List<Complex> range = [];
+
+    for (int i = 0; i < count; i++) {
+      // Calculate the exact value using multiplication instead of repeated addition
+      num value = start + (i * step);
+      range.add(Complex(value));
     }
 
     return Vector.fromList(range);
@@ -404,7 +428,7 @@ class Vector extends IterableMixin<dynamic> {
     Complex r = math.sqrt(x * x + y * y + z * z);
     Complex theta = math.acos(z / r);
     Complex phi = math.atan2(y, x);
-    return [r.toNum(), theta.toNum(), phi.toNum()];
+    return [r, theta, phi];
   }
 
   /// Converts the Vector from Cartesian to Cylindrical coordinates.
@@ -430,7 +454,7 @@ class Vector extends IterableMixin<dynamic> {
     Complex z = _data[2];
     Complex rho = math.sqrt(x * x + y * y);
     Complex phi = math.atan2(y, x);
-    return [rho.toNum(), phi.toNum(), z.toNum()];
+    return [rho, phi, z];
   }
 
   /// Converts the Vector from Cartesian to Polar coordinates.
@@ -456,7 +480,7 @@ class Vector extends IterableMixin<dynamic> {
     Complex y = _data[1];
     Complex r = math.sqrt(x * x + y * y);
     Complex theta = math.atan2(y, x);
-    return [r.toNum(), theta.toNum()];
+    return [r, theta];
   }
 
   // @override  //performance optimization
@@ -648,7 +672,7 @@ class Vector extends IterableMixin<dynamic> {
   Vector roll(dynamic shift) {
     if (_data.isEmpty) return this;
     if (shift is int) {
-      return Vector(_rollFlat);
+      return Vector(_rollFlat(_data, shift));
     } else if (shift is (int, int)) {
       List<dynamic> rolledArray = _rollFlat(_data, shift.$1);
       rolledArray = _rollFlat(rolledArray, shift.$2);

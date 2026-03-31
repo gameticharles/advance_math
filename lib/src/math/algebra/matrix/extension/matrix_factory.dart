@@ -415,22 +415,22 @@ class MatrixFactory {
         break;
 
       case MatrixType.involutory:
-        if (rowCount != columnCount) {
-          throw ArgumentError(
-              "Matrix must be square for the involutory matrix type.");
-        }
+        if (rowCount != columnCount) throw ArgumentError("Must be square.");
 
+        // 1. Generate a random vector v
+        List<double> v = List.generate(
+            rowCount, (_) => random!.nextDouble() * (max - min) + min);
+
+        // 2. Calculate dot product v^T * v
+        double dotVV = v.fold(0.0, (sum, val) => sum + val * val);
+        if (dotVV == 0.0) dotVV = 1.0; // Prevent division by zero
+
+        // 3. Create matrix: I - 2 * (v * v^T) / dotVV
         for (int i = 0; i < rowCount; i++) {
-          data[i][i] = isDouble ? Complex(1.0, 0.0) : Complex(1);
-        }
-        int half = (columnCount / 2).floor();
-        for (int i = 0; i < half; i++) {
-          int j = columnCount - i - 1;
-          num value = isDouble
-              ? random.nextDouble() * (max - min) + min
-              : random.nextInt(max.toInt() - min.toInt()) + min.toInt();
-          data[i][j] = Complex(value);
-          data[j][i] = Complex(-value);
+          for (int j = 0; j < columnCount; j++) {
+            double val = (i == j ? 1.0 : 0.0) - (2.0 * v[i] * v[j] / dotVV);
+            data[i][j] = Complex(val);
+          }
         }
         break;
 
@@ -499,7 +499,9 @@ class MatrixFactory {
               "Matrix must be square for the identity matrix type.");
         }
         for (int i = 0; i < rowCount; i++) {
-          data[i][i] = isDouble ? Complex(1.0) : Complex(1);
+          data[i][i] = value != null
+              ? (isDouble ? Complex(1.0) : Complex(1)) * value
+              : (isDouble ? Complex(1.0) : Complex(1));
         }
 
         break;
