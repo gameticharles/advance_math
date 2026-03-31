@@ -38,6 +38,11 @@ final class Constant extends Polynomial {
       Constant(a: a ?? this.a, variable: variable ?? this.variable);
 
   @override
+  dynamic evaluate([dynamic arg]) {
+    return coefficients.first.evaluate(arg);
+  }
+
+  @override
   Expression expand() {
     return this;
   }

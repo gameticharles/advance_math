@@ -780,11 +780,16 @@ class Polynomial extends Expression {
   /// Evaluates the Polynomial for a given x value.
   @override
   dynamic evaluate([dynamic x]) {
+    // If x is a context Map, look up the variable's value
+    final value = (x is Map<String, dynamic>)
+        ? (x[variable.identifier.name] ?? Complex.zero())
+        : (x ?? Complex.zero());
+
     dynamic result = Complex.zero();
     for (var i = 0; i < coefficients.length; i++) {
       // result += coefficients[i] * pow(x, coefficients.length - 1 - i);
       var term = Multiply(coefficients[i],
-          Pow(Literal(x), Literal(coefficients.length - 1 - i)));
+          Pow(Literal(value), Literal(coefficients.length - 1 - i)));
 
       Expression currentResult =
           (result is Expression) ? result : Literal(result);

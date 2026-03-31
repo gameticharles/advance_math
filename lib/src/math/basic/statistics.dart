@@ -13,7 +13,8 @@ List<dynamic> _flattenArgs(List<dynamic> args) {
 }
 
 List<num> _getArgsParams(List<dynamic> args) {
-  return _flattenArgs(args).map((e) {
+  final flattened = _flattenArgs(args);
+  return flattened.map((e) {
     if (e is Complex) return e.real;
     if (e is String) {
       try {
@@ -540,6 +541,12 @@ dynamic egcd = VarArgsFunction((args, kwargs) {
   return results;
 });
 
+/// Returns the least common multiple (LCM) of a list of numbers.
+///
+/// Example:
+/// ```dart
+/// print(lcm([12, 18])); // 36
+/// ```
 dynamic lcm = VarArgsFunction((args, kwargs) {
   if (args.length == 2 &&
       args.any((e) =>

@@ -523,31 +523,6 @@ class ExpressionParser {
                 }
               }
 
-              if (name == 'gcd' && args.length >= 2) {
-                try {
-                  Polynomial result = Polynomial.fromString(args[0].toString());
-                  for (int i = 1; i < args.length; i++) {
-                    Polynomial next = Polynomial.fromString(args[i].toString());
-                    result = result.gcd(next);
-                  }
-                  return result;
-                } catch (e) {
-                  return CallExpression(object, argument);
-                }
-              }
-
-              if (name == 'lcm' && args.length >= 2) {
-                try {
-                  Polynomial result = Polynomial.fromString(args[0].toString());
-                  for (int i = 1; i < args.length; i++) {
-                    Polynomial next = Polynomial.fromString(args[i].toString());
-                    result = result.lcm(next);
-                  }
-                  return result;
-                } catch (e) {
-                  return CallExpression(object, argument);
-                }
-              }
 
               if (name == 'pfactor' && args.length == 1) {
                 // Prime factorization of integer
