@@ -1,3 +1,11 @@
+# 5.5.2
+
+* **[IMPROVEMENT]** More integrations with the Complex number.
+
+# 5.5.1
+
+* **[IMPROVEMENT]** Initial migration to full complete number.
+
 # 5.4.4
 
 - **[IMPROVEMENT]** Downgrade `characters` package to `1.4.0` to fix `pubspec.yaml`.
@@ -139,8 +147,8 @@
 - **[BUG_FIX]** Fixed coefficient extraction in polynomial solver for correct quadratic detection
 - **[BUG_FIX]** Fixed identity equation handling (e.g., `solve(x-x, x)` now returns `[0]`)
 - **[BUG_FIX]** Fixed cancellation detection in subtraction (e.g., `x - x = 0`)
-
 - **[FEATURE]** Added comprehensive test suites
+
   - `test/parser_calculus_test.dart`: 100 tests for differentiation, integration, and solving
   - `test/calculus/`: Calculus module tests
   - `test/solver/`: Equation solver tests
@@ -390,7 +398,6 @@
 - **[FEATURE]** Added `Decimal` and `Rational` class based on `BigInt` with support for arbitrary precision calculations.
 - **[FEATURE]** Added bases to `advance math`. You can now convert from any base to any other base (i.e base 2-36). See `Bases` class for more information.
 - **[IMPROVEMENT]** Matrix inverse has been improved to work with matrices of any size (e.g. 1x1 matrix).
-
 - **[IMPROVEMENT]** Added `Dataframe` empty initializer/constructor.
 - **[FEATURE]** Converted `Dataframe` columns to a class `Series`
 - **[FEATURE]** Added more functionalities to the `Random` class eg: nextIntInRange, nextDoubleInRange, nextBytes, nextBigIntInRange, nextBigInt, nextDateTime, nextElementFromList, nextNonRepeatingIntList etc.
@@ -404,15 +411,15 @@
   print(isPrime('75611592179197710042')); // Output: false (String)
   print(isPrime('205561530235962095930138512256047424384916810786171737181163')); // Output: true (String)
   ```
-
 - **[FEATURE]** Added more basic math functions: `mod`, `modInv`, nChooseRModPrime, bigIntNChooseRModPrime etc.
 - **[FEATURE]** Added more statistics math functions: `gcf`, `egcd`, `lcm` etc.
 - **[IMPROVEMENT]** In the `Geometry` class:
+
   - The class is splitted into Plane and Solid geometries.
   - In Point class: fixed example function calling, isCollinear computation is moved into GeoUtils, and use `rec` in the constructor fromPolarCoordinates.
 - **[IMPROVEMENT]** Added an argument `isDegrees` for `rec` and `pol` easy computation.
 - **[IMPROVEMENT]** Roman numerals to work with overline characters and parentheses.
-- **[FEATURE]** Added converts polar coordinate `rec` and converts rectangular coordinates`pol` functions
+- **[FEATURE]** Added converts polar coordinate `rec` and converts rectangular coordinates `pol` functions
 - **[FEATURE]** Added an extension `groupBy` to the iterables and `groupByKey` to maps.
 - **[FEATURE]** Added more extensions to String class:
 
@@ -434,7 +441,6 @@
   print(testString.extractCustomPattern(r'\bC\w+', unicode: false));
 
   ```
-
 - **[IMPROVEMENT]** Following the Dart format for libraries
 - **[IMPROVEMENT]** Cleaned code base and examples files
 - **[IMPROVEMENT]** Fixed README
