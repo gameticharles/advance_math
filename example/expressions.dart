@@ -139,10 +139,11 @@ void main(List<String> args) {
     'complex(1, 2) / complex(3, 4)',
     'complex(1, 2) ^ complex(3, 4)',
     'complex(1, 2) ^ 2',
+    'from_polar(1, pi/2)',
   ];
 
   evaluateExpressions(testCases, "Test Cases", context);
-
+  return;
   simpleMath();
   complexMath();
   conditionMath();

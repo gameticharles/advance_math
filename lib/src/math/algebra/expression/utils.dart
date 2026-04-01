@@ -1211,8 +1211,8 @@ class ExpressionContext {
           return {'r': c.abs(), 'theta': c.argument};
         }),
         'from_polar': VarArgsFunction((args, kwargs) {
-          final r = ((kwargs['r'] ?? args[0]) as num).toDouble();
-          final theta = ((kwargs['theta'] ?? args[1]) as num).toDouble();
+          final r = (kwargs['r'] ?? args[0]);
+          final theta = (kwargs['theta'] ?? args[1]);
           return Complex(r * math.cos(theta), r * math.sin(theta));
         }),
       };
@@ -1220,36 +1220,33 @@ class ExpressionContext {
   static Map<String, dynamic> _statsExtras() => {
         ..._sharedExtras(),
 
-        'zscore': VarArgsFunction(
-            (args, _) => ZScore.computeZScore((args.first as num).toDouble())),
+        'zscore':
+            VarArgsFunction((args, _) => ZScore.computeZScore((args.first))),
 
         'zscore_from_raw': VarArgsFunction((args, _) =>
             ZScore.computeZScoreFromRawScore(args[0], args[1], args[2])),
 
         'confidence_interval': VarArgsFunction((args, _) {
           final ci = ZScore.computeConfidenceInterval(
-            (args[0] as num).toDouble(),
-            (args[1] as num).toInt(),
-            (args[2] as num).toDouble(),
-            (args[3] as num).toDouble(),
+            args[0],
+            args[1],
+            args[2],
+            args[3],
           );
           return {'lower': ci.lower, 'upper': ci.upper};
         }),
 
-        'percentile': VarArgsFunction((args, _) =>
-            ZScore.computePercentile((args.first as num).toDouble())),
+        'percentile':
+            VarArgsFunction((args, _) => ZScore.computePercentile(args.first)),
 
-        'p_value': VarArgsFunction(
-            (args, _) => ZScore.computePValue((args.first as num).toDouble())),
+        'p_value':
+            VarArgsFunction((args, _) => ZScore.computePValue(args.first)),
 
-        'cdf': VarArgsFunction(
-            (args, _) => ZScore.computeCDF((args.first as num).toDouble())),
+        'cdf': VarArgsFunction((args, _) => ZScore.computeCDF(args.first)),
 
-        'pdf': VarArgsFunction(
-            (args, _) => ZScore.computePDF((args.first as num).toDouble())),
+        'pdf': VarArgsFunction((args, _) => ZScore.computePDF(args.first)),
 
-        'z_to_t': VarArgsFunction(
-            (args, _) => ZScore.convertZToT((args.first as num).toDouble())),
+        'z_to_t': VarArgsFunction((args, _) => ZScore.convertZToT(args.first)),
 
         'range_stat': VarArgsFunction((args, _) {
           final list = _toDoubles(args);
