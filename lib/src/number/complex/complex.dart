@@ -1583,16 +1583,21 @@ class Complex implements Comparable<dynamic> {
   /// Complex(3, 4).simplify()        // returns the Complex object
   /// ```
   dynamic simplify({double relTol = 1e-9, double absTol = 1e-15}) {
-    return this;
+    if (!math.isClose(imaginary.toDouble(), 0.0,
+        relTol: relTol, absTol: absTol)) {
+      return this;
+    }
+    // Imaginary part is negligible — simplify to a real number
+    if (_isExactInteger(real)) {
+      return real.toInt();
+    }
+    return real.toDouble();
   }
 
   bool _isExactInteger(num value) {
     if (value.isInfinite || value.isNaN) return false;
-
-    // Check for integer value with multiple validation methods
-    return value == value.truncateToDouble() &&
-        value == value.roundToDouble() &&
-        value.toStringAsExponential().contains('e+0');
+    // A value is an exact integer if dividing by 1 leaves no remainder
+    return value % 1 == 0;
   }
 
   num _safeToDouble(num value) {

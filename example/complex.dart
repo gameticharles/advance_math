@@ -254,4 +254,9 @@ void main() {
   print(i + j); // 3i
   print(i * j); // -2 (real number)
   print(i / j); // 0.5 (real number)
+
+  print(Complex(3, 0).simplify()); // returns 3 (int)
+  print(Complex(3.5, 0).simplify()); // returns 3.5 (double)
+  print(Complex(3, 1e-16).simplify()); // returns 3 (negligible imaginary part)
+  print(Complex(3, 4).simplify()); // returns the Complex object
 }
