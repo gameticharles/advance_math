@@ -619,17 +619,7 @@ class Vector extends IterableMixin<dynamic> {
     }
 
     List newValues = indices_.map((i) => _data[i]).toList();
-
-    switch (newValues.length) {
-      case 2:
-        return Vector2(newValues[0], newValues[1]);
-      case 3:
-        return Vector3(newValues[0], newValues[1], newValues[2]);
-      case 4:
-        return Vector4(newValues[0], newValues[1], newValues[2], newValues[3]);
-      default:
-        return Vector.fromList(newValues);
-    }
+    return Vector.fromList(newValues);
   }
 
   /// Flips elements of the vector.

@@ -197,15 +197,14 @@ extension MatrixStatsExtension on Matrix {
   /// print(mins);  // Output: [1, 2]
   /// ```
   List<Complex> columnMins() {
-    List<Complex> mins = List.filled(columnCount, Complex.infinity());
+    List<double> mins = List.filled(columnCount, double.infinity);
     for (var row in _data) {
       for (int j = 0; j < columnCount; j++) {
-        if (Complex(row[j]) < mins[j]) {
-          mins[j] = Complex(row[j]);
-        }
+        final val = Complex(row[j]).real.toDouble();
+        if (val < mins[j]) mins[j] = val;
       }
     }
-    return mins;
+    return mins.map((v) => Complex(v)).toList();
   }
 
   /// Calculates the maximum value for each column in the matrix.
@@ -223,15 +222,14 @@ extension MatrixStatsExtension on Matrix {
   /// print(maxs);  // Output: [5, 6]
   /// ```
   List<Complex> columnMaxs() {
-    List<Complex> maxs = List.filled(columnCount, Complex.negativeInfinity());
+    List<double> maxs = List.filled(columnCount, double.negativeInfinity);
     for (var row in _data) {
       for (int j = 0; j < columnCount; j++) {
-        if (Complex(row[j]) > maxs[j]) {
-          maxs[j] = Complex(row[j]);
-        }
+        final val = Complex(row[j]).real.toDouble();
+        if (val > maxs[j]) maxs[j] = val;
       }
     }
-    return maxs;
+    return maxs.map((v) => Complex(v)).toList();
   }
 
   /// Calculates the mean value for each column in the matrix.
@@ -341,9 +339,11 @@ extension MatrixStatsExtension on Matrix {
   /// print(means);  // Output: [1.5, 3.5, 5.5]
   /// ```
   List<Complex> rowMeans() {
-    return _data
-        .map((row) => (Complex(row.reduce((a, b) => a + b) / row.length)))
-        .toList();
+    return _data.map((row) {
+      final sum = row.fold<Complex>(
+          Complex.zero(), (acc, e) => acc + Complex(e));
+      return sum / Complex(row.length);
+    }).toList();
   }
 
   /// Calculates the standard deviation for each row in the matrix.

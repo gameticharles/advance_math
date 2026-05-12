@@ -145,7 +145,7 @@ void main(List<String> args) {
   ];
 
   evaluateExpressions(testCases, "Test Cases", context);
-  return;
+
   simpleMath();
   complexMath();
   conditionMath();
@@ -167,6 +167,9 @@ void main(List<String> args) {
   polynomial();
   multiPolynomial();
   expressionMath();
+
+  vectorStats();
+  matrixStats();
 }
 
 var parsec = ExpressionParser();
@@ -785,4 +788,129 @@ void expressionMath() {
   print('  Literal result: ${literal.evaluate({'x': 2})}');
   print('  Extension result: ${extension.evaluate({'x': 2})}');
   print('  Helper result: ${helper.evaluate({'x': 2})}');
+}
+
+void test(String label, String expr, [Map<String, dynamic>? extra]) {
+  try {
+    final ctx = {...defaultContext, ...?extra};
+    final result = ExpressionParser().parse(expr).evaluate(ctx);
+    print('✅ $label  →  $result');
+  } catch (e) {
+    print('❌ $label  →  $e');
+  }
+}
+
+void vectorStats() {
+  final v = Vector([1, 2, 3, 4, 5]);
+  final ctx = {...defaultContext, 'v': v};
+
+  print('=== Direct Dart calls ===');
+  try {
+    print('sum():     ${v.sum()}');
+  } catch (e) {
+    print('sum ERROR: $e');
+  }
+  try {
+    print('product(): ${v.product()}');
+  } catch (e) {
+    print('product ERROR: $e');
+  }
+  try {
+    print('mean():    ${v.mean()}');
+  } catch (e) {
+    print('mean ERROR: $e');
+  }
+  try {
+    print('median():  ${v.median()}');
+  } catch (e) {
+    print('median ERROR: $e');
+  }
+  try {
+    print('subVector(start:1,end:3): ${v.subVector(start: 1, end: 3)}');
+  } catch (e) {
+    print('subVector ERROR: $e');
+  }
+
+  print('\n=== Expression context tests ===');
+  test('sumVector(v)', 'sumVector(v)', ctx);
+  test('productVector(v)', 'productVector(v)', ctx);
+  test('meanVector(v)', 'meanVector(v)', ctx);
+  test('medianVector(v)', 'medianVector(v)', ctx);
+  test('subVector(v,1,3)', 'subVector(v, 1, 3)', ctx);
+  test('subVector(v,1)', 'subVector(v, 1)', ctx);
+
+  // inline vector
+  test('sumVector inline', 'sumVector(vector(1,2,3,4,5))');
+  test('productVector inline', 'productVector(vector(1,2,3,4,5))');
+  test('meanVector inline', 'meanVector(vector(1,2,3,4,5))');
+}
+
+void matrixStats() {
+  // Build a test matrix directly
+  final A = Matrix([
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+  ]);
+  final ctx = {...defaultContext, 'A': A};
+
+  print('=== Direct Dart calls (sanity check) ===');
+  try {
+    print('rowMins():    ${A.rowMins()}');
+  } catch (e) {
+    print('rowMins ERROR: $e');
+  }
+  try {
+    print('rowMaxs():    ${A.rowMaxs()}');
+  } catch (e) {
+    print('rowMaxs ERROR: $e');
+  }
+  try {
+    print('rowMeans():   ${A.rowMeans()}');
+  } catch (e) {
+    print('rowMeans ERROR: $e');
+  }
+  try {
+    print('rowStdDevs(): ${A.rowStdDevs()}');
+  } catch (e) {
+    print('rowStdDevs ERROR: $e');
+  }
+  try {
+    print('colMins():    ${A.columnMins()}');
+  } catch (e) {
+    print('colMins ERROR: $e');
+  }
+  try {
+    print('colMaxs():    ${A.columnMaxs()}');
+  } catch (e) {
+    print('colMaxs ERROR: $e');
+  }
+  try {
+    print('colMeans():   ${A.columnMeans()}');
+  } catch (e) {
+    print('colMeans ERROR: $e');
+  }
+  try {
+    print('colStdDevs(): ${A.columnStdDevs()}');
+  } catch (e) {
+    print('colStdDevs ERROR: $e');
+  }
+
+  print('\n=== Expression context tests ===');
+  test('rowMins', 'rowMins(A)', ctx);
+  test('rowMaxs', 'rowMaxs(A)', ctx);
+  test('rowMeans', 'rowMeans(A)', ctx);
+  test('rowStdDevs', 'rowStdDevs(A)', ctx);
+  test('colMins', 'colMins(A)', ctx);
+  test('colMaxs', 'colMaxs(A)', ctx);
+  test('colMeans', 'colMeans(A)', ctx);
+  test('colStdDevs', 'colStdDevs(A)', ctx);
+
+  // Also test that matrix literal works
+  test('matrix + rowMeans inline', 'rowMeans(matrix("1 2 3; 4 5 6; 7 8 9"))');
+  test('skewness', 'skewness(A)', ctx);
+  test('kurtosis', 'kurtosis(A)', ctx);
+  test('matCovariance', 'matCovariance(A)', ctx);
+  test('matCorrelation', 'matCorrelation(A)', ctx);
+  test('condNum', 'condNum(A)', ctx);
 }

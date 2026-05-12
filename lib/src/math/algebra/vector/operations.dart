@@ -403,7 +403,7 @@ extension VectorOperations on Vector {
   /// print(vector.sum());  // Output: 15.0
   /// ```
   dynamic sum() {
-    return _data.fold<num>(0, (a, b) => a + b);
+    return _data.fold<Complex>(Complex.zero(), (a, b) => a + Complex(b));
   }
 
   /// Returns the product of all elements in the vector.
@@ -414,7 +414,7 @@ extension VectorOperations on Vector {
   /// print(vector.product());  // Output: 6.0
   /// ```
   dynamic product() {
-    return _data.fold<num>(1, (a, b) => a * b);
+    return _data.fold<Complex>(Complex.one(), (a, b) => a * Complex(b));
   }
 
   /// Computes the inner product of two vectors.
