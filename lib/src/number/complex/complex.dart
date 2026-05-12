@@ -164,7 +164,10 @@ class Complex implements Comparable<dynamic> {
 
     final t = second / first;
 
-    return first * (Complex(1) + (t * t));
+    // return first * (Complex(1) + (t * t)); wrong
+
+    // Numerically stable: sqrt(first² + second²) = |first| * sqrt(1 + (second/first)²)
+    return (first * (Complex(1) + (t * t)).sqrt()).abs();
   }
 
   static Complex _parseComponent(String s) {
@@ -1493,7 +1496,7 @@ class Complex implements Comparable<dynamic> {
   // Method to check if this complex number can be simplified to a basic number
   // bool get isSimplifiable => (imaginary.abs() < 1e-15) && !real.isNaN;
   bool isSimplifiable({double relTol = 1e-9, double absTol = 1e-15}) =>
-      math.isClose(imaginary.toDouble(), 0.0, relTol: 1e-9, absTol: 1e-15) &&
+      math.isClose(imaginary.toDouble(), 0.0, relTol: relTol, absTol: absTol) &&
       !real.isNaN;
 
   /// Returns the simplified value of this complex number.
@@ -1507,7 +1510,7 @@ class Complex implements Comparable<dynamic> {
   /// Complex(3.5, 0).value    // returns 3.5 (double)
   /// Complex(3, 4).value      // returns the Complex object
   /// ```
-  Complex get value => this;
+  dynamic get value => simplify();
 
   /// Returns `true` if this complex number has a zero imaginary part.
   ///
