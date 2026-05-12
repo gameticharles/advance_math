@@ -72,7 +72,9 @@ void main(List<String> args) {
       'all([1, 1, 0]): ${Expression.parse('all([1, 1, 0])').evaluate(context)}');
   print(
       'iif(1 > 0, "true", "false"): ${Expression.parse('iif(1 > 0, "true", "false")').evaluate(context)}');
-  // print(      'cond(1 > 2, "a", 2 > 1, "b", "c"): ${Expression.parse('cond(1 > 2, "a", 2 > 1, "b", "c")').evaluate(context)}');
+  print(
+      'cond(1 > 2, "a", 2 > 1, "b", "c"): ${Expression.parse('cond(1 > 2, "a", 2 > 1, "b", "c")').evaluate(context)}');
+
   print(
       'choose(2, "apple", "banana", "cherry"): ${Expression.parse('choose(2, "apple", "banana", "cherry")').evaluate(context)}');
   print('any([0, 0, 1]): done');

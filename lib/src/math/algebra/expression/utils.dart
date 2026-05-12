@@ -866,7 +866,7 @@ class ExpressionContext {
         }),
         'nullity':
             VarArgsFunction((args, _) => (args.first as Matrix).nullity()),
-        'cond': VarArgsFunction(
+        'condNum': VarArgsFunction(
             (args, _) => (args.first as Matrix).conditionNumber()),
         'rowCount':
             VarArgsFunction((args, _) => (args.first as Matrix).rowCount),
