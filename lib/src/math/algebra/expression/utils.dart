@@ -1220,33 +1220,37 @@ class ExpressionContext {
   static Map<String, dynamic> _statsExtras() => {
         ..._sharedExtras(),
 
-        'zscore':
-            VarArgsFunction((args, _) => ZScore.computeZScore((args.first))),
+        'zscore': VarArgsFunction(
+            (args, _) => ZScore.computeZScore(_toDouble(args.first))),
 
         'zscore_from_raw': VarArgsFunction((args, _) =>
-            ZScore.computeZScoreFromRawScore(args[0], args[1], args[2])),
+            ZScore.computeZScoreFromRawScore(
+                _toDouble(args[0]), _toDouble(args[1]), _toDouble(args[2]))),
 
         'confidence_interval': VarArgsFunction((args, _) {
           final ci = ZScore.computeConfidenceInterval(
-            args[0],
-            args[1],
-            args[2],
-            args[3],
+            _toDouble(args[0]),
+            _toInt(args[1]),
+            _toDouble(args[2]),
+            _toDouble(args[3]),
           );
           return {'lower': ci.lower, 'upper': ci.upper};
         }),
 
-        'percentile':
-            VarArgsFunction((args, _) => ZScore.computePercentile(args.first)),
+        'percentile': VarArgsFunction(
+            (args, _) => ZScore.computePercentile(_toDouble(args.first))),
 
-        'p_value':
-            VarArgsFunction((args, _) => ZScore.computePValue(args.first)),
+        'p_value': VarArgsFunction(
+            (args, _) => ZScore.computePValue(_toDouble(args.first))),
 
-        'cdf': VarArgsFunction((args, _) => ZScore.computeCDF(args.first)),
+        'cdf': VarArgsFunction(
+            (args, _) => ZScore.computeCDF(_toDouble(args.first))),
 
-        'pdf': VarArgsFunction((args, _) => ZScore.computePDF(args.first)),
+        'pdf': VarArgsFunction(
+            (args, _) => ZScore.computePDF(_toDouble(args.first))),
 
-        'z_to_t': VarArgsFunction((args, _) => ZScore.convertZToT(args.first)),
+        'z_to_t': VarArgsFunction(
+            (args, _) => ZScore.convertZToT(_toDouble(args.first))),
 
         'range_stat': VarArgsFunction((args, _) {
           final list = _toDoubles(args);
@@ -1279,7 +1283,9 @@ class ExpressionContext {
           final first = args.first;
           if (first is Vector) return first.product();
           if (first is List) {
-            return first.fold<num>(1, (a, b) => a * b);
+            // Elements may be Complex — use dynamic accumulator
+            return first.fold<dynamic>(
+                1, (a, b) => (a is Complex ? a.real : a as num) * _toNum(b));
           }
           return args.reduce((a, b) => a * b);
         }),

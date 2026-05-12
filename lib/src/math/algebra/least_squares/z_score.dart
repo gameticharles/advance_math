@@ -55,10 +55,12 @@ class ZScore {
 
     if (p < 0.5) {
       // F^-1(p) = - G^-1(p)
-      return -rationalApproximation(math.sqrt(-2.0 * math.log(p)));
+      return -rationalApproximation(
+          dmath.sqrt(-2.0 * dmath.log(p)));
     } else {
       // F^-1(p) = G^-1(1-p)
-      return rationalApproximation(math.sqrt(-2.0 * math.log(1 - p)));
+      return rationalApproximation(
+          dmath.sqrt(-2.0 * dmath.log(1 - p)));
     }
   }
 
@@ -75,8 +77,9 @@ class ZScore {
   ///
   /// @return confidence level between 0 and 100 corresponding to the Z-score.
   static double computeConfidenceLevel(num zScore, {bool twoTailed = true}) {
-    // Compute the tail area
-    double p = (1.0 + math.erf(zScore / math.sqrt(2.0))) / 2.0;
+    // Compute the tail area — math.erf may return Complex, extract real part
+    final erfVal = math.erf(zScore / math.sqrt(2.0));
+    double p = (1.0 + (erfVal is Complex ? erfVal.real : erfVal as double)) / 2.0;
 
     // Convert the tail area to a confidence level
     double confidenceLevel = 100 * (1 - (1 - p) * (twoTailed ? 2.0 : 1.0));
@@ -95,7 +98,8 @@ class ZScore {
   ///
   /// @return PDF value at the given Z-score.
   static double computePDF(double zScore) {
-    return (1 / math.sqrt(2 * math.pi)) * math.exp(-math.pow(zScore, 2) / 2);
+    return (1 / dmath.sqrt(2 * dmath.pi)) *
+        dmath.exp(-dmath.pow(zScore, 2) / 2);
   }
 
   /// Compute the value of the standard normal Cumulative Density Function (CDF) at a given Z-score.
@@ -109,7 +113,8 @@ class ZScore {
   ///
   /// @return CDF value at the given Z-score.
   static double computeCDF(double zScore) {
-    return 0.5 * (1 + math.erf(zScore / math.sqrt(2)));
+    final erfVal = math.erf(zScore / dmath.sqrt(2));
+    return 0.5 * (1 + (erfVal is Complex ? erfVal.real : erfVal as double));
   }
 
   /// Compute the confidence interval for a given sample mean, sample size, and standard deviation.
@@ -131,7 +136,7 @@ class ZScore {
       double stdDev,
       double confidenceLevel) {
     double zScore = computeZScore(confidenceLevel);
-    double marginOfError = zScore * (stdDev / math.sqrt(sampleSize));
+    double marginOfError = zScore * (stdDev / dmath.sqrt(sampleSize));
     return (
       lower: sampleMean - marginOfError,
       upper: sampleMean + marginOfError
@@ -149,7 +154,9 @@ class ZScore {
   ///
   /// @return The p-value.
   static double computePValue(double zScore) {
-    return 1 - (1.0 + math.erf(zScore / math.sqrt(2.0))) / 2.0;
+    final erfVal = math.erf(zScore / dmath.sqrt(2.0));
+    return 1 -
+        (1.0 + (erfVal is Complex ? erfVal.real : erfVal as double)) / 2.0;
   }
 
   /// Convert Z-score to T-score.
@@ -177,7 +184,10 @@ class ZScore {
   ///
   /// @return The percentile.
   static double computePercentile(double zScore) {
-    return (1.0 + math.erf(zScore / math.sqrt(2.0))) / 2.0 * 100;
+    final erfVal = math.erf(zScore / dmath.sqrt(2.0));
+    return (1.0 + (erfVal is Complex ? erfVal.real : erfVal as double)) /
+        2.0 *
+        100;
   }
 
   /// Compute Z-score from a raw score.
