@@ -1,33 +1,5 @@
 import 'package:advance_math/advance_math.dart';
 
-import 'dart:math' as dmath;
-
-// Mocking math.erf for standalone testing if needed
-class LocalMath {
-  // High-precision approximation of the error function (erf)
-  double erf(double x) {
-    // Abramowitz and Stegun formula 7.1.26
-    const p = 0.3275911;
-    const a1 = 0.254829592;
-    const a2 = -0.284496736;
-    const a3 = 1.421413741;
-    const a4 = -1.453152027;
-    const a5 = 1.061405429;
-
-    final sign = x < 0 ? -1 : 1;
-    final absX = x.abs();
-
-    final t = 1.0 / (1.0 + p * absX);
-    final y = 1.0 -
-        (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t) *
-            dmath.exp(-absX * absX);
-
-    return sign * y;
-  }
-}
-
-final math = LocalMath();
-
 void main() {
   print('================================================================');
   print('🧪 ULTIMATE DIAGNOSTIC TEST SUITE FOR THE Z-SCORE STATISTICAL ENGINE');
