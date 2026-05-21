@@ -222,16 +222,37 @@ dynamic stdErrEst = VarArgsFunction((args, kwargs) {
   if (args.length != 2 || args[0] is! List || args[1] is! List) {
     throw ArgumentError('stdErrEst requires two lists: x and y');
   }
+
   List<num> x = _toNumList(args[0]);
   List<num> y = _toNumList(args[1]);
 
+  if (x.length != y.length || x.length < 3) {
+    throw ArgumentError('Lists must have same length and at least 3 points');
+  }
+
   num meanX = _mean(x);
   num meanY = _mean(y);
-  double numerator = 0;
+
+  num numerator = 0;
+  num denominator = 0;
+
   for (int i = 0; i < x.length; i++) {
-    numerator += math.pow(y[i] - meanY - (x[i] - meanX), 2);
+    numerator += (x[i] - meanX) * (y[i] - meanY);
+    denominator += math.pow(x[i] - meanX, 2);
   }
-  return Complex(math.sqrt(numerator / (x.length - 2)));
+
+  num slope = numerator / denominator;
+  num intercept = meanY - slope * meanX;
+
+  num residualSumSquares = 0;
+
+  for (int i = 0; i < x.length; i++) {
+    num yHat = intercept + slope * x[i];
+
+    residualSumSquares += math.pow(y[i] - yHat, 2);
+  }
+
+  return Complex(math.sqrt(residualSumSquares / (x.length - 2)));
 });
 
 /// Returns the t-Value of the list.

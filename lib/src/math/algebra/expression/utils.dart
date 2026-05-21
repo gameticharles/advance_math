@@ -1229,10 +1229,10 @@ class ExpressionContext {
 
         'confidence_interval': VarArgsFunction((args, _) {
           final ci = ZScore.computeConfidenceInterval(
-            _toDouble(args[0]),
-            _toInt(args[1]),
-            _toDouble(args[2]),
-            _toDouble(args[3]),
+            sampleMean: _toDouble(args[0]),
+            sampleSize: _toInt(args[1]),
+            stdDev: _toDouble(args[2]),
+            confidenceLevel: _toDouble(args[3]),
           );
           return {'lower': ci.lower, 'upper': ci.upper};
         }),
