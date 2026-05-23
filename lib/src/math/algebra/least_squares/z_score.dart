@@ -386,8 +386,9 @@ class ZScore {
       return 0.5 + 0.5 * sinTheta * sum;
     } else {
       // Odd degrees of freedom: includes θ/π term
-      if (df == 1)
+      if (df == 1) {
         return 0.5 + theta / dmath.pi; // Cauchy distribution special case
+      }
       double sum = 1.0;
       double term = 1.0;
       int maxR = (df - 3) ~/ 2;
@@ -767,10 +768,12 @@ class ZScore {
     required double confidenceLevel,
   }) {
     if (sampleSize < 1) throw ArgumentError('sampleSize must be ≥ 1');
-    if (populationStdDev < 0)
+    if (populationStdDev < 0) {
       throw ArgumentError('populationStdDev cannot be negative');
-    if (confidenceLevel <= 0 || confidenceLevel >= 100)
+    }
+    if (confidenceLevel <= 0 || confidenceLevel >= 100) {
       throw ArgumentError('confidenceLevel must satisfy 0 < level < 100');
+    }
 
     double alpha = 1.0 - confidenceLevel / 100.0;
     double zStar = computeCriticalZ(alpha, twoTailed: true);
@@ -866,12 +869,15 @@ class ZScore {
     required double sampleStdDev,
     required double confidenceLevel,
   }) {
-    if (sampleSize < 2)
+    if (sampleSize < 2) {
       throw ArgumentError('sampleSize must be ≥ 2 for t-distribution');
-    if (sampleStdDev < 0)
+    }
+    if (sampleStdDev < 0) {
       throw ArgumentError('sampleStdDev cannot be negative');
-    if (confidenceLevel <= 0 || confidenceLevel >= 100)
+    }
+    if (confidenceLevel <= 0 || confidenceLevel >= 100) {
       throw ArgumentError('confidenceLevel must satisfy 0 < level < 100');
+    }
 
     double alpha = 1.0 - confidenceLevel / 100.0;
     int df = sampleSize - 1;

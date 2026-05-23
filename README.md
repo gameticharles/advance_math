@@ -49,9 +49,6 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
 - Supports math expressions with context and functions.
 - Enhanced expression creation with multiple approaches: explicit Literal objects, toExpression() extension method, and ex() helper function.
 
-## Todo
-
-- Improve speed and performance
 
 ## Usage
 
@@ -3352,7 +3349,7 @@ Tests are located in the test directory. To run tests, execute dart test in the 
 
 ## Contributing Features and bugs
 
-### :beer: Pull requests are welcome
+### 🍺 Pull requests are welcome
 
 Don't forget that `open-source` makes no sense without contributors. No matter how big your changes are, it helps us a lot even it is a line of change.
 
@@ -3362,14 +3359,13 @@ Reporting bugs and issues are contribution too, yes it is.
 
 Please file feature requests and bugs at the [issue tracker][tracker].
 
-[tracker]: https://github.com/gameticharles/advance_math/issues
-
 ## Author
 
 Charles Gameti: [gameticharles@GitHub][github_cg].
 
-[github_cg]: https://github.com/gameticharles
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+[tracker]: https://github.com/gameticharles/advance_math/issues
+[github_cg]: https://github.com/gameticharles
