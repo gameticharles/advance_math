@@ -20,6 +20,7 @@ part 'plane/plane.dart';
 part 'plane/circles/circle.dart';
 part 'plane/circles/ellipse.dart';
 part 'plane/circles/annulus.dart';
+part 'plane/circles/annulus_sector.dart';
 part 'plane/circles/sector.dart';
 part 'plane/circles/segment.dart';
 part 'plane/circles/arc.dart';
@@ -40,6 +41,7 @@ part 'plane/quadrilateral/rectangle.dart';
 part 'plane/quadrilateral/trapezoid.dart';
 part 'plane/quadrilateral/parallelogram.dart';
 part 'plane/quadrilateral/rhombus.dart';
+part 'plane/quadrilateral/kite.dart';
 
 part 'plane/polygons/pentagon.dart';
 part 'plane/polygons/hexagon.dart';
@@ -52,8 +54,12 @@ part 'solid/solid_geometry.dart';
 
 part 'solid/cube.dart';
 part 'solid/sphere.dart';
+part 'solid/hemisphere.dart';
+part 'solid/capsule.dart';
 part 'solid/cylinder.dart';
+part 'solid/hollow_cylinder.dart';
 part 'solid/cone.dart';
+part 'solid/cone_frustum.dart';
 part 'solid/rectangular_prism.dart';
 part 'solid/ellipsoid.dart';
 part 'solid/torus.dart';
