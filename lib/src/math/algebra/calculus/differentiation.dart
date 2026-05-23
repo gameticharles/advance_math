@@ -1,4 +1,5 @@
 import '../../basic/math.dart';
+import 'package:advance_math/advance_math.dart' show LRUCache;
 
 /// A class providing various numerical differentiation methods for approximating
 /// derivatives of functions.
@@ -139,19 +140,27 @@ class NumericalDifferentiation {
       throw ArgumentError('Order of derivative must be positive');
     }
 
-    if (n == 1) {
-      return derivative(f, x, h: h);
-    } else if (n == 2) {
-      return secondDerivative(f, x, h: h);
+    final cache = LRUCache<String, num>(maxSize: 1000);
+
+    num getVal(num point, int order) {
+      final key = '$point:$order';
+      final cached = cache.get(key);
+      if (cached != null) return cached;
+
+      num result;
+      if (order == 1) {
+        result = derivative(f, point, h: h);
+      } else if (order == 2) {
+        result = secondDerivative(f, point, h: h);
+      } else {
+        result = (getVal(point + h, order - 1) - getVal(point - h, order - 1)) / (2 * h);
+      }
+
+      cache.put(key, result);
+      return result;
     }
 
-    // For n > 2, use recursive finite differences
-    // f^(n)(x) ≈ [f^(n-1)(x+h) - f^(n-1)(x-h)] / (2h)
-    num derivativeAtPoint(num point) {
-      return nthDerivative(f, point, n - 1, h: h);
-    }
-
-    return (derivativeAtPoint(x + h) - derivativeAtPoint(x - h)) / (2 * h);
+    return getVal(x, n);
   }
 
   /// Computes the gradient of a multivariate function.

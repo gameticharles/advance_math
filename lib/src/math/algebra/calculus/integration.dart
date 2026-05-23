@@ -1,4 +1,5 @@
 import '../../basic/math.dart';
+import 'package:advance_math/advance_math.dart' show LRUCache;
 
 /// A class providing various numerical integration methods for calculating
 /// definite integrals of functions.
@@ -124,7 +125,16 @@ class NumericalIntegration {
       {double tolerance = 1e-6, int maxDepth = 50}) {
     if (a == b) return 0;
 
-    return _adaptiveSimpsonRecursive(f, a, b, tolerance, maxDepth, 0);
+    final cache = LRUCache<num, num>(maxSize: 1000);
+    num cachedF(num x) {
+      final cached = cache.get(x);
+      if (cached != null) return cached;
+      final val = f(x);
+      cache.put(x, val);
+      return val;
+    }
+
+    return _adaptiveSimpsonRecursive(cachedF, a, b, tolerance, maxDepth, 0);
   }
 
   /// Helper function for adaptive Simpson's rule recursion

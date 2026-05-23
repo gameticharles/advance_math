@@ -166,39 +166,26 @@ abstract class MemoizedBase<R> {
 }
 
 /// A simple LRU cache implementation.
-class _LRUCache<K, V> {
+class LRUCache<K, V> {
   final int? maxSize;
   final Map<K, V> _cache = {};
-  final List<K> _accessOrder = [];
 
-  _LRUCache({this.maxSize});
+  LRUCache({this.maxSize});
 
   V? get(K key) {
-    final value = _cache[key];
-    if (value != null) {
-      // Move to the end of the access list (most recently used)
-      _accessOrder.remove(key);
-      _accessOrder.add(key);
-    }
+    if (!_cache.containsKey(key)) return null;
+    final value = _cache.remove(key) as V;
+    _cache[key] = value;
     return value;
   }
 
   void put(K key, V value) {
-    if (_cache.containsKey(key)) {
-      // Update existing entry
-      _cache[key] = value;
-      _accessOrder.remove(key);
-      _accessOrder.add(key);
-    } else {
-      // Add new entry
-      _cache[key] = value;
-      _accessOrder.add(key);
+    _cache.remove(key);
+    _cache[key] = value;
 
-      // Evict least recently used if we're over capacity
-      if (maxSize != null && _cache.length > maxSize!) {
-        final lruKey = _accessOrder.removeAt(0);
-        _cache.remove(lruKey);
-      }
+    // Evict least recently used if we're over capacity
+    if (maxSize != null && _cache.length > maxSize!) {
+      _cache.remove(_cache.keys.first);
     }
   }
 
@@ -206,18 +193,19 @@ class _LRUCache<K, V> {
 
   void remove(K key) {
     _cache.remove(key);
-    _accessOrder.remove(key);
   }
 
   void clear() {
     _cache.clear();
-    _accessOrder.clear();
   }
 
   int get length => _cache.length;
 
-  List<K> get keys => _accessOrder.toList();
+  List<K> get keys => _cache.keys.toList();
 }
+
+/// Backwards compatibility alias for library-internal usage.
+typedef _LRUCache<K, V> = LRUCache<K, V>;
 
 /// Memoization wrapper for a function with no arguments.
 class Memoized0<R> extends MemoizedBase<R> {
