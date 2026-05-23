@@ -736,6 +736,8 @@ bool isOdd(int n) {
 /// print(isPrime('75611592179197710042')); // Output: false (String)
 /// print(isPrime(BigInt.parse('205561530235962095930138512256047424384916810786171737181163'))); // Output: true (BigInt)
 /// ```
+final _primeCheckCache = LRUCache<String, bool>(maxSize: 1000);
+
 bool isPrime(dynamic number, [int certainty = 12]) {
   // Ensure valid input data type
   if (number is! int && number is! BigInt && number is! String) {
@@ -743,73 +745,83 @@ bool isPrime(dynamic number, [int certainty = 12]) {
         'Invalid input type. Number must be an int, BigInt, or String.');
   }
 
-  BigInt n;
-  try {
-    n = BigInt.parse(number.toString());
-  } on FormatException catch (_) {
-    throw ArgumentError(
-        'Invalid number format. String input must be a valid integer.');
-  }
+  final key = '${number.toString()}:$certainty';
+  final cached = _primeCheckCache.get(key);
+  if (cached != null) return cached;
 
-  // Handle base cases (less than 2 or even numbers)
-  if (n < BigInt.from(2)) {
-    return false;
-  }
-
-  if (n != BigInt.from(2) && n.isEven) {
-    return false;
-  }
-
-  // Quick check for small numbers using trial division (efficient)
-  if (n <= BigInt.from(3)) {
-    return true;
-  }
-  if (n % BigInt.from(2) == BigInt.zero || n % BigInt.from(3) == BigInt.zero) {
-    return false;
-  }
-
-  // handle if the last digit is even
-  if (int.parse(number.toString()[number.toString().length - 1]) % 2 == 0) {
-    return false;
-  }
-
-  // If the number is small, use trial division
-  if (n.bitLength <= 31) {
-    int num = n.toInt();
-    int limit = (sqrt(num) as Complex).real.toInt();
-    for (int i = 5; i <= limit; i += 6) {
-      if (num % i == 0 || num % (i + 2) == 0) return false;
-    }
-    return true;
-  }
-
-  // For large numbers, use Rabin-Miller primality test
-  BigInt s = n - BigInt.one;
-  while (s.isEven) {
-    s >>= 1;
-  }
-
-  for (int i = 0; i < certainty; i++) {
-    BigInt r;
-    do {
-      r = Random.secure().nextBigInt(n);
-    } while (r <= BigInt.zero);
-
-    BigInt tmp = s;
-    BigInt mod = r.modPow(tmp, n);
-
-    while (
-        tmp != n - BigInt.one && mod != BigInt.one && mod != n - BigInt.one) {
-      mod = (mod * mod) % n;
-      tmp <<= 1;
+  bool compute() {
+    BigInt n;
+    try {
+      n = BigInt.parse(number.toString());
+    } on FormatException catch (_) {
+      throw ArgumentError(
+          'Invalid number format. String input must be a valid integer.');
     }
 
-    if (mod != n - BigInt.one && tmp.isEven) {
+    // Handle base cases (less than 2 or even numbers)
+    if (n < BigInt.from(2)) {
       return false;
     }
+
+    if (n != BigInt.from(2) && n.isEven) {
+      return false;
+    }
+
+    // Quick check for small numbers using trial division (efficient)
+    if (n <= BigInt.from(3)) {
+      return true;
+    }
+    if (n % BigInt.from(2) == BigInt.zero || n % BigInt.from(3) == BigInt.zero) {
+      return false;
+    }
+
+    // handle if the last digit is even
+    if (int.parse(number.toString()[number.toString().length - 1]) % 2 == 0) {
+      return false;
+    }
+
+    // If the number is small, use trial division
+    if (n.bitLength <= 31) {
+      int num = n.toInt();
+      int limit = (sqrt(num) as Complex).real.toInt();
+      for (int i = 5; i <= limit; i += 6) {
+        if (num % i == 0 || num % (i + 2) == 0) return false;
+      }
+      return true;
+    }
+
+    // For large numbers, use Rabin-Miller primality test
+    BigInt s = n - BigInt.one;
+    while (s.isEven) {
+      s >>= 1;
+    }
+
+    for (int i = 0; i < certainty; i++) {
+      BigInt r;
+      do {
+        r = Random.secure().nextBigInt(n);
+      } while (r <= BigInt.zero);
+
+      BigInt tmp = s;
+      BigInt mod = r.modPow(tmp, n);
+
+      while (
+          tmp != n - BigInt.one && mod != BigInt.one && mod != n - BigInt.one) {
+        mod = (mod * mod) % n;
+        tmp <<= 1;
+      }
+
+      if (mod != n - BigInt.one && tmp.isEven) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
-  return true;
+  final result = compute();
+  _primeCheckCache.put(key, result);
+  return result;
 }
 
 /// Returns the nth prime number.
@@ -952,32 +964,44 @@ dynamic trunc(dynamic x) {
 ///
 /// - Parameter n: The integer to factor.
 /// - Returns: A list of prime factors of [n].
+final _factorCache = LRUCache<int, List<int>>(maxSize: 1000);
+
 List<int> primeFactors(int n) {
-  List<int> factors = [];
+  final cached = _factorCache.get(n);
+  if (cached != null) return List<int>.from(cached);
 
-  // Divide n by 2 until it's odd
-  while (n % 2 == 0) {
-    factors.add(2);
-    n ~/= 2;
-  }
+  List<int> compute() {
+    List<int> factors = [];
 
-  // n must be odd at this point. So, we can skip one element (i.e., increment by 2)
-  for (int i = 3; i * i <= n; i += 2) {
-    // While i divides n, append i and divide n
-    while (n % i == 0) {
-      factors.add(i);
-      n ~/= i;
+    // Divide n by 2 until it's odd
+    int temp = n;
+    while (temp % 2 == 0) {
+      factors.add(2);
+      temp ~/= 2;
     }
+
+    // temp must be odd at this point. So, we can skip one element (i.e., increment by 2)
+    for (int i = 3; i * i <= temp; i += 2) {
+      // While i divides temp, append i and divide temp
+      while (temp % i == 0) {
+        factors.add(i);
+        temp ~/= i;
+      }
+    }
+
+    // This condition is to handle the case when temp is a prime number greater than 2
+    if (temp > 2) {
+      factors.add(temp);
+    }
+    // Sort the factors
+    factors.sort();
+
+    return factors;
   }
 
-  // This condition is to handle the case when n is a prime number greater than 2
-  if (n > 2) {
-    factors.add(n);
-  }
-  // Sort the factors
-  factors.sort();
-
-  return factors;
+  final result = compute();
+  _factorCache.put(n, result);
+  return List<int>.from(result);
 }
 
 /// Returns the factors of the given integer [n].

@@ -2,8 +2,11 @@ import 'package:petitparser/petitparser.dart';
 import 'expression.dart';
 import '../calculus/symbolic_integration.dart';
 import '../../../number/complex/complex.dart';
+import 'package:advance_math/advance_math.dart' show LRUCache;
 
 class ExpressionParser {
+  static final _parseCache = LRUCache<String, Expression>(maxSize: 1000);
+
   ExpressionParser() {
     expression.set(binaryExpression.seq(conditionArguments.optional()).map(
         (l) => l[1] == null
@@ -14,12 +17,26 @@ class ExpressionParser {
   }
 
   Expression? tryParse(String formattedString) {
+    final cached = _parseCache.get(formattedString);
+    if (cached != null) return cached;
+
     final result = expression.trim().end().parse(formattedString);
-    return result is Success ? result.value : null;
+    if (result is Success) {
+      final parsed = result.value;
+      _parseCache.put(formattedString, parsed);
+      return parsed;
+    }
+    return null;
   }
 
-  Expression parse(String formattedString) =>
-      expression.trim().end().parse(formattedString).value;
+  Expression parse(String formattedString) {
+    final cached = _parseCache.get(formattedString);
+    if (cached != null) return cached;
+
+    final parsed = expression.trim().end().parse(formattedString).value;
+    _parseCache.put(formattedString, parsed);
+    return parsed;
+  }
 
   // Gobbles only identifiers
   // e.g.: `foo`, `_value`, `$x1`

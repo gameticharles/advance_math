@@ -1738,36 +1738,46 @@ extension MatrixOperationExtension on Matrix {
   /// // └  1.5 -0.5 ┘
   /// ```
   Matrix inverse({double conditionThreshold = 1e-3}) {
-    // For non-square matrices, compute the pseudo-inverse directly
-    if (!isSquareMatrix()) {
-      return pseudoInverse();
-    }
-    try {
-      // First attempt: Try LU decomposition for efficiency (works for most well-conditioned matrices)
-      var lu = decomposition.luDecompositionDoolittle();
-      var identity = Matrix.eye(rowCount);
-      return lu.solve(identity);
-    } catch (e) {
-      // LU decomposition failed, continue to SVD
-    }
+    final sig = '$elementsSignature:inverse:$conditionThreshold';
+    final cached = Matrix._inverseCache.get(sig);
+    if (cached != null) return cached;
 
-    // Second attempt: Use SVD which is more robust for ill-conditioned matrices
-    try {
-      var svd = decomposition.singularValueDecomposition();
-
-      // Check condition number to determine if the matrix is numerically invertible
-      if (svd.conditionNumber > Complex(conditionThreshold)) {
-        // Matrix is ill-conditioned but we can still compute a regularized inverse
-        return _computeRegularizedInverse(svd, conditionThreshold);
+    Matrix compute() {
+      // For non-square matrices, compute the pseudo-inverse directly
+      if (!isSquareMatrix()) {
+        return pseudoInverse();
+      }
+      try {
+        // First attempt: Try LU decomposition for efficiency (works for most well-conditioned matrices)
+        var lu = decomposition.luDecompositionDoolittle();
+        var identity = Matrix.eye(rowCount);
+        return lu.solve(identity);
+      } catch (e) {
+        // LU decomposition failed, continue to SVD
       }
 
-      // Standard SVD-based inverse
-      var identity = Matrix.eye(rowCount);
-      return svd.solve(identity);
-    } catch (e) {
-      // If all else fails, use the generalized pseudo-inverse approach
-      return pseudoInverse();
+      // Second attempt: Use SVD which is more robust for ill-conditioned matrices
+      try {
+        var svd = decomposition.singularValueDecomposition();
+
+        // Check condition number to determine if the matrix is numerically invertible
+        if (svd.conditionNumber > Complex(conditionThreshold)) {
+          // Matrix is ill-conditioned but we can still compute a regularized inverse
+          return _computeRegularizedInverse(svd, conditionThreshold);
+        }
+
+        // Standard SVD-based inverse
+        var identity = Matrix.eye(rowCount);
+        return svd.solve(identity);
+      } catch (e) {
+        // If all else fails, use the generalized pseudo-inverse approach
+        return pseudoInverse();
+      }
     }
+
+    final result = compute();
+    Matrix._inverseCache.put(sig, result);
+    return result;
   }
 
   // Helper method for computing regularized inverse for ill-conditioned matrices
@@ -1841,18 +1851,28 @@ extension MatrixOperationExtension on Matrix {
   /// - The computational cost of SVD may be significant for very large matrices.
   ///
   Matrix pseudoInverse() {
-    Matrix a = copy();
-    Matrix aTranspose = a.transpose();
+    final sig = '$elementsSignature:pseudoinverse';
+    final cached = Matrix._pseudoInverseCache.get(sig);
+    if (cached != null) return cached;
 
-    if (rowCount >= columnCount) {
-      // Overdetermined system (more rows than columns)
-      // Pseudo-inverse = (A^T·A)^(-1)·A^T
-      return (aTranspose * a).inverse() * aTranspose;
-    } else {
-      // Underdetermined system (more columns than rows)
-      // Pseudo-inverse = A^T·(A·A^T)^(-1)
-      return aTranspose * (a * aTranspose).inverse();
+    Matrix compute() {
+      Matrix a = copy();
+      Matrix aTranspose = a.transpose();
+
+      if (rowCount >= columnCount) {
+        // Overdetermined system (more rows than columns)
+        // Pseudo-inverse = (A^T·A)^(-1)·A^T
+        return (aTranspose * a).inverse() * aTranspose;
+      } else {
+        // Underdetermined system (more columns than rows)
+        // Pseudo-inverse = A^T·(A·A^T)^(-1)
+        return aTranspose * (a * aTranspose).inverse();
+      }
     }
+
+    final result = compute();
+    Matrix._pseudoInverseCache.put(sig, result);
+    return result;
   }
 
   /// Calculates the dot product of two matrices.

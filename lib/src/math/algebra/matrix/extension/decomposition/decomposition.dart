@@ -17,6 +17,8 @@ class HessenbergResult {
 class MatrixDecomposition {
   final Matrix _matrix;
 
+  static final _decompositionCache = LRUCache<String, dynamic>(maxSize: 500);
+
   /// Constructor for MatrixDecomposition. Takes a Matrix as an argument.
   MatrixDecomposition(this._matrix);
 
@@ -200,6 +202,10 @@ class MatrixDecomposition {
   /// L.prettyPrint();
   /// ```
   CholeskyDecomposition choleskyDecomposition() {
+    final sig = '${_matrix.elementsSignature}:cholesky';
+    final cached = _decompositionCache.get(sig);
+    if (cached != null) return cached as CholeskyDecomposition;
+
     if (_matrix.rowCount != _matrix.columnCount) {
       throw ArgumentError('Matrix must be square for Cholesky decomposition.');
     }
@@ -225,7 +231,9 @@ class MatrixDecomposition {
       }
     }
 
-    return CholeskyDecomposition(A, L);
+    final result = CholeskyDecomposition(A, L);
+    _decompositionCache.put(sig, result);
+    return result;
   }
 
   /// Performs QR Decomposition (Gram-Schmidt Method) decomposition of a matrix.
@@ -246,6 +254,10 @@ class MatrixDecomposition {
   /// qr.R.prettyPrint();
   /// ```
   QRDecomposition qrDecompositionGramSchmidt() {
+    final sig = '${_matrix.elementsSignature}:qr_gs';
+    final cached = _decompositionCache.get(sig);
+    if (cached != null) return cached as QRDecomposition;
+
     if (_matrix.rowCount < _matrix.columnCount) {
       throw ArgumentError(
           'Matrix must have more rows than columns for QR decomposition.');
@@ -270,7 +282,9 @@ class MatrixDecomposition {
       R[k][k] = normU;
       Q.setColumn(k, u.map((x) => x / normU).toList());
     }
-    return QRDecomposition(Q, R);
+    final result = QRDecomposition(Q, R);
+    _decompositionCache.put(sig, result);
+    return result;
   }
 
   /// Computes the QR decomposition of the matrix using the Householder
@@ -297,6 +311,10 @@ class MatrixDecomposition {
   /// qr.R.prettyPrint();
   /// ```
   QRDecomposition qrDecompositionHouseholder() {
+    final sig = '${_matrix.elementsSignature}:qr_hh';
+    final cached = _decompositionCache.get(sig);
+    if (cached != null) return cached as QRDecomposition;
+
     var A = _Utils.toNumMatrix(_matrix);
     Matrix Q = Matrix.eye(A.rowCount);
     Matrix R = A.copy();
@@ -311,7 +329,9 @@ class MatrixDecomposition {
       Q = Q * P;
     }
 
-    return QRDecomposition(Q, R);
+    final result = QRDecomposition(Q, R);
+    _decompositionCache.put(sig, result);
+    return result;
   }
 
   /// Performs LQ decomposition of a matrix.
@@ -335,6 +355,10 @@ class MatrixDecomposition {
   /// lq.Q.prettyPrint();
   /// ```
   LQDecomposition lqDecomposition() {
+    final sig = '${_matrix.elementsSignature}:lq';
+    final cached = _decompositionCache.get(sig);
+    if (cached != null) return cached as LQDecomposition;
+
     // Compute the QR decomposition of the transpose of the matrix
     var A = _Utils.toNumMatrix(_matrix);
     QRDecomposition qr =
@@ -346,7 +370,9 @@ class MatrixDecomposition {
     // Q is the transpose of Q from the QR decomposition
     Matrix Q = qr.Q.transpose();
 
-    return LQDecomposition(Q, L);
+    final result = LQDecomposition(Q, L);
+    _decompositionCache.put(sig, result);
+    return result;
   }
 
   /// Performs LU decomposition using Doolittle's Method without pivoting.
@@ -371,6 +397,10 @@ class MatrixDecomposition {
   /// lu.U.prettyPrint();
   /// ```
   LUDecomposition luDecompositionDoolittle() {
+    final sig = '${_matrix.elementsSignature}:lu_doolittle';
+    final cached = _decompositionCache.get(sig);
+    if (cached != null) return cached as LUDecomposition;
+
     if (_matrix.rowCount != _matrix.columnCount) {
       throw ArgumentError('LU decomposition requires a square matrix');
     }
@@ -388,7 +418,9 @@ class MatrixDecomposition {
         L[i][k] = (A[i][k] - _Utils.sumLUk(L, U, k, i, k)) / U[k][k];
       }
     }
-    return LUDecomposition(L, U);
+    final result = LUDecomposition(L, U);
+    _decompositionCache.put(sig, result);
+    return result;
   }
 
   /// Performs LU decomposition using Doolittle's Method with partial (row) pivoting.
@@ -415,6 +447,10 @@ class MatrixDecomposition {
   /// lu.P.prettyPrint();
   /// ```
   LUDecomposition luDecompositionDoolittlePartialPivoting() {
+    final sig = '${_matrix.elementsSignature}:lu_doolittle_pivot';
+    final cached = _decompositionCache.get(sig);
+    if (cached != null) return cached as LUDecomposition;
+
     var A = _Utils.toNumMatrix(_matrix);
     int n = A.rowCount;
 
@@ -456,7 +492,9 @@ class MatrixDecomposition {
       }
     }
 
-    return LUDecomposition(L, U, P);
+    final result = LUDecomposition(L, U, P);
+    _decompositionCache.put(sig, result);
+    return result;
   }
 
   /// Performs LU decomposition using Crout's Method.
@@ -477,6 +515,10 @@ class MatrixDecomposition {
   /// lu.U.prettyPrint();
   /// ```
   LUDecomposition luDecompositionCrout() {
+    final sig = '${_matrix.elementsSignature}:lu_crout';
+    final cached = _decompositionCache.get(sig);
+    if (cached != null) return cached as LUDecomposition;
+
     if (_matrix.rowCount != _matrix.columnCount) {
       throw ArgumentError('Matrix must be square for LU decomposition.');
     }
@@ -504,7 +546,9 @@ class MatrixDecomposition {
       }
     }
 
-    return LUDecomposition(L, U);
+    final result = LUDecomposition(L, U);
+    _decompositionCache.put(sig, result);
+    return result;
   }
 
   /// Performs LU decomposition using Gauss Elimination Method.
@@ -526,6 +570,10 @@ class MatrixDecomposition {
   /// lu.P.prettyPrint();
   /// ```
   LUDecomposition luDecompositionGauss() {
+    final sig = '${_matrix.elementsSignature}:lu_gauss';
+    final cached = _decompositionCache.get(sig);
+    if (cached != null) return cached as LUDecomposition;
+
     var A = _Utils.toNumMatrix(_matrix);
     int n = A.rowCount;
 
@@ -570,7 +618,9 @@ class MatrixDecomposition {
       }
     }
 
-    return LUDecomposition(L, U, P);
+    final result = LUDecomposition(L, U, P);
+    _decompositionCache.put(sig, result);
+    return result;
   }
 
   /// Performs LU decomposition with complete pivoting.
@@ -593,6 +643,10 @@ class MatrixDecomposition {
   /// lu.Q.prettyPrint();
   /// ```
   LUDecomposition luDecompositionDoolittleCompletePivoting() {
+    final sig = '${_matrix.elementsSignature}:lu_complete_pivot';
+    final cached = _decompositionCache.get(sig);
+    if (cached != null) return cached as LUDecomposition;
+
     var A = _Utils.toNumMatrix(_matrix);
     int n = A.rowCount;
 
@@ -645,7 +699,9 @@ class MatrixDecomposition {
       }
     }
 
-    return LUDecomposition(L, U, P, Q);
+    final result = LUDecomposition(L, U, P, Q);
+    _decompositionCache.put(sig, result);
+    return result;
   }
 
   /// Performs Singular Value Decomposition (SVD) of a matrix.
@@ -666,23 +722,33 @@ class MatrixDecomposition {
   /// svd.V.prettyPrint();
   /// ```
   SingularValueDecomposition singularValueDecomposition({int? maxIterations}) {
-    // Try standard SVD first
-    try {
-      var svd = SVD(_matrix, maxIterations: maxIterations);
-      return SingularValueDecomposition(svd);
-    } catch (e) {
-      print("Standard SVD failed, trying specialized approaches: $e");
+    final sig = '${_matrix.elementsSignature}:svd:$maxIterations';
+    final cached = _decompositionCache.get(sig);
+    if (cached != null) return cached as SingularValueDecomposition;
 
-      // If standard SVD fails, try specialized approaches
-      SingularValueDecomposition? result =
-          _trySpecializedSVD(maxIterations ?? 1000);
-      if (result != null) {
-        return result;
+    SingularValueDecomposition compute() {
+      // Try standard SVD first
+      try {
+        var svd = SVD(_matrix, maxIterations: maxIterations);
+        return SingularValueDecomposition(svd);
+      } catch (e) {
+        print("Standard SVD failed, trying specialized approaches: $e");
+
+        // If standard SVD fails, try specialized approaches
+        SingularValueDecomposition? result =
+            _trySpecializedSVD(maxIterations ?? 1000);
+        if (result != null) {
+          return result;
+        }
+
+        // If all else fails, use the robust fallback approach
+        return _computeRobustSVD(maxIterations ?? 1000);
       }
-
-      // If all else fails, use the robust fallback approach
-      return _computeRobustSVD(maxIterations ?? 1000);
     }
+
+    final result = compute();
+    _decompositionCache.put(sig, result);
+    return result;
   }
 
   // Helper method for specialized SVD approaches
@@ -874,6 +940,10 @@ class MatrixDecomposition {
   /// ```
   EigenvalueDecomposition eigenvalueDecomposition(
       {int maxIterations = 1000, double tolerance = 1e-10}) {
+    final sig = '${_matrix.elementsSignature}:eigen:$maxIterations:$tolerance';
+    final cached = _decompositionCache.get(sig);
+    if (cached != null) return cached as EigenvalueDecomposition;
+
     if (!_matrix.isSquareMatrix()) {
       throw ArgumentError(
           'Matrix must be square for eigenvalue decomposition.');
@@ -909,7 +979,9 @@ class MatrixDecomposition {
 
     // Extract eigenvalues
     Matrix lambda = DiagonalMatrix(ak.diagonal());
-    return EigenvalueDecomposition(lambda, q);
+    final result = EigenvalueDecomposition(lambda, q);
+    _decompositionCache.put(sig, result);
+    return result;
   }
 
   /// Solves a linear equation system Ax = b using various decomposition methods.

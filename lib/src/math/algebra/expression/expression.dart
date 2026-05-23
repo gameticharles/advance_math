@@ -6,6 +6,7 @@ import 'package:petitparser/petitparser.dart';
 import '../../../../advance_math.dart' as math;
 import '../calculus/integration.dart';
 import '../calculus/differentiation.dart';
+import 'dart:math' as dmath;
 
 
 export 'parser.dart';

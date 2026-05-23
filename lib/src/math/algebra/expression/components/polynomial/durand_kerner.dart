@@ -67,6 +67,9 @@ final class DurandKerner extends Polynomial {
   /// The maximum steps to be made by the algorithm.
   final int maxSteps;
 
+  /// Cache of calculated roots for polynomial solver.
+  static final _rootsCache = LRUCache<String, List<dynamic>>(maxSize: 500);
+
   /// Creates a new object that finds all the roots of a polynomial equation
   /// using the Durand-Kerner algorithm. The polynomial can have both complex
   /// ([Complex]) and real ([double]) values.
@@ -201,115 +204,125 @@ final class DurandKerner extends Polynomial {
 
   @override
   List<dynamic> roots() {
-    // In case the polynomial was a constant, just return an empty array because
-    // there are no solutions.
-    if (coefficients.length <= 1) {
-      return [];
-    }
+    final sig = '${coefficients.map((e) => e.hashCode).join(',')}:$precision:$maxSteps:${initialGuess.map((e) => e.hashCode).join(',')}';
+    final cached = _rootsCache.get(sig);
+    if (cached != null) return cached;
 
-    // Proceeding with the setup since the polynomial degree is >= 1.
-    final coefficientsLength = coefficients.length;
-    final reversedCoeffs = coefficients.reversed.toList(growable: false);
-
-    // Buffers for numerators and denominators or real and complex parts.
-    // Buffers for numerators and denominators or real and complex parts.
-    final realBuffer = reversedCoeffs.map((e) {
-      if (e is Literal && e.value is Complex) {
-        return (e.value as Complex).real;
-      } else if (e is Literal && e.value is num) {
-        return (e.value as num).toDouble();
+    List<dynamic> compute() {
+      // In case the polynomial was a constant, just return an empty array because
+      // there are no solutions.
+      if (coefficients.length <= 1) {
+        return [];
       }
-      throw Exception('DurandKerner requires numeric coefficients. Found: $e');
-    }).toList(growable: false);
 
-    final imaginaryBuffer = reversedCoeffs.map((e) {
-      if (e is Literal && e.value is Complex) {
-        return (e.value as Complex).imaginary;
-      } else if (e is Literal && e.value is num) {
-        return 0.0;
-      }
-      throw Exception('DurandKerner requires numeric coefficients. Found: $e');
-    }).toList(growable: false);
+      // Proceeding with the setup since the polynomial degree is >= 1.
+      final coefficientsLength = coefficients.length;
+      final reversedCoeffs = coefficients.reversed.toList(growable: false);
 
-    // Scaling the various coefficients.
-    var upperReal = realBuffer[coefficientsLength - 1];
-    var upperComplex = imaginaryBuffer[coefficientsLength - 1];
-    final squareSum = upperReal * upperReal + upperComplex * upperComplex;
-
-    upperReal /= squareSum;
-    upperComplex /= -squareSum;
-
-    num k1 = 0.0;
-    num k2 = 0.0;
-    num k3 = 0.0;
-    final s = upperComplex - upperReal;
-    final t = upperReal + upperComplex;
-
-    for (var i = 0; i < coefficientsLength - 1; ++i) {
-      k1 = upperReal * (realBuffer[i] + imaginaryBuffer[i]);
-      k2 = realBuffer[i] * s;
-      k3 = imaginaryBuffer[i] * t;
-      realBuffer[i] = k1 - k3;
-      imaginaryBuffer[i] = k1 + k2;
-    }
-
-    realBuffer[coefficientsLength - 1] = 1.0;
-    imaginaryBuffer[coefficientsLength - 1] = 0.0;
-
-    // Using default values to compute the solutions. If they aren't provided,
-    // we will generate default ones.
-    if (initialGuess.isNotEmpty) {
-      final real = initialGuess.map((e) {
-        if (e is Complex) return e.real;
-        if (e is num) return e.toDouble();
-        return 0.0;
+      // Buffers for numerators and denominators or real and complex parts.
+      // Buffers for numerators and denominators or real and complex parts.
+      final realBuffer = reversedCoeffs.map((e) {
+        if (e is Literal && e.value is Complex) {
+          return (e.value as Complex).real;
+        } else if (e is Literal && e.value is num) {
+          return (e.value as num).toDouble();
+        }
+        throw Exception('DurandKerner requires numeric coefficients. Found: $e');
       }).toList(growable: false);
 
-      final complex = initialGuess.map((e) {
-        if (e is Complex) return e.imaginary;
-        return 0.0;
+      final imaginaryBuffer = reversedCoeffs.map((e) {
+        if (e is Literal && e.value is Complex) {
+          return (e.value as Complex).imaginary;
+        } else if (e is Literal && e.value is num) {
+          return 0.0;
+        }
+        throw Exception('DurandKerner requires numeric coefficients. Found: $e');
       }).toList(growable: false);
 
-      return _solve(
-        realValues: real,
-        imaginaryValues: complex,
-        realBuffer: realBuffer,
-        imaginaryBuffer: imaginaryBuffer,
-      );
-    } else {
-      // If we're here, it means that no initial guesses were provided and so we
-      // need to generate some good ones.
-      final real = List<double>.generate(
-        coefficientsLength - 1,
-        (_) => 0.0,
-        growable: false,
-      );
-      final complex = List<double>.generate(
-        coefficientsLength - 1,
-        (_) => 0.0,
-        growable: false,
-      );
+      // Scaling the various coefficients.
+      var upperReal = realBuffer[coefficientsLength - 1];
+      var upperComplex = imaginaryBuffer[coefficientsLength - 1];
+      final squareSum = upperReal * upperReal + upperComplex * upperComplex;
 
-      final bound = _bound(
-        value: coefficientsLength,
-        realBuffer: realBuffer,
-        imaginaryBuffer: imaginaryBuffer,
-      );
-      final factor = bound * 0.65;
-      final multiplier = cos(0.25 * 2 * pi);
+      upperReal /= squareSum;
+      upperComplex /= -squareSum;
+
+      num k1 = 0.0;
+      num k2 = 0.0;
+      num k3 = 0.0;
+      final s = upperComplex - upperReal;
+      final t = upperReal + upperComplex;
 
       for (var i = 0; i < coefficientsLength - 1; ++i) {
-        real[i] = factor * multiplier;
-        complex[i] = factor * sqrt(1.0 - multiplier * multiplier);
+        k1 = upperReal * (realBuffer[i] + imaginaryBuffer[i]);
+        k2 = realBuffer[i] * s;
+        k3 = imaginaryBuffer[i] * t;
+        realBuffer[i] = k1 - k3;
+        imaginaryBuffer[i] = k1 + k2;
       }
 
-      return _solve(
-        realValues: real,
-        imaginaryValues: complex,
-        realBuffer: realBuffer,
-        imaginaryBuffer: imaginaryBuffer,
-      );
+      realBuffer[coefficientsLength - 1] = 1.0;
+      imaginaryBuffer[coefficientsLength - 1] = 0.0;
+
+      // Using default values to compute the solutions. If they aren't provided,
+      // we will generate default ones.
+      if (initialGuess.isNotEmpty) {
+        final real = initialGuess.map((e) {
+          if (e is Complex) return e.real;
+          if (e is num) return e.toDouble();
+          return 0.0;
+        }).toList(growable: false);
+
+        final complex = initialGuess.map((e) {
+          if (e is Complex) return e.imaginary;
+          return 0.0;
+        }).toList(growable: false);
+
+        return _solve(
+          realValues: real,
+          imaginaryValues: complex,
+          realBuffer: realBuffer,
+          imaginaryBuffer: imaginaryBuffer,
+        );
+      } else {
+        // If we're here, it means that no initial guesses were provided and so we
+        // need to generate some good ones.
+        final real = List<double>.generate(
+          coefficientsLength - 1,
+          (_) => 0.0,
+          growable: false,
+        );
+        final complex = List<double>.generate(
+          coefficientsLength - 1,
+          (_) => 0.0,
+          growable: false,
+        );
+
+        final bound = _bound(
+          value: coefficientsLength,
+          realBuffer: realBuffer,
+          imaginaryBuffer: imaginaryBuffer,
+        );
+        final factor = bound * 0.65;
+        final multiplier = dmath.cos(0.25 * 2 * dmath.pi);
+
+        for (var i = 0; i < coefficientsLength - 1; ++i) {
+          real[i] = factor * multiplier;
+          complex[i] = factor * dmath.sqrt(1.0 - multiplier * multiplier);
+        }
+
+        return _solve(
+          realValues: real,
+          imaginaryValues: complex,
+          realBuffer: realBuffer,
+          imaginaryBuffer: imaginaryBuffer,
+        );
+      }
     }
+
+    final result = compute();
+    _rootsCache.put(sig, result);
+    return result;
   }
 
   DurandKerner copyWith({
@@ -348,10 +361,10 @@ final class DurandKerner extends Polynomial {
       final realSquare = realBuffer[i] * realBuffer[i];
       final imagSquare = imaginaryBuffer[i] * imaginaryBuffer[i];
 
-      bound = max(bound, realSquare + imagSquare);
+      bound = dmath.max(bound, realSquare + imagSquare);
     }
 
-    return 1.0 + sqrt(bound);
+    return 1.0 + dmath.sqrt(bound);
   }
 
   /// The Durand-Kerner algorithm that finds the roots of the polynomial.
@@ -443,7 +456,7 @@ final class DurandKerner extends Polynomial {
         realValues[j] = pa - qa;
         imaginaryValues[j] = pb - qb;
 
-        d = max(d, max(qa.abs(), qb.abs()));
+        d = dmath.max(d, dmath.max(qa.abs(), qb.abs()));
       }
 
       // Exiting early if convergence is reached.

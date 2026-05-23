@@ -79,6 +79,17 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// This object provides methods for various matrix decompositions, like LU, QR etc.
   MatrixDecomposition get decomposition => MatrixDecomposition(this);
 
+  /// Returns a unique string signature representing the current dimensions and element values of the matrix.
+  String get elementsSignature {
+    final buffer = StringBuffer('$rowCount,$columnCount:');
+    for (final row in _data) {
+      for (final el in row) {
+        buffer.write('${el.hashCode},');
+      }
+    }
+    return buffer.toString();
+  }
+
   /// Getter to retrieve the LinearSystemSolvers object associated with the matrix.
   /// This object provides methods for solving linear systems of equations represented by the matrix.
   LinearSystemSolvers get linear => LinearSystemSolvers(this);
@@ -86,6 +97,10 @@ class Matrix extends IterableMixin<List<dynamic>> {
   /// Static getter to retrieve the MatrixFactory object.
   /// This object provides methods for generating special kinds of matrices like diagonal, identity etc.
   static MatrixFactory get factory => MatrixFactory();
+
+  /// Caches for matrix inverse and pseudoinverse calculations.
+  static final _inverseCache = LRUCache<String, Matrix>(maxSize: 500);
+  static final _pseudoInverseCache = LRUCache<String, Matrix>(maxSize: 500);
 
   /// Overrides the iterator getter to provide a MatrixIterator.
   /// This iterator iterates over the rows of the matrix.
