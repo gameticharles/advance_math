@@ -179,4 +179,31 @@ extension IterableExt<E> on Iterable<E> {
           'Cannot sum non-numeric elements without a selector function');
     }
   }
+
+  /// Returns the cumulative sum of all elements in this iterable.
+  ///
+  /// For numeric types, this adds elements cumulatively.
+  /// Example: `[1, 2, 3].cumsum() => [1, 3, 6]`
+  ///
+  /// If any element is a Complex number, all elements will be converted to Complex
+  /// and the cumulative sum will consist of Complex numbers.
+  Iterable<dynamic> cumsum([Function(E)? selector]) sync* {
+    dynamic currentSum = 0;
+    bool hasComplex = false;
+
+    for (final element in this) {
+      final val = selector != null ? selector(element) : element;
+      if (val is Complex || currentSum is Complex) {
+        if (!hasComplex) {
+          hasComplex = true;
+          currentSum = Complex(currentSum);
+        }
+        currentSum = currentSum + (val is Complex ? val : Complex(val));
+        yield currentSum;
+      } else {
+        currentSum = currentSum + val;
+        yield currentSum;
+      }
+    }
+  }
 }

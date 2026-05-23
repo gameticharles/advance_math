@@ -193,13 +193,27 @@ extension MatrixOperationExtension on Matrix {
 
   // Helper function to multiply small matrices
   Matrix _normalMultiply(Matrix other) {
-    List<List<dynamic>> newData = List.generate(
-        rowCount, (_) => List.filled(other.columnCount, Complex.zero()));
+    final int r1 = rowCount;
+    final int c1 = columnCount;
+    final int c2 = other.columnCount;
 
-    for (int i = 0; i < rowCount; i++) {
-      for (int j = 0; j < other.columnCount; j++) {
-        for (int k = 0; k < columnCount; k++) {
-          newData[i][j] += _data[i][k] * other[k][j];
+    List<List<dynamic>> newData =
+        List.generate(r1, (_) => List.filled(c2, Complex.zero()));
+
+    for (int i = 0; i < r1; i++) {
+      for (int k = 0; k < c1; k++) {
+        final aVal = _data[i][k];
+        if (aVal == Complex.zero() || aVal == 0) continue;
+
+        int j = 0;
+        for (; j <= c2 - 4; j += 4) {
+          newData[i][j] += aVal * other[k][j];
+          newData[i][j + 1] += aVal * other[k][j + 1];
+          newData[i][j + 2] += aVal * other[k][j + 2];
+          newData[i][j + 3] += aVal * other[k][j + 3];
+        }
+        for (; j < c2; j++) {
+          newData[i][j] += aVal * other[k][j];
         }
       }
     }

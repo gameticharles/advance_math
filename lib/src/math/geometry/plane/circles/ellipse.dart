@@ -21,7 +21,7 @@ class Ellipse extends PlaneGeometry {
   /// - area
   /// - perimeter
   /// - focusDistance and sumOfDistances
-  Ellipse.from({
+  factory Ellipse.from({
     double? semiMajorAxis,
     double? semiMinorAxis,
     double? radiusX,
@@ -31,17 +31,79 @@ class Ellipse extends PlaneGeometry {
     double? focusDistance,
     double? sumOfDistances,
     Point? center,
-  })  : semiMajorAxis = semiMajorAxis ??
-            sqrt((radiusX ?? 0) * (radiusX ?? 0) +
-                (radiusY ?? 0) * (radiusY ?? 0)),
-        semiMinorAxis = semiMinorAxis ??
-            sqrt((radiusX ?? 0) * (radiusX ?? 0) - (focusDistance ?? 0)),
-        center = center ?? Point(0, 0),
-        super("Ellipse") {
-    if (semiMajorAxis == null && semiMinorAxis == null) {
-      throw ArgumentError(
-          'Exactly one of semiMajorAxis and semiMinorAxis must be provided.');
+  }) {
+    double a = 0;
+    double b = 0;
+
+    if (semiMajorAxis != null && semiMinorAxis != null) {
+      a = semiMajorAxis;
+      b = semiMinorAxis;
+    } else if (radiusX != null && radiusY != null) {
+      a = radiusX > radiusY ? radiusX : radiusY;
+      b = radiusX < radiusY ? radiusX : radiusY;
+    } else if (focusDistance != null && sumOfDistances != null) {
+      a = sumOfDistances / 2.0;
+      double c = focusDistance;
+      if (a < c) {
+        throw ArgumentError('Sum of distances (2a) must be greater than twice the focal distance (2c).');
+      }
+      b = dmath.sqrt(a * a - c * c);
+    } else if (area != null) {
+      if (semiMajorAxis != null) {
+        a = semiMajorAxis;
+        b = area / (pi * a);
+      } else if (semiMinorAxis != null) {
+        b = semiMinorAxis;
+        a = area / (pi * b);
+      } else {
+        // Assume circle
+        a = dmath.sqrt(area / pi);
+        b = a;
+      }
+    } else if (perimeter != null) {
+      if (semiMajorAxis != null) {
+        a = semiMajorAxis;
+        // Ramanujan approximation: P ≈ pi * (a + b) * (1 + 3h / (10 + sqrt(4 - 3h)))
+        // We can solve for b numerically. Since b <= a, we search in [0, a].
+        double low = 0;
+        double high = a;
+        for (int i = 0; i < 100; i++) {
+          double mid = (low + high) / 2;
+          double h = ((a - mid) * (a - mid)) / ((a + mid) * (a + mid));
+          double pApprox = pi * (a + mid) * (1 + (3 * h) / (10 + dmath.sqrt(4 - 3 * h)));
+          if (pApprox < perimeter) {
+            low = mid;
+          } else {
+            high = mid;
+          }
+        }
+        b = (low + high) / 2;
+      } else if (semiMinorAxis != null) {
+        b = semiMinorAxis;
+        // We can solve for a numerically. Since a >= b, search in [b, b * 1e5] (generous upper bound).
+        double low = b;
+        double high = b * 100000;
+        for (int i = 0; i < 100; i++) {
+          double mid = (low + high) / 2;
+          double h = ((mid - b) * (mid - b)) / ((mid + b) * (mid + b));
+          double pApprox = pi * (mid + b) * (1 + (3 * h) / (10 + dmath.sqrt(4 - 3 * h)));
+          if (pApprox < perimeter) {
+            low = mid;
+          } else {
+            high = mid;
+          }
+        }
+        a = (low + high) / 2;
+      } else {
+        // Assume circle
+        a = perimeter / (2 * pi);
+        b = a;
+      }
+    } else {
+      throw ArgumentError('Not enough information provided to define an Ellipse.');
     }
+
+    return Ellipse(a, b, center: center);
   }
 
   @override
@@ -57,7 +119,7 @@ class Ellipse extends PlaneGeometry {
             ((semiMajorAxis + semiMinorAxis) * (semiMajorAxis + semiMinorAxis));
     return pi *
         (semiMajorAxis + semiMinorAxis) *
-        (1 + (3 * h) / (10 + sqrt(4 - 3 * h)));
+        (1 + (3 * h) / (10 + dmath.sqrt(4 - 3 * h)));
   }
 
   /// Calculates the linear eccentricity (focal distance) of the ellipse.
@@ -66,7 +128,7 @@ class Ellipse extends PlaneGeometry {
   /// This value is calculated as the square root of the difference between the
   /// squares of the semi-major axis and semi-minor axis.
   double focalDistance() {
-    return sqrt(semiMajorAxis * semiMajorAxis - semiMinorAxis * semiMinorAxis);
+    return dmath.sqrt(semiMajorAxis * semiMajorAxis - semiMinorAxis * semiMinorAxis);
   }
 
   /// Calculates the distance between the two foci of the ellipse.
@@ -120,7 +182,7 @@ class Ellipse extends PlaneGeometry {
   ///
   /// A measure of how much the ellipse deviates from being a circle.
   double eccentricity() {
-    return sqrt(
+    return dmath.sqrt(
         1 - (semiMinorAxis * semiMinorAxis) / (semiMajorAxis * semiMajorAxis));
   }
 
@@ -180,7 +242,7 @@ class Ellipse extends PlaneGeometry {
   double distanceFromPoint(Point p) {
     num x0 = p.x - center.x;
     num y0 = p.y - center.y;
-    double distance = sqrt((x0 * x0) / (semiMajorAxis * semiMajorAxis) +
+    double distance = dmath.sqrt((x0 * x0) / (semiMajorAxis * semiMajorAxis) +
         (y0 * y0) / (semiMinorAxis * semiMinorAxis));
     return distance - 1;
   }
@@ -201,39 +263,39 @@ class Ellipse extends PlaneGeometry {
         // Simpson's rule for numerical integration
         for (int i = 0; i <= n; i++) {
           double theta = theta1 + i * h;
-          double r = sqrt(
-              (semiMajorAxis * semiMajorAxis) * cos(theta) * cos(theta) +
-                  (semiMinorAxis * semiMinorAxis) * sin(theta) * sin(theta));
+          double r = dmath.sqrt(
+              (semiMajorAxis * semiMajorAxis) * dmath.cos(theta) * dmath.cos(theta) +
+                  (semiMinorAxis * semiMinorAxis) * dmath.sin(theta) * dmath.sin(theta));
           sum += i % 2 == 0 ? 2 * r : 4 * r;
         }
         sum -=
-            (sqrt((semiMajorAxis * semiMajorAxis) * cos(theta1) * cos(theta1) +
+            (dmath.sqrt((semiMajorAxis * semiMajorAxis) * dmath.cos(theta1) * dmath.cos(theta1) +
                         (semiMinorAxis * semiMinorAxis) *
-                            sin(theta1) *
-                            sin(theta1)) +
-                    sqrt((semiMajorAxis * semiMajorAxis) *
-                            cos(theta2) *
-                            cos(theta2) +
+                            dmath.sin(theta1) *
+                            dmath.sin(theta1)) +
+                    dmath.sqrt((semiMajorAxis * semiMajorAxis) *
+                            dmath.cos(theta2) *
+                            dmath.cos(theta2) +
                         (semiMinorAxis * semiMinorAxis) *
-                            sin(theta2) *
-                            sin(theta2))) /
+                            dmath.sin(theta2) *
+                            dmath.sin(theta2))) /
                 2;
         return sum * h / 3;
       case 'trapezoidal':
         // Trapezoidal rule for numerical integration
         for (int i = 1; i < n; i++) {
           double theta = theta1 + i * h;
-          double r = sqrt(
-              (semiMajorAxis * semiMajorAxis) * cos(theta) * cos(theta) +
-                  (semiMinorAxis * semiMinorAxis) * sin(theta) * sin(theta));
+          double r = dmath.sqrt(
+              (semiMajorAxis * semiMajorAxis) * dmath.cos(theta) * dmath.cos(theta) +
+                  (semiMinorAxis * semiMinorAxis) * dmath.sin(theta) * dmath.sin(theta));
           sum += 2 * r;
         }
-        sum += sqrt((semiMajorAxis * semiMajorAxis) *
-                    cos(theta1) *
-                    cos(theta1) +
-                (semiMinorAxis * semiMinorAxis) * sin(theta1) * sin(theta1)) +
-            sqrt((semiMajorAxis * semiMajorAxis) * cos(theta2) * cos(theta2) +
-                (semiMinorAxis * semiMinorAxis) * sin(theta2) * sin(theta2));
+        sum += dmath.sqrt((semiMajorAxis * semiMajorAxis) *
+                    dmath.cos(theta1) *
+                    dmath.cos(theta1) +
+                (semiMinorAxis * semiMinorAxis) * dmath.sin(theta1) * dmath.sin(theta1)) +
+            dmath.sqrt((semiMajorAxis * semiMajorAxis) * dmath.cos(theta2) * dmath.cos(theta2) +
+                (semiMinorAxis * semiMinorAxis) * dmath.sin(theta2) * dmath.sin(theta2));
         return sum * h / 2;
       default:
         throw ArgumentError('Unsupported integration method: $method');
@@ -245,7 +307,7 @@ class Ellipse extends PlaneGeometry {
     double a = semiMajorAxis;
     double b = semiMinorAxis;
     return (a * b) /
-        pow((b * b * cos(theta) * cos(theta) + a * a * sin(theta) * sin(theta)),
+        dmath.pow((b * b * dmath.cos(theta) * dmath.cos(theta) + a * a * dmath.sin(theta) * dmath.sin(theta)),
             1.5);
   }
 
