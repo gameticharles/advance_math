@@ -16,8 +16,8 @@ void main() {
       check('1+1', '2');
       check('4^2', '16');
       check('2*-4', '-8');
-      check('2+(3/4)', '11/4'); // Expect symbolic result
-      check('2/3+2/3', '4/3'); // Expect symbolic result
+      check('2+(3/4)', '11/4');
+      check('2/3+2/3', '4/3');
       check('6.5*2', '13.0');
     });
 

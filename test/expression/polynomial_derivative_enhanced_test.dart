@@ -25,7 +25,7 @@ void main() {
 
         // Test evaluation
         final result = poly.evaluate(2);
-        expect(result.real, closeTo(15, 0.001)); // 2*4 + 3*2 + 1 = 15
+        expect(result, closeTo(15, 0.001)); // 2*4 + 3*2 + 1 = 15
       });
 
       test('should create polynomial using ex() helper function', () {
@@ -42,7 +42,7 @@ void main() {
 
         // Test evaluation at x = 1
         final result = poly.evaluate(1);
-        expect(result.real, closeTo(4, 0.001)); // 3 - 2 + 4 - 1 = 4
+        expect(result, closeTo(4, 0.001)); // 3 - 2 + 4 - 1 = 4
       });
 
       test('should create polynomial using explicit Literal objects', () {
@@ -55,7 +55,7 @@ void main() {
 
         // Test evaluation at x = 2
         final result = poly.evaluate(2);
-        expect(result.real, closeTo(0, 0.001)); // 4 - 10 + 6 = 0
+        expect(result, closeTo(0, 0.001)); // 4 - 10 + 6 = 0
       });
 
       test('should create polynomial with mixed creation approaches', () {
@@ -71,8 +71,7 @@ void main() {
 
         // Test evaluation at x = 3
         final result = poly.evaluate(3);
-        expect(
-            result.real, closeTo(10, 0.001)); // 2*9 - 3*3 + 1 = 18 - 9 + 1 = 10
+        expect(result, closeTo(10, 0.001)); // 2*9 - 3*3 + 1 = 18 - 9 + 1 = 10
       });
     });
 
@@ -134,7 +133,7 @@ void main() {
 
         // Test evaluation of derivative at x = 1
         final result = derivative.evaluate(1);
-        expect(result.real, closeTo(8, 0.001)); // 6*1 + 2 = 8
+        expect(result, closeTo(8, 0.001)); // 6*1 + 2 = 8
       });
 
       test('should differentiate polynomial created with ex() helper', () {
@@ -154,8 +153,7 @@ void main() {
 
         // Test evaluation of derivative at x = 2
         final result = derivative.evaluate(2);
-        expect(result.real,
-            closeTo(38, 0.001)); // 12*4 - 6*2 + 2 = 48 - 12 + 2 = 38
+        expect(result, closeTo(38, 0.001)); // 12*4 - 6*2 + 2 = 48 - 12 + 2 = 38
       });
 
       test(
@@ -374,9 +372,9 @@ void main() {
         final result2 = poly2.evaluate(testValue);
         final result3 = poly3.evaluate(testValue);
 
-        expect(result1.real, closeTo(result2.real, 0.001));
-        expect(result2.real, closeTo(result3.real, 0.001));
-        expect(result1.real, closeTo(result3.real, 0.001));
+        expect(result1, closeTo(result2, 0.001));
+        expect(result2, closeTo(result3, 0.001));
+        expect(result1, closeTo(result3, 0.001));
       });
 
       test('should handle edge cases with enhanced literals', () {

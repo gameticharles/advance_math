@@ -552,6 +552,15 @@ class Rational implements Comparable<Rational> {
   /// Converts to [BigInt] via truncation.
   BigInt toBigInt() => truncate();
 
+  /// Converts to [int] via truncation.
+  int toInt() {
+    if (denominator == _i0) throw UnsupportedError("NaN/Inf");
+    if (numerator.abs() > BigInt.from(1 << 63)) {
+      throw UnsupportedError("Number too large for int");
+    }
+    return (numerator ~/ denominator).toInt();
+  }
+
   /// Converts to [double].
   ///
   /// Warning: Precision may be lost for very large or small numbers.

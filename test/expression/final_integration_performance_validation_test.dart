@@ -411,7 +411,7 @@ void main() {
 
         // Test differentiate
         final derivative = expr.differentiate();
-        expect(derivative.evaluate({}), equals(2));
+        expect(derivative.evaluate().value, equals(2));
 
         // Test integrate
         final integral = expr.integrate();

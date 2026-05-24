@@ -7,18 +7,22 @@ void main() {
       var context = defaultContext;
 
       // avg
-      expect(
-          Expression.parse('avg(10, 20, 30)').evaluate(context), equals(20.0));
-      expect(Expression.parse('avg([10, 20, 30])').evaluate(context),
+      expect(Expression.parse('avg(10, 20, 30)').evaluate(context).value,
+          equals(20.0));
+      expect(Expression.parse('avg([10, 20, 30])').evaluate(context).value,
           equals(20.0));
 
       // max
-      expect(Expression.parse('max(1, 5, 2)').evaluate(context), equals(5));
-      expect(Expression.parse('max([1, 5, 2])').evaluate(context), equals(5));
+      expect(
+          Expression.parse('max(1, 5, 2)').evaluate(context).value, equals(5));
+      expect(Expression.parse('max([1, 5, 2])').evaluate(context).value,
+          equals(5));
 
       // min
-      expect(Expression.parse('min(1, 5, 2)').evaluate(context), equals(1));
-      expect(Expression.parse('min([1, 5, 2])').evaluate(context), equals(1));
+      expect(
+          Expression.parse('min(1, 5, 2)').evaluate(context).value, equals(1));
+      expect(Expression.parse('min([1, 5, 2])').evaluate(context).value,
+          equals(1));
 
       // sum
       expect(Expression.parse('sum(1, 2, 3)').evaluate(context), equals(6));
