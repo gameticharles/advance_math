@@ -24,15 +24,15 @@ class Square extends PlaneGeometry {
     num? circumRadius,
   })  : side = side ??
             (diagonal != null
-                ? (diagonal / (sqrt(2) is Complex ? (sqrt(2) as Complex).real.toDouble() : (sqrt(2) as num).toDouble()))
+                ? diagonal / _sqrt2
                 : perimeter != null
                     ? perimeter / 4
                     : area != null
-                        ? (sqrt(area) is Complex ? (sqrt(area) as Complex).real.toDouble() : (sqrt(area) as num).toDouble())
+                        ? dmath.sqrt(area)
                         : inRadius != null
                             ? 2 * inRadius
                             : circumRadius != null
-                                ? ((2 * circumRadius) / (sqrt(2) is Complex ? (sqrt(2) as Complex).real.toDouble() : (sqrt(2) as num).toDouble()))
+                                ? (2 * circumRadius) / _sqrt2
                                 : throw ArgumentError(
                                     'Insufficient parameters provided.')),
         super("Square");
@@ -47,30 +47,25 @@ class Square extends PlaneGeometry {
     return 4 * side;
   }
 
+  static final _sqrt2 = dmath.sqrt(2);
+
   /// Calculates the diagonal length of the square.
   ///
   /// The diagonal length of a square is equal to the side length multiplied by the square root of 2.
   num diagonal() {
-    var s2 = sqrt(2);
-    double sqrt2 = s2 is Complex ? s2.real.toDouble() : (s2 as num).toDouble();
-    return side * sqrt2;
+    return side * _sqrt2;
   }
 
   /// Calculates the angle between the diagonal and the sides of a square.
   ///
   /// The angle between the diagonals of a square is always 45 degrees, or π/4 radians.
   Angle angleBetweenDiagonals() {
-    var val = atan(1);
-    return Angle(rad: val is Complex ? val.real.toDouble() : (val as num).toDouble());
+    return Angle(rad: dmath.atan(1));
   }
 
   /// Get the inRadius of the rectangle.
   num get inRadius => side / 2;
 
   /// Get the outRadius of the rectangle.
-  num get circumRadius {
-    var s2 = sqrt(2);
-    double sqrt2 = s2 is Complex ? s2.real.toDouble() : (s2 as num).toDouble();
-    return (side * sqrt2) / 2;
-  }
+  num get circumRadius => (side * _sqrt2) / 2;
 }

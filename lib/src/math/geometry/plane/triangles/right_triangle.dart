@@ -30,7 +30,7 @@ class RightTriangle extends Triangle {
       : super(
           a: leg1,
           b: leg2,
-          c: (sqrt(leg1 * leg1 + leg2 * leg2) as Complex).real.toDouble(),
+          c: dmath.sqrt(leg1 * leg1 + leg2 * leg2),
           angleA: Angle(deg: 90),
         ) {
     if (leg1 <= 0 || leg2 <= 0) {
@@ -50,7 +50,7 @@ class RightTriangle extends Triangle {
   RightTriangle.fromHypotenuse(double leg, double hypotenuse)
       : super(
           a: leg,
-          b: (sqrt(hypotenuse * hypotenuse - leg * leg) as Complex).real.toDouble(),
+          b: dmath.sqrt(hypotenuse * hypotenuse - leg * leg),
           c: hypotenuse,
           angleA: Angle(deg: 90),
         ) {
@@ -139,10 +139,9 @@ class RightTriangle extends Triangle {
       throw ArgumentError('No valid triangle for given parameters');
     }
 
-    var sqrtD = sqrt(discriminant);
-    double doubleSqrtD = sqrtD is Complex ? sqrtD.real.toDouble() : (sqrtD as num).toDouble();
-    double b1 = (-B + doubleSqrtD) / (2 * A);
-    double b2 = (-B - doubleSqrtD) / (2 * A);
+    var sqrtD = dmath.sqrt(discriminant);
+    double b1 = (-B + sqrtD) / (2 * A);
+    double b2 = (-B - sqrtD) / (2 * A);
 
     // Choose the positive solution that isn't close to 'a'
     double otherLeg = (b1 > 0 && (b1 - a).abs() > 0.001) ? b1 : b2;

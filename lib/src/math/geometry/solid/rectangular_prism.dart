@@ -71,7 +71,7 @@ class RectangularPrism extends SolidGeometry {
   ///
   /// Diagonal = √(l² + w² + h²)
   double get diagonal =>
-      sqrt(length * length + width * width + height * height);
+      dmath.sqrt(length * length + width * width + height * height);
 
   @override
   double area() => surfaceArea();

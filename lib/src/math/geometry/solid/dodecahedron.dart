@@ -20,7 +20,7 @@ class Dodecahedron extends SolidGeometry {
   Point center;
 
   /// Edge length.
-  double edge;
+  num edge;
 
   /// Creates a regular dodecahedron with specified edge length.
   ///
@@ -46,7 +46,7 @@ class Dodecahedron extends SolidGeometry {
     if (volume <= 0) throw ArgumentError('Volume must be positive');
 
     // V = ((15 + 7√5)/4)a³, so a³ = 4V / (15 + 7√5)
-    double edge = pow(4 * volume / (15 + 7 * sqrt(5)), 1 / 3).toDouble();
+    num edge = dmath.pow(4 * volume / (15 + 7 * sqrt(5)), 1 / 3);
     return Dodecahedron(edge: edge, center: center);
   }
 
@@ -63,7 +63,8 @@ class Dodecahedron extends SolidGeometry {
     if (surfaceArea <= 0) throw ArgumentError('Surface area must be positive');
 
     // A = 3√(25 + 10√5) × a², so a = √(A / (3√(25 + 10√5)))
-    double edge = sqrt(surfaceArea / (3 * sqrt(25 + 10 * sqrt(5))));
+    num edge =
+        dmath.sqrt(surfaceArea / (3 * dmath.sqrt(25 + 10 * dmath.sqrt(5))));
     return Dodecahedron(edge: edge, center: center);
   }
 
@@ -71,17 +72,18 @@ class Dodecahedron extends SolidGeometry {
   static const double phi = 1.618033988749895;
 
   /// Gets the inradius (radius of inscribed sphere).
-  double get inRadius => edge * phi * sqrt(3) / 2;
+  double get inRadius => edge * phi * dmath.sqrt(3) / 2;
 
   /// Gets the circumradius (radius of circumscribed sphere).
-  double get circumRadius => edge * phi * sqrt(3) / 2 * sqrt((3 + sqrt(5)) / 2);
+  double get circumRadius =>
+      edge * phi * dmath.sqrt(3) / 2 * dmath.sqrt((3 + dmath.sqrt(5)) / 2);
 
   /// Calculates the volume of the dodecahedron.
   ///
   /// Volume = ((15 + 7√5)/4)a³
   @override
   double volume() {
-    return ((15 + 7 * sqrt(5)) / 4) * pow(edge, 3);
+    return ((15 + 7 * dmath.sqrt(5)) / 4) * dmath.pow(edge, 3);
   }
 
   /// Calculates the surface area of the dodecahedron.
@@ -89,7 +91,7 @@ class Dodecahedron extends SolidGeometry {
   /// Surface Area = 3√(25 + 10√5) × a²
   @override
   double surfaceArea() {
-    return 3 * sqrt(25 + 10 * sqrt(5)) * edge * edge;
+    return 3 * dmath.sqrt(25 + 10 * dmath.sqrt(5)) * edge * edge;
   }
 
   @override

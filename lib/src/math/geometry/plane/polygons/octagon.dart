@@ -30,13 +30,13 @@ class Octagon extends Polygon {
 
     // Generate vertices in a regular pattern
     Point centerPoint = center ?? Point(0, 0);
-    double radius = side / (2 * sin(pi / 8)); // Circumradius
+    double radius = side / (2 * dmath.sin(pi / 8)); // Circumradius
 
     List<Point> generatedVertices = [];
     for (int i = 0; i < 8; i++) {
       double angle = (2 * pi * i) / 8 - pi / 2; // Start from top
-      double x = centerPoint.x + radius * cos(angle);
-      double y = centerPoint.y + radius * sin(angle);
+      double x = centerPoint.x + radius * dmath.cos(angle);
+      double y = centerPoint.y + radius * dmath.sin(angle);
       generatedVertices.add(Point(x, y));
     }
 
@@ -51,7 +51,7 @@ class Octagon extends Polygon {
   /// Creates an octagon from its area.
   factory Octagon.fromArea({required double area, Point? center}) {
     if (area <= 0) throw ArgumentError('Area must be positive');
-    double side = sqrt(area / (2 * (1 + sqrt(2))));
+    double side = dmath.sqrt(area / (2 * (1 + dmath.sqrt(2))));
     return Octagon(side, center: center);
   }
 
@@ -65,14 +65,14 @@ class Octagon extends Polygon {
   factory Octagon.fromCircumradius(
       {required double circumradius, Point? center}) {
     if (circumradius <= 0) throw ArgumentError('Circumradius must be positive');
-    double side = 2 * circumradius * sin(pi / 8);
+    double side = 2 * circumradius * dmath.sin(pi / 8);
     return Octagon(side, center: center);
   }
 
   /// Creates an octagon from its inradius (apothem).
   factory Octagon.fromInradius({required double inradius, Point? center}) {
     if (inradius <= 0) throw ArgumentError('Inradius must be positive');
-    double side = 2 * inradius * tan(pi / 8);
+    double side = 2 * inradius * dmath.tan(pi / 8);
     return Octagon(side, center: center);
   }
 

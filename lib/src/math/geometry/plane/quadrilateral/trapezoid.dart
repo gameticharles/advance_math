@@ -84,21 +84,22 @@ class Trapezoid extends PlaneGeometry {
   ///
   /// Formula: b = a - h * (cot(α) + cot(β))
   double sideLengthB(double angleAlpha, double angleBeta) {
-    return base1 - height * (1 / tan(angleAlpha) + 1 / tan(angleBeta));
+    return base1 -
+        height * (1 / dmath.tan(angleAlpha) + 1 / dmath.tan(angleBeta));
   }
 
   /// Calculates the length of side `c` of the Trapezoid.
   ///
   /// Formula: c = h / sin(α)
   double sideLengthC(double angleAlpha) {
-    return height / sin(angleAlpha);
+    return height / dmath.sin(angleAlpha);
   }
 
   /// Calculates the length of side `d` of the Trapezoid.
   ///
   /// Formula: d = h / sin(β)
   double sideLengthD(double angleBeta) {
-    return height / sin(angleBeta);
+    return height / dmath.sin(angleBeta);
   }
 
   /// Calculates the lengths of the diagonals of the Trapezoid.
@@ -106,10 +107,10 @@ class Trapezoid extends PlaneGeometry {
   /// Uses the law of cosines to find the diagonal lengths.
   /// Returns the lengths of the diagonals as a [List<dynamic>].
   List<dynamic> diagonals() {
-    dynamic diagonal1 =
-        sqrt(side1 * side1 + side2 * side2 + (base1 - base2) * (base1 - base2));
-    dynamic diagonal2 =
-        sqrt(side1 * side1 + side2 * side2 + (base2 - base1) * (base2 - base1));
+    dynamic diagonal1 = dmath.sqrt(
+        side1 * side1 + side2 * side2 + (base1 - base2) * (base1 - base2));
+    dynamic diagonal2 = dmath.sqrt(
+        side1 * side1 + side2 * side2 + (base2 - base1) * (base2 - base1));
     return [diagonal1, diagonal2];
   }
 
@@ -118,9 +119,9 @@ class Trapezoid extends PlaneGeometry {
   /// Uses trigonometric functions to find the angles.
   /// Returns a [List] of four [double] values representing the angles in radians.
   List<dynamic> angles() {
-    dynamic angle1 = acos(
+    dynamic angle1 = dmath.acos(
         (base2 - base1 + side1 * side1 + side2 * side2) / (2 * side1 * side2));
-    dynamic angle2 = acos(
+    dynamic angle2 = dmath.acos(
         (base1 - base2 + side1 * side1 + side2 * side2) / (2 * side1 * side2));
     dynamic angle3 = Complex(pi) - angle1;
     dynamic angle4 = Complex(pi) - angle2;

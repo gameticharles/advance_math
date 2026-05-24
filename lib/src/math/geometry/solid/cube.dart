@@ -31,7 +31,7 @@ class Cube extends SolidGeometry {
   /// If no center is provided, it defaults to (0, 0, 0).
   Cube.fromSurfaceArea(double surfaceArea, {Point? center})
       : center = center ?? Point(0, 0, 0),
-        sideLength = sqrt(surfaceArea / 6).toDouble(),
+        sideLength = dmath.sqrt(surfaceArea / 6),
         super("Cube");
 
   @override

@@ -111,12 +111,12 @@ class Sector extends PlaneGeometry {
   /// Gets the chord length (straight line connecting the arc endpoints).
   ///
   /// Chord = 2r × sin(θ/2)
-  num get chordLength => 2 * _radius * sin(centralAngle.rad / 2);
+  num get chordLength => 2 * _radius * dmath.sin(centralAngle.rad / 2);
 
   /// Gets the height (sagitta) of the arc.
   ///
   /// Height = r × (1 - cos(θ/2))
-  num get height => _radius * (1 - cos(centralAngle.rad / 2));
+  num get height => _radius * (1 - dmath.cos(centralAngle.rad / 2));
 
   /// Checks if a point is inside the sector.
   ///
@@ -135,7 +135,7 @@ class Sector extends PlaneGeometry {
     // For simplicity, assume sector starts at angle 0 relative to X-axis
     // If the sector has a rotation, we would need to adjust.
     // Assuming standard position (0 to centralAngle):
-    double pointAngle = atan2(dy, dx);
+    double pointAngle = dmath.atan2(dy, dx);
     if (pointAngle < 0) pointAngle += 2 * pi;
 
     return pointAngle <= centralAngle.rad;
@@ -154,8 +154,8 @@ class Sector extends PlaneGeometry {
     // Start point (angle 0)
     Point p1 = Point(center.x + _radius, center.y);
     // End point (angle centralAngle)
-    Point p2 = Point(center.x + _radius * cos(centralAngle.rad),
-        center.y + _radius * sin(centralAngle.rad));
+    Point p2 = Point(center.x + _radius * dmath.cos(centralAngle.rad),
+        center.y + _radius * dmath.sin(centralAngle.rad));
 
     List<Point> pointsToCheck = [p1, p2];
 

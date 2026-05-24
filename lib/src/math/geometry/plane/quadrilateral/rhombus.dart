@@ -60,14 +60,12 @@ class Rhombus extends PlaneGeometry {
       // Calculate diagonals using the formula:
       // d1 = 2 * side * sin(angle1/2)
       // d2 = 2 * side * cos(angle1/2)
-      var sinVal1 = sin(angle1!.rad / 2);
-      var cosVal1 = cos(angle1!.rad / 2);
-      diagonal1 = 2 * side! * (sinVal1 is Complex ? sinVal1.real.toDouble() : (sinVal1 as num).toDouble());
-      diagonal2 = 2 * side! * (cosVal1 is Complex ? cosVal1.real.toDouble() : (cosVal1 as num).toDouble());
+      diagonal1 = 2 * side! * dmath.sin(angle1!.rad / 2);
+      diagonal2 = 2 * side! * dmath.cos(angle1!.rad / 2);
 
       // Calculate height
-      var sinVal2 = sin(angle1!.rad);
-      _height = side! * (sinVal2 is Complex ? sinVal2.real.toDouble() : (sinVal2 as num).toDouble());
+      var sinVal2 = dmath.sin(angle1!.rad);
+      _height = side! * sinVal2;
     }
   }
 
@@ -85,13 +83,12 @@ class Rhombus extends PlaneGeometry {
     diagonal2 = d2;
 
     // Calculate side using Pythagorean theorem (diagonals bisect each other)
-    var valSide = sqrt((d1 / 2) * (d1 / 2) + (d2 / 2) * (d2 / 2));
-    side = valSide is Complex ? valSide.real.toDouble() : (valSide as num).toDouble();
+    side = dmath.sqrt((d1 / 2) * (d1 / 2) + (d2 / 2) * (d2 / 2));
 
     // Calculate angles using arctangent
-    var valAngle = atan(d1 / d2);
-    double halfAngle1 = valAngle is Complex ? valAngle.real.toDouble() : (valAngle as num).toDouble();
-    angle1 = Angle(rad: 2 * halfAngle1);
+    var valAngle = dmath.atan(d1 / d2);
+
+    angle1 = Angle(rad: 2 * valAngle);
     angle2 = Angle(deg: 180 - angle1!.deg);
 
     // Calculate height
@@ -132,9 +129,9 @@ class Rhombus extends PlaneGeometry {
     diagonal2 = vertices[1].distanceTo(vertices[3]);
 
     // Calculate angles
-    var valAngle = atan(diagonal1! / diagonal2!);
-    double halfAngle1 = valAngle is Complex ? valAngle.real.toDouble() : (valAngle as num).toDouble();
-    angle1 = Angle(rad: 2 * halfAngle1);
+    var valAngle = dmath.atan(diagonal1! / diagonal2!);
+
+    angle1 = Angle(rad: 2 * valAngle);
     angle2 = Angle(deg: 180 - angle1!.deg);
 
     // Calculate height
@@ -154,9 +151,7 @@ class Rhombus extends PlaneGeometry {
   double get height {
     if (_height != null) return _height!;
     if (angle1 != null && side != null) {
-      var sinVal = sin(angle1!.rad);
-      var doubleSin = sinVal is Complex ? sinVal.real.toDouble() : (sinVal as num).toDouble();
-      return side! * doubleSin;
+      return side! * dmath.sin(angle1!.rad);
     }
     throw StateError('Cannot calculate height: insufficient data');
   }

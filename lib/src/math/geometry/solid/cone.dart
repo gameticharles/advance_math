@@ -44,7 +44,7 @@ class Cone extends SolidGeometry {
   /// Gets the slant height of the cone.
   ///
   /// s = √(r² + h²)
-  double get slantHeight => sqrt(radius * radius + height * height);
+  double get slantHeight => dmath.sqrt(radius * radius + height * height);
 
   /// Calculates the volume of the cone.
   ///

@@ -20,7 +20,7 @@ class Icosahedron extends SolidGeometry {
   Point center;
 
   /// Edge length.
-  double edge;
+  num edge;
 
   /// Creates a regular icosahedron with specified edge length.
   ///
@@ -46,7 +46,7 @@ class Icosahedron extends SolidGeometry {
     if (volume <= 0) throw ArgumentError('Volume must be positive');
 
     // V = (5(3 + √5)/12)a³, so a³ = 12V / (5(3 + √5))
-    double edge = pow(12 * volume / (5 * (3 + sqrt(5))), 1 / 3).toDouble();
+    num edge = dmath.pow(12 * volume / (5 * (3 + dmath.sqrt(5))), 1 / 3);
     return Icosahedron(edge: edge, center: center);
   }
 
@@ -63,7 +63,7 @@ class Icosahedron extends SolidGeometry {
     if (surfaceArea <= 0) throw ArgumentError('Surface area must be positive');
 
     // A = 5√3 × a², so a = √(A / (5√3))
-    double edge = sqrt(surfaceArea / (5 * sqrt(3)));
+    double edge = dmath.sqrt(surfaceArea / (5 * dmath.sqrt(3)));
     return Icosahedron(edge: edge, center: center);
   }
 
@@ -71,17 +71,17 @@ class Icosahedron extends SolidGeometry {
   static const double phi = 1.618033988749895;
 
   /// Gets the inradius (radius of inscribed sphere).
-  double get inRadius => edge * phi * phi / (2 * sqrt(3));
+  double get inRadius => edge * phi * phi / (2 * dmath.sqrt(3));
 
   /// Gets the circumradius (radius of circumscribed sphere).
-  double get circumRadius => edge * phi / (2 * sin(2 * pi / 5));
+  double get circumRadius => edge * phi / (2 * dmath.sin(2 * pi / 5));
 
   /// Calculates the volume of the icosahedron.
   ///
   /// Volume = (5(3 + √5)/12)a³
   @override
   double volume() {
-    return (5 * (3 + sqrt(5)) / 12) * pow(edge, 3);
+    return (5 * (3 + dmath.sqrt(5)) / 12) * dmath.pow(edge, 3);
   }
 
   /// Calculates the surface area of the icosahedron.
@@ -89,7 +89,7 @@ class Icosahedron extends SolidGeometry {
   /// Surface Area = 5√3 × a²
   @override
   double surfaceArea() {
-    return 5 * sqrt(3) * edge * edge;
+    return 5 * dmath.sqrt(3) * edge * edge;
   }
 
   @override

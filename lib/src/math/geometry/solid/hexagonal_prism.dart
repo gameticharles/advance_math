@@ -56,7 +56,7 @@ class HexagonalPrism extends SolidGeometry {
     if (volume <= 0) throw ArgumentError('Volume must be positive');
     if (baseSide <= 0) throw ArgumentError('Base side must be positive');
 
-    double baseArea = (3 * sqrt(3) / 2) * baseSide * baseSide;
+    double baseArea = (3 * dmath.sqrt(3) / 2) * baseSide * baseSide;
     double height = volume / baseArea;
     return HexagonalPrism(baseSide: baseSide, height: height, center: center);
   }
@@ -77,7 +77,7 @@ class HexagonalPrism extends SolidGeometry {
     if (volume <= 0) throw ArgumentError('Volume must be positive');
     if (height <= 0) throw ArgumentError('Height must be positive');
 
-    double baseSide = sqrt((2 * volume) / (3 * sqrt(3) * height));
+    double baseSide = dmath.sqrt((2 * volume) / (3 * dmath.sqrt(3) * height));
     return HexagonalPrism(baseSide: baseSide, height: height, center: center);
   }
 
@@ -97,7 +97,7 @@ class HexagonalPrism extends SolidGeometry {
     if (surfaceArea <= 0) throw ArgumentError('Surface area must be positive');
     if (baseSide <= 0) throw ArgumentError('Base side must be positive');
 
-    double baseArea = (3 * sqrt(3) / 2) * baseSide * baseSide;
+    double baseArea = (3 * dmath.sqrt(3) / 2) * baseSide * baseSide;
     double height = (surfaceArea - 2 * baseArea) / (6 * baseSide);
 
     if (height <= 0) {
@@ -111,7 +111,7 @@ class HexagonalPrism extends SolidGeometry {
   /// Calculates the area of the hexagonal base.
   ///
   /// Base area = (3√3/2)a²
-  double get baseArea => (3 * sqrt(3) / 2) * baseSide * baseSide;
+  double get baseArea => (3 * dmath.sqrt(3) / 2) * baseSide * baseSide;
 
   /// Gets the perimeter of the hexagonal base.
   double get basePerimeter => 6 * baseSide;

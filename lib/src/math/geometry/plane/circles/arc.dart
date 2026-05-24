@@ -40,8 +40,7 @@ class Arc {
   /// [startAngle] is the starting angle in radians (default: 0).
   ///
   /// Throws [ArgumentError] if radius is not positive.
-  Arc(double radius, this.centralAngle,
-      {Point? center, double this.startAngle = 0.0})
+  Arc(num radius, this.centralAngle, {Point? center, this.startAngle = 0.0})
       : _radius = radius,
         center = center ?? Point(0, 0) {
     if (radius <= 0) {
@@ -51,10 +50,10 @@ class Arc {
 
   /// Named constructor following existing pattern.
   factory Arc.from({
-    required double radius,
+    required num radius,
     required Angle centralAngle,
     Point? center,
-    double startAngle = 0.0,
+    num startAngle = 0.0,
   }) {
     return Arc(radius, centralAngle, center: center, startAngle: startAngle);
   }

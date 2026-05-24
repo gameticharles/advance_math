@@ -115,7 +115,7 @@ class Circle extends PlaneGeometry {
 
   /// Calculates the length of a chord given a central angle in radians.
   double get chordLength {
-    return 2.0 * radius * sin(centralAngle!.rad / 2);
+    return 2.0 * radius * dmath.sin(centralAngle!.rad / 2);
   }
 
   /// Calculates the area of a segment given a central angle in radians.
@@ -126,7 +126,7 @@ class Circle extends PlaneGeometry {
 
   /// Calculates the distance from the center to the chord given a central angle in radians.
   double get distanceFromCenterToChord =>
-      radius.toDouble() * cos(centralAngle!.rad / 2);
+      radius * dmath.cos(centralAngle!.rad / 2);
 
   /// Gets a Sector from this circle's radius and central angle.
   ///
@@ -148,7 +148,7 @@ class Circle extends PlaneGeometry {
           'Either provide an angle or set centralAngle on the circle');
     }
 
-    return Sector(radius.toDouble(), effectiveAngle, center: center);
+    return Sector(radius, effectiveAngle, center: center);
   }
 
   /// Gets a Segment from this circle's radius and central angle.
@@ -171,7 +171,7 @@ class Circle extends PlaneGeometry {
           'Either provide an angle or set centralAngle on the circle');
     }
 
-    return Segment(radius.toDouble(), effectiveAngle, center: center);
+    return Segment(radius, effectiveAngle, center: center);
   }
 
   /// Gets an Arc from this circle's radius and central angle.
@@ -195,8 +195,7 @@ class Circle extends PlaneGeometry {
           'Either provide an angle or set centralAngle on the circle');
     }
 
-    return Arc(radius.toDouble(), effectiveAngle,
-        center: center, startAngle: startAngle);
+    return Arc(radius, effectiveAngle, center: center, startAngle: startAngle);
   }
 
   /// Calculates the central angle (in radians) given various parameters.
@@ -220,12 +219,12 @@ class Circle extends PlaneGeometry {
     num phi = 0.0;
 
     if (distanceFromCenterToChord != null) {
-      phi = 2 * acos(distanceFromCenterToChord / radius);
+      phi = 2 * dmath.acos(distanceFromCenterToChord / radius);
     } else if (areaOfSegment != null) {
-      num theta = 2 * acos(1 - (areaOfSegment / radius) / radius);
+      num theta = 2 * dmath.acos(1 - (areaOfSegment / radius) / radius);
       phi = theta;
     } else if (chordLength != null) {
-      phi = 2 * asin(chordLength / (2 * radius));
+      phi = 2 * dmath.asin(chordLength / (2 * radius));
     } else if (areaOfSector != null) {
       phi = (2 * areaOfSector) / (radius * radius);
     } else if (arcLength != null) {
@@ -258,13 +257,13 @@ class Circle extends PlaneGeometry {
     Angle? centralAngle,
   }) {
     if (distanceFromCenterToChord != null && centralAngle != null) {
-      return distanceFromCenterToChord / acos(centralAngle / 2);
+      return distanceFromCenterToChord / dmath.acos(centralAngle.rad / 2);
     } else if (areaOfSegment != null && centralAngle != null) {
-      return sqrt(2 * areaOfSegment / centralAngle.rad);
+      return dmath.sqrt(2 * areaOfSegment / centralAngle.rad);
     } else if (chordLength != null && centralAngle != null) {
-      return chordLength / (2 * sin(centralAngle / 2));
+      return chordLength / (2 * dmath.sin(centralAngle.rad / 2));
     } else if (areaOfSector != null && centralAngle != null) {
-      return sqrt(areaOfSector / (0.5 * centralAngle.rad));
+      return dmath.sqrt(areaOfSector / (0.5 * centralAngle.rad));
     } else if (arcLength != null && centralAngle != null) {
       return arcLength / centralAngle.rad;
     } else {
@@ -289,7 +288,7 @@ class Circle extends PlaneGeometry {
     if (diameter != null) {
       return diameter / 2;
     } else if (area != null) {
-      return sqrt(area / pi);
+      return dmath.sqrt(area / pi);
     } else if (perimeter != null) {
       return perimeter / (2 * pi);
     } else {
@@ -320,8 +319,8 @@ class Circle extends PlaneGeometry {
     if (!isPointInside(point1) || !isPointInside(point2)) {
       throw ArgumentError("Both points must lie on the circle.");
     }
-    var angle1 = atan2(point1.y - center.y, point1.x - center.x);
-    var angle2 = atan2(point2.y - center.y, point2.x - center.x);
+    var angle1 = dmath.atan2(point1.y - center.y, point1.x - center.x);
+    var angle2 = dmath.atan2(point2.y - center.y, point2.x - center.x);
     var arcAngle = 0.0;
     if (direction == 'ccw') {
       if (angle2 <= angle1) {
@@ -346,15 +345,15 @@ class Circle extends PlaneGeometry {
     }
     var pointToCenter = point - center;
     var distance = Line(p1: point, p2: center).length();
-    var angle = acos(radius / distance);
-    var lineAngle = atan2(pointToCenter.y, pointToCenter.x);
+    var angle = dmath.acos(radius / distance);
+    var lineAngle = dmath.atan2(pointToCenter.y, pointToCenter.x);
     var angle1 = lineAngle - angle;
     var angle2 = lineAngle + angle;
 
-    Point endpoint1 = Point(
-        point.x + distance * cos(angle1), point.y + distance * sin(angle1));
-    Point endpoint2 = Point(
-        point.x + distance * cos(angle2), point.y + distance * sin(angle2));
+    Point endpoint1 = Point(point.x + distance * dmath.cos(angle1),
+        point.y + distance * dmath.sin(angle1));
+    Point endpoint2 = Point(point.x + distance * dmath.cos(angle2),
+        point.y + distance * dmath.sin(angle2));
 
     return [Line(p1: point, p2: endpoint1), Line(p1: point, p2: endpoint2)];
   }
@@ -381,7 +380,7 @@ class Circle extends PlaneGeometry {
       {String direction = 'ccw'}) {
     var arcLen = arcLengthBetween(point1, point2, direction: direction);
     var angle = arcLen / radius;
-    return 0.5 * pow(radius, 2) * (angle - sin(angle));
+    return 0.5 * dmath.pow(radius, 2) * (angle - dmath.sin(angle));
   }
 
   /// Checks if this Circle intersects with [otherCircle].
@@ -397,8 +396,11 @@ class Circle extends PlaneGeometry {
     }
 
     var d = center.distanceTo(otherCircle.center);
-    var a = (pow(radius, 2) - pow(otherCircle.radius, 2) + pow(d, 2)) / (2 * d);
-    var h = sqrt(pow(radius, 2) - pow(a, 2));
+    var a = (dmath.pow(radius, 2) -
+            dmath.pow(otherCircle.radius, 2) +
+            dmath.pow(d, 2)) /
+        (2 * d);
+    var h = dmath.sqrt(dmath.pow(radius, 2) - dmath.pow(a, 2));
 
     var centerToOther = otherCircle.center - center;
     var p = center + centerToOther.scale(a / d);
@@ -421,15 +423,19 @@ class Circle extends PlaneGeometry {
       return 0.0;
     }
     if (d <= (radius - otherCircle.radius).abs()) {
-      return min(area(), otherCircle.area()).toDouble();
+      return dmath.min(area(), otherCircle.area());
     }
 
     var r1 = radius;
     var r2 = otherCircle.radius;
-    var alpha = 2 * acos((pow(r1, 2) + pow(d, 2) - pow(r2, 2)) / (2 * r1 * d));
-    var beta = 2 * acos((pow(r2, 2) + pow(d, 2) - pow(r1, 2)) / (2 * r2 * d));
-    var sectorArea1 = 0.5 * pow(r1, 2) * (alpha - sin(alpha));
-    var sectorArea2 = 0.5 * pow(r2, 2) * (beta - sin(beta));
+    var alpha = 2 *
+        dmath.acos((dmath.pow(r1, 2) + dmath.pow(d, 2) - dmath.pow(r2, 2)) /
+            (2 * r1 * d));
+    var beta = 2 *
+        dmath.acos((dmath.pow(r2, 2) + dmath.pow(d, 2) - dmath.pow(r1, 2)) /
+            (2 * r2 * d));
+    var sectorArea1 = 0.5 * dmath.pow(r1, 2) * (alpha - dmath.sin(alpha));
+    var sectorArea2 = 0.5 * dmath.pow(r2, 2) * (beta - dmath.sin(beta));
     return sectorArea1 + sectorArea2;
   }
 
@@ -442,7 +448,7 @@ class Circle extends PlaneGeometry {
 
     var r1 = radius, r2 = otherCircle.radius;
     var a = (r1 - r2) / d;
-    var b = sqrt(1 - pow(a, 2));
+    var b = dmath.sqrt(1 - dmath.pow(a, 2));
     var p = (otherCircle.center - center) * a + center;
     var directions = [
       [b, -a],
@@ -481,19 +487,19 @@ class Circle extends PlaneGeometry {
       // Circumcenter formula
       var D = 2 *
           (p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y));
-      var ux = (pow(p1.x, 2) +
-              pow(p1.y, 2) * (p2.y - p3.y) +
-              pow(p2.x, 2) +
-              pow(p2.y, 2) * (p3.y - p1.y) +
-              pow(p3.x, 2) +
-              pow(p3.y, 2) * (p1.y - p2.y)) /
+      var ux = (dmath.pow(p1.x, 2) +
+              dmath.pow(p1.y, 2) * (p2.y - p3.y) +
+              dmath.pow(p2.x, 2) +
+              dmath.pow(p2.y, 2) * (p3.y - p1.y) +
+              dmath.pow(p3.x, 2) +
+              dmath.pow(p3.y, 2) * (p1.y - p2.y)) /
           D;
-      var uy = (pow(p1.x, 2) +
-              pow(p1.y, 2) * (p3.x - p2.x) +
-              pow(p2.x, 2) +
-              pow(p2.y, 2) * (p1.x - p3.x) +
-              pow(p3.x, 2) +
-              pow(p3.y, 2) * (p2.x - p1.x)) /
+      var uy = (dmath.pow(p1.x, 2) +
+              dmath.pow(p1.y, 2) * (p3.x - p2.x) +
+              dmath.pow(p2.x, 2) +
+              dmath.pow(p2.y, 2) * (p1.x - p3.x) +
+              dmath.pow(p3.x, 2) +
+              dmath.pow(p3.y, 2) * (p2.x - p1.x)) /
           D;
       var center = Point(ux, uy);
       var radius = p1.distanceTo(center);

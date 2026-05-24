@@ -30,14 +30,8 @@ class Parallelogram extends PlaneGeometry {
     if (height1 == null && angle1 == null) {
       throw ArgumentError('Either height or angle must be provided.');
     }
-    if (height1 == null) {
-      var val = side * sin(angle1!);
-      height1 = val is Complex ? val.real.toDouble() : (val as num).toDouble();
-    }
-    if (angle1 == null) {
-      var val = asin(height1! / side);
-      angle1 = val is Complex ? val.real.toDouble() : (val as num).toDouble();
-    }
+    height1 ??= (side * dmath.sin(angle1!));
+    angle1 ??= dmath.asin(height1! / side);
   }
 
   /// Named constructor to create a Parallelogram from various parameters.
@@ -72,7 +66,7 @@ class Parallelogram extends PlaneGeometry {
                 : area != null && height1 != null
                     ? area / height1
                     : height1 != null && height2 != null
-                        ? height1 / sin(angle1!)
+                        ? height1 / dmath.sin(angle1!)
                         : throw ArgumentError(
                             'Insufficient parameters provided.')),
         side = side ??
@@ -81,7 +75,7 @@ class Parallelogram extends PlaneGeometry {
                 : height1 != null && base != null
                     ? area! / height1
                     : height1 != null && height2 != null
-                        ? height2 / sin(angle2!)
+                        ? height2 / dmath.sin(angle2!)
                         : throw ArgumentError(
                             'Insufficient parameters provided.')),
         height1 = height1 ??
@@ -92,9 +86,9 @@ class Parallelogram extends PlaneGeometry {
                     : base != null && side != null && height2 != null
                         ? (side * height2) / base
                         : angle1 != null && base != null
-                            ? side! * sin(angle1)
+                            ? side! * dmath.sin(angle1)
                             : side != null && angle1 != null
-                                ? side * sin(angle1)
+                                ? side * dmath.sin(angle1)
                                 : throw ArgumentError(
                                     'Insufficient parameters provided.')),
         height2 = height2 ??
@@ -105,22 +99,22 @@ class Parallelogram extends PlaneGeometry {
                     : base != null && side != null && height1 != null
                         ? (base * height1) / side
                         : base != null && angle2 != null
-                            ? base * sin(angle2)
+                            ? base * dmath.sin(angle2)
                             : throw ArgumentError(
                                 'Insufficient parameters provided.')),
         angle1 = angle1 ??
             (height2 != null && base != null
-                ? asin(height2 / base)
+                ? dmath.asin(height2 / base)
                 : height1 != null && side != null
-                    ? asin(height1 / side) + (pi / 2)
+                    ? dmath.asin(height1 / side) + (pi / 2)
                     : throw ArgumentError('Insufficient parameters provided.')),
         angle2 = angle2 ??
             (angle1 != null
                 ? pi - angle1
                 : height1 != null && side != null
-                    ? acos(height1 / side) + (pi / 2)
+                    ? dmath.acos(height1 / side) + (pi / 2)
                     : height2 != null && base != null
-                        ? asin(height2 / base) + (pi / 2)
+                        ? dmath.asin(height2 / base) + (pi / 2)
                         : throw ArgumentError(
                             'Insufficient parameters provided.')),
         super("Parallelogram");
@@ -131,8 +125,7 @@ class Parallelogram extends PlaneGeometry {
   /// Returns the area as a [double].
   @override
   double area() {
-    var val = base.toDouble() * (side * sin(angle1!));
-    return val is Complex ? val.real.toDouble() : (val as num).toDouble();
+    return base * (side * dmath.sin(angle1!));
   }
 
   /// Calculates the perimeter of the Parallelogram.
@@ -149,8 +142,8 @@ class Parallelogram extends PlaneGeometry {
   /// Uses the law of cosines to find the diagonal length.
   /// Returns the length of the first diagonal as a [double].
   double diagonal1() {
-    var result = sqrt(base * base + side * side - 2 * base * side * cos(angle1!));
-    return result is Complex ? result.real.toDouble() : (result as num).toDouble();
+    return dmath
+        .sqrt(base * base + side * side - 2 * base * side * dmath.cos(angle1!));
   }
 
   /// Calculates the length of the second diagonal of the Parallelogram.
@@ -159,8 +152,8 @@ class Parallelogram extends PlaneGeometry {
   /// Returns the length of the second diagonal as a [double].
   double diagonal2() {
     double angleBeta = pi - angle1!;
-    var result = sqrt(base * base + side * side - 2 * base * side * cos(angleBeta));
-    return result is Complex ? result.real.toDouble() : (result as num).toDouble();
+    return dmath.sqrt(
+        base * base + side * side - 2 * base * side * dmath.cos(angleBeta));
   }
 
   /// Calculates the angles between the sides of the Parallelogram.
@@ -175,10 +168,8 @@ class Parallelogram extends PlaneGeometry {
   ///
   /// Returns a list of angles in radians.
   ({Angle a, Angle b}) anglesBetweenDiagonals() {
-    var val = asin((2 * area()) / (diagonal1() * diagonal2()));
-    double yeta = val is Complex ? val.real.toDouble() : (val as num).toDouble();
-
-    return (a: Angle(rad: yeta), b: Angle(rad: pi - yeta));
+    var val = dmath.asin((2 * area()) / (diagonal1() * diagonal2()));
+    return (a: Angle(rad: val), b: Angle(rad: pi - val));
   }
 
   /// Verifies the correlation between the diagonals and sides of the Parallelogram.
@@ -188,7 +179,6 @@ class Parallelogram extends PlaneGeometry {
   bool verifyDiagonalsCorrelation() {
     double d1 = diagonal1();
     double d2 = diagonal2();
-    return (d1 * d1 + d2 * d2).toDouble() ==
-        (2 * (base * base + side * side)).toDouble();
+    return (d1 * d1 + d2 * d2) == (2 * (base * base + side * side));
   }
 }

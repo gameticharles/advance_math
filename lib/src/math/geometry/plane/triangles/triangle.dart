@@ -164,17 +164,16 @@ class Triangle extends PlaneGeometry {
 
   /// Private helper function to calculate distance between two points.
   double _distance(Point p1, Point p2) {
-    var result = sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
-    return result is Complex
-        ? result.real.toDouble()
-        : (result as num).toDouble();
+    var result =
+        dmath.sqrt(dmath.pow(p1.x - p2.x, 2) + dmath.pow(p1.y - p2.y, 2));
+    return result;
   }
 
   /// Private helper function to calculate angle from three sides.
   Angle _angleFromSides(num a, num b, num c) {
-    var val = acos((pow(a, 2) + pow(b, 2) - pow(c, 2)) / (2 * a * b));
-    return Angle(
-        rad: val is Complex ? val.real.toDouble() : (val as num).toDouble());
+    var val = dmath.acos(
+        (dmath.pow(a, 2) + dmath.pow(b, 2) - dmath.pow(c, 2)) / (2 * a * b));
+    return Angle(rad: val);
   }
 
   ///
@@ -199,10 +198,8 @@ class Triangle extends PlaneGeometry {
   ///
   static double heronFormula(num a, num b, num c) {
     double s = (a + b + c) / 2;
-    var result = sqrt(s * (s - a) * (s - b) * (s - c));
-    return result is Complex
-        ? result.real.toDouble()
-        : (result as num).toDouble();
+    var result = dmath.sqrt(s * (s - a) * (s - b) * (s - c));
+    return result;
   }
 
   /// Computes the area of a triangle using the trigonometric formula.
@@ -297,14 +294,14 @@ class Triangle extends PlaneGeometry {
   /// Requires two known sides and one known angle.
   void cosineRule() {
     if (a != null && b != null && angleC != null) {
-      var val = sqrt(pow(a!, 2) + pow(b!, 2) - 2 * a! * b! * angleC!.cos());
-      c = val is Complex ? val.real.toDouble() : (val as num).toDouble();
+      c = dmath.sqrt(
+          dmath.pow(a!, 2) + dmath.pow(b!, 2) - 2 * a! * b! * angleC!.cos());
     } else if (a != null && c != null && angleB != null) {
-      var val = sqrt(pow(a!, 2) + pow(c!, 2) - 2 * a! * c! * angleB!.cos());
-      b = val is Complex ? val.real.toDouble() : (val as num).toDouble();
+      b = dmath.sqrt(
+          dmath.pow(a!, 2) + dmath.pow(c!, 2) - 2 * a! * c! * angleB!.cos());
     } else if (b != null && c != null && angleA != null) {
-      var val = sqrt(pow(b!, 2) + pow(c!, 2) - 2 * b! * c! * angleA!.cos());
-      a = val is Complex ? val.real.toDouble() : (val as num).toDouble();
+      a = dmath.sqrt(
+          dmath.pow(b!, 2) + dmath.pow(c!, 2) - 2 * b! * c! * angleA!.cos());
     } else {
       throw Exception("Not enough information provided for the cosine rule.");
     }
@@ -328,10 +325,7 @@ class Triangle extends PlaneGeometry {
       } else if (c == null && angleC != null) {
         c = ratio * angleC!.sin();
       } else if (angleB == null && b != null) {
-        var val = asin(b! / ratio);
-        angleB = Angle(
-            rad:
-                val is Complex ? val.real.toDouble() : (val as num).toDouble());
+        angleB = Angle(rad: dmath.asin(b! / ratio));
         angleC = Angle(deg: 180 - angleA!.deg - angleB!.deg);
       }
     } else if (b != null && angleB != null) {
@@ -341,10 +335,7 @@ class Triangle extends PlaneGeometry {
       } else if (c == null && angleC != null) {
         c = ratio * angleC!.sin();
       } else if (angleA == null && a != null) {
-        var val = asin(a! / ratio);
-        angleA = Angle(
-            rad:
-                val is Complex ? val.real.toDouble() : (val as num).toDouble());
+        angleA = Angle(rad: dmath.asin(a! / ratio));
         angleC = Angle(deg: 180 - angleA!.deg - angleB!.deg);
       }
     } else if (c != null && angleC != null) {
@@ -354,10 +345,7 @@ class Triangle extends PlaneGeometry {
       } else if (b == null && angleB != null) {
         b = ratio * angleB!.sin();
       } else if (angleA == null && a != null) {
-        var val = asin(a! / ratio);
-        angleA = Angle(
-            rad:
-                val is Complex ? val.real.toDouble() : (val as num).toDouble());
+        angleA = Angle(rad: dmath.asin(a! / ratio));
         angleB = Angle(deg: 180 - angleA!.deg - angleC!.deg);
       }
     } else {
@@ -465,7 +453,7 @@ class Triangle extends PlaneGeometry {
       throw StateError(
           "Vertices and sides must be known to calculate inCenter.");
     }
-    double p = (a! + b! + c!).toDouble();
+    num p = (a! + b! + c!);
     return Point(
       (a! * A!.x + b! * B!.x + c! * C!.x) / p,
       (a! * A!.y + b! * B!.y + c! * C!.y) / p,
@@ -478,26 +466,21 @@ class Triangle extends PlaneGeometry {
       throw StateError(
           "Vertices A, B, C must be known to calculate circumCenter.");
     }
-    double d = (2 *
-            (A!.x * (B!.y - C!.y) +
-                B!.x * (C!.y - A!.y) +
-                C!.x * (A!.y - B!.y)))
-        .toDouble();
+    num d = (2 *
+        (A!.x * (B!.y - C!.y) + B!.x * (C!.y - A!.y) + C!.x * (A!.y - B!.y)));
     if (d == 0) {
       // Collinear points, circumcenter is at infinity.
       // Returning a point with Infinity coordinates.
       return Point(double.infinity, double.infinity);
     }
-    double ux = (((A!.x * A!.x + A!.y * A!.y) * (B!.y - C!.y) +
-                (B!.x * B!.x + B!.y * B!.y) * (C!.y - A!.y) +
-                (C!.x * C!.x + C!.y * C!.y) * (A!.y - B!.y)) /
-            d)
-        .toDouble();
-    double uy = (((A!.x * A!.x + A!.y * A!.y) * (C!.x - B!.x) +
-                (B!.x * B!.x + B!.y * B!.y) * (A!.x - C!.x) +
-                (C!.x * C!.x + C!.y * C!.y) * (B!.x - A!.x)) /
-            d)
-        .toDouble();
+    num ux = (((A!.x * A!.x + A!.y * A!.y) * (B!.y - C!.y) +
+            (B!.x * B!.x + B!.y * B!.y) * (C!.y - A!.y) +
+            (C!.x * C!.x + C!.y * C!.y) * (A!.y - B!.y)) /
+        d);
+    num uy = (((A!.x * A!.x + A!.y * A!.y) * (C!.x - B!.x) +
+            (B!.x * B!.x + B!.y * B!.y) * (A!.x - C!.x) +
+            (C!.x * C!.x + C!.y * C!.y) * (B!.x - A!.x)) /
+        d);
     return Point(ux, uy);
   }
 

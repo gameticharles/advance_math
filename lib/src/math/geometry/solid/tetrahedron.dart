@@ -22,7 +22,7 @@ class Tetrahedron extends SolidGeometry {
   Point center;
 
   /// Edge length (for regular tetrahedron).
-  double? edge;
+  num? edge;
 
   /// Base area (for general tetrahedron).
   double? baseArea;
@@ -50,8 +50,8 @@ class Tetrahedron extends SolidGeometry {
   }
 
   /// Creates a regular tetrahedron with all edges of equal length.
-  factory Tetrahedron.regular({required double edge, Point? center}) {
-    double height = edge * sqrt(2.0 / 3.0);
+  factory Tetrahedron.regular({required num edge, Point? center}) {
+    double height = edge * dmath.sqrt(2.0 / 3.0);
     return Tetrahedron._(
       edge: edge,
       height: height,
@@ -87,7 +87,7 @@ class Tetrahedron extends SolidGeometry {
     if (volume <= 0) throw ArgumentError('Volume must be positive');
 
     // V = a³/(6√2), so a³ = 6√2 × V
-    double edge = pow(6 * sqrt(2) * volume, 1 / 3).toDouble();
+    num edge = dmath.pow(6 * dmath.sqrt(2) * volume, 1 / 3);
     return Tetrahedron.regular(edge: edge, center: center);
   }
 
@@ -106,7 +106,7 @@ class Tetrahedron extends SolidGeometry {
     if (surfaceArea <= 0) throw ArgumentError('Surface area must be positive');
 
     // A = √3 × a², so a = √(A / √3)
-    double edge = sqrt(surfaceArea / sqrt(3));
+    double edge = dmath.sqrt(surfaceArea / dmath.sqrt(3));
     return Tetrahedron.regular(edge: edge, center: center);
   }
 
@@ -118,7 +118,7 @@ class Tetrahedron extends SolidGeometry {
   double volume() {
     if (edge != null) {
       // Regular tetrahedron
-      return pow(edge!, 3) / (6 * sqrt(2));
+      return dmath.pow(edge!, 3) / (6 * dmath.sqrt(2));
     } else if (baseArea != null) {
       // General tetrahedron
       return (1 / 3) * baseArea! * height;
@@ -133,7 +133,7 @@ class Tetrahedron extends SolidGeometry {
   double surfaceArea() {
     if (edge != null) {
       // Regular tetrahedron
-      return sqrt(3) * edge! * edge!;
+      return dmath.sqrt(3) * edge! * edge!;
     }
     throw StateError('Surface area calculation requires edge length');
   }
@@ -153,14 +153,14 @@ class Tetrahedron extends SolidGeometry {
   BoundingBox3D boundingBox() {
     if (edge != null) {
       // For regular tetrahedron, use circumradius
-      double circumR = edge! * sqrt(6) / 4;
+      num circumR = edge! * dmath.sqrt(6) / 4;
       return BoundingBox3D(
         Point(center.x - circumR, center.y - circumR, center.z! - circumR),
         Point(center.x + circumR, center.y + circumR, center.z! + circumR),
       );
     } else {
       // For general tetrahedron, approximate from base area and height
-      double baseRadius = sqrt(baseArea! / pi);
+      num baseRadius = dmath.sqrt(baseArea! / pi);
       return BoundingBox3D(
         Point(center.x - baseRadius, center.y - baseRadius, center.z!),
         Point(center.x + baseRadius, center.y + baseRadius, center.z! + height),

@@ -20,7 +20,7 @@ class Sphere extends SolidGeometry {
   Point center;
 
   /// The radius of the sphere.
-  double radius;
+  num radius;
 
   /// Creates a sphere with the specified radius and optional center.
   ///
@@ -39,7 +39,7 @@ class Sphere extends SolidGeometry {
   /// r = ∛(3V / 4π)
   Sphere.fromVolume(double volume, {Point? center})
       : center = center ?? Point(0, 0, 0),
-        radius = pow((3 * volume) / (4 * pi), 1 / 3).toDouble(),
+        radius = dmath.pow((3 * volume) / (4 * pi), 1 / 3),
         super('Sphere') {
     if (volume <= 0) {
       throw ArgumentError('Volume must be positive, got: $volume');
@@ -51,7 +51,7 @@ class Sphere extends SolidGeometry {
   /// r = √(A / 4π)
   Sphere.fromSurfaceArea(double surfaceArea, {Point? center})
       : center = center ?? Point(0, 0, 0),
-        radius = sqrt(surfaceArea / (4 * pi)),
+        radius = dmath.sqrt(surfaceArea / (4 * pi)),
         super('Sphere') {
     if (surfaceArea <= 0) {
       throw ArgumentError('Surface area must be positive, got: $surfaceArea');
@@ -63,7 +63,7 @@ class Sphere extends SolidGeometry {
   /// Volume = (4/3) × π × r³
   @override
   double volume() {
-    return (4 / 3) * pi * pow(radius, 3);
+    return (4 / 3) * pi * dmath.pow(radius, 3);
   }
 
   /// Calculates the surface area of the sphere.
@@ -71,7 +71,7 @@ class Sphere extends SolidGeometry {
   /// Surface Area = 4 × π × r²
   @override
   double surfaceArea() {
-    return 4 * pi * pow(radius, 2);
+    return 4 * pi * dmath.pow(radius, 2);
   }
 
   @override

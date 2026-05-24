@@ -31,13 +31,13 @@ class Pentagon extends Polygon {
 
     // Generate vertices in a regular pattern
     Point centerPoint = center ?? Point(0, 0);
-    double radius = side / (2 * sin(pi / 5)); // Circumradius
+    double radius = side / (2 * dmath.sin(pi / 5)); // Circumradius
 
     List<Point> generatedVertices = [];
     for (int i = 0; i < 5; i++) {
       double angle = (2 * pi * i) / 5 - pi / 2; // Start from top
-      double x = centerPoint.x + radius * cos(angle);
-      double y = centerPoint.y + radius * sin(angle);
+      double x = centerPoint.x + radius * dmath.cos(angle);
+      double y = centerPoint.y + radius * dmath.sin(angle);
       generatedVertices.add(Point(x, y));
     }
 
@@ -54,7 +54,7 @@ class Pentagon extends Polygon {
   /// Calculates side from: side = √(4A / √(25 + 10√5))
   factory Pentagon.fromArea({required double area, Point? center}) {
     if (area <= 0) throw ArgumentError('Area must be positive');
-    double side = sqrt(4 * area / sqrt(25 + 10 * sqrt(5)));
+    double side = dmath.sqrt(4 * area / dmath.sqrt(25 + 10 * dmath.sqrt(5)));
     return Pentagon(side, center: center);
   }
 
@@ -72,7 +72,7 @@ class Pentagon extends Polygon {
   factory Pentagon.fromCircumradius(
       {required double circumradius, Point? center}) {
     if (circumradius <= 0) throw ArgumentError('Circumradius must be positive');
-    double side = 2 * circumradius * sin(pi / 5);
+    double side = 2 * circumradius * dmath.sin(pi / 5);
     return Pentagon(side, center: center);
   }
 
@@ -81,7 +81,7 @@ class Pentagon extends Polygon {
   /// Calculates side = 2r × tan(π/5)
   factory Pentagon.fromInradius({required double inradius, Point? center}) {
     if (inradius <= 0) throw ArgumentError('Inradius must be positive');
-    double side = 2 * inradius * tan(pi / 5);
+    double side = 2 * inradius * dmath.tan(pi / 5);
     return Pentagon(side, center: center);
   }
 
@@ -92,7 +92,7 @@ class Pentagon extends Polygon {
   ///
   /// For a regular pentagon, short diagonal = φ × side, where φ is the golden ratio.
   /// Or, short diagonal = 2 * side * cos(pi/5)
-  double get shortDiagonal => 2 * side * cos(pi / 5);
+  double get shortDiagonal => 2 * side * dmath.cos(pi / 5);
 
   /// Gets the interior angle of the pentagon (108°).
   Angle get interiorAngle => Angle(deg: 108);
@@ -103,12 +103,12 @@ class Pentagon extends Polygon {
   /// Gets the circumradius (radius of circumscribed circle).
   ///
   /// circumradius = side / (2 × sin(π/5))
-  double get circumRadius => side / (2 * sin(pi / 5));
+  double get circumRadius => side / (2 * dmath.sin(pi / 5));
 
   /// Gets the inradius (radius of inscribed circle).
   ///
   /// inradius = side / (2 × tan(π/5))
-  double get inRadius => side / (2 * tan(pi / 5));
+  double get inRadius => side / (2 * dmath.tan(pi / 5));
 
   /// Gets the apothem (distance from center to midpoint of a side).
   ///

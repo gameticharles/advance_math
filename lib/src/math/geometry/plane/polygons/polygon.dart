@@ -381,7 +381,7 @@ class Polygon extends PlaneGeometry {
       Point p1 = vertices![i];
       Point p2 = vertices![j];
 
-      double t = (point - p1).dot(p2 - p1) / pow((p2 - p1).magnitude, 2);
+      double t = (point - p1).dot(p2 - p1) / dmath.pow((p2 - p1).magnitude, 2);
 
       Point candidatePoint;
       if (0 <= t && t <= 1) {
@@ -818,7 +818,8 @@ class Polygon extends PlaneGeometry {
       throw Exception(
           "Number of sides and side length are required for regular polygon area calculation.");
     }
-    return (numSides! * pow(sideLength!, 2)) / (4 * tan(pi / numSides!));
+    return (numSides! * dmath.pow(sideLength!, 2)) /
+        (4 * dmath.tan(pi / numSides!));
   }
 
   /// Calculate the perimeter of a polygon.
@@ -913,12 +914,12 @@ class Polygon extends PlaneGeometry {
     for (var i = 0; i < numSides!; i++) {
       var pi = vertices![i];
       var pj = vertices![(i + 1) % numSides!];
-      I += ((pow(pi.x, 2) + pi.x * pj.x + pow(pj.x, 2)) *
+      I += ((dmath.pow(pi.x, 2) + pi.x * pj.x + dmath.pow(pj.x, 2)) *
               (pi.y * pj.x - pi.x * pj.y)) /
           12;
     }
 
-    return abs(I);
+    return I.abs();
   }
 
   double sideLengthIrregular(int i) {
@@ -971,11 +972,12 @@ class Polygon extends PlaneGeometry {
     if (perimeter != null) {
       sideLength = perimeter / numSides!;
     } else if (area != null) {
-      sideLength = sqrt((4 * area) / (numSides! * (1 / tan(pi / numSides!))));
+      sideLength =
+          sqrt((4 * area) / (numSides! * (1 / dmath.tan(pi / numSides!))));
     } else if (circumradius != null) {
-      sideLength = 2 * circumradius * sin(pi / numSides!) as double;
+      sideLength = 2 * circumradius * dmath.sin(pi / numSides!);
     } else if (inradius != null) {
-      sideLength = 2 * inradius * tan(pi / numSides!) as double;
+      sideLength = 2 * inradius * dmath.tan(pi / numSides!);
     } else {
       throw ArgumentError(
           "At least one of the parameters (perimeter, area, circumradius, inradius) must be provided.");
@@ -1124,7 +1126,7 @@ class RegularPolygon extends Polygon {
       throw Exception(
           "Number of sides and side length are required for regular polygon inradius calculation.");
     }
-    return sideLength! / (2 * tan(pi / numSides!));
+    return sideLength! / (2 * dmath.tan(pi / numSides!));
   }
 
   /// Calculate the circumradius of a regular polygon.

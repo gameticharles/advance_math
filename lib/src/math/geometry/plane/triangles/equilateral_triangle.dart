@@ -44,9 +44,9 @@ class EquilateralTriangle extends Triangle {
   /// Throws [ArgumentError] if [height] is not positive.
   EquilateralTriangle.fromHeight(double height)
       : super(
-          a: (2 * height) / sqrt(3),
-          b: (2 * height) / sqrt(3),
-          c: (2 * height) / sqrt(3),
+          a: (2 * height) / dmath.sqrt(3),
+          b: (2 * height) / dmath.sqrt(3),
+          c: (2 * height) / dmath.sqrt(3),
           angleA: Angle(deg: 60),
           angleB: Angle(deg: 60),
           angleC: Angle(deg: 60),
@@ -63,9 +63,9 @@ class EquilateralTriangle extends Triangle {
   /// Throws [ArgumentError] if [area] is not positive.
   EquilateralTriangle.fromArea(double area)
       : super(
-          a: sqrt((4 * area) / sqrt(3)),
-          b: sqrt((4 * area) / sqrt(3)),
-          c: sqrt((4 * area) / sqrt(3)),
+          a: dmath.sqrt((4 * area) / dmath.sqrt(3)),
+          b: dmath.sqrt((4 * area) / dmath.sqrt(3)),
+          c: dmath.sqrt((4 * area) / dmath.sqrt(3)),
           angleA: Angle(deg: 60),
           angleB: Angle(deg: 60),
           angleC: Angle(deg: 60),
@@ -117,9 +117,9 @@ class EquilateralTriangle extends Triangle {
   /// Throws [ArgumentError] if [inradius] is not positive.
   EquilateralTriangle.fromInradius(double inradius)
       : super(
-          a: 2 * sqrt(3) * inradius,
-          b: 2 * sqrt(3) * inradius,
-          c: 2 * sqrt(3) * inradius,
+          a: 2 * dmath.sqrt(3) * inradius,
+          b: 2 * dmath.sqrt(3) * inradius,
+          c: 2 * dmath.sqrt(3) * inradius,
           angleA: Angle(deg: 60),
           angleB: Angle(deg: 60),
           angleC: Angle(deg: 60),
@@ -136,9 +136,9 @@ class EquilateralTriangle extends Triangle {
   /// Throws [ArgumentError] if [circumradius] is not positive.
   EquilateralTriangle.fromCircumradius(double circumradius)
       : super(
-          a: sqrt(3) * circumradius,
-          b: sqrt(3) * circumradius,
-          c: sqrt(3) * circumradius,
+          a: dmath.sqrt(3) * circumradius,
+          b: dmath.sqrt(3) * circumradius,
+          c: dmath.sqrt(3) * circumradius,
           angleA: Angle(deg: 60),
           angleB: Angle(deg: 60),
           angleC: Angle(deg: 60),
@@ -160,31 +160,27 @@ class EquilateralTriangle extends Triangle {
   /// Since all sides are equal, this returns the value of side a.
   double get side => a!.toDouble();
 
+  final _s3 = dmath.sqrt(3);
+
   /// Gets the height of the equilateral triangle.
   ///
   /// Height = (√3/2) × side
   double get height {
-    var s3 = sqrt(3);
-    double sqrt3 = s3 is Complex ? s3.real.toDouble() : (s3 as num).toDouble();
-    return (sqrt3 / 2) * side;
+    return (_s3 / 2) * side;
   }
 
   /// Gets the inradius (radius of inscribed circle).
   ///
   /// For an equilateral triangle: inradius = side / (2√3)
   double get inRadius {
-    var s3 = sqrt(3);
-    double sqrt3 = s3 is Complex ? s3.real.toDouble() : (s3 as num).toDouble();
-    return side / (2 * sqrt3);
+    return side / (2 * _s3);
   }
 
   /// Gets the circumradius (radius of circumscribed circle).
   ///
   /// For an equilateral triangle: circumradius = side / √3
   double get circumRadius {
-    var s3 = sqrt(3);
-    double sqrt3 = s3 is Complex ? s3.real.toDouble() : (s3 as num).toDouble();
-    return side / sqrt3;
+    return side / _s3;
   }
 
   @override

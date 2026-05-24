@@ -9,13 +9,13 @@ part of 'geometry.dart';
 /// circles, and polygons.
 class Point extends Vector {
   /// The x-coordinate of the point.
-  dynamic x;
+  num x;
 
   /// The y-coordinate of the point.
-  dynamic y;
+  num y;
 
   /// The z-coordinate of the point. If the point is 2D, this value is null.
-  dynamic z;
+  num? z;
 
   /// Constructor for creating a new `Point`.
   ///
@@ -55,7 +55,7 @@ class Point extends Vector {
     origin = origin ?? Point.origin(false);
     var rr = rec(r, theta);
 
-    return Point(origin.x + rr.x, origin.y + rr.y);
+    return Point(origin.x + rr.x.toNum(), origin.y + rr.y.toNum());
   }
 
   /// Creates a 3D point and sets the coordinates of the point given spherical
@@ -71,9 +71,9 @@ class Point extends Vector {
   /// ```
   factory Point.fromSphericalCoordinates(
       dynamic r, dynamic theta, dynamic phi) {
-    var x = r * sin(phi) * cos(theta);
-    var y = r * sin(phi) * sin(theta);
-    var z = r * cos(phi);
+    var x = r * dmath.sin(phi) * dmath.cos(theta);
+    var y = r * dmath.sin(phi) * dmath.sin(theta);
+    var z = r * dmath.cos(phi);
     return Point(x, y, z);
   }
 
@@ -252,8 +252,8 @@ class Point extends Vector {
   ///
   /// Returns a new `Point` instance representing the rotated point.
   Point rotate(Angle angle) {
-    var cosAngle = cos(angle.rad);
-    var sinAngle = sin(angle.rad);
+    var cosAngle = dmath.cos(angle.rad);
+    var sinAngle = dmath.sin(angle.rad);
     var xRotated = x * cosAngle - y * sinAngle;
     var yRotated = x * sinAngle + y * cosAngle;
     return Point(xRotated, yRotated, z);
@@ -277,8 +277,8 @@ class Point extends Vector {
   Point rotateBy(Angle angle, [Point? origin]) {
     origin = origin ?? Point.origin(false);
 
-    var cosAngle = cos(angle.rad);
-    var sinAngle = sin(angle.rad);
+    var cosAngle = dmath.cos(angle.rad);
+    var sinAngle = dmath.sin(angle.rad);
 
     var translatedX = x - origin.x;
     var translatedY = y - origin.y;
@@ -318,11 +318,9 @@ class Point extends Vector {
     var dy = otherPoint.y - y;
     if (z != null && otherPoint.z != null) {
       var dz = otherPoint.z! - z!;
-      var result = sqrt(dx * dx + dy * dy + dz * dz);
-      return result is Complex ? result.real.toDouble() : (result as num).toDouble();
+      return dmath.sqrt(dx * dx + dy * dy + dz * dz);
     } else {
-      var result = sqrt(dx * dx + dy * dy);
-      return result is Complex ? result.real.toDouble() : (result as num).toDouble();
+      return dmath.sqrt(dx * dx + dy * dy);
     }
   }
 
@@ -431,7 +429,7 @@ class Point extends Vector {
   Angle angleBetween(Point otherPoint) {
     var dx = otherPoint.x - x;
     var dy = otherPoint.y - y;
-    return Angle(rad: atan2(dy, dx));
+    return Angle(rad: dmath.atan2(dy, dx));
   }
 
   /// Translates the point by the given amounts `dx`, `dy`, and `dz`.
@@ -477,8 +475,8 @@ class Point extends Vector {
     if (z != null) {
       throw Exception("Polar coordinates are not supported for 3D points.");
     }
-    var r = sqrt(x * x + y * y);
-    var theta = atan2(y, x);
+    var r = dmath.sqrt(x * x + y * y);
+    var theta = dmath.atan2(y, x);
     return (r, Angle(rad: theta));
   }
 
@@ -495,11 +493,11 @@ class Point extends Vector {
   /// ```
   ///
   /// Returns the slope as a `double`.
-  Complex slopeTo(Point otherPoint) {
+  double slopeTo(Point otherPoint) {
     var dy = otherPoint.y - y;
     var dx = otherPoint.x - x;
     if (dx == 0) {
-      return Complex.infinity(); // Vertical line: slope is undefined
+      return double.infinity; // Vertical line: slope is undefined
     }
     return dy / dx;
   }
@@ -536,10 +534,9 @@ class Point extends Vector {
             linePoint2.x * linePoint1.y -
             linePoint2.y * linePoint1.x)
         .abs();
-    var den = sqrt(pow(linePoint2.y - linePoint1.y, 2) +
-        pow(linePoint2.x - linePoint1.x, 2));
-    var result = numVal / den;
-    return result is Complex ? result.real.toDouble() : (result as num).toDouble();
+    var den = dmath.sqrt(dmath.pow(linePoint2.y - linePoint1.y, 2) +
+        dmath.pow(linePoint2.x - linePoint1.x, 2));
+    return numVal / den;
   }
 
   /// Computes the bearing from this point to another point.
@@ -583,8 +580,8 @@ class Point extends Vector {
   Angle bearingTo(Point point, {bool isXAxis = true}) {
     return Angle(
             rad: isXAxis
-                ? atan2(point.y - y, point.x - x)
-                : atan2(point.x - x, point.y - y))
+                ? dmath.atan2(point.y - y, point.x - x)
+                : dmath.atan2(point.x - x, point.y - y))
         .normalize();
   }
 

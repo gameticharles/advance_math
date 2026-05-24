@@ -60,7 +60,7 @@ class Torus extends SolidGeometry {
     if (volume <= 0) throw ArgumentError('Volume must be positive');
     if (majorRadius <= 0) throw ArgumentError('Major radius must be positive');
 
-    double minorRadius = sqrt(volume / (2 * pi * pi * majorRadius));
+    double minorRadius = dmath.sqrt(volume / (2 * pi * pi * majorRadius));
     return Torus(
         majorRadius: majorRadius, minorRadius: minorRadius, center: center);
   }

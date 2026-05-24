@@ -76,7 +76,7 @@ class SquarePyramid extends SolidGeometry {
     if (volume <= 0) throw ArgumentError('Volume must be positive');
     if (height <= 0) throw ArgumentError('Height must be positive');
 
-    double baseSide = sqrt((3 * volume) / height);
+    double baseSide = dmath.sqrt((3 * volume) / height);
     return SquarePyramid(baseSide: baseSide, height: height, center: center);
   }
 
@@ -102,7 +102,7 @@ class SquarePyramid extends SolidGeometry {
           'Slant height must be greater than half the base side. Got slantHeight: $slantHeight, baseSide/2: $halfBase');
     }
 
-    double height = sqrt(slantHeight * slantHeight - halfBase * halfBase);
+    double height = dmath.sqrt(slantHeight * slantHeight - halfBase * halfBase);
     return SquarePyramid(baseSide: baseSide, height: height, center: center);
   }
 
@@ -110,7 +110,7 @@ class SquarePyramid extends SolidGeometry {
   ///
   /// s = √(h² + (a/2)²)
   double get slantHeight =>
-      sqrt(height * height + (baseSide / 2) * (baseSide / 2));
+      dmath.sqrt(height * height + (baseSide / 2) * (baseSide / 2));
 
   /// Calculates the volume of the square pyramid.
   ///

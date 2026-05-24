@@ -36,8 +36,8 @@ class Hexagon extends Polygon {
     List<Point> generatedVertices = [];
     for (int i = 0; i < 6; i++) {
       double angle = (2 * pi * i) / 6 - pi / 2; // Start from top
-      double x = centerPoint.x + radius * cos(angle);
-      double y = centerPoint.y + radius * sin(angle);
+      double x = centerPoint.x + radius * dmath.cos(angle);
+      double y = centerPoint.y + radius * dmath.sin(angle);
       generatedVertices.add(Point(x, y));
     }
 

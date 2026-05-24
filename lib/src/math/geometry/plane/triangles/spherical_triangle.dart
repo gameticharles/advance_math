@@ -42,10 +42,10 @@ class SphericalTriangle {
 
   factory SphericalTriangle.fromTwoSidesAndAngle(
       Angle angleA, Angle sideA, Angle sideB) {
-    var angleB = Angle(rad: asin(angleA.sin() * sideB.rad / sideA.rad));
+    var angleB = Angle(rad: dmath.asin(angleA.sin() * sideB.rad / sideA.rad));
     var angleC = Angle(rad: pi - angleA.rad - angleB.rad);
     var sideC = Angle(
-        rad: acos((sideA.cos() - sideB.cos() * angleC.cos()) /
+        rad: dmath.acos((sideA.cos() - sideB.cos() * angleC.cos()) /
             (sideB.sin() * angleC.sin())));
     //_validateTriangle();
     return SphericalTriangle._(angleA, angleB, angleC, sideA, sideB, sideC);
@@ -54,9 +54,10 @@ class SphericalTriangle {
   factory SphericalTriangle.fromTwoAnglesAndSide(
       Angle angleA, Angle angleB, Angle sideA) {
     var angleC = Angle(rad: pi - angleA.rad - angleB.rad);
-    var sideB = Angle(rad: asin(sideA.sin() * angleB.sin() / angleA.sin()));
+    var sideB =
+        Angle(rad: dmath.asin(sideA.sin() * angleB.sin() / angleA.sin()));
     var sideC = Angle(
-        rad: acos(sideA.cos() -
+        rad: dmath.acos(sideA.cos() -
             sideB.cos() * angleC.cos() / (sideB.sin() * angleC.sin())));
     //_validateTriangle();
     return SphericalTriangle._(angleA, angleB, angleC, sideA, sideB, sideC);
@@ -65,13 +66,13 @@ class SphericalTriangle {
   factory SphericalTriangle.fromAllSides(
       Angle sideA, Angle sideB, Angle sideC) {
     var angleA = Angle(
-        rad: acos((sideC.cos() - sideA.cos() * sideB.cos()) /
+        rad: dmath.acos((sideC.cos() - sideA.cos() * sideB.cos()) /
             (sideA.sin() * sideB.sin())));
     var angleB = Angle(
-        rad: acos((sideA.cos() - sideB.cos() * sideC.cos()) /
+        rad: dmath.acos((sideA.cos() - sideB.cos() * sideC.cos()) /
             (sideB.sin() * sideC.sin())));
     var angleC = Angle(
-        rad: acos((sideB.cos() - sideC.cos() * sideA.cos()) /
+        rad: dmath.acos((sideB.cos() - sideC.cos() * sideA.cos()) /
             (sideC.sin() * sideA.sin())));
     //_validateTriangle();
     return SphericalTriangle._(angleA, angleB, angleC, sideA, sideB, sideC);
@@ -80,13 +81,13 @@ class SphericalTriangle {
   factory SphericalTriangle.fromAllAngles(
       Angle angleA, Angle angleB, Angle angleC) {
     var sideA = Angle(
-        rad: acos((angleC.cos() - angleA.cos() * angleB.cos()) /
+        rad: dmath.acos((angleC.cos() - angleA.cos() * angleB.cos()) /
             (angleA.sin() * angleB.sin())));
     var sideB = Angle(
-        rad: acos((angleA.cos() - angleB.cos() * angleC.cos()) /
+        rad: dmath.acos((angleA.cos() - angleB.cos() * angleC.cos()) /
             (angleB.sin() * angleC.sin())));
     var sideC = Angle(
-        rad: acos((angleB.cos() - angleC.cos() * angleA.cos()) /
+        rad: dmath.acos((angleB.cos() - angleC.cos() * angleA.cos()) /
             (angleC.sin() * angleA.sin())));
     //_validateTriangle();
     return SphericalTriangle._(angleA, angleB, angleC, sideA, sideB, sideC);
@@ -98,7 +99,7 @@ class SphericalTriangle {
 
   factory SphericalTriangle.fromSideAndAngle(Angle angleA, Angle sideA) {
     // First, calculate the other two angles
-    var angleB = Angle(rad: asin(sideA.sin() * angleA.sin()));
+    var angleB = Angle(rad: dmath.asin(sideA.sin() * angleA.sin()));
     var angleC = Angle(rad: pi - angleA.rad - angleB.rad);
 
     // Then, calculate the other two sides

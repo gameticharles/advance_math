@@ -82,7 +82,7 @@ class TriangularPrism extends SolidGeometry {
     if (volume <= 0) throw ArgumentError('Volume must be positive');
     if (side <= 0) throw ArgumentError('Side must be positive');
 
-    double baseArea = (sqrt(3) / 4) * side * side;
+    double baseArea = (dmath.sqrt(3) / 4) * side * side;
     double height = volume / baseArea;
     return TriangularPrism.equilateral(
         side: side, height: height, center: center);
@@ -104,7 +104,7 @@ class TriangularPrism extends SolidGeometry {
     if (volume <= 0) throw ArgumentError('Volume must be positive');
     if (height <= 0) throw ArgumentError('Height must be positive');
 
-    double side = sqrt((4 * volume) / (sqrt(3) * height));
+    double side = dmath.sqrt((4 * volume) / (dmath.sqrt(3) * height));
     return TriangularPrism.equilateral(
         side: side, height: height, center: center);
   }
@@ -115,7 +115,7 @@ class TriangularPrism extends SolidGeometry {
     double b = baseSides[1];
     double c = baseSides[2];
     double s = (a + b + c) / 2; // semi-perimeter
-    return sqrt(s * (s - a) * (s - b) * (s - c));
+    return dmath.sqrt(s * (s - a) * (s - b) * (s - c));
   }
 
   /// Gets the perimeter of the triangular base.
@@ -152,7 +152,7 @@ class TriangularPrism extends SolidGeometry {
   BoundingBox3D boundingBox() {
     // Use maximum side for conservative bounding
     double maxSide = baseSides.reduce((a, b) => a > b ? a : b);
-    double radius = maxSide / sqrt(3);
+    double radius = maxSide / dmath.sqrt(3);
     return BoundingBox3D(
       Point(center.x - radius, center.y - radius, center.z! - height / 2),
       Point(center.x + radius, center.y + radius, center.z! + height / 2),

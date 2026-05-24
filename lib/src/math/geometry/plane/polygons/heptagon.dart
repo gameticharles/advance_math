@@ -31,13 +31,13 @@ class Heptagon extends Polygon {
 
     // Generate vertices in a regular pattern
     Point centerPoint = center ?? Point(0, 0);
-    double radius = side / (2 * sin(pi / 7)); // Circumradius
+    double radius = side / (2 * dmath.sin(pi / 7)); // Circumradius
 
     List<Point> generatedVertices = [];
     for (int i = 0; i < 7; i++) {
       double angle = (2 * pi * i) / 7 - pi / 2; // Start from top
-      double x = centerPoint.x + radius * cos(angle);
-      double y = centerPoint.y + radius * sin(angle);
+      double x = centerPoint.x + radius * dmath.cos(angle);
+      double y = centerPoint.y + radius * dmath.sin(angle);
       generatedVertices.add(Point(x, y));
     }
 
@@ -52,7 +52,7 @@ class Heptagon extends Polygon {
   /// Creates a heptagon from its area.
   factory Heptagon.fromArea({required double area, Point? center}) {
     if (area <= 0) throw ArgumentError('Area must be positive');
-    double side = sqrt((4 * area) / (7 * (1 / tan(pi / 7))));
+    double side = dmath.sqrt((4 * area) / (7 * (1 / dmath.tan(pi / 7))));
     return Heptagon(side, center: center);
   }
 
@@ -66,14 +66,14 @@ class Heptagon extends Polygon {
   factory Heptagon.fromCircumradius(
       {required double circumradius, Point? center}) {
     if (circumradius <= 0) throw ArgumentError('Circumradius must be positive');
-    double side = 2 * circumradius * sin(pi / 7);
+    double side = 2 * circumradius * dmath.sin(pi / 7);
     return Heptagon(side, center: center);
   }
 
   /// Creates a heptagon from its inradius (apothem).
   factory Heptagon.fromInradius({required double inradius, Point? center}) {
     if (inradius <= 0) throw ArgumentError('Inradius must be positive');
-    double side = 2 * inradius * tan(pi / 7);
+    double side = 2 * inradius * dmath.tan(pi / 7);
     return Heptagon(side, center: center);
   }
 
@@ -89,12 +89,12 @@ class Heptagon extends Polygon {
   /// Gets the circumradius (radius of circumscribed circle).
   ///
   /// circumradius = side / (2 × sin(π/7))
-  double get circumRadius => side / (2 * sin(pi / 7));
+  double get circumRadius => side / (2 * dmath.sin(pi / 7));
 
   /// Gets the inradius (radius of inscribed circle).
   ///
   /// inradius = side / (2 × tan(π/7))
-  double get inRadius => side / (2 * tan(pi / 7));
+  double get inRadius => side / (2 * dmath.tan(pi / 7));
 
   /// Gets the apothem (distance from center to midpoint of a side).
   ///

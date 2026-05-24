@@ -61,7 +61,7 @@ class Segment extends PlaneGeometry {
   /// Throws [ArgumentError] if parameters are invalid.
   Segment.fromChord(num radius, num chordLength, {Point? center})
       : _radius = radius,
-        centralAngle = Angle(rad: 2 * asin(chordLength / (2 * radius))),
+        centralAngle = Angle(rad: 2 * dmath.asin(chordLength / (2 * radius))),
         center = center ?? Point(0, 0),
         super('Segment') {
     if (radius <= 0 || chordLength <= 0) {
@@ -81,7 +81,7 @@ class Segment extends PlaneGeometry {
   /// Throws [ArgumentError] if parameters are invalid.
   Segment.fromHeight(num radius, num height, {Point? center})
       : _radius = radius,
-        centralAngle = Angle(rad: 2 * acos((radius - height) / radius)),
+        centralAngle = Angle(rad: 2 * dmath.acos((radius - height) / radius)),
         center = center ?? Point(0, 0),
         super('Segment') {
     if (radius <= 0 || height <= 0) {
@@ -102,19 +102,20 @@ class Segment extends PlaneGeometry {
   /// Gets the chord length (straight line across the segment).
   ///
   /// Chord = 2r × sin(θ/2)
-  num get chordLength => 2 * _radius * sin(centralAngle.rad / 2);
+  num get chordLength => 2 * _radius * dmath.sin(centralAngle.rad / 2);
 
   /// Gets the height (sagitta) of the segment.
   ///
   /// Height = r × (1 - cos(θ/2))
-  num get height => _radius * (1 - cos(centralAngle.rad / 2));
+  num get height => _radius * (1 - dmath.cos(centralAngle.rad / 2));
 
   /// Calculates the area of the segment.
   ///
   /// Area = (r²/2) × (θ - sin(θ))
   @override
   double area() {
-    return (_radius * _radius / 2) * (centralAngle.rad - sin(centralAngle.rad));
+    return (_radius * _radius / 2) *
+        (centralAngle.rad - dmath.sin(centralAngle.rad));
   }
 
   /// Calculates the perimeter of the segment.
@@ -133,7 +134,7 @@ class Segment extends PlaneGeometry {
   /// Gets the area of the triangle formed by the two radii and chord.
   ///
   /// Triangle area = (r²/2) × sin(θ)
-  num get triangleArea => (_radius * _radius / 2) * sin(centralAngle.rad);
+  num get triangleArea => (_radius * _radius / 2) * dmath.sin(centralAngle.rad);
 
   /// Calculates the bounding box of the segment.
   List<Point> boundingBox() {
@@ -144,8 +145,8 @@ class Segment extends PlaneGeometry {
 
     // Endpoints of the chord/arc
     Point p1 = Point(center.x + _radius, center.y);
-    Point p2 = Point(center.x + _radius * cos(centralAngle.rad),
-        center.y + _radius * sin(centralAngle.rad));
+    Point p2 = Point(center.x + _radius * dmath.cos(centralAngle.rad),
+        center.y + _radius * dmath.sin(centralAngle.rad));
 
     List<Point> pointsToCheck = [p1, p2];
 

@@ -22,7 +22,7 @@ class Octahedron extends SolidGeometry {
   Point center;
 
   /// Edge length.
-  double edge;
+  num edge;
 
   /// Creates a regular octahedron with specified edge length.
   ///
@@ -48,7 +48,7 @@ class Octahedron extends SolidGeometry {
     if (volume <= 0) throw ArgumentError('Volume must be positive');
 
     // V = (√2/3)a³, so a³ = 3V/√2
-    double edge = pow(3 * volume / sqrt(2), 1 / 3).toDouble();
+    num edge = dmath.pow(3 * volume / dmath.sqrt(2), 1 / 3);
     return Octahedron(edge: edge, center: center);
   }
 
@@ -65,7 +65,7 @@ class Octahedron extends SolidGeometry {
     if (surfaceArea <= 0) throw ArgumentError('Surface area must be positive');
 
     // A = 2√3 × a², so a = √(A / (2√3))
-    double edge = sqrt(surfaceArea / (2 * sqrt(3)));
+    num edge = dmath.sqrt(surfaceArea / (2 * dmath.sqrt(3)));
     return Octahedron(edge: edge, center: center);
   }
 
@@ -80,7 +80,7 @@ class Octahedron extends SolidGeometry {
   factory Octahedron.fromInradius({required double inradius, Point? center}) {
     if (inradius <= 0) throw ArgumentError('Inradius must be positive');
 
-    double edge = inradius * sqrt(6);
+    num edge = inradius * dmath.sqrt(6);
     return Octahedron(edge: edge, center: center);
   }
 
@@ -96,27 +96,27 @@ class Octahedron extends SolidGeometry {
       {required double circumradius, Point? center}) {
     if (circumradius <= 0) throw ArgumentError('Circumradius must be positive');
 
-    double edge = circumradius * sqrt(2);
+    num edge = circumradius * dmath.sqrt(2);
     return Octahedron(edge: edge, center: center);
   }
 
   /// Gets the height of the octahedron.
   ///
   /// Height = a√2
-  double get height => edge * sqrt(2);
+  double get height => edge * dmath.sqrt(2);
 
   /// Gets the inradius (radius of inscribed sphere).
-  double get inRadius => edge * sqrt(6) / 6;
+  double get inRadius => edge * dmath.sqrt(6) / 6;
 
   /// Gets the circumradius (radius of circumscribed sphere).
-  double get circumRadius => edge * sqrt(2) / 2;
+  double get circumRadius => edge * dmath.sqrt(2) / 2;
 
   /// Calculates the volume of the octahedron.
   ///
   /// Volume = (√2/3)a³
   @override
   double volume() {
-    return (sqrt(2) / 3) * pow(edge, 3);
+    return (dmath.sqrt(2) / 3) * dmath.pow(edge, 3);
   }
 
   /// Calculates the surface area of the octahedron.
@@ -124,7 +124,7 @@ class Octahedron extends SolidGeometry {
   /// Surface Area = 2√3 × a²
   @override
   double surfaceArea() {
-    return 2 * sqrt(3) * edge * edge;
+    return 2 * dmath.sqrt(3) * edge * edge;
   }
 
   @override

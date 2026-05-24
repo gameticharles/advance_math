@@ -152,15 +152,15 @@ class ErrorEllipse extends PlaneGeometry {
   double get bearing => (90 - orientationAngle) % 360;
 
   /// Distance along the X axis (unrotated, scaled 1-sigma * factors).
-  double get sx => sigmaO * sqrt(sigmaX2);
+  double get sx => sigmaO * dmath.sqrt(sigmaX2);
 
   /// Distance along the Y axis (unrotated, scaled 1-sigma * factors).
-  double get sy => sigmaO * sqrt(sigmaY2);
+  double get sy => sigmaO * dmath.sqrt(sigmaY2);
 
   /// Eccentricity of the ellipse: √(1 - (b²/a²)).
   double get eccentricity {
     if (_semiMajorAxis == 0) return 0;
-    return sqrt(1 -
+    return dmath.sqrt(1 -
         (_semiMinorAxis * _semiMinorAxis) / (_semiMajorAxis * _semiMajorAxis));
   }
 
@@ -204,7 +204,8 @@ class ErrorEllipse extends PlaneGeometry {
 
     // 2. Eigenvalue calculation helper (Delta)
     // λ = (σx² + σy² ± √((σx² - σy²)² + 4σxy²)) / 2
-    double delta = sqrt(pow((sigmaX2 - sigmaY2), 2) + 4 * pow(sigmaXY, 2));
+    double delta = dmath
+        .sqrt(dmath.pow((sigmaX2 - sigmaY2), 2) + 4 * dmath.pow(sigmaXY, 2));
     double lambda1 = 0.5 * (sigmaX2 + sigmaY2 + delta);
     double lambda2 = 0.5 * (sigmaX2 + sigmaY2 - delta);
 
@@ -212,9 +213,9 @@ class ErrorEllipse extends PlaneGeometry {
     // Axis = sigmaO * sqrt(lambda * chiSquared)
     // Note: If sigmaO is meant to work on Standard Deviation level, appropriate;
     // if on Variance, it would be sqrt. Usage usually implies linear scale factor.
-    double scale = sigmaO * sqrt(_chiSquaredScale);
-    _semiMajorAxis = scale * sqrt(lambda1);
-    _semiMinorAxis = scale * sqrt(lambda2);
+    double scale = sigmaO * dmath.sqrt(_chiSquaredScale);
+    _semiMajorAxis = scale * dmath.sqrt(lambda1);
+    _semiMinorAxis = scale * dmath.sqrt(lambda2);
 
     // 3. Orientation
     // θ = 0.5 * atan2(2σxy, σx² - σy²)
@@ -222,7 +223,7 @@ class ErrorEllipse extends PlaneGeometry {
     if (sigmaXY.abs() < 1e-10 && (sigmaX2 - sigmaY2).abs() < 1e-10) {
       thetaRad = 0.0;
     } else {
-      thetaRad = 0.5 * atan2(2 * sigmaXY, sigmaX2 - sigmaY2);
+      thetaRad = 0.5 * dmath.atan2(2 * sigmaXY, sigmaX2 - sigmaY2);
     }
     _orientation = Angle(rad: thetaRad);
   }
@@ -237,7 +238,7 @@ class ErrorEllipse extends PlaneGeometry {
 
     // Approximation for 2 DOF: Quantile function of Chi-Squared(k=2)
     // Q(p) = -2 * ln(1 - p)
-    return (-2 * log(1 - confidenceLevel)).toDouble();
+    return (-2 * dmath.log(1 - confidenceLevel));
   }
 
   @override
@@ -250,7 +251,7 @@ class ErrorEllipse extends PlaneGeometry {
     // Ramanujan approximation
     double a = _semiMajorAxis;
     double b = _semiMinorAxis;
-    return pi * (3 * (a + b) - sqrt((3 * a + b) * (a + 3 * b)));
+    return pi * (3 * (a + b) - dmath.sqrt((3 * a + b) * (a + 3 * b)));
   }
 
   /// Generates points representing the ellipse for plotting.
@@ -258,8 +259,8 @@ class ErrorEllipse extends PlaneGeometry {
       {Point? center}) {
     List<Map<String, double>> points = [];
     double theta = _orientation.rad.toDouble();
-    double cosTheta = cos(theta);
-    double sinTheta = sin(theta);
+    double cosTheta = dmath.cos(theta);
+    double sinTheta = dmath.sin(theta);
     double cx = (center ?? this.center).x.toDouble();
     double cy = (center ?? this.center).y.toDouble();
 
@@ -269,11 +270,11 @@ class ErrorEllipse extends PlaneGeometry {
       // x = cx + a*cos(t)*cos(θ) - b*sin(t)*sin(θ)
       // y = cy + a*cos(t)*sin(θ) + b*sin(t)*cos(θ)
       double x = cx +
-          _semiMajorAxis * cos(angle) * cosTheta -
-          _semiMinorAxis * sin(angle) * sinTheta;
+          _semiMajorAxis * dmath.cos(angle) * cosTheta -
+          _semiMinorAxis * dmath.sin(angle) * sinTheta;
       double y = cy +
-          _semiMajorAxis * cos(angle) * sinTheta +
-          _semiMinorAxis * sin(angle) * cosTheta;
+          _semiMajorAxis * dmath.cos(angle) * sinTheta +
+          _semiMinorAxis * dmath.sin(angle) * cosTheta;
       points.add({'x': x, 'y': y});
     }
     return points;
@@ -284,12 +285,12 @@ class ErrorEllipse extends PlaneGeometry {
     num dx = point.x - center.x;
     num dy = point.y - center.y;
 
-    double cosTheta = cos(_orientation.rad);
-    double sinTheta = sin(_orientation.rad);
+    double cosTheta = dmath.cos(_orientation.rad);
+    double sinTheta = dmath.sin(_orientation.rad);
 
     // Rotate point to align with axes
-    double xPrime = (dx * cosTheta + dy * sinTheta).toDouble();
-    double yPrime = (-dx * sinTheta + dy * cosTheta).toDouble();
+    double xPrime = (dx * cosTheta + dy * sinTheta);
+    double yPrime = (-dx * sinTheta + dy * cosTheta);
 
     // Check ellipse equation
     return (xPrime * xPrime) / (_semiMajorAxis * _semiMajorAxis) +

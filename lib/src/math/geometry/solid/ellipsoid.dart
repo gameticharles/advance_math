@@ -20,13 +20,13 @@ class Ellipsoid extends SolidGeometry {
   Point center;
 
   /// Semi-axis along x-axis.
-  double a;
+  num a;
 
   /// Semi-axis along y-axis.
-  double b;
+  num b;
 
   /// Semi-axis along z-axis.
-  double c;
+  num c;
 
   /// Creates an ellipsoid with specified semi-axes.
   ///
@@ -55,9 +55,9 @@ class Ellipsoid extends SolidGeometry {
   /// var ellipsoid = Ellipsoid.fromVolume(volume: 100, a: 5, b: 4);
   /// ```
   factory Ellipsoid.fromVolume({
-    required double volume,
-    required double a,
-    required double b,
+    required num volume,
+    required num a,
+    required num b,
     Point? center,
   }) {
     if (volume <= 0) throw ArgumentError('Volume must be positive');
@@ -93,9 +93,9 @@ class Ellipsoid extends SolidGeometry {
 
     // V = (4/3)π × a × (a/ratioAB) × (a/ratioAC) = (4/3)π × a³/(ratioAB × ratioAC)
     // a³ = 3V × ratioAB × ratioAC / (4π)
-    double a = pow(3 * volume * ratioAB * ratioAC / (4 * pi), 1 / 3).toDouble();
-    double b = a / ratioAB;
-    double c = a / ratioAC;
+    num a = dmath.pow(3 * volume * ratioAB * ratioAC / (4 * pi), 1 / 3);
+    num b = a / ratioAB;
+    num c = a / ratioAC;
 
     return Ellipsoid(a: a, b: b, c: c, center: center);
   }
@@ -115,11 +115,11 @@ class Ellipsoid extends SolidGeometry {
   @override
   double surfaceArea() {
     const double p = 1.6075;
-    double ap = pow(a, p).toDouble();
-    double bp = pow(b, p).toDouble();
-    double cp = pow(c, p).toDouble();
+    num ap = dmath.pow(a, p);
+    num bp = dmath.pow(b, p);
+    num cp = dmath.pow(c, p);
 
-    return 4 * pi * pow((ap * bp + ap * cp + bp * cp) / 3, 1 / p);
+    return 4 * pi * dmath.pow((ap * bp + ap * cp + bp * cp) / 3, 1 / p);
   }
 
   @override
