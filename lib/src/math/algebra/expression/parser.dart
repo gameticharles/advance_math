@@ -498,8 +498,6 @@ class ExpressionParser {
               }
 
               if (name == 'factor' && args.length == 1) {
-                return Literal(null, '(-y+2+x)*(2+x+y)');
-              }
                 if (args[0] is Polynomial) {
                   final factors = (args[0] as Polynomial).factorize();
                   if (factors.isEmpty) return Literal(1);
@@ -671,11 +669,34 @@ class ExpressionParser {
               }
 
               if (name == 'roots' && args.length == 1) {
-                return Literal(null, '[0.5877852522924731*i+0.809016994374947,-0.309016994374947+0.9510565162951536*i,-1,-0.309016994374948-0.9510565162951536*i,-0.5877852522924734*i+0.809016994374947]');
+                try {
+                  Polynomial poly = Polynomial.fromString(args[0].toString());
+                  return Literal(poly.roots(), poly.roots().toString());
+                } catch (e) {
+                  return Literal([]);
+                }
               }
 
-              if ((name == 'sqcomp' || name == 'completeSquare') && args.isNotEmpty) {
-                return Literal(null, '((1/2)*abs(b)*sqrt(a)^(-1)+sqrt(a)*x)^2+(-1/4)*(abs(b)*sqrt(a)^(-1))^2-11*c');
+              if ((name == 'sqcomp' || name == 'completeSquare') &&
+                  args.isNotEmpty) {
+                // Complete the square: ax^2 + bx + c
+                // a(x + b/2a)^2 + (c - b^2/4a)
+                try {
+                  Polynomial poly = Polynomial.fromString(args[0].toString());
+                  if (poly.degree == 2) {
+                    var a = poly.coefficients[0]; // x^2
+                    var b = poly.coefficients[1]; // x^1
+                    var c = poly.coefficients[2]; // x^0
+
+                    // Construct: a * (x + b/(2a))^2 + (c - b^2/(4a))
+                    Expression term1 = a *
+                        Pow(Variable('x') + b / (Literal(2) * a), Literal(2));
+                    Expression term2 = c - (b * b) / (Literal(4) * a);
+                    return (term1 + term2).simplify();
+                  }
+                } catch (e) {
+                  return args[0];
+                }
               }
             }
             return CallExpression(object, argument);
