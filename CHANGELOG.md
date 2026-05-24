@@ -5,6 +5,8 @@
 - **[FEATURE]** Added comprehensive Computer Algebra System (CAS) support with fully-featured expression simplification and parsing.
 - **[IMPROVEMENT]** Advanced fraction/rational representation in the expression engine, replacing division-by-integer double conversions with precise `Rational` representation.
 - **[BUG_FIX]** Resolved expression type coercion issues where numeric literals were incorrectly forced into `Complex` types instead of standard numbers, resolving crash/type mismatches (`Complex is not a subtype of double/num`).
+- **[BUG_FIX]** Added robust parsing and representation for hyperbolic and inverse hyperbolic trigonometric functions (e.g., cosh, sinh, asinh, acosh) in CAS to prevent runtime evaluation failures.
+- **[BUG_FIX]** Optimized Rational division simplification in expression engine to prevent type mismatches when resolving division of integers and rational values.
 - **[BUG_FIX]** Fixed equation solvers (linear, quadratic, cubic) and Durand-Kerner polynomial root finding algorithm for better stability and correctness.
 - **[IMPROVEMENT]** Enhanced binary and unary operators (Add, Subtract, Multiply, Divide, Modulo, Power, Log) to support comprehensive CAS simplifications.
 
