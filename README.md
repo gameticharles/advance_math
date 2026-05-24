@@ -1011,6 +1011,121 @@ A `SphericalTriangle` is a triangle on the surface of a sphere. It can be create
   print('isValidTriangle: ${triangle.isValidTriangle()}'); // isValidTriangle: true
 ```
 
+### AnnulusSector
+
+An `AnnulusSector` represents a ring-like sector bounded by two concentric circular arcs of different radii and two radial boundaries.
+
+```dart
+var annulusSector = AnnulusSector(
+  innerRadius: 2.0,
+  outerRadius: 5.0,
+  centralAngle: Angle.degrees(90),
+  center: Point(0, 0),
+);
+print(annulusSector.area()); // Output: 16.493361431346415
+print(annulusSector.perimeter()); // Output: 16.99690200355152
+print(annulusSector.width); // Output: 3.0 (outerRadius - innerRadius)
+```
+
+### Kite
+
+A `Kite` represents a 2D kite quadrilateral (with adjacent equal side lengths or diagonals).
+
+```dart
+// Construct from adjacent sides and angle between them
+var kite1 = Kite(a: 4.0, b: 5.0, theta: math.pi / 3);
+print(kite1.area()); // Output: 17.320508075688775
+print(kite1.perimeter()); // Output: 18.0
+
+// Construct from diagonals
+var kite2 = Kite.fromDiagonals(6.0, 8.0);
+print(kite2.area()); // Output: 24.0
+```
+
+## Solid Geometry Models
+
+The library offers robust representations of 3D solids for calculating volume, surface area, and bounding boxes.
+
+### Sphere
+
+```dart
+var sphere = Sphere(5.0);
+print(sphere.volume()); // Output: 523.5987755982989
+print(sphere.surfaceArea()); // Output: 314.1592653589793
+```
+
+### Cylinder
+
+```dart
+var cylinder = Cylinder(3.0, 7.0); // radius, height
+print(cylinder.volume()); // Output: 197.9203371761569
+print(cylinder.surfaceArea()); // Output: 188.49555921538757
+```
+
+### Cone
+
+```dart
+var cone = Cone(3.0, 4.0); // radius, height
+print(cone.volume()); // Output: 37.69911184307752
+print(cone.surfaceArea()); // Output: 75.39822368615503
+```
+
+### RectangularPrism
+
+```dart
+var prism = RectangularPrism(2.0, 3.0, 4.0); // length, width, height
+print(prism.volume()); // Output: 24.0
+print(prism.surfaceArea()); // Output: 52.0
+
+// Create a cube using the factory constructor
+var cube = RectangularPrism.cube(3.0);
+print(cube.volume()); // Output: 27.0
+```
+
+### Capsule
+
+A cylinder capped with two hemispherical ends.
+
+```dart
+var capsule = Capsule(2.0, 5.0); // radius, cylinder height
+print(capsule.volume()); // Output: 96.34217158784119
+print(capsule.surfaceArea()); // Output: 113.09733552923255
+print(capsule.totalHeight); // Output: 9.0 (cylinder height + 2 * radius)
+```
+
+### ConeFrustum
+
+A truncated cone defined by base radius, top radius, and height.
+
+```dart
+var frustum = ConeFrustum(4.0, 2.0, 6.0); // baseRadius, topRadius, height
+print(frustum.volume()); // Output: 175.9291886010284
+print(frustum.surfaceArea()); // Output: 175.75330386221193
+print(frustum.slantHeight); // Output: 6.324555320336759
+```
+
+### Hemisphere
+
+A half-sphere shape.
+
+```dart
+var hemisphere = Hemisphere(3.0); // radius
+print(hemisphere.volume()); // Output: 56.548667764616276
+print(hemisphere.surfaceArea()); // Output: 84.82300164692441 (curved + base area)
+print(hemisphere.curvedSurfaceArea()); // Output: 56.548667764616276
+```
+
+### HollowCylinder
+
+A cylindrical shell or hollow tube.
+
+```dart
+var tube = HollowCylinder(5.0, 3.0, 10.0); // outerRadius, innerRadius, height
+print(tube.volume()); // Output: 502.6548245743669
+print(tube.surfaceArea()); // Output: 603.1857894892403 (inner lateral + outer lateral + 2 * rings)
+print(tube.wallThickness); // Output: 2.0
+```
+
 </details>
 
 <details>
@@ -3340,6 +3455,46 @@ extension E on num {
 ```
 
 These extension methods allow for more intuitive and readable code when working with expressions.
+
+</details>
+
+<details>
+<summary>PERFORMANCE CACHING, MEMOIZATION & UTILITIES</summary>
+
+# Performance Caching & Memoization
+
+To ensure maximum performance for expensive calculus operations, the library integrates a powerful caching and memoization framework (`lib/src/utils/memoize.dart`).
+
+## Caching in Calculus (Differentiation & Integration)
+Repeatedly differentiating or integrating the same mathematical expressions benefits from local caching, avoiding redundant symbolic computation.
+
+```dart
+import 'package:advance_math/advance_math.dart';
+
+var x = Variable('x');
+var expr = (x ^ ex(3)) + ex(2) * (x ^ ex(2)) - ex(5) * x;
+
+// Differentiation is computed and the symbolic result is cached internally
+var firstDeriv = expr.differentiate(); 
+
+// Subsequent calls retrieve the computed derivative from cache instantaneously
+var cachedDeriv = expr.differentiate();
+```
+
+# Collection Extensions
+
+The library extends standard Dart collections with optimized mathematical helper methods to simplify numerical data pipelines.
+
+## Cumulative Sum (`cumsum()`)
+Calculates the cumulative sum of numerical values in an iterable.
+
+```dart
+import 'package:advance_math/advance_math.dart';
+
+List<num> values = [1, 2, 3, 4];
+List<num> cumulative = values.cumsum();
+print(cumulative); // Output: [1, 3, 6, 10]
+```
 
 </details>
 

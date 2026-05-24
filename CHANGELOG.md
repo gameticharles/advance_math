@@ -1,3 +1,37 @@
+# 5.6.0
+
+## Computer Algebra System (CAS) & Expressions
+
+- **[FEATURE]** Added comprehensive Computer Algebra System (CAS) support with fully-featured expression simplification and parsing.
+- **[IMPROVEMENT]** Advanced fraction/rational representation in the expression engine, replacing division-by-integer double conversions with precise `Rational` representation.
+- **[BUG_FIX]** Resolved expression type coercion issues where numeric literals were incorrectly forced into `Complex` types instead of standard numbers, resolving crash/type mismatches (`Complex is not a subtype of double/num`).
+- **[BUG_FIX]** Fixed equation solvers (linear, quadratic, cubic) and Durand-Kerner polynomial root finding algorithm for better stability and correctness.
+- **[IMPROVEMENT]** Enhanced binary and unary operators (Add, Subtract, Multiply, Divide, Modulo, Power, Log) to support comprehensive CAS simplifications.
+
+## Plane & Solid Geometry
+
+- **[FEATURE]** Added new solid geometry models:
+  - `Capsule`: Cylinder with hemispherical end caps.
+  - `ConeFrustum`: Frustum of a cone defined by bottom/top radii and height.
+  - `Hemisphere`: Perfect hemisphere geometry support.
+  - `HollowCylinder`: Hollow pipe/tube geometry representation.
+- **[FEATURE]** Added new plane geometry models:
+  - `AnnulusSector`: Sector of a hollow circle/annulus.
+  - `Kite`: Quadrilateral representing a geometric kite.
+- **[IMPROVEMENT]** Fixed and optimized mathematical calculations for `Ellipse` (generating coordinates, perimeter, and area).
+- **[FEATURE]** Integrated robust unit tests covering all new geometry additions in `geometry_expansion_test.dart`.
+
+## Caching, Memoization & Core Math Efficiency
+
+- **[IMPROVEMENT]** Enhanced differentiation and integration performance by implementing efficient memoization and local caching mechanisms.
+- **[FEATURE]** Added `cumsum()` cumulative sum helper implementation to iterables extension (`iterable_ext.dart`) with optimized performance.
+- **[IMPROVEMENT]** Optimized matrix arithmetic and factorization/decomposition methods (including LU and SVD) to minimize computational overhead.
+
+## Statistics & Cleanup
+
+- **[IMPROVEMENT]** Streamlined and cleaned the Z-Score module, updating sample code in `example/zscore.dart` and resolving statistical computation bugs.
+- **[IMPROVEMENT]** Cleaned up the core codebase, updated `README.md`, and added extensive test suites for caching, geometry, and CAS validation.
+
 # 5.5.5
 
 * **[IMPROVEMENT]** Fixed bugs
