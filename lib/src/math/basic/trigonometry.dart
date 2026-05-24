@@ -588,7 +588,8 @@ dynamic coth(dynamic x) {
 /// ```
 dynamic asinh(dynamic x) {
   if (x is num) {
-    return log(x + sqrt(x * x + 1));
+    dynamic res = log(Complex(x) + sqrt(x * x + 1));
+    return res is Complex ? res.simplify() : res;
   } else if (x is Complex) {
     return log(x + (x * x + 1).sqrt());
   } else if (x is Matrix) {
@@ -621,7 +622,8 @@ dynamic acosh(dynamic x) {
     if (x < 1) {
       throw ArgumentError('Invalid input for acosh: input must be >= 1');
     }
-    return log(x + sqrt(x * x - 1));
+    dynamic res = log(Complex(x) + sqrt(x * x - 1));
+    return res is Complex ? res.simplify() : res;
   } else if (x is Complex) {
     return Complex(x).acosh();
   } else if (x is Matrix) {

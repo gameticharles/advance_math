@@ -197,7 +197,7 @@ Complex rect(double x) {
 /// ```dart
 /// print(sinc(1));    // Output: 0.8414709848078965 (approximate value of sin(1)/1)
 /// ```
-Complex sinc(dynamic x) {
+dynamic sinc(dynamic x) {
   if (x == 0 || x == Complex.zero()) return Complex.one();
   return sin(x) / x;
 }

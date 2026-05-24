@@ -31,15 +31,17 @@ class Term {
   int get hashCode => coefficient.hashCode ^ variables.hashCode;
 
   dynamic evaluate(Map<String, num> values) {
-    dynamic result = coefficient;
+    dynamic result = coefficient is Complex ? coefficient : Complex(coefficient);
     variables.forEach((varName, power) {
       if (values.containsKey(varName)) {
-        result *= pow(values[varName], power);
+        final val = values[varName];
+        final Complex valComplex = Complex(val!);
+        result *= valComplex.pow(Complex(power));
       } else {
         throw ArgumentError('Missing value for variable $varName.');
       }
     });
-    return result;
+    return result is Complex ? (result as Complex).simplify() : result;
   }
 }
 

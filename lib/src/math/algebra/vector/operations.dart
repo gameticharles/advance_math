@@ -15,9 +15,13 @@ extension VectorOperations on Vector {
       return other + this;
     } else if (other is num || other is Complex) {
       Vector result = Vector(length);
+      final otherComplex = other is num ? Complex(other) : other as Complex;
       for (int i = 0; i < length; i++) {
-        result[i] = this[i] + (other is num ? Complex(other) : other);
+        final current = this[i];
+        final currentComplex = current is Complex ? current : Complex(current);
+        result[i] = currentComplex + otherComplex;
       }
+      return result;
     }
     if (length != other.length) {
       throw ArgumentError("Vectors must have the same length for addition.");
@@ -30,7 +34,11 @@ extension VectorOperations on Vector {
 
     Vector result = Vector(length);
     for (int i = 0; i < length; i++) {
-      result[i] = this[i] + other[i];
+      final t1 = this[i];
+      final t2 = other[i];
+      final c1 = t1 is Complex ? t1 : Complex(t1);
+      final c2 = t2 is Complex ? t2 : Complex(t2);
+      result[i] = c1 + c2;
     }
     return result;
   }
@@ -40,9 +48,13 @@ extension VectorOperations on Vector {
       return other - this;
     } else if (other is num || other is Complex) {
       Vector result = Vector(length);
+      final otherComplex = other is num ? Complex(other) : other as Complex;
       for (int i = 0; i < length; i++) {
-        result[i] = this[i] - (other is num ? Complex(other) : other);
+        final current = this[i];
+        final currentComplex = current is Complex ? current : Complex(current);
+        result[i] = currentComplex - otherComplex;
       }
+      return result;
     }
     if (length != other.length) {
       throw ArgumentError("Vectors must have the same length for subtraction.");
@@ -55,7 +67,11 @@ extension VectorOperations on Vector {
 
     Vector result = Vector(length);
     for (int i = 0; i < length; i++) {
-      result[i] = this[i] - other[i];
+      final t1 = this[i];
+      final t2 = other[i];
+      final c1 = t1 is Complex ? t1 : Complex(t1);
+      final c2 = t2 is Complex ? t2 : Complex(t2);
+      result[i] = c1 - c2;
     }
     return result;
   }
@@ -63,18 +79,25 @@ extension VectorOperations on Vector {
   Vector operator *(dynamic other) {
     Vector result = Vector(length);
     if (other is num || other is Complex) {
+      final otherComplex = other is num ? Complex(other) : other as Complex;
       for (int i = 0; i < length; i++) {
-        result[i] = this[i] * (other is num ? Complex(other) : other);
+        final current = this[i];
+        final currentComplex = current is Complex ? current : Complex(current);
+        result[i] = currentComplex * otherComplex;
       }
     } else if (other is Matrix) {
       result = Vector((other * this).flatten());
     } else if (other is Vector) {
       if (length != other.length) {
         throw ArgumentError(
-            "Vectors must have the same length for subtraction.");
+            "Vectors must have the same length for multiplication.");
       }
       for (int i = 0; i < length; i++) {
-        result[i] = this[i] * other[i];
+        final t1 = this[i];
+        final t2 = other[i];
+        final c1 = t1 is Complex ? t1 : Complex(t1);
+        final c2 = t2 is Complex ? t2 : Complex(t2);
+        result[i] = c1 * c2;
       }
     }
 
@@ -84,16 +107,23 @@ extension VectorOperations on Vector {
   Vector operator /(dynamic other) {
     Vector result = Vector(length);
     if (other is num || other is Complex) {
+      final otherComplex = other is num ? Complex(other) : other as Complex;
       for (int i = 0; i < length; i++) {
-        result[i] = this[i] / (other is num ? Complex(other) : other);
+        final current = this[i];
+        final currentComplex = current is Complex ? current : Complex(current);
+        result[i] = currentComplex / otherComplex;
       }
     } else if (other is Vector) {
       if (length != other.length) {
         throw ArgumentError(
-            "Vectors must have the same length for subtraction.");
+            "Vectors must have the same length for division.");
       }
       for (int i = 0; i < length; i++) {
-        result[i] = this[i] / other[i];
+        final t1 = this[i];
+        final t2 = other[i];
+        final c1 = t1 is Complex ? t1 : Complex(t1);
+        final c2 = t2 is Complex ? t2 : Complex(t2);
+        result[i] = c1 / c2;
       }
     }
     return result;
