@@ -419,6 +419,6 @@ void main() {
 }
 
 extension PrimitiveReal on num {
-  double get real => this.toDouble();
+  double get real => toDouble();
   double get imaginary => 0.0;
 }

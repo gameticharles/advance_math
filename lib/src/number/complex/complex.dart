@@ -1922,10 +1922,12 @@ class Complex implements Comparable<dynamic> {
 
     // Special case for purely real numbers
     if (i == 0) {
-      if (r is num && r.isInfinite)
+      if (r is num && r.isInfinite) {
         return r.isNegative ? '-Infinity' : 'Infinity';
-      if (r is Rational && r.isInfinite)
+      }
+      if (r is Rational && r.isInfinite) {
         return r.isNegative ? '-Infinity' : 'Infinity';
+      }
       if (r is num && r.isNaN) return 'NaN';
       if (r is Rational && r.isNaN) return 'NaN';
       return _formatValue(r,
@@ -1934,10 +1936,12 @@ class Complex implements Comparable<dynamic> {
 
     // Special case for purely imaginary numbers
     if (r == 0) {
-      if (i is num && i.isInfinite)
+      if (i is num && i.isInfinite) {
         return i.isNegative ? '-Infinityi' : 'Infinityi';
-      if (i is Rational && i.isInfinite)
+      }
+      if (i is Rational && i.isInfinite) {
         return i.isNegative ? '-Infinityi' : 'Infinityi';
+      }
       if (i is num && i.isNaN) return 'NaNi';
       if (i is Rational && i.isNaN) return 'NaNi';
       if (i is Rational ? i.toDouble() == 1.0 : i == 1) return 'i';
@@ -2011,10 +2015,14 @@ class Complex implements Comparable<dynamic> {
   String _formatImaginary(dynamic originalValue, String formattedValue) {
     if (originalValue is Rational
         ? originalValue.toDouble() == 1.0
-        : originalValue == 1) return 'i';
+        : originalValue == 1) {
+      return 'i';
+    }
     if (originalValue is Rational
         ? originalValue.toDouble() == -1.0
-        : originalValue == -1) return '-i';
+        : originalValue == -1) {
+      return '-i';
+    }
     return '${formattedValue}i';
   }
 
@@ -2027,8 +2035,9 @@ class Complex implements Comparable<dynamic> {
       return value.toString();
     }
     if (asFraction) return _toFractionString((value as num).toDouble());
-    if (fractionDigits != null)
+    if (fractionDigits != null) {
       return (value as num).toStringAsFixed(fractionDigits);
+    }
     return _fixZero(value as num);
   }
 

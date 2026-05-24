@@ -43,15 +43,15 @@ class Divide extends BinaryOperationsExpression {
     return _normalizeResult(result);
   }
 
-// Helper method to check if an expression contains a Variable
-  bool _containsVariable(Expression expr) {
-    if (expr is Variable) {
-      return true;
-    } else if (expr is BinaryOperationsExpression) {
-      return _containsVariable(expr.left) || _containsVariable(expr.right);
-    }
-    return false;
-  }
+// // Helper method to check if an expression contains a Variable
+//   bool _containsVariable(Expression expr) {
+//     if (expr is Variable) {
+//       return true;
+//     } else if (expr is BinaryOperationsExpression) {
+//       return _containsVariable(expr.left) || _containsVariable(expr.right);
+//     }
+//     return false;
+//   }
 
   @override
   Expression differentiate([Variable? v]) {
@@ -177,7 +177,9 @@ class Divide extends BinaryOperationsExpression {
     dynamic extractNum(Literal lit) {
       final v = lit.value;
       if (v is num) return v;
-      if (v is Complex && v.isReal) return v.simplify(); // returns int or double
+      if (v is Complex && v.isReal) {
+        return v.simplify(); // returns int or double
+      }
       return v;
     }
 
@@ -232,7 +234,9 @@ class Divide extends BinaryOperationsExpression {
       final dv = extractNum(denominator);
       if (dv is num) {
         if (dv == 0) throw Exception('Division by zero');
-        return Multiply(Literal(1 / dv), numerator).simplify();
+        //return Multiply(Literal(1 / dv), numerator).simplify();
+        final reciprocal = (dv is int) ? Rational(1, dv) : 1 / dv;
+        return Multiply(Literal(reciprocal), numerator).simplify();
       }
     }
 

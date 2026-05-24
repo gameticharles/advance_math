@@ -15,14 +15,14 @@ dynamic _normalizeResult(dynamic result) {
     if (result.imaginary == 0) {
       final r = result.real;
       if (r is Rational) {
-        return r.isInteger ? r.toInt() : r.toDouble();
+        return r.isInteger ? r.toInt() : r;
       }
       return r;
     }
     return result;
   }
   if (result is Rational) {
-    return result.isInteger ? result.toInt() : result.toDouble();
+    return result.isInteger ? result.toInt() : result;
   }
   return result;
 }

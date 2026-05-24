@@ -348,24 +348,24 @@ class ExpressionSolver {
     return e;
   }
 
-  /// Check if equation can be solved as polynomial
-  static bool _isPolynomialEquation(Expression expr, Variable v) {
-    try {
-      // Expand first to handle factored forms like (x-1)*(x-2)
-      // And simplify to combine terms
-      Expression normalized = _normalizeForPoly(expr);
-      Expression expanded = normalized.expand().simplify();
+  // /// Check if equation can be solved as polynomial
+  // static bool _isPolynomialEquation(Expression expr, Variable v) {
+  //   try {
+  //     // Expand first to handle factored forms like (x-1)*(x-2)
+  //     // And simplify to combine terms
+  //     Expression normalized = _normalizeForPoly(expr);
+  //     Expression expanded = normalized.expand().simplify();
 
-      String exprStr = expanded.toString();
-      // Clean up string for check
-      exprStr = exprStr.replaceAll(RegExp(r'\.0(?!\d)'), '');
+  //     String exprStr = expanded.toString();
+  //     // Clean up string for check
+  //     exprStr = exprStr.replaceAll(RegExp(r'\.0(?!\d)'), '');
 
-      return Polynomial.isPolynomial(exprStr, varName: v.identifier.name);
-    } catch (e) {
-      // print('DEBUG _isPolynomialEquation: caught exception $e');
-      return false;
-    }
-  }
+  //     return Polynomial.isPolynomial(exprStr, varName: v.identifier.name);
+  //   } catch (e) {
+  //     // print('DEBUG _isPolynomialEquation: caught exception $e');
+  //     return false;
+  //   }
+  // }
 
   /// Solve by variable isolation
   /// Solve by variable isolation

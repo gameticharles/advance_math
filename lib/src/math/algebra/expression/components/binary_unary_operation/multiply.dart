@@ -46,14 +46,14 @@ class Multiply extends BinaryOperationsExpression {
   }
 
 // Helper method to check if an expression contains a Variable
-  bool _containsVariable(Expression expr) {
-    if (expr is Variable) {
-      return true;
-    } else if (expr is BinaryOperationsExpression) {
-      return _containsVariable(expr.left) || _containsVariable(expr.right);
-    }
-    return false;
-  }
+  // bool _containsVariable(Expression expr) {
+  //   if (expr is Variable) {
+  //     return true;
+  //   } else if (expr is BinaryOperationsExpression) {
+  //     return _containsVariable(expr.left) || _containsVariable(expr.right);
+  //   }
+  //   return false;
+  // }
 
   @override
   Expression differentiate([Variable? v]) {

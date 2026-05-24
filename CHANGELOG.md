@@ -1,3 +1,7 @@
+# 5.5.5
+
+* **[IMPROVEMENT]** Fixed bugs
+
 # 5.5.4
 
 * **[IMPROVEMENT]** Fixed bugs
@@ -12,7 +16,7 @@
 
 # 5.5.1
 
-* **[IMPROVEMENT]** Initial migration to full complete number.
+* **[IMPROVEMENT]** Initial migration to full complex number.
 
 # 5.4.4
 
