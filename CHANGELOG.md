@@ -1,3 +1,7 @@
+# 5.6.1
+
+* **[IMPROVEMENT]** Fixed bugs
+
 # 5.6.0
 
 ## Computer Algebra System (CAS) & Expressions

@@ -1,4 +1,5 @@
 import 'package:advance_math/advance_math.dart';
+import 'dart:math' as dmath;
 
 part 'currency.dart';
 part 'language_config.dart';
@@ -144,7 +145,7 @@ class NumWords {
     if (fractionalPart != null) {
       num fractionalValue = _convertStringToNum(fractionalPart, config);
       totalValue +=
-          (fractionalValue / pow(10, fractionalValue.toString().length));
+          (fractionalValue / dmath.pow(10, fractionalValue.toString().length));
     }
 
     // Apply negative if needed
@@ -189,7 +190,8 @@ class NumWords {
               ? getKeyByValue(config.hundreds, word) * 100
               : currentValue * getKeyByValue(config.hundreds, word) * 100;
         } else if (config.magnitudes.contains(word)) {
-          num magnitudeValue = pow(10, config.magnitudes.indexOf(word) * 3);
+          num magnitudeValue =
+              dmath.pow(10, config.magnitudes.indexOf(word) * 3);
           totalValue += currentValue * magnitudeValue;
           currentValue = 0;
         } else if (config.chunkConversionRule != null) {
@@ -204,7 +206,8 @@ class NumWords {
               ? getKeyByValue(config.hundreds, word) * 100
               : currentValue * getKeyByValue(config.hundreds, word);
         } else if (config.magnitudes.contains(word)) {
-          num magnitudeValue = pow(10, config.magnitudes.indexOf(word) * 3);
+          num magnitudeValue =
+              dmath.pow(10, config.magnitudes.indexOf(word) * 3);
           totalValue += currentValue * magnitudeValue;
           currentValue = 0;
         } else if (config.chunkConversionRule != null) {
@@ -254,7 +257,7 @@ class NumWords {
         : decimalPlaces;
 
     // Multiplier calculation based on finalDecimalPlaces
-    int multiplier = pow(10, finalDecimalPlaces).toInt();
+    int multiplier = dmath.pow(10, finalDecimalPlaces).toInt();
 
     // Separate the value into main and fractional parts
     int mainPart = value.toInt();
