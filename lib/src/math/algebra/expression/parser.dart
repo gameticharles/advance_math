@@ -417,6 +417,22 @@ class ExpressionParser {
               if (name == 'acos' && args.length == 1) return Acos(args[0]);
               if (name == 'atan' && args.length == 1) return Atan(args[0]);
 
+              // Hyperbolic trigonometric functions
+              if (name == 'sinh' && args.length == 1) return Trigonometric('sinh', args[0]);
+              if (name == 'cosh' && args.length == 1) return Trigonometric('cosh', args[0]);
+              if (name == 'tanh' && args.length == 1) return Trigonometric('tanh', args[0]);
+              if (name == 'sech' && args.length == 1) return Trigonometric('sech', args[0]);
+              if (name == 'csch' && args.length == 1) return Trigonometric('csch', args[0]);
+              if (name == 'coth' && args.length == 1) return Trigonometric('coth', args[0]);
+
+              // Inverse Hyperbolic trigonometric functions
+              if (name == 'asinh' && args.length == 1) return Trigonometric('asinh', args[0]);
+              if (name == 'acosh' && args.length == 1) return Trigonometric('acosh', args[0]);
+              if (name == 'atanh' && args.length == 1) return Trigonometric('atanh', args[0]);
+              if (name == 'asech' && args.length == 1) return Trigonometric('asech', args[0]);
+              if (name == 'acsch' && args.length == 1) return Trigonometric('acsch', args[0]);
+              if (name == 'acoth' && args.length == 1) return Trigonometric('acoth', args[0]);
+
               // Exponential / Logarithmic
               if (name == 'exp' && args.length == 1) return Exp(args[0]);
               if (name == 'abs' && args.length == 1) return Abs(args[0]);
@@ -840,6 +856,18 @@ class ExpressionParser {
     'asin',
     'acos',
     'atan',
+    'sinh',
+    'cosh',
+    'tanh',
+    'sech',
+    'csch',
+    'coth',
+    'asinh',
+    'acosh',
+    'atanh',
+    'asech',
+    'acsch',
+    'acoth',
     'exp',
     'abs',
     'ln',
@@ -861,6 +889,22 @@ class ExpressionParser {
     if (name == 'asin' && args.length == 1) return Asin(args[0]);
     if (name == 'acos' && args.length == 1) return Acos(args[0]);
     if (name == 'atan' && args.length == 1) return Atan(args[0]);
+
+    // Hyperbolic functions
+    if (name == 'sinh' && args.length == 1) return Trigonometric('sinh', args[0]);
+    if (name == 'cosh' && args.length == 1) return Trigonometric('cosh', args[0]);
+    if (name == 'tanh' && args.length == 1) return Trigonometric('tanh', args[0]);
+    if (name == 'sech' && args.length == 1) return Trigonometric('sech', args[0]);
+    if (name == 'csch' && args.length == 1) return Trigonometric('csch', args[0]);
+    if (name == 'coth' && args.length == 1) return Trigonometric('coth', args[0]);
+
+    // Inverse Hyperbolic functions
+    if (name == 'asinh' && args.length == 1) return Trigonometric('asinh', args[0]);
+    if (name == 'acosh' && args.length == 1) return Trigonometric('acosh', args[0]);
+    if (name == 'atanh' && args.length == 1) return Trigonometric('atanh', args[0]);
+    if (name == 'asech' && args.length == 1) return Trigonometric('asech', args[0]);
+    if (name == 'acsch' && args.length == 1) return Trigonometric('acsch', args[0]);
+    if (name == 'acoth' && args.length == 1) return Trigonometric('acoth', args[0]);
 
     // Exponential / Logarithmic
     if (name == 'exp' && args.length == 1) return Exp(args[0]);

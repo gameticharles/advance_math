@@ -59,25 +59,43 @@ class Simplifier {
   static Expression _fracSimp(Expression expr) {
     if (expr is Divide) {
       // Recursively simplify operands first
-      var num = simplify(expr.left);
-      var den = simplify(expr.right);
+      var leftExpr = simplify(expr.left);
+      var rightExpr = simplify(expr.right);
 
-      if (num is Literal && den is Literal) {
-        if (num.value is int && den.value is int) {
-          if (num.value % den.value == 0) {
-            return Literal(num.value / den.value);
+      if (leftExpr is Literal && rightExpr is Literal) {
+        final numVal = leftExpr.value;
+        final denVal = rightExpr.value;
+        if (numVal is int && denVal is int) {
+          if (numVal % denVal == 0) {
+            return Literal(numVal ~/ denVal);
           }
-          var gcdVal = num.value.gcd(den.value);
+          var gcdVal = numVal.gcd(denVal);
           if (gcdVal > 1) {
             return Divide(
-                Literal(num.value / gcdVal), Literal(den.value / gcdVal));
+                Literal(numVal ~/ gcdVal), Literal(denVal ~/ gcdVal));
           }
+        } else if (numVal is Rational || denVal is Rational) {
+          try {
+            var result = Rational(numVal) / Rational(denVal);
+            if (result.denominator == BigInt.one) {
+              return Literal(result.toInt());
+            }
+            return Literal(result);
+          } catch (e) {
+            // Fall back
+          }
+        } else if (numVal is num && denVal is num) {
+          return Literal(numVal / denVal);
         } else {
-          return Literal(num.value / den.value);
+          try {
+            return Literal(numVal / denVal);
+          } catch (e) {
+            // Fall back
+          }
         }
       }
 
-      return Divide(num, den);
+      return Divide(leftExpr, rightExpr);
     }
     // Recursively apply to other binary expressions
     if (expr is BinaryOperationsExpression) {
