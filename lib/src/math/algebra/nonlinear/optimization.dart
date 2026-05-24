@@ -16,7 +16,6 @@ class OptimizationResult {
 
   /// Additional message or error description.
   final String message;
-
   OptimizationResult({
     required this.solution,
     required this.value,
@@ -24,7 +23,6 @@ class OptimizationResult {
     required this.converged,
     this.message = '',
   });
-
   @override
   String toString() {
     return 'OptimizationResult(converged: $converged, iterations: $iterations, value: $value, solution: $solution)';
@@ -50,25 +48,22 @@ class Optimization {
     double tolerance = 1e-6,
   }) {
     Matrix x = Matrix.fromList(x0.map((e) => [Complex(e)]).toList());
-
     for (int k = 0; k < maxIter; k++) {
       List<num> currentX =
-          x.flatten().map((e) => e is Complex ? e.real : (e as num)).toList();
-
+          x.flatten().map((e) => _Utils.toNumValue(e)).toList();
       // Compute gradient
       var gradResult = gradient(currentX);
       List<num> grad = (gradResult as List).cast<num>();
       Matrix gradMatrix =
           Matrix.fromList(grad.map((e) => [Complex(e.toDouble())]).toList());
-
       // Update: x = x - learningRate * gradient
       Matrix xNew = x - gradMatrix.scale(learningRate);
-
       // Check convergence
       if ((xNew - x).norm(Norm.manhattan) < tolerance) {
         List<num> finalX = xNew
             .flatten()
             .map((e) => e is Complex ? e.real : (e as num))
+            .map((e) => _Utils.toNumValue(e))
             .toList();
         return OptimizationResult(
           solution: xNew,
@@ -77,11 +72,9 @@ class Optimization {
           converged: true,
         );
       }
-
       x = xNew;
     }
-
-    List<num> finalX = x.flatten().map((e) => (e as Complex).real).toList();
+    List<num> finalX = x.flatten().map((e) => _Utils.toNumValue(e)).toList();
     return OptimizationResult(
       solution: x,
       value: f(finalX),
@@ -101,7 +94,6 @@ class Optimization {
   }) {
     Matrix x = Matrix.fromList(x0.map((e) => [Complex(e)]).toList());
     List<num> currentX = x0;
-
     // Initial gradient
     dynamic gradResult = gradient(currentX);
     List<num> grad =
@@ -109,31 +101,27 @@ class Optimization {
     Matrix gradMatrix =
         Matrix.fromList(grad.map((e) => [Complex(-e.toDouble())]).toList());
     Matrix direction = gradMatrix.copy(); // d = -grad
-
     for (int k = 0; k < maxIter; k++) {
-      currentX =
-          x.flatten().map((e) => e is Complex ? e.real : (e as num)).toList();
-
+      currentX = x.flatten().map((e) => _Utils.toNumValue(e)).toList();
       // Line search to find optimal step size
       List<num> dir = direction
           .flatten()
           .map((e) => e is Complex ? e.real : (e as num))
+          .map((e) => _Utils.toNumValue(e))
           .toList();
       double alpha = _lineSearch(f, currentX, dir);
-
       // Update position
       Matrix xNew = x + direction.scale(alpha);
       List<num> xNewList = xNew
           .flatten()
           .map((e) => e is Complex ? e.real : (e as num))
+          .map((e) => _Utils.toNumValue(e))
           .toList();
-
       // New gradient
       var gradNewResult = gradient(xNewList);
       List<num> gradNew = (gradNewResult as List).cast<num>();
       Matrix gradNewMatrix =
           Matrix.fromList(gradNew.map((e) => [Complex(e.toDouble())]).toList());
-
       // Check convergence
       if (gradNewMatrix.norm(Norm.manhattan) < tolerance) {
         return OptimizationResult(
@@ -143,22 +131,18 @@ class Optimization {
           converged: true,
         );
       }
-
       // Fletcher-Reeves: beta = ||grad_new||^2 / ||grad||^2
       gradMatrix =
           Matrix.fromList(grad.map((e) => [Complex(e.toDouble())]).toList());
       double beta = (gradNewMatrix.norm(Norm.frobenius) *
               gradNewMatrix.norm(Norm.frobenius)) /
           (gradMatrix.norm(Norm.frobenius) * gradMatrix.norm(Norm.frobenius));
-
       // Update direction: d = -grad_new + beta * d
       direction = gradNewMatrix.scale(-1) + direction.scale(beta);
-
       x = xNew;
       grad = gradNew;
     }
-
-    List<num> finalX = x.flatten().map((e) => (e as Complex).real).toList();
+    List<num> finalX = x.flatten().map((e) => _Utils.toNumValue(e)).toList();
     return OptimizationResult(
       solution: x,
       value: f(finalX),
@@ -179,17 +163,14 @@ class Optimization {
     int n = x0.length;
     Matrix x = Matrix.fromList(x0.map((e) => [Complex(e)]).toList());
     Matrix H = Matrix.eye(n); // Initial Hessian approximation (identity)
-
     for (int k = 0; k < maxIter; k++) {
       List<num> currentX =
-          x.flatten().map((e) => e is Complex ? e.real : (e as num)).toList();
-
+          x.flatten().map((e) => _Utils.toNumValue(e)).toList();
       // Compute gradient
       var gradResult = gradient(currentX);
       List<num> grad = (gradResult as List).cast<num>();
       Matrix gradMatrix =
           Matrix.fromList(grad.map((e) => [Complex(e.toDouble())]).toList());
-
       // Check convergence
       if (gradMatrix.norm(Norm.manhattan) < tolerance) {
         return OptimizationResult(
@@ -199,53 +180,42 @@ class Optimization {
           converged: true,
         );
       }
-
       // Compute search direction: p = -H * grad
       Matrix p = (H * gradMatrix).scale(-1);
-      List<num> pList =
-          p.flatten().map((e) => e is Complex ? e.real : (e as num)).toList();
-
+      List<num> pList = p.flatten().map((e) => _Utils.toNumValue(e)).toList();
       // Line search
       double alpha = _lineSearch(f, currentX, pList);
-
       // Update position: s = alpha * p
       Matrix s = p.scale(alpha);
       Matrix xNew = x + s;
       List<num> xNewList = xNew
           .flatten()
           .map((e) => e is Complex ? e.real : (e as num))
+          .map((e) => _Utils.toNumValue(e))
           .toList();
-
       // New gradient
       List<num> gradNew = gradient(xNewList) as List<num>;
       Matrix gradNewMatrix =
           Matrix.fromList(gradNew.map((e) => [Complex(e)]).toList());
-
       // y = grad_new - grad
       Matrix y = gradNewMatrix - gradMatrix;
-
       // BFGS update of Hessian approximation
       // H = H + (s^T y + y^T H y)(s s^T)/(s^T y)^2 - (H y s^T + s y^T H)/(s^T y)
       Matrix sTy = s.transpose() * y;
       num sTyVal = (sTy[0][0] as Complex).real;
-
       if (sTyVal.abs() > 1e-10) {
         Matrix yTHy = y.transpose() * H * y;
         num yTHyVal = (yTHy[0][0] as Complex).real;
-
         Matrix ssT = s * s.transpose();
         Matrix hyysT = (H * y) * s.transpose();
         Matrix syyTH = s * (y.transpose() * H);
-
         H = H +
             ssT.scale((sTyVal + yTHyVal) / (sTyVal * sTyVal)) -
             (hyysT + syyTH).scale(1 / sTyVal);
       }
-
       x = xNew;
     }
-
-    List<num> finalX = x.flatten().map((e) => (e as Complex).real).toList();
+    List<num> finalX = x.flatten().map((e) => _Utils.toNumValue(e)).toList();
     return OptimizationResult(
       solution: x,
       value: f(finalX),
@@ -263,7 +233,6 @@ class Optimization {
     double tolerance = 1e-6,
   }) {
     int n = x0.length;
-
     // Create initial simplex
     List<List<num>> simplex = [x0];
     for (int i = 0; i < n; i++) {
@@ -271,17 +240,14 @@ class Optimization {
       vertex[i] += 1.0; // Offset each dimension
       simplex.add(vertex);
     }
-
     // Nelder-Mead coefficients
     double alpha = 1.0; // Reflection
     double gamma = 2.0; // Expansion
     double rho = 0.5; // Contraction
     double sigma = 0.5; // Shrink
-
     for (int iter = 0; iter < maxIter; iter++) {
       // Sort simplex by function values
       simplex.sort((a, b) => (f(a) as num).compareTo(f(b) as num));
-
       // Check convergence
       num fBest = f(simplex[0]);
       num fWorst = f(simplex[n]);
@@ -294,7 +260,6 @@ class Optimization {
           converged: true,
         );
       }
-
       // Compute centroid (excluding worst point)
       List<num> centroid = List.filled(n, 0.0);
       for (int i = 0; i < n; i++) {
@@ -303,19 +268,16 @@ class Optimization {
         }
       }
       centroid = centroid.map((e) => e / n).toList();
-
       // Reflection
       List<num> xReflect = List.generate(
         n,
         (i) => centroid[i] + alpha * (centroid[i] - simplex[n][i]),
       );
       num fReflect = f(xReflect);
-
       if (f(simplex[0]) <= fReflect && fReflect < f(simplex[n - 1])) {
         simplex[n] = xReflect;
         continue;
       }
-
       // Expansion
       if (fReflect < f(simplex[0])) {
         List<num> xExpand = List.generate(
@@ -326,19 +288,16 @@ class Optimization {
         simplex[n] = fExpand < fReflect ? xExpand : xReflect;
         continue;
       }
-
       // Contraction
       List<num> xContract = List.generate(
         n,
         (i) => centroid[i] + rho * (simplex[n][i] - centroid[i]),
       );
       num fContract = f(xContract);
-
       if (fContract < f(simplex[n])) {
         simplex[n] = xContract;
         continue;
       }
-
       // Shrink
       for (int i = 1; i <= n; i++) {
         simplex[i] = List.generate(
@@ -347,7 +306,6 @@ class Optimization {
         );
       }
     }
-
     List<num> best = simplex[0];
     return OptimizationResult(
       solution: Matrix.fromList(best.map((e) => [Complex(e)]).toList()),
@@ -400,14 +358,12 @@ class Optimization {
     double rho = 0.5,
   }) {
     num f0 = f(x);
-
     // Approximate directional derivative
     List<num> grad = _approximateGradient(f, x);
     double dirDeriv = 0.0;
     for (int i = 0; i < x.length; i++) {
       dirDeriv += grad[i] * direction[i];
     }
-
     // Backtracking
     for (int i = 0; i < 20; i++) {
       List<num> xNew =
@@ -417,7 +373,6 @@ class Optimization {
       }
       alpha *= rho;
     }
-
     return alpha;
   }
 
@@ -426,14 +381,12 @@ class Optimization {
     int n = x.length;
     double h = 1e-8;
     List<num> grad = [];
-
     num fx = f(x);
     for (int i = 0; i < n; i++) {
       List<num> xh = List<num>.from(x);
       xh[i] += h;
       grad.add((f(xh) - fx) / h);
     }
-
     return grad;
   }
 }

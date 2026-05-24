@@ -13,14 +13,12 @@ class NonlinearSystemResult {
 
   /// Additional message or error description.
   final String message;
-
   NonlinearSystemResult({
     required this.solution,
     required this.iterations,
     required this.converged,
     this.message = '',
   });
-
   @override
   String toString() {
     return 'NonlinearSystemResult(converged: $converged, iterations: $iterations, solution: $solution)';
@@ -50,19 +48,15 @@ class NonlinearSystems {
       throw ArgumentError(
           'Number of functions must match number of variables.');
     }
-
     Matrix x = Matrix.fromList(initialGuess.map((e) => [e]).toList());
-
     for (int k = 0; k < maxIter; k++) {
       List<num> currentX =
-          x.flatten().map((e) => e is Complex ? e.real : e as num).toList();
-
+          x.flatten().map((e) => _Utils.toNumValue(e)).toList();
       // Evaluate F(x)
       Matrix F = Matrix.zeros(n, 1);
       for (int i = 0; i < n; i++) {
         F[i][0] = Complex(functions[i](currentX) as num);
       }
-
       // Check convergence
       if (F.norm(Norm.manhattan) < tolerance) {
         return NonlinearSystemResult(
@@ -71,7 +65,6 @@ class NonlinearSystems {
           converged: true,
         );
       }
-
       // Compute Jacobian J(x)
       Matrix J;
       if (jacobian != null) {
@@ -85,13 +78,11 @@ class NonlinearSystems {
       } else {
         J = _approximateJacobian(functions, currentX);
       }
-
       // Solve J * deltaX = -F
       try {
         Matrix deltaX = J.linear
             .solve(F.scale(-1), method: LinearSystemMethod.gaussElimination);
         x = x + deltaX;
-
         if (deltaX.norm(Norm.manhattan) < tolerance) {
           return NonlinearSystemResult(
             solution: x,
@@ -108,7 +99,6 @@ class NonlinearSystems {
         );
       }
     }
-
     return NonlinearSystemResult(
       solution: x,
       iterations: maxIter,
@@ -128,18 +118,14 @@ class NonlinearSystems {
   }) {
     int n = initialGuess.length;
     Matrix x = Matrix.fromList(initialGuess.map((e) => [e]).toList());
-
     // Initial Jacobian approximation
-    List<num> currentX =
-        x.flatten().map((e) => e is Complex ? e.real : e as num).toList();
+    List<num> currentX = x.flatten().map((e) => _Utils.toNumValue(e)).toList();
     Matrix J = _approximateJacobian(functions, currentX);
-
     // Evaluate F(x)
     Matrix F = Matrix.zeros(n, 1);
     for (int i = 0; i < n; i++) {
       F[i][0] = Complex(functions[i](currentX) as num);
     }
-
     for (int k = 0; k < maxIter; k++) {
       if (F.norm(Norm.manhattan) < tolerance) {
         return NonlinearSystemResult(
@@ -148,7 +134,6 @@ class NonlinearSystems {
           converged: true,
         );
       }
-
       // Solve J * deltaX = -F
       Matrix deltaX;
       try {
@@ -163,31 +148,25 @@ class NonlinearSystems {
           message: 'Singular Jacobian in Broyden step: $e',
         );
       }
-
       Matrix xNew = x + deltaX;
       List<num> xNewList =
-          xNew.flatten().map((e) => e is Complex ? e.real : e as num).toList();
-
+          xNew.flatten().map((e) => _Utils.toNumValue(e)).toList();
       // Evaluate F(xNew)
       Matrix fNew = Matrix.zeros(n, 1);
       for (int i = 0; i < n; i++) {
         fNew[i][0] = Complex(functions[i](xNewList) as num);
       }
-
       // Broyden update
       // y = FNew - F
       Matrix y = fNew - F;
-
       // J = J + (y - J * deltaX) * deltaX^T / (deltaX^T * deltaX)
       // Note: J * deltaX is approximately -F from the solve step, but we compute it exactly or use y - (-F) = FNew?
       // Actually J * deltaX = -F is only true if solved exactly.
       // Standard update: J_{k+1} = J_k + \frac{y_k - J_k s_k}{s_k^T s_k} s_k^T
-
       Matrix jdx = J * deltaX;
       Matrix numTerm = (y - jdx);
       Matrix denTerm = deltaX.transpose() * deltaX;
       num den = (denTerm[0][0] as Complex).real;
-
       if (den.abs() < 1e-15) {
         // Step too small, stop
         return NonlinearSystemResult(
@@ -197,13 +176,10 @@ class NonlinearSystems {
           message: 'Step size too small for update',
         );
       }
-
       J = J + (numTerm * deltaX.transpose()).scale(1 / den);
-
       x = xNew;
       F = fNew;
     }
-
     return NonlinearSystemResult(
       solution: x,
       iterations: maxIter,
@@ -223,16 +199,13 @@ class NonlinearSystems {
   }) {
     int n = initialGuess.length;
     Matrix x = Matrix.fromList(initialGuess.map((e) => [e]).toList());
-
     for (int k = 0; k < maxIter; k++) {
       List<num> currentX =
-          x.flatten().map((e) => e is Complex ? e.real : e as num).toList();
+          x.flatten().map((e) => _Utils.toNumValue(e)).toList();
       Matrix xNew = Matrix.zeros(n, 1);
-
       for (int i = 0; i < n; i++) {
         xNew[i][0] = Complex(gFunctions[i](currentX) as num);
       }
-
       if ((xNew - x).norm(Norm.manhattan) < tolerance) {
         return NonlinearSystemResult(
           solution: xNew,
@@ -240,10 +213,8 @@ class NonlinearSystems {
           converged: true,
         );
       }
-
       x = xNew;
     }
-
     return NonlinearSystemResult(
       solution: x,
       iterations: maxIter,
@@ -256,13 +227,10 @@ class NonlinearSystems {
     int n = x.length;
     Matrix J = Matrix.zeros(n, n);
     double h = 1e-8;
-
     List<num> fx = functions.map((f) => f(x) as num).toList();
-
     for (int j = 0; j < n; j++) {
       List<num> xPlusH = List<num>.from(x);
       xPlusH[j] = xPlusH[j] + h;
-
       for (int i = 0; i < n; i++) {
         num fxh = functions[i](xPlusH) as num;
         J[i][j] = Complex((fxh - fx[i]) / h);

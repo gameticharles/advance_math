@@ -9,6 +9,7 @@ import 'dart:math' as dmath;
 import 'package:dartframe/dartframe.dart';
 
 import '../../number/complex/complex.dart';
+import '../../number/decimal/rational.dart';
 import '../geometry/geometry.dart';
 import '/src/math/basic/math.dart' as math;
 import 'package:advance_math/advance_math.dart' show LRUCache;

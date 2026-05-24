@@ -4,10 +4,24 @@ part of '../algebra.dart';
 Performance Optimizations:
    - Implement parallel processing techniques to improve the performance of computationally intensive operations (e.g., matrix multiplication, decompositions)
    - Optimize existing methods using efficient algorithms or data structures
-
 */
-
 class _Utils {
+  static num toNumValue(dynamic e) {
+    if (e is Complex) {
+      final r = e.real;
+      if (r is num) return r;
+      if (r is Rational) return r.toDouble();
+      return double.parse(r.toString());
+    }
+    if (e is Rational) {
+      return e.toDouble();
+    }
+    if (e is num) {
+      return e;
+    }
+    return double.parse(e.toString());
+  }
+
   static List<List<dynamic>> parseMatrixString(String input) {
     return input
         .split(';')
@@ -90,13 +104,11 @@ class _Utils {
     'is': (a, b) => a.runtimeType == b,
     'is!': (a, b) => a.runtimeType != b,
   };
-
   // Helper method for solving a linear system using backward substitution.
   static Matrix backwardSubstitution(Matrix upper, Matrix y) {
     int rowCount = upper.rowCount;
     int colCount = y.columnCount;
     Matrix x = Matrix.zeros(rowCount, colCount, isDouble: true);
-
     for (int i = rowCount - 1; i >= 0; i--) {
       for (int j = 0; j < colCount; j++) {
         x[i][j] = y[i][j];
@@ -106,7 +118,6 @@ class _Utils {
         x[i][j] /= upper[i][i];
       }
     }
-
     return x;
   }
 
@@ -115,7 +126,6 @@ class _Utils {
     int rowCount = lower.rowCount;
     int colCount = b.columnCount;
     Matrix y = Matrix.zeros(rowCount, colCount);
-
     for (int i = 0; i < rowCount; i++) {
       for (int j = 0; j < colCount; j++) {
         y[i][j] = b[i][j];
@@ -125,7 +135,6 @@ class _Utils {
         y[i][j] /= lower[i][i];
       }
     }
-
     return y;
   }
 
@@ -133,7 +142,6 @@ class _Utils {
   static Matrix forwardElimination(Matrix a, Matrix b,
       {bool forLUDecomposition = false}) {
     int rowCount = a.rowCount;
-
     for (int k = 0; k < rowCount - 1; k++) {
       for (int i = k + 1; i < rowCount; i++) {
         dynamic factor = a[i][k] / a[k][k];
@@ -148,7 +156,6 @@ class _Utils {
         }
       }
     }
-
     return a;
   }
 
@@ -175,18 +182,14 @@ class _Utils {
     int n = columnVector.rowCount;
     Matrix e1 = Matrix.zeros(n, 1);
     e1[0][0] = Complex.one();
-
     // Check if the matrix is filled with zeros and return the identity matrix if true
     if (columnVector.norm() == Complex.zero()) {
       return Matrix.eye(n);
     }
-
     Matrix u =
         (columnVector + e1) * columnVector.norm() * columnVector[0][0].sign;
-
     Matrix P = Matrix.eye(n) -
         ((u * u.transpose()) * (Complex(2) / math.pow(u.norm(), Complex(2))));
-
     return P;
   }
 
@@ -211,12 +214,10 @@ class _Utils {
       MatrixAlign alignment = MatrixAlign.right}) {
     List<int> columnWidths = List.generate(m.columnCount, (_) => 0);
     List<String> rows = [];
-
     for (var row in m.toList()) {
       row.asMap().forEach((index, element) => columnWidths[index] =
           dmath.max(columnWidths[index], element.toString().length));
     }
-
     rows = m
         .toList()
         .map((row) => row
@@ -227,19 +228,15 @@ class _Utils {
                 : entry.value.toString().padLeft(columnWidths[entry.key]))
             .join(separator))
         .toList();
-
     if (m.rowCount == 1) {
       return 'Matrix: ${m.rowCount}x${m.columnCount}\n[ ${rows[0]} ]';
     }
-
     String matToString = '';
-
     //Return empty matrix string
     if (m.toList().isEmpty) {
       matToString = '[ ]';
       return 'Matrix: ${m.rowCount}x${m.columnCount}\n$matToString';
     }
-
     if (isPrettyMatrix) {
       String top = '┌ ${rows[0]} ┐';
       String middle = m.rowCount > 2
@@ -252,7 +249,6 @@ class _Utils {
       String matrixRepresentation = rows.map((row) => ' [ $row ]').join('\n');
       matToString = '[\n$matrixRepresentation\n]';
     }
-
     return 'Matrix: ${m.rowCount}x${m.columnCount}\n$matToString';
   }
 }

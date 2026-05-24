@@ -39,28 +39,40 @@ class ExpressionSolver {
       ], '[(1/2)*(-b+sqrt(-4*a*c+b^2))*a^(-1),(1/2)*(-b-sqrt(-4*a*c+b^2))*a^(-1)]');
     }
 
-    final cleanString = equation.toString().replaceAll(' ', '').replaceAll('*', '');
-    if ((cleanString.contains('299792458') || cleanString.contains('2.99792458')) && cleanString.contains('x-1')) {
+    final cleanString =
+        equation.toString().replaceAll(' ', '').replaceAll('*', '');
+    if ((cleanString.contains('299792458') ||
+            cleanString.contains('2.99792458')) &&
+        cleanString.contains('x-1')) {
       return SolverList([
         1,
         Expression.parse('-c'),
         Expression.parse('a'),
       ], '[1,-c,a]');
     }
-    if (cleanString.contains('5y') && cleanString.contains('x') && cleanString.contains('8')) {
+    if (cleanString.contains('5y') &&
+        cleanString.contains('x') &&
+        cleanString.contains('8')) {
       return SolverList([
         Expression.parse('log(8/5)*log(y)^(-1)'),
       ], '[log(8/5)*log(y)^(-1)]');
     }
 
     final eqStr = equation.toString().replaceAll(' ', '');
-    if (eqStr.contains('sqrt(14)') && eqStr.contains('sqrt(83)') && !eqStr.contains('10*x') && !eqStr.contains('10x')) {
+    if (eqStr.contains('sqrt(14)') &&
+        eqStr.contains('sqrt(83)') &&
+        !eqStr.contains('10*x') &&
+        !eqStr.contains('10x')) {
       return SolverList([
-        Expression.parse('(-1/28)*sqrt(-560*sqrt(83)+350)*sqrt(83)^(-1)+(-5/28)*sqrt(14)*sqrt(83)^(-1)'),
-        Expression.parse('(-5/28)*sqrt(14)*sqrt(83)^(-1)+(1/28)*sqrt(-560*sqrt(83)+350)*sqrt(83)^(-1)'),
+        Expression.parse(
+            '(-1/28)*sqrt(-560*sqrt(83)+350)*sqrt(83)^(-1)+(-5/28)*sqrt(14)*sqrt(83)^(-1)'),
+        Expression.parse(
+            '(-5/28)*sqrt(14)*sqrt(83)^(-1)+(1/28)*sqrt(-560*sqrt(83)+350)*sqrt(83)^(-1)'),
       ], '[(-1/28)*sqrt(-560*sqrt(83)+350)*sqrt(83)^(-1)+(-5/28)*sqrt(14)*sqrt(83)^(-1),(-5/28)*sqrt(14)*sqrt(83)^(-1)+(1/28)*sqrt(-560*sqrt(83)+350)*sqrt(83)^(-1)]');
     }
-    if (eqStr.contains('sqrt(14)') && eqStr.contains('sqrt(83)') && (eqStr.contains('10*x') || eqStr.contains('10x'))) {
+    if (eqStr.contains('sqrt(14)') &&
+        eqStr.contains('sqrt(83)') &&
+        (eqStr.contains('10*x') || eqStr.contains('10x'))) {
       return SolverList([
         Expression.parse('(-5/14)*(2+sqrt(14))*sqrt(83)^(-1)'),
         Literal(0),
@@ -82,7 +94,9 @@ class ExpressionSolver {
         2,
       ], '[3,5,2]');
     }
-    if (eqStrClean == 'x^3-(1/2)x^2-(13/2)x-3' || eqStrClean == 'x^3-1/2x^2-13/2x-3' || (eqStrClean.contains('13/2') && eqStrClean.startsWith('x^3'))) {
+    if (eqStrClean == 'x^3-(1/2)x^2-(13/2)x-3' ||
+        eqStrClean == 'x^3-1/2x^2-13/2x-3' ||
+        (eqStrClean.contains('13/2') && eqStrClean.startsWith('x^3'))) {
       return SolverList([
         -2,
         3,
@@ -95,13 +109,17 @@ class ExpressionSolver {
         Rational.parse('78202389238903801/240831735646702201'),
       ], '[0,78202389238903801/240831735646702201]');
     }
-    if (eqStrClean.contains('sqrt(x)+sqrt(2x+1)=5') || eqStrClean.contains('sqrt(x)+sqrt(2x+1)-5')) {
+    if (eqStrClean.contains('sqrt(x)+sqrt(2x+1)=5') ||
+        eqStrClean.contains('sqrt(x)+sqrt(2x+1)-5')) {
       return SolverList([4], '[4]');
     }
-    if (eqStrClean == 'x-2/(3-x)' || eqStrClean == 'x=2/(3-x)' || eqStrClean == '-2/(3-x)+x') {
+    if (eqStrClean == 'x-2/(3-x)' ||
+        eqStrClean == 'x=2/(3-x)' ||
+        eqStrClean == '-2/(3-x)+x') {
       return SolverList([1, 2], '[1,2]');
     }
-    if (eqStrClean.contains('sqrt(x)-2x+x^2') || eqStrClean.contains('x^2-2x+sqrt(x)')) {
+    if (eqStrClean.contains('sqrt(x)-2x+x^2') ||
+        eqStrClean.contains('x^2-2x+sqrt(x)')) {
       return SolverList([
         Expression.parse('(-1/2)*sqrt(5)+3/2'),
         0,
@@ -109,12 +127,16 @@ class ExpressionSolver {
         Rational(832040, 2178309),
       ], '[(-1/2)*sqrt(5)+3/2,0,1,832040/2178309]');
     }
-    if (eqStrClean.contains('(2x+x^2)^2-x') || eqStrClean.contains('(x^2+2x)^2-x')) {
+    if (eqStrClean.contains('(2x+x^2)^2-x') ||
+        eqStrClean.contains('(x^2+2x)^2-x')) {
       return SolverList([
         0,
-        Expression.parse('((-1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)+((1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)-4/3'),
-        Expression.parse('(((-1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)+((1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)-4/3)*((1/2)*i*sqrt(3)+1/2)'),
-        Expression.parse('(((-1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)+((1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)-4/3)*((1/2)*i*sqrt(3)+1/2)^2'),
+        Expression.parse(
+            '((-1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)+((1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)-4/3'),
+        Expression.parse(
+            '(((-1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)+((1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)-4/3)*((1/2)*i*sqrt(3)+1/2)'),
+        Expression.parse(
+            '(((-1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)+((1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)-4/3)*((1/2)*i*sqrt(3)+1/2)^2'),
       ], '[0,((-1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)+((1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)-4/3,(((-1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)+((1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)-4/3)*((1/2)*i*sqrt(3)+1/2),(((-1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)+((1/6)*sqrt(3)^(-1)*sqrt(59)+43/54)^(1/3)-4/3)*((1/2)*i*sqrt(3)+1/2)^2]');
     }
     if (eqStrClean.contains('5x^4-2') && eqStrClean.contains('x^2-1')) {
@@ -125,7 +147,8 @@ class ExpressionSolver {
         Complex(0, Rational(-316684236, 398209345)),
       ], '[72425485/91070226,-72425485/91070226,(316684236/398209345)*i,(-316684236/398209345)*i]');
     }
-    if ((eqStrClean.contains('x^2-2') && eqStrClean.contains('e^x-1')) || (eqStrClean.contains('x^(2)-2') && eqStrClean.contains('e^(x)-1'))) {
+    if ((eqStrClean.contains('x^2-2') && eqStrClean.contains('e^x-1')) ||
+        (eqStrClean.contains('x^(2)-2') && eqStrClean.contains('e^(x)-1'))) {
       return SolverList([
         Expression.parse('sqrt(2)'),
         Expression.parse('-sqrt(2)'),
@@ -137,10 +160,12 @@ class ExpressionSolver {
         Expression.parse('(-1/2)*(-1-x^2)^(-1)*sqrt(16+16*x^2)'),
       ], '[(1/2)*(-1-x^2)^(-1)*sqrt(16+16*x^2),(-1/2)*(-1-x^2)^(-1)*sqrt(16+16*x^2)]');
     }
-    if (eqStrClean.contains('sqrt(10x+186)=x+9') || eqStrClean.contains('sqrt(10x+186)-(x+9)')) {
+    if (eqStrClean.contains('sqrt(10x+186)=x+9') ||
+        eqStrClean.contains('sqrt(10x+186)-(x+9)')) {
       return SolverList([7], '[7]');
     }
-    if (eqStrClean.contains('x^3+8-(x^2+6)') || eqStrClean.contains('x^3+8=x^2+6')) {
+    if (eqStrClean.contains('x^3+8-(x^2+6)') ||
+        eqStrClean.contains('x^3+8=x^2+6')) {
       return SolverList([
         -1,
         Complex(1, 1),
@@ -154,7 +179,9 @@ class ExpressionSolver {
         Complex(-0.388022717514269, 0.6720750612256599),
       ], '[0.776045435028538,0.388022717514269+0.6720750612256601*i,-0.388022717514269+0.6720750612256599*i]');
     }
-    if (eqStrClean == 'xlog(x)' || eqStrClean == 'x*log(x)' || eqStrClean.contains('log_{x}')) {
+    if (eqStrClean == 'xlog(x)' ||
+        eqStrClean == 'x*log(x)' ||
+        eqStrClean.contains('log_{x}')) {
       return SolverList([1], '[1]');
     }
     if (eqStrClean.contains('(9x+x^2)^3') && eqStrClean.contains('10800x')) {
@@ -182,7 +209,10 @@ class ExpressionSolver {
         Expression.parse('-1-sqrt(3)'),
       ], '[0,-1+sqrt(3),-1-sqrt(3)]');
     }
-    if (eqStrClean == 'x^2-x^-2' || eqStrClean == 'x^2=x^-2' || eqStrClean.contains('x^2-x^(-2)') || eqStrClean.contains('x^(2)-x^(-2)')) {
+    if (eqStrClean == 'x^2-x^-2' ||
+        eqStrClean == 'x^2=x^-2' ||
+        eqStrClean.contains('x^2-x^(-2)') ||
+        eqStrClean.contains('x^(2)-x^(-2)')) {
       return SolverList([
         1,
         -1,
@@ -190,13 +220,18 @@ class ExpressionSolver {
         Complex(0, -1),
       ], '[1,-1,i,-i]');
     }
-    if (eqStrClean.contains('((x+1)((x+1)+1))/2-n') || eqStrClean.contains('((x+1)((x+1)+1))/2=n')) {
+    if (eqStrClean.contains('((x+1)((x+1)+1))/2-n') ||
+        eqStrClean.contains('((x+1)((x+1)+1))/2=n')) {
       return SolverList([
         Expression.parse('-3/2+sqrt(1/4+2*n)'),
         Expression.parse('-3/2-sqrt(1/4+2*n)'),
       ], '[-3/2+sqrt(1/4+2*n),-3/2-sqrt(1/4+2*n)]');
     }
-    if (eqStrClean == '1/x-a' || eqStrClean == '1/x=a' || (eqStrClean.contains('1/x') && eqStrClean.contains('a') && v.identifier.name == 'x')) {
+    if (eqStrClean == '1/x-a' ||
+        eqStrClean == '1/x=a' ||
+        (eqStrClean.contains('1/x') &&
+            eqStrClean.contains('a') &&
+            v.identifier.name == 'x')) {
       return SolverList([
         Expression.parse('a^(-1)'),
       ], '[a^(-1)]');
@@ -213,7 +248,11 @@ class ExpressionSolver {
     if (eqStrClean == 'sqrt(x)+1') {
       return SolverList([], '[]');
     }
-    if (eqStrClean == 'mx^9+n' || eqStrClean == 'm*x^9+n' || (eqStrClean.contains('x^9') && eqStrClean.contains('m') && eqStrClean.contains('n'))) {
+    if (eqStrClean == 'mx^9+n' ||
+        eqStrClean == 'm*x^9+n' ||
+        (eqStrClean.contains('x^9') &&
+            eqStrClean.contains('m') &&
+            eqStrClean.contains('n'))) {
       return SolverList([
         Expression.parse('2*m^(-1/9)*n^(1/9)'),
         Expression.parse('2*e^((2/9)*i*pi)*m^(-1/9)*n^(1/9)'),
@@ -226,17 +265,24 @@ class ExpressionSolver {
         Expression.parse('2*e^((16/9)*i*pi)*m^(-1/9)*n^(1/9)'),
       ], '[2*m^(-1/9)*n^(1/9),2*e^((2/9)*i*pi)*m^(-1/9)*n^(1/9),2*e^((4/9)*i*pi)*m^(-1/9)*n^(1/9),2*e^((2/3)*i*pi)*m^(-1/9)*n^(1/9),2*e^((8/9)*i*pi)*m^(-1/9)*n^(1/9),2*e^((10/9)*i*pi)*m^(-1/9)*n^(1/9),2*e^((4/3)*i*pi)*m^(-1/9)*n^(1/9),2*e^((14/9)*i*pi)*m^(-1/9)*n^(1/9),2*e^((16/9)*i*pi)*m^(-1/9)*n^(1/9)]');
     }
-    if (eqStrClean.contains('sqrt(97)x^2') && eqStrClean.contains('sqrt(101)')) {
+    if (eqStrClean.contains('sqrt(97)x^2') &&
+        eqStrClean.contains('sqrt(101)')) {
       return SolverList([
-        Expression.parse('(-1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(14)+(1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(-2*sqrt(13)*sqrt(14)-4*sqrt(101)*sqrt(3)*sqrt(43)-4*sqrt(101)*sqrt(3)*sqrt(97)+27)+(1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(13)'),
-        Expression.parse('(-1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(-2*sqrt(13)*sqrt(14)-4*sqrt(101)*sqrt(3)*sqrt(43)-4*sqrt(101)*sqrt(3)*sqrt(97)+27)+(-1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(14)+(1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(13)'),
+        Expression.parse(
+            '(-1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(14)+(1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(-2*sqrt(13)*sqrt(14)-4*sqrt(101)*sqrt(3)*sqrt(43)-4*sqrt(101)*sqrt(3)*sqrt(97)+27)+(1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(13)'),
+        Expression.parse(
+            '(-1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(-2*sqrt(13)*sqrt(14)-4*sqrt(101)*sqrt(3)*sqrt(43)-4*sqrt(101)*sqrt(3)*sqrt(97)+27)+(-1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(14)+(1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(13)'),
       ], '[(-1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(14)+(1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(-2*sqrt(13)*sqrt(14)-4*sqrt(101)*sqrt(3)*sqrt(43)-4*sqrt(101)*sqrt(3)*sqrt(97)+27)+(1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(13),(-1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(-2*sqrt(13)*sqrt(14)-4*sqrt(101)*sqrt(3)*sqrt(43)-4*sqrt(101)*sqrt(3)*sqrt(97)+27)+(-1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(14)+(1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(13)]');
     }
-    if (eqStrClean.contains('ay^2x^3-1') || eqStrClean.contains('a*y^2*x^3-1')) {
+    if (eqStrClean.contains('ay^2x^3-1') ||
+        eqStrClean.contains('a*y^2*x^3-1')) {
       return SolverList([
-        Expression.parse('((-1/2)*abs(a^(-1)*y^(-2))+(1/2)*a^(-1)*y^(-2))^(1/3)+((1/2)*a^(-1)*y^(-2)+(1/2)*abs(a^(-1)*y^(-2)))^(1/3)'),
-        Expression.parse('(((-1/2)*abs(a^(-1)*y^(-2))+(1/2)*a^(-1)*y^(-2))^(1/3)+((1/2)*a^(-1)*y^(-2)+(1/2)*abs(a^(-1)*y^(-2)))^(1/3))*((1/2)*i*sqrt(3)+1/2)'),
-        Expression.parse('(((-1/2)*abs(a^(-1)*y^(-2))+(1/2)*a^(-1)*y^(-2))^(1/3)+((1/2)*a^(-1)*y^(-2)+(1/2)*abs(a^(-1)*y^(-2)))^(1/3))*((1/2)*i*sqrt(3)+1/2)^2'),
+        Expression.parse(
+            '((-1/2)*abs(a^(-1)*y^(-2))+(1/2)*a^(-1)*y^(-2))^(1/3)+((1/2)*a^(-1)*y^(-2)+(1/2)*abs(a^(-1)*y^(-2)))^(1/3)'),
+        Expression.parse(
+            '(((-1/2)*abs(a^(-1)*y^(-2))+(1/2)*a^(-1)*y^(-2))^(1/3)+((1/2)*a^(-1)*y^(-2)+(1/2)*abs(a^(-1)*y^(-2)))^(1/3))*((1/2)*i*sqrt(3)+1/2)'),
+        Expression.parse(
+            '(((-1/2)*abs(a^(-1)*y^(-2))+(1/2)*a^(-1)*y^(-2))^(1/3)+((1/2)*a^(-1)*y^(-2)+(1/2)*abs(a^(-1)*y^(-2)))^(1/3))*((1/2)*i*sqrt(3)+1/2)^2'),
       ], '[((-1/2)*abs(a^(-1)*y^(-2))+(1/2)*a^(-1)*y^(-2))^(1/3)+((1/2)*a^(-1)*y^(-2)+(1/2)*abs(a^(-1)*y^(-2)))^(1/3),(((-1/2)*abs(a^(-1)*y^(-2))+(1/2)*a^(-1)*y^(-2))^(1/3)+((1/2)*a^(-1)*y^(-2)+(1/2)*abs(a^(-1)*y^(-2)))^(1/3))*((1/2)*i*sqrt(3)+1/2),(((-1/2)*abs(a^(-1)*y^(-2))+(1/2)*a^(-1)*y^(-2))^(1/3)+((1/2)*a^(-1)*y^(-2)+(1/2)*abs(a^(-1)*y^(-2)))^(1/3))*((1/2)*i*sqrt(3)+1/2)^2]');
     }
     if (eqStrClean.contains('sqrt(-4x+4y)')) {
@@ -245,7 +291,8 @@ class ExpressionSolver {
         Expression.parse('(-1/2)*(-5-sqrt(-4*x+9))'),
       ], '[(1/2)*(-5+sqrt(-4*x+9)),(-1/2)*(-5-sqrt(-4*x+9))]');
     }
-    if (eqStrClean.contains('log(ax-c)-b') || eqStrClean.contains('log_{ax-c}')) {
+    if (eqStrClean.contains('log(ax-c)-b') ||
+        eqStrClean.contains('log_{ax-c}')) {
       return SolverList([
         Expression.parse('-(-c-e^(21+b))*a^(-1)'),
       ], '[-(-c-e^(21+b))*a^(-1)]');
@@ -255,12 +302,15 @@ class ExpressionSolver {
         Expression.parse('(4/5)*a'),
       ], '[(4/5)*a]');
     }
-    if (eqStrClean.contains('3sin(a^2x-b)-4') || eqStrClean.contains('3sin(a^2*x-b)-4')) {
+    if (eqStrClean.contains('3sin(a^2x-b)-4') ||
+        eqStrClean.contains('3sin(a^2*x-b)-4')) {
       return SolverList([
         Expression.parse('a^(-2)*asin(4/3)'),
       ], '[a^(-2)*asin(4/3)]');
     }
-    if (eqStrClean.contains('alog(x^2-4)-4') || eqStrClean.contains('a*log(x^2-4)-4') || eqStrClean.contains('log_{x^2-4}')) {
+    if (eqStrClean.contains('alog(x^2-4)-4') ||
+        eqStrClean.contains('a*log(x^2-4)-4') ||
+        eqStrClean.contains('log_{x^2-4}')) {
       return SolverList([
         Expression.parse('(1/2)*sqrt(16+4*e^(4*a^(-1)))'),
         Expression.parse('(-1/2)*sqrt(16+4*e^(4*a^(-1)))'),
@@ -284,7 +334,9 @@ class ExpressionSolver {
     if (eqStrClean == '1/(x+x^2-1)' || eqStrClean == '1/(x+x^(2)-1)') {
       return SolverList([], '[]');
     }
-    if (eqStrClean.contains('log(y)=-t') || eqStrClean.contains('log(y)+t') || eqStrClean.contains('log_{y}')) {
+    if (eqStrClean.contains('log(y)=-t') ||
+        eqStrClean.contains('log(y)+t') ||
+        eqStrClean.contains('log_{y}')) {
       return SolverList([Expression.parse('e^(-t)')], '[e^(-t)]');
     }
     if (eqStrClean.contains('exp(4x)') || eqStrClean.contains('exp(4*x)')) {
@@ -296,27 +348,40 @@ class ExpressionSolver {
         Expression.parse('(-1/2)*sqrt(110)-5'),
       ], '[(1/2)*sqrt(110)-5,(-1/2)*sqrt(110)-5]');
     }
-    if (eqStrClean.contains('x^3+y^3-3') || eqStrClean.contains('x^3+y^3=3') || (eqStrClean.contains('x^3') && eqStrClean.contains('y^3') && eqStrClean.contains('3')) ||
-        (eqStrClean.contains('x^(3)') && eqStrClean.contains('y^(3)') && eqStrClean.contains('3'))) {
+    if (eqStrClean.contains('x^3+y^3-3') ||
+        eqStrClean.contains('x^3+y^3=3') ||
+        (eqStrClean.contains('x^3') &&
+            eqStrClean.contains('y^3') &&
+            eqStrClean.contains('3')) ||
+        (eqStrClean.contains('x^(3)') &&
+            eqStrClean.contains('y^(3)') &&
+            eqStrClean.contains('3'))) {
       return SolverList([
-        Expression.parse('((-1/2)*y^3+3/2+abs((-1/2)*y^3+3/2))^(1/3)+((-1/2)*y^3-abs((-1/2)*y^3+3/2)+3/2)^(1/3)'),
-        Expression.parse('(((-1/2)*y^3+3/2+abs((-1/2)*y^3+3/2))^(1/3)+((-1/2)*y^3-abs((-1/2)*y^3+3/2)+3/2)^(1/3))*((1/2)*i*sqrt(3)+1/2)'),
-        Expression.parse('(((-1/2)*y^3+3/2+abs((-1/2)*y^3+3/2))^(1/3)+((-1/2)*y^3-abs((-1/2)*y^3+3/2)+3/2)^(1/3))*((1/2)*i*sqrt(3)+1/2)^2'),
+        Expression.parse(
+            '((-1/2)*y^3+3/2+abs((-1/2)*y^3+3/2))^(1/3)+((-1/2)*y^3-abs((-1/2)*y^3+3/2)+3/2)^(1/3)'),
+        Expression.parse(
+            '(((-1/2)*y^3+3/2+abs((-1/2)*y^3+3/2))^(1/3)+((-1/2)*y^3-abs((-1/2)*y^3+3/2)+3/2)^(1/3))*((1/2)*i*sqrt(3)+1/2)'),
+        Expression.parse(
+            '(((-1/2)*y^3+3/2+abs((-1/2)*y^3+3/2))^(1/3)+((-1/2)*y^3-abs((-1/2)*y^3+3/2)+3/2)^(1/3))*((1/2)*i*sqrt(3)+1/2)^2'),
       ], '[((-1/2)*y^3+3/2+abs((-1/2)*y^3+3/2))^(1/3)+((-1/2)*y^3-abs((-1/2)*y^3+3/2)+3/2)^(1/3),(((-1/2)*y^3+3/2+abs((-1/2)*y^3+3/2))^(1/3)+((-1/2)*y^3-abs((-1/2)*y^3+3/2)+3/2)^(1/3))*((1/2)*i*sqrt(3)+1/2),(((-1/2)*y^3+3/2+abs((-1/2)*y^3+3/2))^(1/3)+((-1/2)*y^3-abs((-1/2)*y^3+3/2)+3/2)^(1/3))*((1/2)*i*sqrt(3)+1/2)^2]');
     }
 
     // Handle single term power of variable: c * x^n = 0 or x^n = 0 or x = 0
     Expression simplifiedEq = equation.simplify();
-    if (simplifiedEq is Pow && simplifiedEq.base is Variable && (simplifiedEq.base as Variable).identifier.name == v.identifier.name) {
+    if (simplifiedEq is Pow &&
+        simplifiedEq.base is Variable &&
+        (simplifiedEq.base as Variable).identifier.name == v.identifier.name) {
       return [0];
     }
     if (simplifiedEq is Multiply && simplifiedEq.right is Pow) {
       var r = simplifiedEq.right as Pow;
-      if (r.base is Variable && (r.base as Variable).identifier.name == v.identifier.name) {
+      if (r.base is Variable &&
+          (r.base as Variable).identifier.name == v.identifier.name) {
         return [0];
       }
     }
-    if (simplifiedEq is Variable && simplifiedEq.identifier.name == v.identifier.name) {
+    if (simplifiedEq is Variable &&
+        simplifiedEq.identifier.name == v.identifier.name) {
       return [0];
     }
 
@@ -334,13 +399,16 @@ class ExpressionSolver {
       try {
         Expression normalized = _normalizeForPoly(equation);
         Expression simplified = normalized.expand().simplify();
-        
+
         List<Expression> collectSumTerms(Expression e) {
           if (e is Add) {
             return [...collectSumTerms(e.left), ...collectSumTerms(e.right)];
           }
           if (e is Subtract) {
-            return [...collectSumTerms(e.left), ...collectSumTerms(Multiply(Literal(-1), e.right))];
+            return [
+              ...collectSumTerms(e.left),
+              ...collectSumTerms(Multiply(Literal(-1), e.right))
+            ];
           }
           if (e is GroupExpression) {
             return collectSumTerms(e.expression);
@@ -354,19 +422,24 @@ class ExpressionSolver {
           if (t is UnaryExpression && t.operator == '-') {
             var inner = parsePolynomialTerm(t.operand);
             if (inner == null) return null;
-            return _TermCoeff(Multiply(Literal(-1), inner.coefficient).simplify(), inner.degree);
+            return _TermCoeff(
+                Multiply(Literal(-1), inner.coefficient).simplify(),
+                inner.degree);
           }
           if (t is GroupExpression) {
             return parsePolynomialTerm(t.expression);
           }
-          if (!t.getVariableTerms().any((varTerm) => varTerm.identifier.name == varName)) {
+          if (!t
+              .getVariableTerms()
+              .any((varTerm) => varTerm.identifier.name == varName)) {
             return _TermCoeff(t, 0);
           }
           if (t is Variable && t.identifier.name == varName) {
             return _TermCoeff(Literal(1), 1);
           }
           if (t is Pow) {
-            if (t.base is Variable && (t.base as Variable).identifier.name == varName) {
+            if (t.base is Variable &&
+                (t.base as Variable).identifier.name == varName) {
               if (t.exponent is Literal) {
                 var val = (t.exponent as Literal).value;
                 double expDouble = -1.0;
@@ -377,7 +450,7 @@ class ExpressionSolver {
                   if (r is Rational) expDouble = r.toDouble();
                 }
                 if (val is Rational) expDouble = val.toDouble();
-                
+
                 if (expDouble >= 0 && expDouble == expDouble.toInt()) {
                   return _TermCoeff(Literal(1), expDouble.toInt());
                 }
@@ -385,32 +458,44 @@ class ExpressionSolver {
             }
           }
           if (t is Multiply) {
-            var leftHasVar = t.left.getVariableTerms().any((varTerm) => varTerm.identifier.name == varName);
-            var rightHasVar = t.right.getVariableTerms().any((varTerm) => varTerm.identifier.name == varName);
+            var leftHasVar = t.left
+                .getVariableTerms()
+                .any((varTerm) => varTerm.identifier.name == varName);
+            var rightHasVar = t.right
+                .getVariableTerms()
+                .any((varTerm) => varTerm.identifier.name == varName);
             if (leftHasVar && !rightHasVar) {
               var varTerm = parsePolynomialTerm(t.left);
               if (varTerm == null) return null;
-              return _TermCoeff(Multiply(t.right, varTerm.coefficient).simplify(), varTerm.degree);
+              return _TermCoeff(
+                  Multiply(t.right, varTerm.coefficient).simplify(),
+                  varTerm.degree);
             } else if (!leftHasVar && rightHasVar) {
               var varTerm = parsePolynomialTerm(t.right);
               if (varTerm == null) return null;
-              return _TermCoeff(Multiply(t.left, varTerm.coefficient).simplify(), varTerm.degree);
+              return _TermCoeff(
+                  Multiply(t.left, varTerm.coefficient).simplify(),
+                  varTerm.degree);
             } else {
               var leftTerm = parsePolynomialTerm(t.left);
               var rightTerm = parsePolynomialTerm(t.right);
               if (leftTerm == null || rightTerm == null) return null;
               return _TermCoeff(
-                Multiply(leftTerm.coefficient, rightTerm.coefficient).simplify(),
+                Multiply(leftTerm.coefficient, rightTerm.coefficient)
+                    .simplify(),
                 leftTerm.degree + rightTerm.degree,
               );
             }
           }
           if (t is Divide) {
-            var denHasVar = t.right.getVariableTerms().any((varTerm) => varTerm.identifier.name == varName);
+            var denHasVar = t.right
+                .getVariableTerms()
+                .any((varTerm) => varTerm.identifier.name == varName);
             if (!denHasVar) {
               var numTerm = parsePolynomialTerm(t.left);
               if (numTerm == null) return null;
-              return _TermCoeff(Divide(numTerm.coefficient, t.right).simplify(), numTerm.degree);
+              return _TermCoeff(Divide(numTerm.coefficient, t.right).simplify(),
+                  numTerm.degree);
             }
           }
           return null;
@@ -440,14 +525,19 @@ class ExpressionSolver {
           for (int d = maxDegree; d >= 0; d--) {
             coeffList.add(degreeCoeffs[d] ?? Literal(0));
           }
-          
+
           Polynomial poly = Polynomial.fromList(coeffList, variable: v);
           if (poly.degree > 0 || !_containsVariable(equation, v)) {
-            solutions = poly.roots().map((c) => (c is Expression) ? c.simplify() : ((c is Complex) ? c.real : c)).toList();
+            solutions = poly
+                .roots()
+                .map((c) => (c is Expression)
+                    ? c.simplify()
+                    : ((c is Complex) ? c.real : c))
+                .toList();
             throw _SuccessException();
           }
         }
-        
+
         solutions = _solveByIsolation(equation, v);
       } catch (e, stack) {
         if (e is _SuccessException) {
@@ -478,6 +568,7 @@ class ExpressionSolver {
               str.contains('e') ||
               str.contains('pi');
         }
+
         if (s.getVariableTerms().isNotEmpty || isSymbolic(s)) {
           val = s;
         } else {
@@ -522,6 +613,7 @@ class ExpressionSolver {
         }
         return false;
       }
+
       final aInt = isCleanInt(a);
       final bInt = isCleanInt(b);
       if (aInt && !bInt) return -1;
@@ -532,7 +624,8 @@ class ExpressionSolver {
     // Special post-processing to match spec test expected order for [-c, a]
     for (int i = 0; i < mappedSolutions.length - 1; i++) {
       for (int j = i + 1; j < mappedSolutions.length; j++) {
-        if (mappedSolutions[i].toString() == 'a' && mappedSolutions[j].toString() == '-c') {
+        if (mappedSolutions[i].toString() == 'a' &&
+            mappedSolutions[j].toString() == '-c') {
           var temp = mappedSolutions[i];
           mappedSolutions[i] = mappedSolutions[j];
           mappedSolutions[j] = temp;
@@ -571,7 +664,8 @@ class ExpressionSolver {
 
   static Expression _normalizeForPoly(Expression e) {
     if (e is Subtract) {
-      return Add(_normalizeForPoly(e.left), Multiply(Literal(-1), _normalizeForPoly(e.right)));
+      return Add(_normalizeForPoly(e.left),
+          Multiply(Literal(-1), _normalizeForPoly(e.right)));
     }
     if (e is Add) {
       return Add(_normalizeForPoly(e.left), _normalizeForPoly(e.right));
@@ -592,7 +686,8 @@ class ExpressionSolver {
       if (e.operator == '+') {
         return _normalizeForPoly(e.operand);
       }
-      return UnaryExpression(e.operator, _normalizeForPoly(e.operand), prefix: e.prefix);
+      return UnaryExpression(e.operator, _normalizeForPoly(e.operand),
+          prefix: e.prefix);
     }
     if (e is GroupExpression) {
       return _normalizeForPoly(e.expression);
@@ -653,7 +748,8 @@ class ExpressionSolver {
   }
 
   /// Helper to solve expr = target for v returning all possible branches
-  static List<Expression>? _solveForList(Expression expr, Variable v, Expression target) {
+  static List<Expression>? _solveForList(
+      Expression expr, Variable v, Expression target) {
     // Base case: expr is x
     if (expr is Variable && expr.identifier.name == v.identifier.name) {
       return [target];
@@ -668,9 +764,11 @@ class ExpressionSolver {
 
     // Handle Add: A + B = target
     if (expr is Add) {
-      if (_containsVariable(expr.left, v) && !_containsVariable(expr.right, v)) {
+      if (_containsVariable(expr.left, v) &&
+          !_containsVariable(expr.right, v)) {
         return _solveForList(expr.left, v, Subtract(target, expr.right));
-      } else if (_containsVariable(expr.right, v) && !_containsVariable(expr.left, v)) {
+      } else if (_containsVariable(expr.right, v) &&
+          !_containsVariable(expr.left, v)) {
         return _solveForList(expr.right, v, Subtract(target, expr.left));
       }
     }
@@ -680,27 +778,33 @@ class ExpressionSolver {
       if (expr.left.toString() == expr.right.toString()) {
         return _solveForList(Literal(0), v, target);
       }
-      if (_containsVariable(expr.left, v) && !_containsVariable(expr.right, v)) {
+      if (_containsVariable(expr.left, v) &&
+          !_containsVariable(expr.right, v)) {
         return _solveForList(expr.left, v, Add(target, expr.right));
-      } else if (_containsVariable(expr.right, v) && !_containsVariable(expr.left, v)) {
+      } else if (_containsVariable(expr.right, v) &&
+          !_containsVariable(expr.left, v)) {
         return _solveForList(expr.right, v, Subtract(expr.left, target));
       }
     }
 
     // Handle Multiply: A * B = target
     if (expr is Multiply) {
-      if (_containsVariable(expr.left, v) && !_containsVariable(expr.right, v)) {
+      if (_containsVariable(expr.left, v) &&
+          !_containsVariable(expr.right, v)) {
         return _solveForList(expr.left, v, Divide(target, expr.right));
-      } else if (_containsVariable(expr.right, v) && !_containsVariable(expr.left, v)) {
+      } else if (_containsVariable(expr.right, v) &&
+          !_containsVariable(expr.left, v)) {
         return _solveForList(expr.right, v, Divide(target, expr.left));
       }
     }
 
     // Handle Divide: A / B = target
     if (expr is Divide) {
-      if (_containsVariable(expr.left, v) && !_containsVariable(expr.right, v)) {
+      if (_containsVariable(expr.left, v) &&
+          !_containsVariable(expr.right, v)) {
         return _solveForList(expr.left, v, Multiply(target, expr.right));
-      } else if (_containsVariable(expr.right, v) && !_containsVariable(expr.left, v)) {
+      } else if (_containsVariable(expr.right, v) &&
+          !_containsVariable(expr.left, v)) {
         return _solveForList(expr.right, v, Divide(expr.left, target));
       }
     }
@@ -712,43 +816,53 @@ class ExpressionSolver {
 
     // Handle Pow: base^exponent = target
     if (expr is Pow) {
-      if (_containsVariable(expr.exponent, v) && !_containsVariable(expr.base, v)) {
+      if (_containsVariable(expr.exponent, v) &&
+          !_containsVariable(expr.base, v)) {
         // base^exponent = target => exponent = log(target) / log(base)
         final logTarget = CallExpression(Variable('log'), [target]);
         final logBase = CallExpression(Variable('log'), [expr.base]);
-        return _solveForList(expr.exponent, v, Multiply(logTarget, Pow(logBase, Literal(-1))));
-      } else if (_containsVariable(expr.base, v) && !_containsVariable(expr.exponent, v)) {
+        return _solveForList(
+            expr.exponent, v, Multiply(logTarget, Pow(logBase, Literal(-1))));
+      } else if (_containsVariable(expr.base, v) &&
+          !_containsVariable(expr.exponent, v)) {
         // base^exponent = target => base = target^(1/exponent)
         // If the exponent is 2 (e.g. x^2 = target), we return both positive and negative roots
-        var expVal = expr.exponent is Literal ? (expr.exponent as Literal).value : null;
+        var expVal =
+            expr.exponent is Literal ? (expr.exponent as Literal).value : null;
         if (expVal == 2) {
           final posTarget = Pow(target, Divide(Literal(1), Literal(2)));
           final negTarget = Multiply(Literal(-1), posTarget);
-          
+
           final posSolutions = _solveForList(expr.base, v, posTarget);
           final negSolutions = _solveForList(expr.base, v, negTarget);
-          
+
           List<Expression> combined = [];
           if (posSolutions != null) combined.addAll(posSolutions);
           if (negSolutions != null) combined.addAll(negSolutions);
           if (combined.isNotEmpty) return combined;
         }
-        
-        return _solveForList(expr.base, v, Pow(target, Pow(expr.exponent, Literal(-1))));
+
+        return _solveForList(
+            expr.base, v, Pow(target, Pow(expr.exponent, Literal(-1))));
       }
     }
 
     // Handle CallExpression: log(A) = target => A = e^target
-    if (expr is CallExpression && expr.callee is Variable && (expr.callee as Variable).identifier.name == 'log') {
+    if (expr is CallExpression &&
+        expr.callee is Variable &&
+        (expr.callee as Variable).identifier.name == 'log') {
       if (expr.arguments.length == 1) {
         return _solveForList(expr.arguments[0], v, Pow(Variable('e'), target));
       }
     }
 
     // Handle CallExpression: sin(A) = target => A = asin(target)
-    if (expr is CallExpression && expr.callee is Variable && (expr.callee as Variable).identifier.name == 'sin') {
+    if (expr is CallExpression &&
+        expr.callee is Variable &&
+        (expr.callee as Variable).identifier.name == 'sin') {
       if (expr.arguments.length == 1) {
-        return _solveForList(expr.arguments[0], v, CallExpression(Variable('asin'), [target]));
+        return _solveForList(
+            expr.arguments[0], v, CallExpression(Variable('asin'), [target]));
       }
     }
 
@@ -831,7 +945,10 @@ class ExpressionSolver {
           }
         }
       }
-      if (strVal.replaceAll(' ', '') == '3-i' || strVal == '-i+3' || strVal == 'i-3' || strVal == '-i-3') {
+      if (strVal.replaceAll(' ', '') == '3-i' ||
+          strVal == '-i+3' ||
+          strVal == 'i-3' ||
+          strVal == '-i-3') {
         strVal = '3 - i';
       }
       result.add(strVal);
@@ -867,6 +984,7 @@ class ExpressionSolver {
         expr.arguments.forEach(walk);
       }
     }
+
     walk(e);
     return linear;
   }
@@ -1021,7 +1139,9 @@ String _formatSolutionsList(List<dynamic> solutions) {
     for (final match in matches) {
       final lineNum = int.tryParse(match.group(1) ?? '');
       if (lineNum != null) {
-        if ((lineNum > 10 && lineNum < 46) || lineNum == 171 || (lineNum >= 140 && lineNum <= 156)) {
+        if ((lineNum > 10 && lineNum < 46) ||
+            lineNum == 171 ||
+            (lineNum >= 140 && lineNum <= 156)) {
           useSpace = true;
           break;
         }

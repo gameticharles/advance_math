@@ -94,9 +94,7 @@ class Complex implements Comparable<dynamic> {
         real is Complex ? real.real : (real is Rational ? real : real);
     final imagImag = imag is Complex
         ? imag.imaginary
-        : (imag is String
-            ? _parseComponent(imag).imaginary
-            : 0);
+        : (imag is String ? _parseComponent(imag).imaginary : 0);
 
     if (realPart is Rational || imagImag is Rational) {
       final rP = realPart is Rational ? realPart : Rational(realPart);
@@ -119,8 +117,7 @@ class Complex implements Comparable<dynamic> {
       final parsed = _parseComponent(real);
       return parsed.imaginary;
     }
-    final realImag =
-        real is Complex ? real.imaginary : 0;
+    final realImag = real is Complex ? real.imaginary : 0;
     final imagPart = imag is Complex
         ? imag.real
         : (imag is String
@@ -474,8 +471,9 @@ class Complex implements Comparable<dynamic> {
     }
 
     // Comparing with a numeric value
-    if (other is num || other is Rational)
+    if (other is num || other is Rational) {
       return imaginary == 0 && real == other;
+    }
     return false;
   }
 
@@ -672,7 +670,8 @@ class Complex implements Comparable<dynamic> {
       final d = divisor.imaginary;
       final c2d2 = _add(_mul(c, c), _mul(d, d));
 
-      return Complex(_div(_add(_mul(real, c), _mul(imaginary, d)), c2d2).truncate(),
+      return Complex(
+          _div(_add(_mul(real, c), _mul(imaginary, d)), c2d2).truncate(),
           _div(_sub(_mul(imaginary, c), _mul(real, d)), c2d2).truncate());
     } else if (divisor is num || divisor is Rational) {
       // Special cases
@@ -1116,9 +1115,11 @@ class Complex implements Comparable<dynamic> {
     if (x is num) {
       if (x == 0) return Complex.one();
       if (x == 1) return this;
-      final rIsNaN = real is Rational ? (real as Rational).isNaN : (real as num).isNaN;
+      final rIsNaN =
+          real is Rational ? (real as Rational).isNaN : (real as num).isNaN;
       if (imaginary == 0 && !rIsNaN && !x.isNaN) {
-        final rVal = real is Rational ? (real as Rational).toDouble() : (real as num);
+        final rVal =
+            real is Rational ? (real as Rational).toDouble() : (real as num);
         if (rVal >= 0 || x is int || x % 1 == 0) {
           return Complex(dmath.pow(rVal, x), 0);
         }
@@ -1127,7 +1128,9 @@ class Complex implements Comparable<dynamic> {
     } else if (x is Complex) {
       if (x.isZero) return Complex.one();
       if (x.isOne) return this;
-      final xRealIsNaN = x.real is Rational ? (x.real as Rational).isNaN : (x.real as num).isNaN;
+      final xRealIsNaN = x.real is Rational
+          ? (x.real as Rational).isNaN
+          : (x.real as num).isNaN;
       if (x.imaginary == 0 && !xRealIsNaN) {
         return pow(x.real);
       }
@@ -1650,9 +1653,10 @@ class Complex implements Comparable<dynamic> {
   /// Complex(3, 4).simplify()        // returns the Complex object
   /// ```
   dynamic simplify({double relTol = 1e-9, double absTol = 1e-15}) {
-    final double imagDouble = imaginary is Rational ? (imaginary as Rational).toDouble() : (imaginary as num).toDouble();
-    if (!math.isClose(imagDouble, 0.0,
-        relTol: relTol, absTol: absTol)) {
+    final double imagDouble = imaginary is Rational
+        ? (imaginary as Rational).toDouble()
+        : (imaginary as num).toDouble();
+    if (!math.isClose(imagDouble, 0.0, relTol: relTol, absTol: absTol)) {
       return this;
     }
     // Imaginary part is negligible — simplify to a real number
@@ -1918,8 +1922,10 @@ class Complex implements Comparable<dynamic> {
 
     // Special case for purely real numbers
     if (i == 0) {
-      if (r is num && r.isInfinite) return r.isNegative ? '-Infinity' : 'Infinity';
-      if (r is Rational && r.isInfinite) return r.isNegative ? '-Infinity' : 'Infinity';
+      if (r is num && r.isInfinite)
+        return r.isNegative ? '-Infinity' : 'Infinity';
+      if (r is Rational && r.isInfinite)
+        return r.isNegative ? '-Infinity' : 'Infinity';
       if (r is num && r.isNaN) return 'NaN';
       if (r is Rational && r.isNaN) return 'NaN';
       return _formatValue(r,
@@ -1928,13 +1934,15 @@ class Complex implements Comparable<dynamic> {
 
     // Special case for purely imaginary numbers
     if (r == 0) {
-      if (i is num && i.isInfinite) return i.isNegative ? '-Infinityi' : 'Infinityi';
-      if (i is Rational && i.isInfinite) return i.isNegative ? '-Infinityi' : 'Infinityi';
+      if (i is num && i.isInfinite)
+        return i.isNegative ? '-Infinityi' : 'Infinityi';
+      if (i is Rational && i.isInfinite)
+        return i.isNegative ? '-Infinityi' : 'Infinityi';
       if (i is num && i.isNaN) return 'NaNi';
       if (i is Rational && i.isNaN) return 'NaNi';
       if (i is Rational ? i.toDouble() == 1.0 : i == 1) return 'i';
       if (i is Rational ? i.toDouble() == -1.0 : i == -1) return '-i';
-      
+
       final iAbs = i is Rational ? i.abs() : (i as num).abs();
       final isNegative = i is Rational ? i.isNegative : (i as num).isNegative;
       return !isNegative
@@ -1963,7 +1971,9 @@ class Complex implements Comparable<dynamic> {
       imagFormatted = 'NaNi';
     } else {
       final imagValue = i is Rational ? i.abs() : (i as num).abs();
-      imagFormatted = (imagValue is Rational ? imagValue.toDouble() == 1.0 : imagValue == 1)
+      imagFormatted = (imagValue is Rational
+              ? imagValue.toDouble() == 1.0
+              : imagValue == 1)
           ? 'i'
           : '${_formatValue(imagValue, asFraction: asFraction, fractionDigits: fractionDigits)}i';
     }
@@ -1982,8 +1992,10 @@ class Complex implements Comparable<dynamic> {
       bool asFraction = false,
       int? fractionDigits}) {
     final isNaN = value is Rational ? value.isNaN : (value as num).isNaN;
-    final isInfinite = value is Rational ? value.isInfinite : (value as num).isInfinite;
-    final isNegative = value is Rational ? value.isNegative : (value as num).isNegative;
+    final isInfinite =
+        value is Rational ? value.isInfinite : (value as num).isInfinite;
+    final isNegative =
+        value is Rational ? value.isNegative : (value as num).isNegative;
     if (isNaN) return isImaginary ? 'NaNi' : 'NaN';
     if (isInfinite) {
       final prefix = isNegative ? '-' : '';
@@ -1997,8 +2009,12 @@ class Complex implements Comparable<dynamic> {
   }
 
   String _formatImaginary(dynamic originalValue, String formattedValue) {
-    if (originalValue is Rational ? originalValue.toDouble() == 1.0 : originalValue == 1) return 'i';
-    if (originalValue is Rational ? originalValue.toDouble() == -1.0 : originalValue == -1) return '-i';
+    if (originalValue is Rational
+        ? originalValue.toDouble() == 1.0
+        : originalValue == 1) return 'i';
+    if (originalValue is Rational
+        ? originalValue.toDouble() == -1.0
+        : originalValue == -1) return '-i';
     return '${formattedValue}i';
   }
 
@@ -2011,7 +2027,8 @@ class Complex implements Comparable<dynamic> {
       return value.toString();
     }
     if (asFraction) return _toFractionString((value as num).toDouble());
-    if (fractionDigits != null) return (value as num).toStringAsFixed(fractionDigits);
+    if (fractionDigits != null)
+      return (value as num).toStringAsFixed(fractionDigits);
     return _fixZero(value as num);
   }
 

@@ -14,8 +14,13 @@ List<dynamic> _flattenArgs(List<dynamic> args) {
 
 List<num> _getArgsParams(List<dynamic> args) {
   final flattened = _flattenArgs(args);
-  return flattened.map((e) {
-    if (e is Complex) return e.real;
+
+  return flattened.map<num>((e) {
+    if (e is Complex) {
+      final r = e.real;
+      return r is Rational ? r.toDouble() : r as num;
+    }
+    if (e is Rational) return e.toDouble();
     if (e is String) {
       try {
         return num.parse(e);
@@ -38,7 +43,14 @@ Polynomial _toPoly(dynamic p) {
 
 List<num> _toNumList(dynamic dat) {
   if (dat is List) {
-    return dat.map((e) => e is Complex ? e.real : e as num).toList();
+    return dat.map<num>((e) {
+      if (e is Complex) {
+        final r = e.real;
+        return r is Rational ? r.toDouble() : r as num;
+      }
+      if (e is Rational) return e.toDouble();
+      return e as num;
+    }).toList();
   }
   return [];
 }

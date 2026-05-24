@@ -135,14 +135,23 @@ extension ComplexOperationX<T extends Complex> on T {
     if (x is num) {
       if (x == 0) return Complex.one();
       if (x == 1) return this;
-      if (imaginary == 0 && !real.isNaN && !x.isNaN) {
-        return Complex(math.pow(real, x), 0);
+      final rIsNaN =
+          real is Rational ? (real as Rational).isNaN : (real as num).isNaN;
+      if (imaginary == 0 && !rIsNaN && !x.isNaN) {
+        final rVal =
+            real is Rational ? (real as Rational).toDouble() : (real as num);
+        if (rVal >= 0 || x is int || x % 1 == 0) {
+          return Complex(math.pow(rVal, x), 0);
+        }
       }
       return (log() * x).exp();
     } else if (x is Complex) {
       if (x.isZero) return Complex.one();
       if (x.isOne) return this;
-      if (x.imaginary == 0 && !x.real.isNaN) {
+      final xRealIsNaN = x.real is Rational
+          ? (x.real as Rational).isNaN
+          : (x.real as num).isNaN;
+      if (x.imaginary == 0 && !xRealIsNaN) {
         return pow(x.real);
       }
       return (log() * x).exp();
@@ -204,16 +213,35 @@ extension ComplexOperationX<T extends Complex> on T {
   /// print(z_ln); // Output: 1.0 + 0.0i
   /// ```
   Complex ln() {
-    return Complex(math.log(magnitude), angle);
+    return Complex(math.log(magnitude), angle.real);
   }
 
   num abs() {
-    if (real.isNaN || imaginary.isNaN) return double.nan;
-    if (real.isInfinite || imaginary.isInfinite) return double.infinity;
+    final isRealNaN =
+        real is Rational ? (real as Rational).isNaN : (real as num).isNaN;
+    final isImagNaN = imaginary is Rational
+        ? (imaginary as Rational).isNaN
+        : (imaginary as num).isNaN;
+    if (isRealNaN || isImagNaN) return double.nan;
+
+    final isRealInf = real is Rational
+        ? (real as Rational).isInfinite
+        : (real as num).isInfinite;
+    final isImagInf = imaginary is Rational
+        ? (imaginary as Rational).isInfinite
+        : (imaginary as num).isInfinite;
+    if (isRealInf || isImagInf) return double.infinity;
 
     // Handle potential overflow in a more robust way
-    final a = real.abs();
-    final b = imaginary.abs();
+    final rNum =
+        real is Rational ? (real as Rational).toDouble() : (real as num);
+    final iNum = imaginary is Rational
+        ? (imaginary as Rational).toDouble()
+        : (imaginary as num);
+
+    final a = rNum.abs();
+    final b = iNum.abs();
+
     if (a == 0) return b;
     if (b == 0) return a;
 
@@ -226,7 +254,7 @@ extension ComplexOperationX<T extends Complex> on T {
     // }
 
     // Magnitude is always a real number: sqrt(a^2 + b^2)
-    final value = dmath.sqrt(real * real + imaginary * imaginary);
+    final value = dmath.sqrt(a * a + b * b);
     return value.toInt() == value ? value.toInt() : value;
   }
 
@@ -254,7 +282,7 @@ extension ComplexOperationX<T extends Complex> on T {
     // Handle zero case
     if (isZero) return Complex(double.negativeInfinity, 0);
     // Handle other cases
-    return Complex(math.log(abs()), argument);
+    return Complex(math.log(abs()), argument.real);
   }
 
   // ============================================================
