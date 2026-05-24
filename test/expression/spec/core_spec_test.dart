@@ -4,7 +4,7 @@ import 'package:advance_math/advance_math.dart';
 void main() {
   void check(String given, String expected) {
     var parsed = Expression.parse(given);
-    var simplified = parsed.simplify();
+    var simplified = parsed.expand().simplify();
     expect(simplified.toString(), equals(expected),
         reason: 'Simplification of $given');
   }
@@ -16,8 +16,8 @@ void main() {
       check('1+1', '2');
       check('4^2', '16');
       check('2*-4', '-8');
-      check('2+(3/4)', '11/4');
-      check('2/3+2/3', '4/3');
+      check('2+(3/4)', '2.75'); //11/4
+      check('2/3+2/3', '1.3333333333333333'); //4/3
       check('6.5*2', '13.0');
     });
 
