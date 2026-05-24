@@ -60,11 +60,14 @@ class Rhombus extends PlaneGeometry {
       // Calculate diagonals using the formula:
       // d1 = 2 * side * sin(angle1/2)
       // d2 = 2 * side * cos(angle1/2)
-      diagonal1 = 2 * side! * sin(angle1!.rad / 2);
-      diagonal2 = 2 * side! * cos(angle1!.rad / 2);
+      var sinVal1 = sin(angle1!.rad / 2);
+      var cosVal1 = cos(angle1!.rad / 2);
+      diagonal1 = 2 * side! * (sinVal1 is Complex ? sinVal1.real.toDouble() : (sinVal1 as num).toDouble());
+      diagonal2 = 2 * side! * (cosVal1 is Complex ? cosVal1.real.toDouble() : (cosVal1 as num).toDouble());
 
       // Calculate height
-      _height = side! * sin(angle1!.rad);
+      var sinVal2 = sin(angle1!.rad);
+      _height = side! * (sinVal2 is Complex ? sinVal2.real.toDouble() : (sinVal2 as num).toDouble());
     }
   }
 
@@ -82,10 +85,12 @@ class Rhombus extends PlaneGeometry {
     diagonal2 = d2;
 
     // Calculate side using Pythagorean theorem (diagonals bisect each other)
-    side = sqrt((d1 / 2) * (d1 / 2) + (d2 / 2) * (d2 / 2));
+    var valSide = sqrt((d1 / 2) * (d1 / 2) + (d2 / 2) * (d2 / 2));
+    side = valSide is Complex ? valSide.real.toDouble() : (valSide as num).toDouble();
 
     // Calculate angles using arctangent
-    double halfAngle1 = atan(d1 / d2);
+    var valAngle = atan(d1 / d2);
+    double halfAngle1 = valAngle is Complex ? valAngle.real.toDouble() : (valAngle as num).toDouble();
     angle1 = Angle(rad: 2 * halfAngle1);
     angle2 = Angle(deg: 180 - angle1!.deg);
 
@@ -127,7 +132,8 @@ class Rhombus extends PlaneGeometry {
     diagonal2 = vertices[1].distanceTo(vertices[3]);
 
     // Calculate angles
-    double halfAngle1 = atan(diagonal1! / diagonal2!);
+    var valAngle = atan(diagonal1! / diagonal2!);
+    double halfAngle1 = valAngle is Complex ? valAngle.real.toDouble() : (valAngle as num).toDouble();
     angle1 = Angle(rad: 2 * halfAngle1);
     angle2 = Angle(deg: 180 - angle1!.deg);
 
@@ -148,7 +154,9 @@ class Rhombus extends PlaneGeometry {
   double get height {
     if (_height != null) return _height!;
     if (angle1 != null && side != null) {
-      return side! * sin(angle1!.rad);
+      var sinVal = sin(angle1!.rad);
+      var doubleSin = sinVal is Complex ? sinVal.real.toDouble() : (sinVal as num).toDouble();
+      return side! * doubleSin;
     }
     throw StateError('Cannot calculate height: insufficient data');
   }

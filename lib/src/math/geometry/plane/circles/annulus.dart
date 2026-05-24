@@ -144,9 +144,12 @@ class Annulus extends PlaneGeometry {
   /// Calculates the diagonal (d) of a sector of the annulus for a given central angle (phi) in radians.
   ///
   /// Uses the same formula as sectorDiagonal for clarity.
-  double get sectorDiagonal => sqrt(outerRadius * outerRadius +
-      innerRadius * innerRadius -
-      2 * outerRadius * innerRadius * centralAngle!.cos());
+  double get sectorDiagonal {
+    var result = sqrt(outerRadius * outerRadius +
+        innerRadius * innerRadius -
+        2 * outerRadius * innerRadius * centralAngle!.cos());
+    return result is Complex ? result.real.toDouble() : (result as num).toDouble();
+  }
 
   /// Computes the central angle (phi) of a sector of an annulus based on the provided parameters.
   ///
@@ -271,8 +274,9 @@ class Annulus extends PlaneGeometry {
     } else if (sectorArea != null &&
         outerRadius != null &&
         centralAngle != null) {
-      return sqrt(
+      var result = sqrt(
           (outerRadius * outerRadius) - (2 * sectorArea) / centralAngle.rad);
+      return result is Complex ? result.real.toDouble() : (result as num).toDouble();
     } else if (interiorCircumference != null && centralAngle != null) {
       return interiorCircumference / centralAngle.rad;
     } else if (interiorCircumference != null) {
@@ -280,7 +284,8 @@ class Annulus extends PlaneGeometry {
     } else if (area != null && perimeter != null) {
       return (perimeter / (4 * pi) - (area / perimeter));
     } else if (area != null && outerRadius != null) {
-      return sqrt((outerRadius * outerRadius) - (area / pi));
+      var result = sqrt((outerRadius * outerRadius) - (area / pi));
+      return result is Complex ? result.real.toDouble() : (result as num).toDouble();
     } else if (perimeter != null && outerRadius != null) {
       return (perimeter / (2 * pi)) - outerRadius;
     } else if (area != null && width != null) {
@@ -345,8 +350,9 @@ class Annulus extends PlaneGeometry {
     } else if (sectorArea != null &&
         innerRadius != null &&
         centralAngle != null) {
-      return sqrt(
+      var result = sqrt(
           (2 * sectorArea) / centralAngle.rad + innerRadius * innerRadius);
+      return result is Complex ? result.real.toDouble() : (result as num).toDouble();
     } else if (exteriorCircumference != null && centralAngle != null) {
       return exteriorCircumference / centralAngle.rad;
     } else if (exteriorCircumference != null) {
@@ -354,7 +360,8 @@ class Annulus extends PlaneGeometry {
     } else if (area != null && perimeter != null) {
       return (perimeter / (4 * pi) + (area / perimeter));
     } else if (area != null && innerRadius != null) {
-      return sqrt((area / pi) + (innerRadius * innerRadius));
+      var result = sqrt((area / pi) + (innerRadius * innerRadius));
+      return result is Complex ? result.real.toDouble() : (result as num).toDouble();
     } else if (perimeter != null && innerRadius != null) {
       return (perimeter / (2 * pi)) - innerRadius;
     } else if (area != null && width != null) {

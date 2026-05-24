@@ -125,7 +125,7 @@ class Pentagon extends Polygon {
   /// Area = (1/4)√(25 + 10√5) × side²
   @override
   double area() {
-    return 0.25 * sqrt(25 + 10 * sqrt(5)) * side * side;
+    return 0.25 * dmath.sqrt(25 + 10 * dmath.sqrt(5)) * side * side;
   }
 
   /// Calculates the perimeter of the pentagon.

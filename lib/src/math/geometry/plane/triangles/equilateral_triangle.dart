@@ -163,17 +163,29 @@ class EquilateralTriangle extends Triangle {
   /// Gets the height of the equilateral triangle.
   ///
   /// Height = (√3/2) × side
-  double get height => (sqrt(3) / 2) * side;
+  double get height {
+    var s3 = sqrt(3);
+    double sqrt3 = s3 is Complex ? s3.real.toDouble() : (s3 as num).toDouble();
+    return (sqrt3 / 2) * side;
+  }
 
   /// Gets the inradius (radius of inscribed circle).
   ///
   /// For an equilateral triangle: inradius = side / (2√3)
-  double get inRadius => side / (2 * sqrt(3));
+  double get inRadius {
+    var s3 = sqrt(3);
+    double sqrt3 = s3 is Complex ? s3.real.toDouble() : (s3 as num).toDouble();
+    return side / (2 * sqrt3);
+  }
 
   /// Gets the circumradius (radius of circumscribed circle).
   ///
   /// For an equilateral triangle: circumradius = side / √3
-  double get circumRadius => side / sqrt(3);
+  double get circumRadius {
+    var s3 = sqrt(3);
+    double sqrt3 = s3 is Complex ? s3.real.toDouble() : (s3 as num).toDouble();
+    return side / sqrt3;
+  }
 
   @override
   String toString() {

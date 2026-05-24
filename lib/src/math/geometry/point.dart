@@ -318,9 +318,11 @@ class Point extends Vector {
     var dy = otherPoint.y - y;
     if (z != null && otherPoint.z != null) {
       var dz = otherPoint.z! - z!;
-      return sqrt(dx * dx + dy * dy + dz * dz);
+      var result = sqrt(dx * dx + dy * dy + dz * dz);
+      return result is Complex ? result.real.toDouble() : (result as num).toDouble();
     } else {
-      return sqrt(dx * dx + dy * dy);
+      var result = sqrt(dx * dx + dy * dy);
+      return result is Complex ? result.real.toDouble() : (result as num).toDouble();
     }
   }
 
@@ -529,14 +531,15 @@ class Point extends Vector {
   ///
   /// Returns the distance as a `double`.
   double distanceToLine(Point linePoint1, Point linePoint2) {
-    var num = ((linePoint2.y - linePoint1.y) * x -
+    var numVal = ((linePoint2.y - linePoint1.y) * x -
             (linePoint2.x - linePoint1.x) * y +
             linePoint2.x * linePoint1.y -
             linePoint2.y * linePoint1.x)
         .abs();
     var den = sqrt(pow(linePoint2.y - linePoint1.y, 2) +
         pow(linePoint2.x - linePoint1.x, 2));
-    return num / den;
+    var result = numVal / den;
+    return result is Complex ? result.real.toDouble() : (result as num).toDouble();
   }
 
   /// Computes the bearing from this point to another point.
@@ -599,7 +602,7 @@ class Point extends Vector {
   /// Returns the distance as a `double`.
   double distanceToCircle(Point center, double radius) {
     var distanceToCenter = distanceTo(center);
-    return max(0, distanceToCenter - radius);
+    return dmath.max(0.0, distanceToCenter - radius);
   }
 
   /// Calculates the shortest distance from this point to a polyline, which is a
@@ -617,7 +620,7 @@ class Point extends Vector {
     var minDistance = double.infinity;
     for (var i = 0; i < polyline.length - 1; i++) {
       var distance = distanceToLine(polyline[i], polyline[i + 1]);
-      minDistance = min(minDistance, distance);
+      minDistance = dmath.min(minDistance, distance);
     }
     return minDistance;
   }

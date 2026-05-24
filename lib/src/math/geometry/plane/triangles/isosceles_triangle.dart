@@ -84,7 +84,8 @@ class IsoscelesTriangle extends Triangle {
     if (base <= 0) throw ArgumentError('Base must be positive');
 
     double height = (2 * area) / base;
-    double equalSide = sqrt(height * height + (base / 2) * (base / 2));
+    var val = sqrt(height * height + (base / 2) * (base / 2));
+    double equalSide = val is Complex ? val.real.toDouble() : (val as num).toDouble();
 
     return IsoscelesTriangle(equalSide, base);
   }
@@ -138,7 +139,8 @@ class IsoscelesTriangle extends Triangle {
   /// This uses the Pythagorean theorem:
   /// height = √(equalSide² - (base/2)²)
   double get heightToBase {
-    return sqrt(equalSide * equalSide - (baseLength / 2) * (baseLength / 2));
+    var result = sqrt(equalSide * equalSide - (baseLength / 2) * (baseLength / 2));
+    return result is Complex ? result.real.toDouble() : (result as num).toDouble();
   }
 
   /// Gets the median from the apex to the base.

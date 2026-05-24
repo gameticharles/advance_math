@@ -916,7 +916,9 @@ class Complex implements Comparable<dynamic> {
   /// Complex modulus represents the magnitude of this complex number in the complex plane.
   /// Synonymous with abs().
   Complex get complexModulus {
-    final value = dmath.sqrt(real * real + imaginary * imaginary);
+    final double r = real is Rational ? (real as Rational).toDouble() : (real as num).toDouble();
+    final double i = imaginary is Rational ? (imaginary as Rational).toDouble() : (imaginary as num).toDouble();
+    final value = dmath.sqrt(r * r + i * i);
     return Complex(value);
   }
 
@@ -927,7 +929,11 @@ class Complex implements Comparable<dynamic> {
   Complex get absoluteSquare => complexModulus * complexModulus;
 
   /// In radians.
-  Complex get complexArgument => Complex(dmath.atan2(imaginary, real));
+  Complex get complexArgument {
+    final double r = real is Rational ? (real as Rational).toDouble() : (real as num).toDouble();
+    final double i = imaginary is Rational ? (imaginary as Rational).toDouble() : (imaginary as num).toDouble();
+    return Complex(dmath.atan2(i, r));
+  }
 
   /// Phase is synonymous with complex argument.
   Complex get phase => complexArgument;
@@ -942,10 +948,10 @@ class Complex implements Comparable<dynamic> {
   num get magnitude {
     if (real.isNaN || imaginary.isNaN) return double.nan;
     if (real.isInfinite || imaginary.isInfinite) return double.infinity;
-    final a = real.abs();
-    final b = imaginary.abs();
-    if (b == 0) return a.toDouble();
-    if (a == 0) return b.toDouble();
+    final double a = real is Rational ? (real as Rational).toDouble().abs() : (real as num).toDouble().abs();
+    final double b = imaginary is Rational ? (imaginary as Rational).toDouble().abs() : (imaginary as num).toDouble().abs();
+    if (b == 0) return a;
+    if (a == 0) return b;
     if (a > b) {
       final r = b / a;
       return a * dmath.sqrt(1 + r * r);
@@ -1154,13 +1160,19 @@ class Complex implements Comparable<dynamic> {
     // Handle zero case
     if (isZero) return Complex.zero();
 
-    final t = dmath.sqrt((abs().real + real.abs()) / 2.0);
-    if (real >= 0.0) {
-      return Complex(t, imaginary / (2.0 * t));
+    final double realVal = real is Rational ? (real as Rational).toDouble() : (real as num).toDouble();
+    final double absReal = realVal.abs();
+    final double absVal = abs().real is Rational ? (abs().real as Rational).toDouble() : (abs().real as num).toDouble();
+
+    final t = dmath.sqrt((absVal + absReal) / 2.0);
+    final double imaginaryVal = imaginary is Rational ? (imaginary as Rational).toDouble() : (imaginary as num).toDouble();
+
+    if (realVal >= 0.0) {
+      return Complex(t, imaginaryVal / (2.0 * t));
     } else {
-      final sign = imaginary >= 0 ? 1 : -1;
+      final sign = imaginaryVal >= 0 ? 1 : -1;
       return Complex(
-        imaginary.abs() / (2.0 * t),
+        imaginaryVal.abs() / (2.0 * t),
         sign * t,
       );
     }
@@ -1226,9 +1238,8 @@ class Complex implements Comparable<dynamic> {
     if (real.isNaN || imaginary.isNaN) return Complex.nan();
     if (real.isInfinite || imaginary.isInfinite) return Complex.infinity();
 
-    // Handle potential overflow in a more robust way
-    final a = real.abs();
-    final b = imaginary.abs();
+    final double a = real is Rational ? (real as Rational).toDouble().abs() : (real as num).toDouble().abs();
+    final double b = imaginary is Rational ? (imaginary as Rational).toDouble().abs() : (imaginary as num).toDouble().abs();
     if (a == 0) return Complex(b);
     if (b == 0) return Complex(a);
 

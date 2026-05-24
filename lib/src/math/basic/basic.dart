@@ -771,7 +771,8 @@ bool isPrime(dynamic number, [int certainty = 12]) {
     if (n <= BigInt.from(3)) {
       return true;
     }
-    if (n % BigInt.from(2) == BigInt.zero || n % BigInt.from(3) == BigInt.zero) {
+    if (n % BigInt.from(2) == BigInt.zero ||
+        n % BigInt.from(3) == BigInt.zero) {
       return false;
     }
 

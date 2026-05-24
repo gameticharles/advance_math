@@ -54,7 +54,7 @@ class Hexagon extends Polygon {
   /// Calculates side from: side = √(2A / (3√3))
   factory Hexagon.fromArea({required double area, Point? center}) {
     if (area <= 0) throw ArgumentError('Area must be positive');
-    double side = sqrt((2 * area) / (3 * sqrt(3)));
+    double side = dmath.sqrt((2 * area) / (3 * dmath.sqrt(3)));
     return Hexagon(side, center: center);
   }
 
@@ -80,7 +80,7 @@ class Hexagon extends Polygon {
   /// Calculates side = (2/√3) × inradius
   factory Hexagon.fromInradius({required double inradius, Point? center}) {
     if (inradius <= 0) throw ArgumentError('Inradius must be positive');
-    double side = (2 / sqrt(3)) * inradius;
+    double side = (2 / dmath.sqrt(3)) * inradius;
     return Hexagon(side, center: center);
   }
 
@@ -101,7 +101,7 @@ class Hexagon extends Polygon {
   /// Gets the inradius (radius of inscribed circle).
   ///
   /// inradius = (√3/2) × side
-  double get inRadius => (sqrt(3) / 2) * side;
+  double get inRadius => (dmath.sqrt(3) / 2) * side;
 
   /// Gets the diagonal (long diagonal connecting opposite vertices).
   ///
@@ -111,7 +111,7 @@ class Hexagon extends Polygon {
   /// Gets the short diagonal (connecting vertices separated by one vertex).
   ///
   /// short diagonal = √3 × side
-  double get shortDiagonal => sqrt(3) * side;
+  double get shortDiagonal => dmath.sqrt(3) * side;
 
   /// Gets the apothem (distance from center to midpoint of a side).
   ///
@@ -128,7 +128,7 @@ class Hexagon extends Polygon {
   /// Area = (3√3/2) × side²
   @override
   double area() {
-    return (3 * sqrt(3) / 2) * side * side;
+    return (3 * dmath.sqrt(3) / 2) * side * side;
   }
 
   /// Calculates the perimeter of the hexagon.

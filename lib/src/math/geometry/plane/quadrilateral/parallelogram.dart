@@ -30,8 +30,14 @@ class Parallelogram extends PlaneGeometry {
     if (height1 == null && angle1 == null) {
       throw ArgumentError('Either height or angle must be provided.');
     }
-    height1 ??= side * sin(angle1!);
-    angle1 ??= asin(height1! / side);
+    if (height1 == null) {
+      var val = side * sin(angle1!);
+      height1 = val is Complex ? val.real.toDouble() : (val as num).toDouble();
+    }
+    if (angle1 == null) {
+      var val = asin(height1! / side);
+      angle1 = val is Complex ? val.real.toDouble() : (val as num).toDouble();
+    }
   }
 
   /// Named constructor to create a Parallelogram from various parameters.
@@ -125,7 +131,8 @@ class Parallelogram extends PlaneGeometry {
   /// Returns the area as a [double].
   @override
   double area() {
-    return base.toDouble() * (side * sin(angle1!));
+    var val = base.toDouble() * (side * sin(angle1!));
+    return val is Complex ? val.real.toDouble() : (val as num).toDouble();
   }
 
   /// Calculates the perimeter of the Parallelogram.
@@ -142,7 +149,8 @@ class Parallelogram extends PlaneGeometry {
   /// Uses the law of cosines to find the diagonal length.
   /// Returns the length of the first diagonal as a [double].
   double diagonal1() {
-    return sqrt(base * base + side * side - 2 * base * side * cos(angle1!));
+    var result = sqrt(base * base + side * side - 2 * base * side * cos(angle1!));
+    return result is Complex ? result.real.toDouble() : (result as num).toDouble();
   }
 
   /// Calculates the length of the second diagonal of the Parallelogram.
@@ -151,7 +159,8 @@ class Parallelogram extends PlaneGeometry {
   /// Returns the length of the second diagonal as a [double].
   double diagonal2() {
     double angleBeta = pi - angle1!;
-    return sqrt(base * base + side * side - 2 * base * side * cos(angleBeta));
+    var result = sqrt(base * base + side * side - 2 * base * side * cos(angleBeta));
+    return result is Complex ? result.real.toDouble() : (result as num).toDouble();
   }
 
   /// Calculates the angles between the sides of the Parallelogram.
@@ -166,7 +175,8 @@ class Parallelogram extends PlaneGeometry {
   ///
   /// Returns a list of angles in radians.
   ({Angle a, Angle b}) anglesBetweenDiagonals() {
-    double yeta = asin((2 * area()) / (diagonal1() * diagonal2()));
+    var val = asin((2 * area()) / (diagonal1() * diagonal2()));
+    double yeta = val is Complex ? val.real.toDouble() : (val as num).toDouble();
 
     return (a: Angle(rad: yeta), b: Angle(rad: pi - yeta));
   }

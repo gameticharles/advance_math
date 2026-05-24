@@ -26,7 +26,9 @@ class Rectangle extends PlaneGeometry {
             (perimeter != null && width != null
                 ? (perimeter / 2) - width
                 : diagonal != null && width != null
-                    ? sqrt(diagonal * diagonal - width * width)
+                    ? (sqrt(diagonal * diagonal - width * width) is Complex
+                        ? (sqrt(diagonal * diagonal - width * width) as Complex).real.toDouble()
+                        : (sqrt(diagonal * diagonal - width * width) as num).toDouble())
                     : area != null && width != null
                         ? area / width
                         : throw ArgumentError(
@@ -35,7 +37,9 @@ class Rectangle extends PlaneGeometry {
             (perimeter != null && length != null
                 ? (perimeter / 2) - length
                 : diagonal != null && length != null
-                    ? sqrt(diagonal * diagonal - length * length)
+                    ? (sqrt(diagonal * diagonal - length * length) is Complex
+                        ? (sqrt(diagonal * diagonal - length * length) as Complex).real.toDouble()
+                        : (sqrt(diagonal * diagonal - length * length) as num).toDouble())
                     : area != null && length != null
                         ? area / length
                         : throw ArgumentError(
@@ -61,8 +65,10 @@ class Rectangle extends PlaneGeometry {
     if (area <= 0) throw ArgumentError('Area must be positive');
     if (aspectRatio <= 0) throw ArgumentError('Aspect ratio must be positive');
 
-    double length = sqrt(area * aspectRatio);
-    double width = sqrt(area / aspectRatio);
+    var lenVal = sqrt(area * aspectRatio);
+    double length = lenVal is Complex ? lenVal.real.toDouble() : (lenVal as num).toDouble();
+    var widVal = sqrt(area / aspectRatio);
+    double width = widVal is Complex ? widVal.real.toDouble() : (widVal as num).toDouble();
     return Rectangle(length, width);
   }
 
@@ -80,7 +86,8 @@ class Rectangle extends PlaneGeometry {
   ///
   /// The diagonal length is calculated using the Pythagorean theorem, taking the square root of the sum of the squares of the length and width.
   double diagonal() {
-    return sqrt(length * length + width * width);
+    var result = sqrt(length * length + width * width);
+    return result is Complex ? result.real.toDouble() : (result as num).toDouble();
   }
 
   /// Calculates the ratio of the perimeter to twice the diagonal of the rectangle.
@@ -118,9 +125,11 @@ class Rectangle extends PlaneGeometry {
   /// The returned value is a map with two keys, 'a' and 'b', each containing an [Angle] instance
   /// representing the angles between the diagonals.
   ({Angle a, Angle b}) anglesBetweenDiagonals() {
+    var atanA = atan(width / length);
+    var atanB = atan(length / width);
     return (
-      a: Angle(rad: atan(width / length)),
-      b: Angle(rad: atan(length / width)),
+      a: Angle(rad: atanA is Complex ? atanA.real.toDouble() : (atanA as num).toDouble()),
+      b: Angle(rad: atanB is Complex ? atanB.real.toDouble() : (atanB as num).toDouble()),
     );
   }
 }

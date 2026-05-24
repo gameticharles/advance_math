@@ -88,12 +88,12 @@ class Octagon extends Polygon {
   /// Gets the circumradius (radius of circumscribed circle).
   ///
   /// circumradius = side / (2 × sin(π/8))
-  double get circumRadius => side / (2 * sin(pi / 8));
+  double get circumRadius => side / (2 * dmath.sin(pi / 8));
 
   /// Gets the inradius (radius of inscribed circle).
   ///
   /// inradius = side / (2 × tan(π/8)) = side × (1 + √2) / 2
-  double get inRadius => side * (1 + sqrt(2)) / 2;
+  double get inRadius => side * (1 + dmath.sqrt(2)) / 2;
 
   /// Gets the apothem (distance from center to midpoint of a side).
   ///
@@ -110,7 +110,7 @@ class Octagon extends Polygon {
   /// Area = 2(1 + √2) × side²
   @override
   double area() {
-    return 2 * (1 + sqrt(2)) * side * side;
+    return 2 * (1 + dmath.sqrt(2)) * side * side;
   }
 
   /// Calculates the perimeter of the octagon.

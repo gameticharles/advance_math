@@ -90,7 +90,7 @@ class GeoUtils {
       // Find points within the d-distance window above nextPoint
       double upperBound = nextPoint.y + d;
       int idx = _binarySearch(yWorkingSet, upperBound, 'upper');
-      for (int j = max(0, idx - 5); j < min(yWorkingSet.length, idx + 5); j++) {
+      for (int j = dmath.max(0, idx - 5); j < dmath.min(yWorkingSet.length, idx + 5); j++) {
         Point next = yWorkingSet[j];
         double dist = nextPoint.distanceTo(next);
         if (dist < d) {
@@ -103,7 +103,7 @@ class GeoUtils {
       // Find points within the d-distance window below nextPoint
       double lowerBound = nextPoint.y - d;
       idx = _binarySearch(yWorkingSet, lowerBound, 'lower');
-      for (int j = max(0, idx - 5); j < min(yWorkingSet.length, idx + 5); j++) {
+      for (int j = dmath.max(0, idx - 5); j < dmath.min(yWorkingSet.length, idx + 5); j++) {
         Point next = yWorkingSet[j];
         double dist = nextPoint.distanceTo(next);
         if (dist < d) {

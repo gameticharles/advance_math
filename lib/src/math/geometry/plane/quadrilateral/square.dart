@@ -24,15 +24,15 @@ class Square extends PlaneGeometry {
     num? circumRadius,
   })  : side = side ??
             (diagonal != null
-                ? diagonal / sqrt(2)
+                ? (diagonal / (sqrt(2) is Complex ? (sqrt(2) as Complex).real.toDouble() : (sqrt(2) as num).toDouble()))
                 : perimeter != null
                     ? perimeter / 4
                     : area != null
-                        ? sqrt(area)
+                        ? (sqrt(area) is Complex ? (sqrt(area) as Complex).real.toDouble() : (sqrt(area) as num).toDouble())
                         : inRadius != null
                             ? 2 * inRadius
                             : circumRadius != null
-                                ? (2 * circumRadius) / sqrt(2)
+                                ? ((2 * circumRadius) / (sqrt(2) is Complex ? (sqrt(2) as Complex).real.toDouble() : (sqrt(2) as num).toDouble()))
                                 : throw ArgumentError(
                                     'Insufficient parameters provided.')),
         super("Square");
@@ -51,19 +51,26 @@ class Square extends PlaneGeometry {
   ///
   /// The diagonal length of a square is equal to the side length multiplied by the square root of 2.
   num diagonal() {
-    return side * sqrt(2);
+    var s2 = sqrt(2);
+    double sqrt2 = s2 is Complex ? s2.real.toDouble() : (s2 as num).toDouble();
+    return side * sqrt2;
   }
 
   /// Calculates the angle between the diagonal and the sides of a square.
   ///
   /// The angle between the diagonals of a square is always 45 degrees, or π/4 radians.
   Angle angleBetweenDiagonals() {
-    return Angle(rad: atan(1));
+    var val = atan(1);
+    return Angle(rad: val is Complex ? val.real.toDouble() : (val as num).toDouble());
   }
 
   /// Get the inRadius of the rectangle.
   num get inRadius => side / 2;
 
   /// Get the outRadius of the rectangle.
-  num get circumRadius => (side * sqrt(2)) / 2;
+  num get circumRadius {
+    var s2 = sqrt(2);
+    double sqrt2 = s2 is Complex ? s2.real.toDouble() : (s2 as num).toDouble();
+    return (side * sqrt2) / 2;
+  }
 }

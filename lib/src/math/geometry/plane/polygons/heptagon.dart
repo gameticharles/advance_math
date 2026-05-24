@@ -111,7 +111,7 @@ class Heptagon extends Polygon {
   /// Area = (7/4) × side² × cot(π/7)
   @override
   double area() {
-    return (7 / 4) * side * side * (1 / tan(pi / 7));
+    return (7 / 4) * side * side * (1 / dmath.tan(pi / 7));
   }
 
   /// Calculates the perimeter of the heptagon.

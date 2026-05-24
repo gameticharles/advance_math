@@ -93,8 +93,11 @@ class Triangle extends PlaneGeometry {
       throw Exception(
           "Sides b, c and angleC must be known to calculate the median.");
     }
-    return 0.5 *
+    var result =
         sqrt((b! * b!) + (c! * c!) + ((2 * b!) * c! * cos(angleC!.rad)));
+    var val =
+        result is Complex ? result.real.toDouble() : (result as num).toDouble();
+    return 0.5 * val;
   }
 
   /// The median of side `b` of the triangle.
@@ -105,8 +108,11 @@ class Triangle extends PlaneGeometry {
       throw Exception(
           "Sides a, c and angleC must be known to calculate the median.");
     }
-    return 0.5 *
+    var result =
         sqrt((a! * a!) + (c! * c!) + ((2 * a!) * c! * cos(angleC!.rad)));
+    var val =
+        result is Complex ? result.real.toDouble() : (result as num).toDouble();
+    return 0.5 * val;
   }
 
   /// The median of side `c` of the triangle.
@@ -117,8 +123,11 @@ class Triangle extends PlaneGeometry {
       throw Exception(
           "Sides a, b and angleC must be known to calculate the median.");
     }
-    return 0.5 *
+    var result =
         sqrt((a! * a!) + (b! * b!) + ((2 * a!) * b! * cos(angleC!.rad)));
+    var val =
+        result is Complex ? result.real.toDouble() : (result as num).toDouble();
+    return 0.5 * val;
   }
 
   /// Get the circumcircle radius of the triangle.
@@ -150,17 +159,22 @@ class Triangle extends PlaneGeometry {
       throw Exception(
           "All sides must be known to calculate the incircle radius.");
     }
-    return sqrt(((s - a!) * (s - b!) * (s - c!)) / s);
+    return dmath.sqrt(((s - a!) * (s - b!) * (s - c!)) / s);
   }
 
   /// Private helper function to calculate distance between two points.
   double _distance(Point p1, Point p2) {
-    return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
+    var result = sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
+    return result is Complex
+        ? result.real.toDouble()
+        : (result as num).toDouble();
   }
 
   /// Private helper function to calculate angle from three sides.
   Angle _angleFromSides(num a, num b, num c) {
-    return Angle(rad: acos((pow(a, 2) + pow(b, 2) - pow(c, 2)) / (2 * a * b)));
+    var val = acos((pow(a, 2) + pow(b, 2) - pow(c, 2)) / (2 * a * b));
+    return Angle(
+        rad: val is Complex ? val.real.toDouble() : (val as num).toDouble());
   }
 
   ///
@@ -185,7 +199,10 @@ class Triangle extends PlaneGeometry {
   ///
   static double heronFormula(num a, num b, num c) {
     double s = (a + b + c) / 2;
-    return sqrt(s * (s - a) * (s - b) * (s - c));
+    var result = sqrt(s * (s - a) * (s - b) * (s - c));
+    return result is Complex
+        ? result.real.toDouble()
+        : (result as num).toDouble();
   }
 
   /// Computes the area of a triangle using the trigonometric formula.
@@ -280,11 +297,14 @@ class Triangle extends PlaneGeometry {
   /// Requires two known sides and one known angle.
   void cosineRule() {
     if (a != null && b != null && angleC != null) {
-      c = sqrt(pow(a!, 2) + pow(b!, 2) - 2 * a! * b! * angleC!.cos());
+      var val = sqrt(pow(a!, 2) + pow(b!, 2) - 2 * a! * b! * angleC!.cos());
+      c = val is Complex ? val.real.toDouble() : (val as num).toDouble();
     } else if (a != null && c != null && angleB != null) {
-      b = sqrt(pow(a!, 2) + pow(c!, 2) - 2 * a! * c! * angleB!.cos());
+      var val = sqrt(pow(a!, 2) + pow(c!, 2) - 2 * a! * c! * angleB!.cos());
+      b = val is Complex ? val.real.toDouble() : (val as num).toDouble();
     } else if (b != null && c != null && angleA != null) {
-      a = sqrt(pow(b!, 2) + pow(c!, 2) - 2 * b! * c! * angleA!.cos());
+      var val = sqrt(pow(b!, 2) + pow(c!, 2) - 2 * b! * c! * angleA!.cos());
+      a = val is Complex ? val.real.toDouble() : (val as num).toDouble();
     } else {
       throw Exception("Not enough information provided for the cosine rule.");
     }
@@ -308,7 +328,10 @@ class Triangle extends PlaneGeometry {
       } else if (c == null && angleC != null) {
         c = ratio * angleC!.sin();
       } else if (angleB == null && b != null) {
-        angleB = Angle(rad: asin(b! / ratio));
+        var val = asin(b! / ratio);
+        angleB = Angle(
+            rad:
+                val is Complex ? val.real.toDouble() : (val as num).toDouble());
         angleC = Angle(deg: 180 - angleA!.deg - angleB!.deg);
       }
     } else if (b != null && angleB != null) {
@@ -318,7 +341,10 @@ class Triangle extends PlaneGeometry {
       } else if (c == null && angleC != null) {
         c = ratio * angleC!.sin();
       } else if (angleA == null && a != null) {
-        angleA = Angle(rad: asin(a! / ratio));
+        var val = asin(a! / ratio);
+        angleA = Angle(
+            rad:
+                val is Complex ? val.real.toDouble() : (val as num).toDouble());
         angleC = Angle(deg: 180 - angleA!.deg - angleB!.deg);
       }
     } else if (c != null && angleC != null) {
@@ -328,7 +354,10 @@ class Triangle extends PlaneGeometry {
       } else if (b == null && angleB != null) {
         b = ratio * angleB!.sin();
       } else if (angleA == null && a != null) {
-        angleA = Angle(rad: asin(a! / ratio));
+        var val = asin(a! / ratio);
+        angleA = Angle(
+            rad:
+                val is Complex ? val.real.toDouble() : (val as num).toDouble());
         angleB = Angle(deg: 180 - angleA!.deg - angleC!.deg);
       }
     } else {
