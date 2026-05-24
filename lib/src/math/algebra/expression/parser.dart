@@ -698,15 +698,24 @@ class ExpressionParser {
                 // Complete the square: ax^2 + bx + c
                 // a(x + b/2a)^2 + (c - b^2/4a)
                 try {
-                  Polynomial poly = Polynomial.fromString(args[0].toString());
+                  String varName = 'x';
+                  final String source = args[0].toString();
+                  // Clean standard math functions to avoid mistaking them for variable name
+                  final cleanSource = source.replaceAll(RegExp(r'\b(sqcomp|completeSquare|sin|cos|tan|asin|acos|atan|sinh|cosh|tanh|log|ln|exp|abs|sqrt)\b'), '');
+                  final match = RegExp(r'[a-zA-Z]').firstMatch(cleanSource);
+                  if (match != null) {
+                    varName = match.group(0)!;
+                  }
+
+                  Polynomial poly = Polynomial.fromString(source, variable: Variable(varName));
                   if (poly.degree == 2) {
                     var a = poly.coefficients[0]; // x^2
                     var b = poly.coefficients[1]; // x^1
                     var c = poly.coefficients[2]; // x^0
 
-                    // Construct: a * (x + b/(2a))^2 + (c - b^2/(4a))
+                    // Construct: a * (var + b/(2a))^2 + (c - b^2/(4a))
                     Expression term1 = a *
-                        Pow(Variable('x') + b / (Literal(2) * a), Literal(2));
+                        Pow(Variable(varName) + b / (Literal(2) * a), Literal(2));
                     Expression term2 = c - (b * b) / (Literal(4) * a);
                     return (term1 + term2).simplify();
                   }

@@ -159,13 +159,11 @@ void algebraExamples() {
   demoEval('coeffs(t*x, x)');
 
   printSection('Polynomial Roots (Future Feature)');
-  print(
-      '  roots() => (Function signature issue - needs direct Polynomial API call)');
-  print('  Use: Polynomial.fromString("x^2+2*x+1").roots() instead');
+  demoEval('roots(x^2+2*x+1)');
 
   printSection('Complete the Square (Future Feature)');
-  print('  sqcomp(9*x^2-18*x+17) => (Not yet implemented)');
-  print('  sqcomp(s^2+s+1) => (Not yet implemented)');
+  demoEval('sqcomp(9*x^2-18*x+17)');
+  demoEval('sqcomp(s^2+s+1)');
 
   printSection('Polynomial Division (Future Feature)');
   print(
@@ -258,8 +256,7 @@ void solvingExamples() {
   printSection('Quadratic Equations');
   demoEval('solve(x^2-1=0, x)', description: 'x² - 1 = 0');
   demoEval('solve(x^2+2*x+1=0, x)', description: 'x² + 2x + 1 = 0');
-  // Complex roots not yet fully supported in solve
-  print('  x² + 1 = 0 => (Complex roots - future feature)');
+  demoEval('solve(x^2+1=0, x)', description: 'x² + 1 = 0 (Complex roots)');
   print('  Quadratic formula => (General solve - future feature)');
 
   printSection('Cubic Equations');
@@ -270,18 +267,15 @@ void solvingExamples() {
   printSection('Factored Equations');
   demoEval('solve((x-1)*(x-2)=0, x)', description: '(x-1)(x-2) = 0');
   demoEval('solve(x*(x+3)=0, x)', description: 'x(x+3) = 0');
-  // Some factored equations not working
-  print('  3(x+5)(x-4) = 0 => (Solver needs improvement)');
+  demoEval('solve(3*(x+5)*(x-4)=0, x)', description: '3(x+5)(x-4) = 0');
 
   printSection('Equations with Special Functions (Future Features)');
   print('  √x - 1 = 0 => (Not yet implemented)');
   print('  √(x²-1) = 0 => (Not yet implemented)');
   print('  x ln x = 0 => (Not yet implemented)');
 
-  printSection('Systems of Equations (Future Feature)');
-  print('  Systems of equations => (Solver needs improvement)');
-  print(
-      '  solveEquations(["x+y=1", "x-y=1"]) => (Returns empty array - needs fix)');
+  printSection('Systems of Equations');
+  demoEval('solveEquations(["x+y=1", "x-y=1"])');
 }
 
 // ============================================================================
@@ -305,8 +299,7 @@ void advancedExamples() {
   printSection('Complex Numbers');
   demoEval('gcd(-20+16*i, -10+8*i)', description: 'GCD of complex numbers');
   demoEval('lcm(-20+16*i, -10+8*i)', description: 'LCM of complex numbers');
-  // Complex roots not yet fully supported
-  print('  x² + 1 = 0 (complex roots) => (Returns empty array - needs fix)');
+  demoEval('solve(x^2+1=0, x)', description: 'x² + 1 = 0 (complex roots)');
 
   printSection('Partial Fractions (Future Features)');
   print('  partfrac((3*x+2)/(x²+x), x) => (Not yet implemented)');

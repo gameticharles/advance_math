@@ -185,7 +185,7 @@ class ExpressionSolver {
                 .roots()
                 .map((c) => (c is Expression)
                     ? c.simplify()
-                    : ((c is Complex) ? c.real : c))
+                    : ((c is Complex) ? (c.imaginary == 0 ? c.real : c) : c))
                 .toList();
             throw _SuccessException();
           }
