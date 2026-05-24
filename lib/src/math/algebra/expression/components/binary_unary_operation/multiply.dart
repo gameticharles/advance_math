@@ -8,7 +8,13 @@ class Multiply extends BinaryOperationsExpression {
     dynamic leftEval = left.evaluate(arg);
     dynamic rightEval = right.evaluate(arg);
 
-    // Handle the identity and zero properties of multiplication
+    if (leftEval is Expression || rightEval is Expression) {
+      return Multiply(
+        leftEval is Expression ? leftEval : Literal(leftEval),
+        rightEval is Expression ? rightEval : Literal(rightEval),
+      ).simplify();
+    }
+
     if (leftEval is Matrix) {
       return (leftEval * rightEval);
     }
@@ -17,7 +23,7 @@ class Multiply extends BinaryOperationsExpression {
     }
     if ((leftEval is num && leftEval == 0) ||
         (rightEval is num && rightEval == 0)) {
-      return Complex.zero();
+      return _normalizeResult(Complex.zero());
     }
     if (leftEval is num && leftEval == 1) {
       return rightEval;
@@ -26,35 +32,17 @@ class Multiply extends BinaryOperationsExpression {
       return leftEval;
     }
 
-    // Convert num to Literal if the other operand is an Expression
-    leftEval = convertToLiteralIfNeeded(leftEval, rightEval);
-    rightEval = convertToLiteralIfNeeded(rightEval, leftEval);
-
-    // If both evaluate to numbers, return the sum as a number
+    dynamic result;
     if (leftEval is Complex) {
-      return (leftEval * rightEval);
+      result = (leftEval * rightEval);
+    } else if (rightEval is Complex) {
+      result = (rightEval * leftEval);
+    } else if (leftEval is num && rightEval is num) {
+      result = Complex(leftEval * rightEval);
+    } else {
+      result = Multiply(Literal(leftEval), Literal(rightEval)).simplify();
     }
-    if (rightEval is Complex) {
-      return (rightEval * leftEval);
-    }
-    if (leftEval is num && rightEval is num) {
-      return Complex(leftEval * rightEval);
-    }
-
-    // If x is null and either operand contains a Variable, return the simplified version of the expression
-    if (arg == null && (_containsVariable(left) || _containsVariable(right))) {
-      return simplify();
-    }
-
-    // At this point, both operands should be Expression types that support the + operator.
-    // If they aren't, there's likely a mismatch or unsupported scenario.
-    if (leftEval is Expression && rightEval is Expression) {
-      return Multiply(leftEval, rightEval).simplify();
-    }
-
-    // Default return (should ideally never reach this point)
-    // throw Exception('Unsupported evaluation scenario in Multiply.evaluate');
-    return simplify();
+    return _normalizeResult(result);
   }
 
 // Helper method to check if an expression contains a Variable
@@ -121,6 +109,25 @@ class Multiply extends BinaryOperationsExpression {
       return v;
     }
 
+    dynamic multiplyVals(dynamic v1, dynamic v2) {
+      if (v1 is num && v2 is num) return v1 * v2;
+      if (v1 is Complex && v2 is Complex) return v1 * v2;
+      if (v1 is Complex && (v2 is num || v2 is Rational)) return v1 * v2;
+      if (v2 is Complex && (v1 is num || v1 is Rational)) return v2 * v1;
+      if (v1 is Rational && v2 is Rational) return v1 * v2;
+      if (v1 is num && v2 is Rational) return v2 * v1;
+      if (v1 is Rational && v2 is num) return v1 * v2;
+      try {
+        return v1 * v2;
+      } catch (_) {
+        try {
+          return v2 * v1;
+        } catch (_) {
+          rethrow;
+        }
+      }
+    }
+
     // Normalize Negate(expr) or UnaryExpression('-', expr) to -1 * expr
     bool isNegate(Expression e) {
       return e is Negate || (e is UnaryExpression && e.operator == '-');
@@ -163,15 +170,27 @@ class Multiply extends BinaryOperationsExpression {
     if (simpleLeft is Literal && simpleRight is Literal) {
       var leftVal = litVal(simpleLeft);
       var rightVal = litVal(simpleRight);
-      if (leftVal is Complex || rightVal is Complex) {
-        return Literal(Complex(leftVal) * Complex(rightVal)).simplify();
-      }
-      return Literal(leftVal * rightVal).simplify();
+      var val = multiplyVals(leftVal, rightVal);
+      if (val is Complex && val.isReal) val = val.simplify();
+      return Literal(val).simplify();
     }
 
     // Enforce right-associativity: (A * B) * C -> A * (B * C)
     if (simpleLeft is Multiply) {
       return Multiply(simpleLeft.left, Multiply(simpleLeft.right, simpleRight))
+          .simplifyBasic();
+    }
+
+    // Swap constant to the left: x * c -> c * x
+    if (simpleRight is Literal && simpleLeft is! Literal) {
+      return Multiply(simpleRight, simpleLeft).simplifyBasic();
+    }
+
+    // Commutativity / Associativity: x * (c * y) = c * (x * y)
+    if (simpleLeft is! Literal &&
+        simpleRight is Multiply &&
+        simpleRight.left is Literal) {
+      return Multiply(simpleRight.left, Multiply(simpleLeft, simpleRight.right))
           .simplifyBasic();
     }
 
@@ -266,7 +285,7 @@ class Multiply extends BinaryOperationsExpression {
         simpleRight.left is Literal) {
       var c1 = litVal(simpleLeft);
       var c2 = litVal(simpleRight.left as Literal);
-      var val = (c1 is num && c2 is Complex) ? c2 * c1 : c1 * c2;
+      var val = multiplyVals(c1, c2);
       if (val is Complex && val.isReal) val = val.simplify();
       return Multiply(Literal(val), simpleRight.right).simplifyBasic();
     }
@@ -277,7 +296,7 @@ class Multiply extends BinaryOperationsExpression {
         simpleRight is Literal) {
       var c1 = litVal(simpleLeft.left as Literal);
       var c2 = litVal(simpleRight);
-      var val = (c1 is num && c2 is Complex) ? c2 * c1 : c1 * c2;
+      var val = multiplyVals(c1, c2);
       if (val is Complex && val.isReal) val = val.simplify();
       return Multiply(Literal(val), simpleLeft.right).simplifyBasic();
     }
@@ -288,7 +307,7 @@ class Multiply extends BinaryOperationsExpression {
         simpleRight.right is Literal) {
       var c1 = litVal(simpleLeft);
       var c2 = litVal(simpleRight.right as Literal);
-      var val = (c1 is num && c2 is Complex) ? c2 * c1 : c1 * c2;
+      var val = multiplyVals(c1, c2);
       if (val is Complex && val.isReal) val = val.simplify();
       return Multiply(Literal(val), simpleRight.left).simplifyBasic();
     }
@@ -299,7 +318,7 @@ class Multiply extends BinaryOperationsExpression {
         simpleRight is Literal) {
       var c1 = litVal(simpleLeft.right as Literal);
       var c2 = litVal(simpleRight);
-      var val = (c1 is num && c2 is Complex) ? c2 * c1 : c1 * c2;
+      var val = multiplyVals(c1, c2);
       if (val is Complex && val.isReal) val = val.simplify();
       return Multiply(Literal(val), simpleLeft.left).simplifyBasic();
     }
@@ -311,7 +330,7 @@ class Multiply extends BinaryOperationsExpression {
           (simpleRight).left is Literal) {
         var c1 = litVal((simpleLeft).left as Literal);
         var c2 = litVal((simpleRight).left as Literal);
-        var newCoefficient = (c1 is num && c2 is Complex) ? c2 * c1 : c1 * c2;
+        var newCoefficient = multiplyVals(c1, c2);
         if (newCoefficient is Complex && newCoefficient.isReal) {
           newCoefficient = newCoefficient.simplify();
         }
@@ -501,15 +520,39 @@ class Multiply extends BinaryOperationsExpression {
 
   @override
   String toString() {
-    // Avoid excessive parentheses
     var leftStr = left.toString();
     var rightStr = right.toString();
 
-    // If left is Add or Subtract, wrap in parens (precedence)
+    // Clean formatting for coefficient -1: -1 * x -> -x
+    if (left is Literal) {
+      final val = (left as Literal).value;
+      if (val == -1) {
+        if (right is Add || right is Subtract) {
+          return "-($rightStr)";
+        }
+        return "-$rightStr";
+      }
+      if (val == 1) {
+        return rightStr;
+      }
+    }
+    if (right is Literal) {
+      final val = (right as Literal).value;
+      if (val == -1) {
+        if (left is Add || left is Subtract) {
+          return "-($leftStr)";
+        }
+        return "-$leftStr";
+      }
+      if (val == 1) {
+        return leftStr;
+      }
+    }
+
+    // Avoid excessive parentheses
     if (left is Add || left is Subtract) {
       leftStr = '($leftStr)';
     }
-    // If right is Add or Subtract, wrap in parens
     if (right is Add || right is Subtract) {
       rightStr = '($rightStr)';
     }

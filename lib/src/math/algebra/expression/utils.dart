@@ -9,6 +9,24 @@ int _toInt(dynamic v) => v is Complex ? v.real.toInt() : (v as num).toInt();
 num _toNum(dynamic v) => v is Complex ? v.real : (v as num);
 double _toDouble(dynamic v) =>
     v is Complex ? v.real.toDouble() : (v as num).toDouble();
+
+dynamic _normalizeResult(dynamic result) {
+  if (result is Complex) {
+    if (result.imaginary == 0) {
+      final r = result.real;
+      if (r is Rational) {
+        return r.isInteger ? (r.numerator ~/ r.denominator).toInt() : r.toDouble();
+      }
+      return r;
+    }
+    return result;
+  }
+  if (result is Rational) {
+    return result.isInteger ? (result.numerator ~/ result.denominator).toInt() : result.toDouble();
+  }
+  return result;
+}
+
 Point _toPoint(dynamic v) => v is Point ? v : (v as Vector).toPoint();
 
 List<dynamic> _flattenArgs(List<dynamic> args) {
@@ -46,18 +64,30 @@ class ExpressionContext {
       if (args.isEmpty) return [];
       if (args.first is List) {
         return (args.first as List)
-            .map((e) => (e is num)
+            .map<double>((e) => (e is num)
                 ? e.toDouble()
-                : (e is Complex ? e.real.toDouble() : 0.0))
+                : (e is Complex
+                    ? (e.real is Rational
+                        ? (e.real as Rational).toDouble()
+                        : (e.real as num).toDouble())
+                    : 0.0))
             .toList();
       }
       return args
-          .map((e) => (e is num)
+          .map<double>((e) => (e is num)
               ? e.toDouble()
-              : (e is Complex ? e.real.toDouble() : 0.0))
+              : (e is Complex
+                  ? (e.real is Rational
+                      ? (e.real as Rational).toDouble()
+                      : (e.real as num).toDouble())
+                  : 0.0))
           .toList();
     }
-    return [args is Complex ? args.real.toDouble() : (args as num).toDouble()];
+    if (args is Complex) {
+      final r = args.real;
+      return [r is Rational ? r.toDouble() : (r as num).toDouble()];
+    }
+    return [(args as num).toDouble()];
   }
 
   /// Provides common constants and basic mathematical functions.

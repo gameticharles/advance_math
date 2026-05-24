@@ -73,6 +73,9 @@ class Negate extends Expression {
 
   @override
   String toString() {
-    return "-(${operand.toString()})";
+    if (operand is Literal || operand is Variable) {
+      return "-$operand";
+    }
+    return "-($operand)";
   }
 }

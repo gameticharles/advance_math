@@ -7,6 +7,9 @@ void main() {
   void check(String given, dynamic expected) {
     var parsed = Expression.parse(given);
     var result = parsed.evaluate();
+    if (result is Literal) {
+      result = result.value;
+    }
 
     // Normalize expected
     var exp = expected;
@@ -23,7 +26,9 @@ void main() {
             reason: 'Eval of $given');
       }
     } else if (result is Complex) {
-      expect(result.real, closeTo(exp, 1e-10),
+      final r = result.real;
+      final rDouble = r is Rational ? r.toDouble() : r;
+      expect(rDouble, closeTo(exp, 1e-10),
           reason: 'Eval of $given (real part)');
       expect(result.imaginary, closeTo(0, 1e-10),
           reason: 'Eval of $given (imaginary part)');
@@ -34,7 +39,7 @@ void main() {
     } else {
       // Try parsing result string to num if it's a Literal
       if (result is Literal && result.value is num) {
-        expect(result.value, closeTo(expected, 1e-10));
+        expect(result.value, closeTo(exp, 1e-10));
       } else {
         // Debug info for failure
         if (result.toString() != expected.toString()) {

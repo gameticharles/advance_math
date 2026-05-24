@@ -19,7 +19,7 @@ void main() {
     group('quadratic equations', () {
       test('solve(x^2-1=0, x)', () => check('solve(x^2-1=0, x)', '[1, -1]'));
       test('solve(x^2+2*x+1=0, x)',
-          () => check('solve(x^2+2*x+1=0, x)', '[-1, -1]'));
+          () => check('solve(x^2+2*x+1=0, x)', '[-1]'));
       test('solve(x^2+1=0, x)', () => check('solve(x^2+1=0, x)', '[i, -i]'));
     });
 
@@ -35,7 +35,7 @@ void main() {
     });
 
     group('equations with parameters', () {
-      test('solve(x+a=0, x)', () => check('solve(x+a=0, x)', '[-1*a]'));
+      test('solve(x+a=0, x)', () => check('solve(x+a=0, x)', '[-a]'));
       test('solve(a*x+b=0, x)', () => check('solve(a*x+b=0, x)', '[-b/a]'));
     });
 
@@ -149,7 +149,7 @@ void main() {
       check('solveEquations(["x^2+y=3", "x+y+z=6", "z^2-y=7"])',
           '[x, 1, y, 2, z, 3]');
       // check('solveEquations(["x*y-cos(z)=-3", "3*z^3-y^2+1=12", "3*sin(x)*cos(y)-x^3=-4"])', 'x,1.10523895006979,y,-2.98980336936266,z,1.88015428627437'); // Numeric solver?
-      check('solveEquations(["x=i","x+y=3"])', '[x, i, y, -i+3]');
+      check('solveEquations(["x=i","x+y=3"])', '[x, i, y, 3 - i]');
       // check('solveEquations(["x/(45909438.9 + 0 + x)=0", "45909438.9+0+x=45909438.9"])', 'x,0');
       check('solveEquations(["a=1"])', '[a, 1]');
       // check('solveEquations(["x=5", "0.6=1-(x/(10+y))"])', 'x,5,y,2.5');

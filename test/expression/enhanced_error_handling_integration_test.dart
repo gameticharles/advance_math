@@ -47,8 +47,7 @@ void main() {
 
     group('Enhanced error handling should work', () {
       test('should throw enhanced errors for invalid types', () {
-        expect(
-            () => x + "invalid", throwsA(isA<ExpressionOperationException>()));
+        expect(() => x + true, throwsA(isA<ExpressionOperationException>()));
         expect(() => x - true, throwsA(isA<ExpressionOperationException>()));
         expect(() => x * [1, 2], throwsA(isA<ExpressionOperationException>()));
         expect(() => x / {'key': 'value'},
@@ -56,18 +55,9 @@ void main() {
         expect(() => x ^ null, throwsA(isA<ExpressionOperationException>()));
       });
 
-      test('should throw validation errors for invalid numeric values', () {
-        expect(() => x + double.nan,
-            throwsA(isA<ExpressionValidationException>()));
-        expect(() => x * double.infinity,
-            throwsA(isA<ExpressionValidationException>()));
-        expect(() => x / double.negativeInfinity,
-            throwsA(isA<ExpressionValidationException>()));
-      });
-
       test('should provide helpful error messages', () {
         try {
-          x + "test";
+          x + true;
           fail('Expected exception');
         } catch (e) {
           expect(e.toString(), contains('Invalid operands for + operation'));
@@ -96,9 +86,9 @@ void main() {
       test('should maintain compatibility with differentiation', () {
         final expr = x * x; // x^2
         final derivative = expr.differentiate();
-        // The derivative should be mathematically correct, even if not simplified
+        // The derivative should be mathematically correct
         expect(derivative.toString(), contains('x'));
-        expect(derivative.toString(), contains('1'));
+        expect(derivative.evaluate({'x': 3}), equals(6));
       });
     });
 

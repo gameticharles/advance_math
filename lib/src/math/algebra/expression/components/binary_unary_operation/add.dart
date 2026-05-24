@@ -10,41 +10,30 @@ class Add extends BinaryOperationsExpression {
     dynamic leftEval = left.evaluate(arg);
     dynamic rightEval = right.evaluate(arg);
 
-    // Convert num to Literal if the other operand is an Expression
-    leftEval = convertToLiteralIfNeeded(leftEval, rightEval);
-    rightEval = convertToLiteralIfNeeded(rightEval, leftEval);
+    if (leftEval is Expression || rightEval is Expression) {
+      return Add(
+        leftEval is Expression ? leftEval : Literal(leftEval),
+        rightEval is Expression ? rightEval : Literal(rightEval),
+      ).simplify();
+    }
 
-    // If both evaluate to numbers, return the sum as a number
     if (leftEval is Matrix) {
       return (leftEval + rightEval);
     }
     if (rightEval is Matrix) {
       return (leftEval + rightEval);
     }
+    dynamic result;
     if (leftEval is Complex) {
-      return (leftEval + rightEval);
+      result = (leftEval + rightEval);
+    } else if (rightEval is Complex) {
+      result = (rightEval + leftEval);
+    } else if (leftEval is num && rightEval is num) {
+      result = Complex(leftEval + rightEval);
+    } else {
+      result = Add(Literal(leftEval), Literal(rightEval)).simplify();
     }
-    if (rightEval is Complex) {
-      return (rightEval + leftEval);
-    }
-    if (leftEval is num && rightEval is num) {
-      return Complex(leftEval + rightEval);
-    }
-
-    // If x is null and either operand contains a Variable, return the simplified version of the expression
-    if (arg == null && (_containsVariable(left) || _containsVariable(right))) {
-      return simplify();
-    }
-
-    // At this point, both operands should be Expression types that support the + operator.
-    // If they aren't, there's likely a mismatch or unsupported scenario.
-    if (leftEval is Expression && rightEval is Expression) {
-      return Add(leftEval, rightEval).simplify();
-    }
-
-    // Default return (should ideally never reach this point)
-    // throw Exception('Unsupported evaluation scenario in Add.evaluate');
-    return simplify();
+    return _normalizeResult(result);
   }
 
 // Helper method to check if an expression contains a Variable
@@ -145,14 +134,21 @@ class Add extends BinaryOperationsExpression {
     Map<String, dynamic> likeTerms = {};
     Map<String, Expression> termExpressions = {}; // Store original expressions
     dynamic constantTerm = 0;
+    List<Expression> symbolicConstantTerms = [];
 
     for (var term in terms) {
       if (term is Literal) {
         var val = term.evaluate();
-        if (constantTerm is num && val is Complex) {
-          constantTerm = val + constantTerm;
+        if (val is Complex || val is num || val is Rational) {
+          if (constantTerm is num && val is Complex) {
+            constantTerm = val + constantTerm;
+          } else {
+            constantTerm += val;
+          }
+        } else if (val is Expression) {
+          symbolicConstantTerms.add(val);
         } else {
-          constantTerm += val;
+          symbolicConstantTerms.add(Literal(val));
         }
       } else if (term is Variable) {
         String key = term.toString();
@@ -187,6 +183,7 @@ class Add extends BinaryOperationsExpression {
     if (constantTerm != 0) {
       simplifiedTerms.add(Literal(constantTerm));
     }
+    simplifiedTerms.addAll(symbolicConstantTerms);
 
     for (var entry in likeTerms.entries) {
       if (entry.value == 1) {
@@ -257,8 +254,8 @@ class Add extends BinaryOperationsExpression {
             if (term2.toString() == target4AB.toString() ||
                 term2.toString() == target4BA.toString()) {
               // Found it! Replace term1 and term2 with (A+B)^2
-              simplifiedTerms.removeAt(max(i, j));
-              simplifiedTerms.removeAt(min(i, j));
+              simplifiedTerms.removeAt(dmath.max(i, j));
+              simplifiedTerms.removeAt(dmath.min(i, j));
               simplifiedTerms.add(Pow(Add(A, B), Literal(2)).simplifyBasic());
               // Restart or break? Restart to be safe
               return Add(

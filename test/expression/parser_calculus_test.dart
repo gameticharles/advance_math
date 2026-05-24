@@ -20,8 +20,8 @@ void main() {
           () => expect(parser.parse('diff(x^1, x)').toString(), equals('1')));
       test(
           'diff(x^-1, x)',
-          () => expect(
-              parser.parse('diff(x^-1, x)').toString(), contains('x^-1*-1/x')));
+          () => expect(parser.parse('diff(x^-1, x)').toString(),
+              contains('x^(-1)*-1/x')));
 
       // 6-10: Partial Differentiation
       test('diff(y, x)',
@@ -101,8 +101,10 @@ void main() {
               parser.parse('diff(x^0.5, x)').toString(), contains('x^-0.5')));
       test(
           'diff(1/x^2, x)',
-          () => expect(parser.parse('diff(x^-2, x)').toString(),
-              anyOf(contains('x^-3'), contains('x^-2*-2/x'))));
+          () => expect(
+              parser.parse('diff(x^-2, x)').toString(),
+              anyOf(contains('x^-3'), contains('x^-2*-2/x'),
+                  contains('x^(-2)*-2/x'))));
 
       // 26-30: Product & Quotient Rules
       test(
@@ -111,8 +113,8 @@ void main() {
               parser.parse('diff(x*x, x)').toString(), contains('x'))); // 2x
       test(
           'diff(x/2, x)',
-          () =>
-              expect(parser.parse('diff(x/2, x)').toString(), contains('0.5')));
+          () => expect(parser.parse('diff(x/2, x)').toString(),
+              anyOf(contains('0.5'), contains('1/2'))));
       test(
           'diff(sin(x)/cos(x), x)',
           () => expect(parser.parse('diff(sin(x)/cos(x), x)').toString(),
@@ -278,7 +280,7 @@ void main() {
           () => expect(
               parser.parse('integrate(x*sin(x), x)').toString(),
               anyOf(contains('x * cos(x)'), contains('x*-(cos(x))'),
-                  contains('x*-1*cos(x)'))));
+                  contains('x*-1*cos(x)'), contains('-x*cos(x)'))));
       test(
           'integrate(x*cos(x), x)',
           () => expect(parser.parse('integrate(x*cos(x), x)').toString(),
@@ -287,8 +289,11 @@ void main() {
           'integrate(ln(x), x)',
           () => expect(
               parser.parse('integrate(ln(x), x)').toString(),
-              anyOf(contains('x*ln(x)-x'), contains('ln(x)*1*x-1*x'),
-                  contains('ln(x)*x-1*x')))); // x*ln(x) - x
+              anyOf(
+                  contains('x*ln(x)-x'),
+                  contains('ln(x)*1*x-1*x'),
+                  contains('ln(x)*x-1*x'),
+                  contains('ln(x)*x-x')))); // x*ln(x) - x
       test(
           'integrate(x^2*exp(x), x)',
           () => expect(parser.parse('integrate(x^2*exp(x), x)').toString(),

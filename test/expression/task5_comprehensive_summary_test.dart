@@ -1,6 +1,27 @@
 import 'package:test/test.dart';
 import 'package:advance_math/advance_math.dart';
 
+dynamic evalVal(dynamic val) {
+  if (val is Complex) {
+    final r = val.real;
+    if (r is Rational) return r.toDouble();
+    return r;
+  }
+  if (val is Rational) return val.toDouble();
+  return val;
+}
+
+double getReal(dynamic val) {
+  if (val is Complex) {
+    final r = val.real;
+    if (r is Rational) return r.toDouble();
+    return r.toDouble();
+  }
+  if (val is Rational) return val.toDouble();
+  if (val is num) return val.toDouble();
+  return (val as num).toDouble();
+}
+
 /// Comprehensive test suite for Task 5: Test polynomial and derivative operations
 /// with enhanced expression creation
 ///
@@ -34,7 +55,7 @@ void main() {
 
         // Test evaluation at x = 2: 3*4 + 2*2 + 1 = 17
         final result = poly.evaluate(2);
-        expect(result.real, closeTo(17, 0.001));
+        expect(getReal(result), closeTo(17, 0.001));
       });
 
       test('should create and evaluate polynomials using ex() helper', () {
@@ -50,7 +71,7 @@ void main() {
 
         // Test evaluation at x = 1: 2 - 1 + 4 - 3 = 2
         final result = poly.evaluate(1);
-        expect(result.real, closeTo(2, 0.001));
+        expect(getReal(result), closeTo(2, 0.001));
       });
 
       test('should create polynomials with mixed enhanced methods', () {
@@ -65,7 +86,7 @@ void main() {
 
         // Test evaluation at x = 2: 2*4 - 3*2 + 5 = 8 - 6 + 5 = 7
         final result = poly.evaluate(2);
-        expect(result.real, closeTo(7, 0.001));
+        expect(getReal(result), closeTo(7, 0.001));
       });
 
       test('should perform polynomial arithmetic with enhanced methods', () {
@@ -103,7 +124,7 @@ void main() {
         // Derivative should be: 12x^2 + 6x + 2
         // Test at x = 1: 12 + 6 + 2 = 20
         final result = derivative.evaluate(1);
-        expect(result.real, closeTo(20, 0.001));
+        expect(getReal(result), closeTo(20, 0.001));
       });
 
       test('should differentiate polynomials created with ex() helper', () {
@@ -120,7 +141,7 @@ void main() {
         // Derivative should be: 10x - 3
         // Test at x = 2: 20 - 3 = 17
         final result = derivative.evaluate(2);
-        expect(result.real, closeTo(17, 0.001));
+        expect(getReal(result), closeTo(17, 0.001));
       });
 
       test('should differentiate complex expressions with enhanced literals',
@@ -135,7 +156,7 @@ void main() {
         expect(derivative, isA<Expression>());
 
         // Test that derivative can be evaluated
-        final result = derivative.evaluate({'x': 1});
+        final result = evalVal(derivative.evaluate({'x': 1}));
         expect(result, isA<num>());
       });
 
@@ -150,7 +171,7 @@ void main() {
         expect(derivative, isA<Expression>());
 
         // Test evaluation
-        final result = derivative.evaluate({'x': 0});
+        final result = evalVal(derivative.evaluate({'x': 0}));
         expect(result, isA<num>());
       });
     });
@@ -196,7 +217,7 @@ void main() {
         expect(integral, isA<Expression>());
 
         // Test that integral can be evaluated
-        final result = integral.evaluate({'x': 2});
+        final result = evalVal(integral.evaluate({'x': 2}));
         expect(result, isA<num>());
       });
     });
@@ -214,7 +235,7 @@ void main() {
         expect(expr, isA<Expression>());
 
         // Test evaluation at x=2, y=1: 3*2*1 + 2*4 - 1 + 4 = 6 + 8 - 1 + 4 = 17
-        final result = expr.evaluate({'x': 2, 'y': 1});
+        final result = evalVal(expr.evaluate({'x': 2, 'y': 1}));
         expect(result, closeTo(17, 0.001));
       });
 
@@ -229,7 +250,7 @@ void main() {
         expect(expr, isA<Expression>());
 
         // Test evaluation at x=1, y=2, z=1: 2*1*2*1 + 1*2 - 3*1*1 + 5 = 4 + 2 - 3 + 5 = 8
-        final result = expr.evaluate({'x': 1, 'y': 2, 'z': 1});
+        final result = evalVal(expr.evaluate({'x': 1, 'y': 2, 'z': 1}));
         expect(result, closeTo(8, 0.001));
       });
 
@@ -245,11 +266,11 @@ void main() {
         expect(product, isA<Expression>());
 
         // Test evaluation of sum at x=1, y=2: (2*1*2 + 3*1) + (2 - 1) = 7 + 1 = 8
-        final sumResult = sum.evaluate({'x': 1, 'y': 2});
+        final sumResult = evalVal(sum.evaluate({'x': 1, 'y': 2}));
         expect(sumResult, closeTo(8, 0.001));
 
         // Test evaluation of product at x=1, y=2: (2*1*2 + 3*1) * (2 - 1) = 7 * 1 = 7
-        final productResult = product.evaluate({'x': 1, 'y': 2});
+        final productResult = evalVal(product.evaluate({'x': 1, 'y': 2}));
         expect(productResult, closeTo(7, 0.001));
       });
 
@@ -266,7 +287,7 @@ void main() {
         expect(derivative, isA<Expression>());
 
         // Test evaluation of derivative
-        final result = derivative.evaluate({'x': 1, 'y': 2});
+        final result = evalVal(derivative.evaluate({'x': 1, 'y': 2}));
         expect(result, isA<num>());
       });
 
@@ -280,7 +301,7 @@ void main() {
         expect(product, isA<Expression>());
 
         // Test evaluation at x=2, y=1: (2+1)^2 * (4-1) = 9 * 3 = 27
-        final result = product.evaluate({'x': 2, 'y': 1});
+        final result = evalVal(product.evaluate({'x': 2, 'y': 1}));
         expect(result, closeTo(27, 0.001));
       });
 
@@ -295,7 +316,7 @@ void main() {
         expect(rational, isA<Expression>());
 
         // Test evaluation at x=3, y=1: (9 + 2) / (3 + 1) = 11 / 4 = 2.75
-        final result = rational.evaluate({'x': 3, 'y': 1});
+        final result = evalVal(rational.evaluate({'x': 3, 'y': 1}));
         expect(result, closeTo(2.75, 0.001));
       });
     });
@@ -313,9 +334,9 @@ void main() {
 
         // All should evaluate to the same result
         final testValue = {'x': 2};
-        final result1 = expr1.evaluate(testValue);
-        final result2 = expr2.evaluate(testValue);
-        final result3 = expr3.evaluate(testValue);
+        final result1 = evalVal(expr1.evaluate(testValue));
+        final result2 = evalVal(expr2.evaluate(testValue));
+        final result3 = evalVal(expr3.evaluate(testValue));
 
         expect(result1, closeTo(result2, 0.001));
         expect(result2, closeTo(result3, 0.001));
@@ -328,17 +349,17 @@ void main() {
       test('should handle edge cases with enhanced literals', () {
         // Test with zero coefficients
         final zeroExpr = 0.toExpression() * x + ex(0);
-        final result = zeroExpr.evaluate({'x': 5});
+        final result = evalVal(zeroExpr.evaluate({'x': 5}));
         expect(result, equals(0));
 
         // Test with negative coefficients
         final negExpr = (-2).toExpression() * x + ex(-3);
-        final negResult = negExpr.evaluate({'x': 1});
+        final negResult = evalVal(negExpr.evaluate({'x': 1}));
         expect(negResult, equals(-5));
 
         // Test with decimal coefficients
         final decimalExpr = 2.5.toExpression() * x + ex(1.5);
-        final decimalResult = decimalExpr.evaluate({'x': 2});
+        final decimalResult = evalVal(decimalExpr.evaluate({'x': 2}));
         expect(decimalResult, closeTo(6.5, 0.001));
       });
 
@@ -351,7 +372,7 @@ void main() {
 
         expect(expr, isA<Expression>());
 
-        final result = expr.evaluate({'t': 4});
+        final result = evalVal(expr.evaluate({'t': 4}));
         expect(result, equals(11)); // 2*4 + 3 = 11
       });
     });
@@ -365,7 +386,7 @@ void main() {
         expect(lnExpr, isA<Expression>());
 
         // Test evaluation
-        final result = lnExpr.evaluate({'x': 2});
+        final result = evalVal(lnExpr.evaluate({'x': 2}));
         expect(result, isA<num>());
       });
 
@@ -377,7 +398,7 @@ void main() {
         expect(power, isA<Expression>());
 
         // Test evaluation at x=2: (2+1)^3 = 27
-        final result = power.evaluate({'x': 2});
+        final result = evalVal(power.evaluate({'x': 2}));
         expect(result, closeTo(27, 0.001));
       });
 
@@ -390,9 +411,14 @@ void main() {
         expect(sum, isA<Expression>());
 
         // Test evaluation
-        final result = sum.evaluate({'x': 0, 'y': 1});
+        final result = evalVal(sum.evaluate({'x': 0, 'y': 1}));
         expect(result, isA<num>());
       });
     });
   });
+}
+
+extension PrimitiveReal on num {
+  double get real => this.toDouble();
+  double get imaginary => 0.0;
 }

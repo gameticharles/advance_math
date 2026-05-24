@@ -5,8 +5,9 @@ class Literal extends Expression {
   final String raw;
 
   // Constructor to initialize the literal's value
-  Literal(this.value, [String? raw])
-      : raw = raw ?? (value is String ? '"$value"' : '$value');
+  Literal(dynamic val, [String? raw])
+      : value = (val is Complex) ? val.simplify() : val,
+        raw = raw ?? (val is String ? '"$val"' : (val is Complex ? '${val.simplify()}' : '$val'));
 
   @override
   dynamic evaluate([dynamic arg]) {
@@ -20,7 +21,9 @@ class Literal extends Expression {
           (key is Expression) ? key.evaluate(arg) : key,
           (value is Expression) ? value.evaluate(arg) : value));
     }
-    if (value is num) return Complex(value);
+    if (value is num || value is Rational) {
+      return _normalizeResult(Complex(value));
+    }
     return value;
   }
 

@@ -5,24 +5,19 @@ class Divide extends BinaryOperationsExpression {
 
   @override
   dynamic evaluate([dynamic arg]) {
-    // Helper method to convert num to Literal if the other operand is an Expression
-    dynamic convertToLiteralIfNeeded(dynamic val, dynamic other) {
-      if (val is num && other is Expression) {
-        return Literal(val);
-      }
-      return val;
-    }
-
     dynamic leftEval = left.evaluate(arg);
     dynamic rightEval = right.evaluate(arg);
 
-    if (rightEval == 0) {
+    if (rightEval == 0 || rightEval == Complex.zero()) {
       throw Exception('Division by zero!');
     }
 
-    // Convert num to Literal if the other operand is an Expression
-    leftEval = convertToLiteralIfNeeded(leftEval, rightEval);
-    rightEval = convertToLiteralIfNeeded(rightEval, leftEval);
+    if (leftEval is Expression || rightEval is Expression) {
+      return Divide(
+        leftEval is Expression ? leftEval : Literal(leftEval),
+        rightEval is Expression ? rightEval : Literal(rightEval),
+      ).simplify();
+    }
 
     if (leftEval is Matrix) {
       return (leftEval / rightEval);
@@ -31,30 +26,21 @@ class Divide extends BinaryOperationsExpression {
       return (leftEval / rightEval);
     }
     if (leftEval is num && rightEval is num) {
-      return Complex(leftEval / rightEval);
+      return _normalizeResult(Complex(leftEval / rightEval));
     }
 
+    dynamic result;
     if (leftEval is Complex || rightEval is Complex) {
-      if (Complex(rightEval) == Complex.zero()) {
+      final rC = rightEval is Complex ? rightEval : Complex(rightEval);
+      if (rC == Complex.zero()) {
         throw Exception('Division by zero!');
       }
-      return (Complex(leftEval) / Complex(rightEval));
+      final lC = leftEval is Complex ? leftEval : Complex(leftEval);
+      result = lC / rC;
+    } else {
+      result = Divide(Literal(leftEval), Literal(rightEval)).simplify();
     }
-
-    // If x is null and either operand contains a Variable, return the simplified version of the expression
-    if (arg == null && (_containsVariable(left) || _containsVariable(right))) {
-      return simplify();
-    }
-
-    // At this point, both operands should be Expression types that support the + operator.
-    // If they aren't, there's likely a mismatch or unsupported scenario.
-    if (leftEval is Expression && rightEval is Expression) {
-      return Divide(leftEval, rightEval).simplify();
-    }
-
-    // Default return (should ideally never reach this point)
-    // throw Exception('Unsupported evaluation scenario in Divide.evaluate');
-    return simplify();
+    return _normalizeResult(result);
   }
 
 // Helper method to check if an expression contains a Variable
@@ -202,7 +188,10 @@ class Divide extends BinaryOperationsExpression {
       if (l is num && r is num) {
         if (r == 0) throw Exception('Division by zero');
         // If result is integer, return integer
-        if (l % r == 0) return Literal(l ~/ r);
+        if (l % r == 0) return Literal((l ~/ r).toInt());
+        if (l == l.toInt() && r == r.toInt()) {
+          return Literal(Rational(l.toInt(), r.toInt()));
+        }
         return Literal(l / r);
       }
 

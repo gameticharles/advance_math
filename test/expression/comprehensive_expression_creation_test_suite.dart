@@ -95,18 +95,18 @@ void main() {
         final intExtension = 42.toExpression();
         final intHelper = ex(42);
 
-        expect((intLiteral).value, isA<Complex>());
-        expect((intExtension as Literal).value, isA<Complex>());
-        expect((intHelper as Literal).value, isA<Complex>());
+        expect((intLiteral).value, isA<int>());
+        expect((intExtension as Literal).value, isA<int>());
+        expect((intHelper as Literal).value, isA<int>());
 
         // Test double preservation
         final doubleLiteral = Literal(3.14);
         final doubleExtension = 3.14.toExpression();
         final doubleHelper = ex(3.14);
 
-        expect((doubleLiteral).value, isA<Complex>());
-        expect((doubleExtension as Literal).value, isA<Complex>());
-        expect((doubleHelper as Literal).value, isA<Complex>());
+        expect((doubleLiteral).value, isA<double>());
+        expect((doubleExtension as Literal).value, isA<double>());
+        expect((doubleHelper as Literal).value, isA<double>());
       });
     });
 

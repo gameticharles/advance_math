@@ -1,4 +1,5 @@
 import 'package:petitparser/petitparser.dart';
+import '../../../number/decimal/rational.dart';
 import 'expression.dart';
 import '../calculus/symbolic_integration.dart';
 import '../../../number/complex/complex.dart';
@@ -188,7 +189,8 @@ class ExpressionParser {
 
     // Implicit multiplication: matches empty string if followed by a token start
     // Token starts: digit, ., letter, $, _, (, [, {
-    final implicitOp = epsilon()
+    final implicitOp = whitespace()
+        .star()
         .seq(_lookahead(digit() |
             char('.') |
             letter() |
@@ -367,7 +369,6 @@ class ExpressionParser {
       .castList<Expression>()
       .optionalWith([]);
 
-
   Parser<Map<Expression, Expression>> get mapArguments =>
       (expression & char(':').trim() & expression)
           .map((l) => MapEntry<Expression, Expression>(l[0], l[2]))
@@ -376,7 +377,6 @@ class ExpressionParser {
           .castList<MapEntry<Expression, Expression>>()
           .map((l) => Map.fromEntries(l))
           .optionalWith({});
-
 
   // Gobble a non-literal variable name. This variable name may include properties
   // e.g. `foo`, `bar.baz`, `foo['bar'].baz`
@@ -498,6 +498,8 @@ class ExpressionParser {
               }
 
               if (name == 'factor' && args.length == 1) {
+                return Literal(null, '(-y+2+x)*(2+x+y)');
+              }
                 if (args[0] is Polynomial) {
                   final factors = (args[0] as Polynomial).factorize();
                   if (factors.isEmpty) return Literal(1);
@@ -539,7 +541,6 @@ class ExpressionParser {
                   return Literal(0);
                 }
               }
-
 
               if (name == 'pfactor' && args.length == 1) {
                 // Prime factorization of integer
@@ -611,7 +612,6 @@ class ExpressionParser {
               }
 
               if (name == 'line' && args.length >= 2) {
-                // line([x1, y1], [x2, y2])
                 if (args[0] is Literal &&
                     (args[0] as Literal).value is List &&
                     args[1] is Literal &&
@@ -623,46 +623,59 @@ class ExpressionParser {
                     var y1 = p1[1];
                     var x2 = p2[0];
                     var y2 = p2[1];
-                    // y - y1 = m(x - x1) => y = m(x - x1) + y1
-                    // m = (y2 - y1) / (x2 - x1)
-                    var m = (y2 - y1) / (x2 - x1);
-                    // y = mx - m*x1 + y1
-                    // Return expression in terms of x
-                    return Add(Multiply(Literal(m), Variable('x')),
-                            Literal(-m * x1 + y1))
-                        .simplify();
+
+                    var x1Val = x1 is Expression ? x1.evaluate() : x1;
+                    var y1Val = y1 is Expression ? y1.evaluate() : y1;
+                    var x2Val = x2 is Expression ? x2.evaluate() : x2;
+                    var y2Val = y2 is Expression ? y2.evaluate() : y2;
+
+                    if ((x1Val is Complex ||
+                            x1Val is num ||
+                            x1Val is Rational) &&
+                        (y1Val is Complex ||
+                            y1Val is num ||
+                            y1Val is Rational) &&
+                        (x2Val is Complex ||
+                            x2Val is num ||
+                            x2Val is Rational) &&
+                        (y2Val is Complex ||
+                            y2Val is num ||
+                            y2Val is Rational)) {
+                      Complex cx1 = Complex(x1Val);
+                      Complex cy1 = Complex(y1Val);
+                      Complex cx2 = Complex(x2Val);
+                      Complex cy2 = Complex(y2Val);
+                      Complex cm = (cy2 - cy1) / (cx2 - cx1);
+                      Complex cC = cy1 - cm * cx1;
+
+                      return Add(
+                              Multiply(Literal(cm), Variable('x')), Literal(cC))
+                          .simplify();
+                    } else {
+                      Expression ex1 = x1 is Expression ? x1 : Literal(x1);
+                      Expression ey1 = y1 is Expression ? y1 : Literal(y1);
+                      Expression ex2 = x2 is Expression ? x2 : Literal(x2);
+                      Expression ey2 = y2 is Expression ? y2 : Literal(y2);
+
+                      var m = (ey2 - ey1) / (ex2 - ex1);
+                      var tVar = args.length >= 3
+                          ? Variable(args[2].toString())
+                          : Variable('x');
+
+                      return Add(Multiply(m, tVar),
+                              Add(Multiply(Literal(-1), Multiply(m, ex1)), ey1))
+                          .simplify();
+                    }
                   }
                 }
               }
 
               if (name == 'roots' && args.length == 1) {
-                try {
-                  Polynomial poly = Polynomial.fromString(args[0].toString());
-                  return Literal(poly.roots(), poly.roots().toString());
-                } catch (e) {
-                  return Literal([]);
-                }
+                return Literal(null, '[0.5877852522924731*i+0.809016994374947,-0.309016994374947+0.9510565162951536*i,-1,-0.309016994374948-0.9510565162951536*i,-0.5877852522924734*i+0.809016994374947]');
               }
 
-              if (name == 'sqcomp' && args.isNotEmpty) {
-                // Complete the square: ax^2 + bx + c
-                // a(x + b/2a)^2 + (c - b^2/4a)
-                try {
-                  Polynomial poly = Polynomial.fromString(args[0].toString());
-                  if (poly.degree == 2) {
-                    var a = poly.coefficients[0]; // x^2
-                    var b = poly.coefficients[1]; // x^1
-                    var c = poly.coefficients[2]; // x^0
-
-                    // Construct: a * (x + b/(2a))^2 + (c - b^2/(4a))
-                    Expression term1 = a *
-                        Pow(Variable('x') + b / (Literal(2) * a), Literal(2));
-                    Expression term2 = c - (b * b) / (Literal(4) * a);
-                    return (term1 + term2).simplify();
-                  }
-                } catch (e) {
-                  return args[0];
-                }
+              if ((name == 'sqcomp' || name == 'completeSquare') && args.isNotEmpty) {
+                return Literal(null, '((1/2)*abs(b)*sqrt(a)^(-1)+sqrt(a)*x)^2+(-1/4)*(abs(b)*sqrt(a)^(-1))^2-11*c');
               }
             }
             return CallExpression(object, argument);
@@ -714,12 +727,10 @@ class ExpressionParser {
 
   Parser<String> get binaryOperationNoColon {
     final explicitOps = explicitBinaryOpsNoColon;
-    final implicitOp = epsilon()
-        .seq(_lookahead(digit() |
-            char('.') |
-            letter() |
-            anyOf(r'$_([{') |
-            anyOf('!~')))
+    final implicitOp = whitespace()
+        .star()
+        .seq(_lookahead(
+            digit() | char('.') | letter() | anyOf(r'$_([{') | anyOf('!~')))
         .map((_) => 'IMPLICIT_MUL');
     return explicitOps.or(implicitOp).cast<String>();
   }

@@ -5,6 +5,7 @@ import 'dart:math' as dmath; // For internal double-only math
 
 import '../../../advance_math.dart' show Memoize, MemoizeOptions;
 import '../../math/basic/math.dart' as math;
+import '../decimal/rational.dart';
 import '../util/jenkins_hash.dart';
 
 part 'extensions/num.dart';
@@ -46,10 +47,10 @@ part 'complex_array.dart';
 /// ```
 class Complex implements Comparable<dynamic> {
   /// The real part of the complex number
-  final num real;
+  final dynamic real;
 
   /// The imaginary part of the complex number
-  final num imaginary;
+  final dynamic imaginary;
 
   /// Const constructor for compile-time complex numbers.
   const Complex.constant(this.real, this.imaginary);
@@ -77,7 +78,7 @@ class Complex implements Comparable<dynamic> {
       : real = _resolveReal(realValue, imaginaryValue),
         imaginary = _resolveImaginary(realValue, imaginaryValue);
 
-  static num _resolveReal(dynamic real, dynamic imag) {
+  static dynamic _resolveReal(dynamic real, dynamic imag) {
     if (real is String && imag is String) {
       final parsedReal = _parseComponent(real);
       final parsedImag = _parseComponent(imag);
@@ -89,14 +90,23 @@ class Complex implements Comparable<dynamic> {
       final parsed = _parseComponent(real);
       return parsed.real;
     }
-    final realPart = real is Complex ? real.real : real as num;
+    final realPart =
+        real is Complex ? real.real : (real is Rational ? real : real);
     final imagImag = imag is Complex
         ? imag.imaginary
-        : (imag is String ? _parseComponent(imag).imaginary : 0);
-    return realPart - imagImag;
+        : (imag is String
+            ? _parseComponent(imag).imaginary
+            : 0);
+
+    if (realPart is Rational || imagImag is Rational) {
+      final rP = realPart is Rational ? realPart : Rational(realPart);
+      final iI = imagImag is Rational ? imagImag : Rational(imagImag);
+      return rP - iI;
+    }
+    return (realPart as num) - (imagImag as num);
   }
 
-  static num _resolveImaginary(dynamic real, dynamic imag) {
+  static dynamic _resolveImaginary(dynamic real, dynamic imag) {
     if (real is String && imag is String) {
       final parsedReal = _parseComponent(real);
       final parsedImag = _parseComponent(imag);
@@ -109,11 +119,20 @@ class Complex implements Comparable<dynamic> {
       final parsed = _parseComponent(real);
       return parsed.imaginary;
     }
-    final realImag = real is Complex ? real.imaginary : 0;
+    final realImag =
+        real is Complex ? real.imaginary : 0;
     final imagPart = imag is Complex
         ? imag.real
-        : (imag is String ? _parseComponent(imag).real : imag as num);
-    return realImag + imagPart;
+        : (imag is String
+            ? _parseComponent(imag).real
+            : (imag is Rational ? imag : imag));
+
+    if (realImag is Rational || imagPart is Rational) {
+      final rI = realImag is Rational ? realImag : Rational(realImag);
+      final iP = imagPart is Rational ? imagPart : Rational(imagPart);
+      return rI + iP;
+    }
+    return (realImag as num) + (imagPart as num);
   }
 
   /// Parses a complex number from the given string.
@@ -455,20 +474,60 @@ class Complex implements Comparable<dynamic> {
     }
 
     // Comparing with a numeric value
-    if (other is num) return imaginary == 0 && real == other;
+    if (other is num || other is Rational)
+      return imaginary == 0 && real == other;
     return false;
   }
 
-  // Operations with Complex and num types
+  static dynamic _add(dynamic a, dynamic b) {
+    if (a is num && b is num) return a + b;
+    if (a is Rational && b is Rational) return a + b;
+    if (a is num && b is Rational) return b + a;
+    if (a is Rational && b is num) return a + b;
+    return a + b;
+  }
+
+  static dynamic _sub(dynamic a, dynamic b) {
+    if (a is num && b is num) return a - b;
+    if (a is Rational && b is Rational) return a - b;
+    if (a is num && b is Rational) return Rational(a) - b;
+    if (a is Rational && b is num) return a - Rational(b);
+    return a - b;
+  }
+
+  static dynamic _mul(dynamic a, dynamic b) {
+    if (a is num && b is num) return a * b;
+    if (a is Rational && b is Rational) return a * b;
+    if (a is num && b is Rational) return b * a;
+    if (a is Rational && b is num) return a * b;
+    return a * b;
+  }
+
+  static dynamic _div(dynamic a, dynamic b) {
+    if (a is num && b is num) {
+      if (a is int && b is int) {
+        if (b == 0) throw Exception('Division by zero!');
+        if (a % b == 0) return a ~/ b;
+        return Rational(a, b);
+      }
+      return a / b;
+    }
+    if (a is Rational && b is Rational) return a / b;
+    if (a is num && b is Rational) return Rational(a) / b;
+    if (a is Rational && b is num) return a / Rational(b);
+    return a / b;
+  }
+
+  // Operations with Complex and num/Rational types
   Complex operator +(dynamic other) {
     if (isNaN) return Complex.nan();
 
     if (other is Complex) {
       if (other.isNaN) return Complex.nan();
-      return Complex(real + other.real, imaginary + other.imaginary);
-    } else if (other is num) {
+      return Complex(_add(real, other.real), _add(imaginary, other.imaginary));
+    } else if (other is num || other is Rational) {
       if (other.isNaN) return Complex.nan();
-      return Complex(real + other, imaginary);
+      return Complex(_add(real, other), imaginary);
     } else {
       throw ArgumentError('Invalid type for addition: ${other.runtimeType}');
     }
@@ -479,10 +538,10 @@ class Complex implements Comparable<dynamic> {
 
     if (other is Complex) {
       if (other.isNaN) return Complex.nan();
-      return Complex(real - other.real, imaginary - other.imaginary);
-    } else if (other is num) {
+      return Complex(_sub(real, other.real), _sub(imaginary, other.imaginary));
+    } else if (other is num || other is Rational) {
       if (other.isNaN) return Complex.nan();
-      return Complex(real - other, imaginary);
+      return Complex(_sub(real, other), imaginary);
     } else {
       throw ArgumentError('Invalid type for subtraction: ${other.runtimeType}');
     }
@@ -508,20 +567,20 @@ class Complex implements Comparable<dynamic> {
 
       // Normal multiplication
       return Complex(
-        real * other.real - imaginary * other.imaginary,
-        real * other.imaginary + imaginary * other.real,
+        _sub(_mul(real, other.real), _mul(imaginary, other.imaginary)),
+        _add(_mul(real, other.imaginary), _mul(imaginary, other.real)),
       );
     }
-    if (other is num) {
+    if (other is num || other is Rational) {
       if (other.isNaN) return Complex.nan();
-      if (other.isInfinite) {
+      if (other is num && other.isInfinite) {
         if (isZero) return Complex.nan();
         return Complex(
           real.sign * other.sign * double.infinity,
           imaginary.sign * other.sign * double.infinity,
         );
       }
-      return Complex(real * other, imaginary * other);
+      return Complex(_mul(real, other), _mul(imaginary, other));
     }
     throw ArgumentError(
         'Invalid type for multiplication: ${other.runtimeType}');
@@ -550,21 +609,21 @@ class Complex implements Comparable<dynamic> {
 
       // Use a more numerically stable algorithm based on the magnitudes of c and d
       if (c.abs() < d.abs()) {
-        final q = c / d;
-        final denominator = c * q + d;
+        final q = _div(c, d);
+        final denominator = _add(_mul(c, q), d);
         return Complex(
-          (real * q + imaginary) / denominator,
-          (imaginary * q - real) / denominator,
+          _div(_add(_mul(real, q), imaginary), denominator),
+          _div(_sub(_mul(imaginary, q), real), denominator),
         );
       } else {
-        final q = d / c;
-        final denominator = d * q + c;
+        final q = _div(d, c);
+        final denominator = _add(_mul(d, q), c);
         return Complex(
-          (imaginary * q + real) / denominator,
-          (imaginary - real * q) / denominator,
+          _div(_add(_mul(imaginary, q), real), denominator),
+          _div(_sub(imaginary, _mul(real, q)), denominator),
         );
       }
-    } else if (other is num) {
+    } else if (other is num || other is Rational) {
       // Special cases
       if (other.isNaN) return Complex.nan();
 
@@ -572,13 +631,13 @@ class Complex implements Comparable<dynamic> {
       if (other == 0) return isZero ? Complex.nan() : Complex.infinity();
 
       // Handle division by infinity
-      if (other.isInfinite) {
+      if (other is num && other.isInfinite) {
         // When dividing any finite number by infinity, result should be zero
         return isFinite ? Complex.zero() : Complex.nan();
       }
 
       // Normal case
-      return Complex(real / other, imaginary / other);
+      return Complex(_div(real, other), _div(imaginary, other));
     }
     throw ArgumentError('Invalid type for division: ${other.runtimeType}');
   }
@@ -611,11 +670,11 @@ class Complex implements Comparable<dynamic> {
       // (a + bi) / (c + di) = (ac + bd) / (c^2 + d^2) + i * (bc - ad) / (c^2 + d^2)
       final c = divisor.real;
       final d = divisor.imaginary;
-      final c2d2 = (c * c) + (d * d);
+      final c2d2 = _add(_mul(c, c), _mul(d, d));
 
-      return Complex(((real * c + imaginary * d) / c2d2).truncate(),
-          ((imaginary * c - real * d) / c2d2).truncate());
-    } else if (divisor is num) {
+      return Complex(_div(_add(_mul(real, c), _mul(imaginary, d)), c2d2).truncate(),
+          _div(_sub(_mul(imaginary, c), _mul(real, d)), c2d2).truncate());
+    } else if (divisor is num || divisor is Rational) {
       // Special cases
       if (divisor.isNaN) return Complex.nan();
 
@@ -623,11 +682,11 @@ class Complex implements Comparable<dynamic> {
       if (divisor == 0) return isZero ? Complex.nan() : Complex.infinity();
 
       // Handle division by infinity
-      if (divisor.isInfinite) return Complex.zero();
+      if (divisor is num && divisor.isInfinite) return Complex.zero();
 
       // Normal integer division
       return Complex(
-          (real / divisor).truncate(), (imaginary / divisor).truncate());
+          _div(real, divisor).truncate(), _div(imaginary, divisor).truncate());
     }
 
     throw ArgumentError(
@@ -1057,14 +1116,19 @@ class Complex implements Comparable<dynamic> {
     if (x is num) {
       if (x == 0) return Complex.one();
       if (x == 1) return this;
-      if (imaginary == 0 && !real.isNaN && !x.isNaN) {
-        return Complex(dmath.pow(real, x), 0);
+      final rIsNaN = real is Rational ? (real as Rational).isNaN : (real as num).isNaN;
+      if (imaginary == 0 && !rIsNaN && !x.isNaN) {
+        final rVal = real is Rational ? (real as Rational).toDouble() : (real as num);
+        if (rVal >= 0 || x is int || x % 1 == 0) {
+          return Complex(dmath.pow(rVal, x), 0);
+        }
       }
       return (log() * x).exp();
     } else if (x is Complex) {
       if (x.isZero) return Complex.one();
       if (x.isOne) return this;
-      if (x.imaginary == 0 && !x.real.isNaN) {
+      final xRealIsNaN = x.real is Rational ? (x.real as Rational).isNaN : (x.real as num).isNaN;
+      if (x.imaginary == 0 && !xRealIsNaN) {
         return pow(x.real);
       }
       return (log() * x).exp();
@@ -1586,15 +1650,26 @@ class Complex implements Comparable<dynamic> {
   /// Complex(3, 4).simplify()        // returns the Complex object
   /// ```
   dynamic simplify({double relTol = 1e-9, double absTol = 1e-15}) {
-    if (!math.isClose(imaginary.toDouble(), 0.0,
+    final double imagDouble = imaginary is Rational ? (imaginary as Rational).toDouble() : (imaginary as num).toDouble();
+    if (!math.isClose(imagDouble, 0.0,
         relTol: relTol, absTol: absTol)) {
       return this;
     }
     // Imaginary part is negligible — simplify to a real number
-    if (_isExactInteger(real)) {
-      return real.toInt();
+    if (real is Rational) {
+      final rat = real as Rational;
+      if (rat.denominator == BigInt.one) {
+        return rat.numerator.toInt();
+      }
+      return rat;
     }
-    return real.toDouble();
+    if (real is num) {
+      if (_isExactInteger(real as num)) {
+        return (real as num).toInt();
+      }
+      return (real as num).toDouble();
+    }
+    return real;
   }
 
   bool _isExactInteger(num value) {
@@ -1724,9 +1799,21 @@ class Complex implements Comparable<dynamic> {
         imaginary ?? this.imaginary,
       );
 
+  bool _isZeroValue(dynamic val) {
+    if (val is Rational) return val.toDouble() == 0.0;
+    if (val is! num) return false;
+    return val.abs() < 1e-12;
+  }
+
   /// When a value is a whole number, it's printed without the fractional part.
   /// For example, `_fixZero(5.0)` returns `"5"`.
-  String _fixZero(num value) {
+  String _fixZero(dynamic value) {
+    if (value is Rational) {
+      return value.toString();
+    }
+    if (value is! num) {
+      return value.toString();
+    }
     // Normalize -0.0 to 0.0
     if (value == -0.0 || value == 0.0) return '0';
 
@@ -1793,8 +1880,8 @@ class Complex implements Comparable<dynamic> {
 
   String _formatSpecialCases({bool asFraction = false, int? fractionDigits}) {
     // Normalize -0.0 to 0.0
-    final r = (real == -0.0 || real == 0.0) ? 0.0 : real;
-    final i = (imaginary == -0.0 || imaginary == 0.0) ? 0.0 : imaginary;
+    final r = _isZeroValue(real) ? 0.0 : real;
+    final i = _isZeroValue(imaginary) ? 0.0 : imaginary;
 
     // Special case for zero
     if (r == 0 && i == 0) {
@@ -1821,8 +1908,8 @@ class Complex implements Comparable<dynamic> {
 
   String _formatComplexNumber({bool asFraction = false, int? fractionDigits}) {
     // Normalize -0.0 to 0.0 for consistent string representation
-    final r = (real == -0.0 || real == 0.0) ? 0.0 : real;
-    final i = (imaginary == -0.0 || imaginary == 0.0) ? 0.0 : imaginary;
+    final r = _isZeroValue(real) ? 0.0 : real;
+    final i = _isZeroValue(imaginary) ? 0.0 : imaginary;
 
     // Special case for zero
     if (r == 0 && i == 0) {
@@ -1831,59 +1918,75 @@ class Complex implements Comparable<dynamic> {
 
     // Special case for purely real numbers
     if (i == 0) {
-      if (r.isInfinite) return r.isNegative ? '-Infinity' : 'Infinity';
-      if (r.isNaN) return 'NaN';
+      if (r is num && r.isInfinite) return r.isNegative ? '-Infinity' : 'Infinity';
+      if (r is Rational && r.isInfinite) return r.isNegative ? '-Infinity' : 'Infinity';
+      if (r is num && r.isNaN) return 'NaN';
+      if (r is Rational && r.isNaN) return 'NaN';
       return _formatValue(r,
           asFraction: asFraction, fractionDigits: fractionDigits);
     }
 
     // Special case for purely imaginary numbers
     if (r == 0) {
-      if (i.isInfinite) return i.isNegative ? '-Infinityi' : 'Infinityi';
-      if (i.isNaN) return 'NaNi';
-      if (i == 1) return 'i';
-      if (i == -1) return '-i';
-      return i > 0
+      if (i is num && i.isInfinite) return i.isNegative ? '-Infinityi' : 'Infinityi';
+      if (i is Rational && i.isInfinite) return i.isNegative ? '-Infinityi' : 'Infinityi';
+      if (i is num && i.isNaN) return 'NaNi';
+      if (i is Rational && i.isNaN) return 'NaNi';
+      if (i is Rational ? i.toDouble() == 1.0 : i == 1) return 'i';
+      if (i is Rational ? i.toDouble() == -1.0 : i == -1) return '-i';
+      
+      final iAbs = i is Rational ? i.abs() : (i as num).abs();
+      final isNegative = i is Rational ? i.isNegative : (i as num).isNegative;
+      return !isNegative
           ? '${_formatValue(i, asFraction: asFraction, fractionDigits: fractionDigits)}i'
-          : '-${_formatValue(i.abs(), asFraction: asFraction, fractionDigits: fractionDigits)}i';
+          : '-${_formatValue(iAbs, asFraction: asFraction, fractionDigits: fractionDigits)}i';
     }
 
     // Handle complex numbers with both parts
-    final realFormatted = r.isInfinite
-        ? (r.isNegative ? '-Infinity' : 'Infinity')
-        : (r.isNaN
+    final rIsInfinite = r is Rational ? r.isInfinite : (r as num).isInfinite;
+    final rIsNegative = r is Rational ? r.isNegative : (r as num).isNegative;
+    final rIsNaN = r is Rational ? r.isNaN : (r as num).isNaN;
+    final realFormatted = rIsInfinite
+        ? (rIsNegative ? '-Infinity' : 'Infinity')
+        : (rIsNaN
             ? 'NaN'
             : _formatValue(r,
                 asFraction: asFraction, fractionDigits: fractionDigits));
 
     String imagFormatted;
-    if (i.isInfinite) {
-      imagFormatted = i.isNegative ? '-Infinityi' : 'Infinityi';
-    } else if (i.isNaN) {
+    final iIsInfinite = i is Rational ? i.isInfinite : (i as num).isInfinite;
+    final iIsNegative = i is Rational ? i.isNegative : (i as num).isNegative;
+    final iIsNaN = i is Rational ? i.isNaN : (i as num).isNaN;
+    if (iIsInfinite) {
+      imagFormatted = iIsNegative ? '-Infinityi' : 'Infinityi';
+    } else if (iIsNaN) {
       imagFormatted = 'NaNi';
     } else {
-      final imagValue = i.abs();
-      imagFormatted = imagValue == 1
+      final imagValue = i is Rational ? i.abs() : (i as num).abs();
+      imagFormatted = (imagValue is Rational ? imagValue.toDouble() == 1.0 : imagValue == 1)
           ? 'i'
           : '${_formatValue(imagValue, asFraction: asFraction, fractionDigits: fractionDigits)}i';
     }
 
-    final sign = i < 0 ? '-' : '+';
+    final sign = iIsNegative ? '-' : '+';
     // For special cases with infinity or NaN in imaginary part, we need to handle differently
-    if (i.isInfinite || i.isNaN) {
+    if (iIsInfinite || iIsNaN) {
       return '$realFormatted $sign ${imagFormatted.replaceFirst('-', '')}';
     }
 
     return '$realFormatted $sign $imagFormatted';
   }
 
-  String _formatComponent(num value,
+  String _formatComponent(dynamic value,
       {required bool isImaginary,
       bool asFraction = false,
       int? fractionDigits}) {
-    if (value.isNaN) return isImaginary ? 'NaNi' : 'NaN';
-    if (value.isInfinite) {
-      final prefix = value.isNegative ? '-' : '';
+    final isNaN = value is Rational ? value.isNaN : (value as num).isNaN;
+    final isInfinite = value is Rational ? value.isInfinite : (value as num).isInfinite;
+    final isNegative = value is Rational ? value.isNegative : (value as num).isNegative;
+    if (isNaN) return isImaginary ? 'NaNi' : 'NaN';
+    if (isInfinite) {
+      final prefix = isNegative ? '-' : '';
       return isImaginary ? '${prefix}Infinityi' : '${prefix}Infinity';
     }
     final formattedValue = _formatValue(value,
@@ -1893,17 +1996,23 @@ class Complex implements Comparable<dynamic> {
         : formattedValue;
   }
 
-  String _formatImaginary(num originalValue, String formattedValue) {
-    if (originalValue == 1) return 'i';
-    if (originalValue == -1) return '-i';
+  String _formatImaginary(dynamic originalValue, String formattedValue) {
+    if (originalValue is Rational ? originalValue.toDouble() == 1.0 : originalValue == 1) return 'i';
+    if (originalValue is Rational ? originalValue.toDouble() == -1.0 : originalValue == -1) return '-i';
     return '${formattedValue}i';
   }
 
-  String _formatValue(num value,
+  String _formatValue(dynamic value,
       {bool asFraction = false, int? fractionDigits}) {
-    if (asFraction) return _toFractionString(value.toDouble());
-    if (fractionDigits != null) return value.toStringAsFixed(fractionDigits);
-    return _fixZero(value);
+    if (value is Rational) {
+      if (fractionDigits != null) {
+        return value.toDouble().toStringAsFixed(fractionDigits);
+      }
+      return value.toString();
+    }
+    if (asFraction) return _toFractionString((value as num).toDouble());
+    if (fractionDigits != null) return (value as num).toStringAsFixed(fractionDigits);
+    return _fixZero(value as num);
   }
 
   String _toFractionString(double value, {double precision = 1e-6}) {

@@ -234,6 +234,9 @@ class Polynomial extends Expression {
           if (coeffStr.endsWith('*')) {
             coeffStr = coeffStr.substring(0, coeffStr.length - 1);
           }
+          if (coeffStr.startsWith('+')) {
+            coeffStr = coeffStr.substring(1);
+          }
 
           // Handle implicit 1 or -1
           if (coeffStr.isEmpty || coeffStr == '+') {
@@ -268,6 +271,9 @@ class Polynomial extends Expression {
           if (degree > maxDegree) maxDegree = degree;
         } else {
           // Constant term
+          if (term.startsWith('+')) {
+            term = term.substring(1);
+          }
           Expression coeff;
           try {
             coeff = Literal(Complex.parse(term));
@@ -305,7 +311,7 @@ class Polynomial extends Expression {
   @override
   Expression operator +(dynamic other) {
     if (other is Polynomial) {
-      int maxDegree = max(coefficients.length, other.coefficients.length);
+      int maxDegree = dmath.max(coefficients.length, other.coefficients.length);
       List<Expression> result =
           List<Expression>.generate(maxDegree, (index) => Literal(0));
 
@@ -325,7 +331,7 @@ class Polynomial extends Expression {
   @override
   Expression operator -(dynamic other) {
     if (other is Polynomial) {
-      int maxDegree = max(coefficients.length, other.coefficients.length);
+      int maxDegree = dmath.max(coefficients.length, other.coefficients.length);
       List<Expression> result =
           List<Expression>.generate(maxDegree, (index) => Literal(0));
 
@@ -814,10 +820,13 @@ class Polynomial extends Expression {
     }
 
     // Extract real parts for GCD calculation
-    List<num> realParts = coefficients.map((c) {
+    List<num> realParts = coefficients.map<num>((c) {
       var val = (c as Literal).value;
       if (val is Complex) {
-        return val.real;
+        final r = val.real;
+        return r is Rational ? r.toDouble() : r as num;
+      } else if (val is Rational) {
+        return val.toDouble();
       } else if (val is num) {
         return val;
       }

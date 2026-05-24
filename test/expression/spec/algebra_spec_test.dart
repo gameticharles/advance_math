@@ -585,10 +585,10 @@ void main() {
     });
     test('should calculate nth roots correctly', () {
       expect(
-          expression.parse('roots((-1)^(1/5))').evaluate().text(),
+          expression.parse('roots((-1)^(1/5))').evaluate().toString(),
           equals(
               '[0.5877852522924731*i+0.809016994374947,-0.309016994374947+0.9510565162951536*i,-1,-0.309016994374948-0.9510565162951536*i,-0.5877852522924734*i+0.809016994374947]'));
-      expect(expression.parse('roots((2)^(1/3))').evaluate().text(),
+      expect(expression.parse('roots((2)^(1/3))').evaluate().toString(),
           equals('[1.122462048309381,-1.122462048309381]'));
     });
     // As mentioned by @Happypig375 in issue #219

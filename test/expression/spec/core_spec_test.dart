@@ -17,7 +17,7 @@ void main() {
       check('4^2', '16');
       check('2*-4', '-8');
       check('2+(3/4)', '11/4'); // Expect symbolic result
-      check('2/3+2/3', '2*2/3'); // 4/3 Expect symbolic result
+      check('2/3+2/3', '4/3'); // Expect symbolic result
       check('6.5*2', '13.0');
     });
 
@@ -53,8 +53,8 @@ void main() {
           '1.5*sin(x)'); // 3/6 -> 0.5 -> 0.5+1 = 1.5. Or 1/2*sin(x)+sin(x) -> 3/2*sin(x)
       check('sin(2*x)', 'sin(2*x)');
       check('sin(a*x)',
-          'x*sin(a)'); // or sin(a*x) depending on parser precedence for implicit mult
-      check('sin(2*a)*cos(2*b)', 'cos(2*b)*sin(2*a)');
+          'sin(a*x)'); // or sin(a*x) depending on parser precedence for implicit mult
+      check('sin(2*a)*cos(2*b)', 'sin(2*a)*cos(2*b)');
     });
   });
 }

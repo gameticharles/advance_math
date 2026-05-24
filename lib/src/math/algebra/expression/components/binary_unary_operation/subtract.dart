@@ -8,44 +8,30 @@ class Subtract extends BinaryOperationsExpression {
     dynamic leftEval = left.evaluate(arg);
     dynamic rightEval = right.evaluate(arg);
 
-    // Convert num to Literal if the other operand is an Expression
-    leftEval = convertToLiteralIfNeeded(leftEval, rightEval);
-    rightEval = convertToLiteralIfNeeded(rightEval, leftEval);
+    if (leftEval is Expression || rightEval is Expression) {
+      return Subtract(
+        leftEval is Expression ? leftEval : Literal(leftEval),
+        rightEval is Expression ? rightEval : Literal(rightEval),
+      ).simplify();
+    }
 
-    // If both evaluate to numbers, return the sum as a number
-    // If both evaluate to numbers, return the sum as a number
     if (leftEval is Matrix) {
       return (leftEval - rightEval);
     }
     if (rightEval is Matrix) {
       return (leftEval - rightEval);
     }
+    dynamic result;
     if (leftEval is Complex) {
-      return (leftEval - rightEval);
+      result = (leftEval - rightEval);
+    } else if (rightEval is Complex) {
+      result = (Complex(leftEval) - rightEval);
+    } else if (leftEval is num && rightEval is num) {
+      result = Complex(leftEval - rightEval);
+    } else {
+      result = Subtract(Literal(leftEval), Literal(rightEval)).simplify();
     }
-    if (rightEval is Complex) {
-      // num - Complex = -(Complex - num)
-      // Or convert num to Complex
-      return (Complex(leftEval) - rightEval);
-    }
-    if (leftEval is num && rightEval is num) {
-      return Complex(leftEval - rightEval);
-    }
-
-    // If x is null and either operand contains a Variable, return the simplified version of the expression
-    if (arg == null && (_containsVariable(left) || _containsVariable(right))) {
-      return simplify();
-    }
-
-    // At this point, both operands should be Expression types that support the + operator.
-    // If they aren't, there's likely a mismatch or unsupported scenario.
-    if (leftEval is Expression && rightEval is Expression) {
-      return Subtract(leftEval, rightEval).simplify();
-    }
-
-    // Default return (should ideally never reach this point)
-    // throw Exception('Unsupported evaluation scenario in Subtract.evaluate');
-    return simplify();
+    return _normalizeResult(result);
   }
 
 // Helper method to check if an expression contains a Variable
