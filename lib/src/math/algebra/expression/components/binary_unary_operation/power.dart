@@ -147,6 +147,34 @@ class Pow extends BinaryOperationsExpression {
       return Pow(simplifiedBase.base, newExponent).simplifyBasic();
     }
 
+    // 1^x = 1 for any x
+    if (simplifiedBase is Literal) {
+      final bv = litVal(simplifiedBase);
+      if (bv == 1) return Literal(1);
+    }
+
+    // (a * b)^n = a^n * b^n for literal integer n
+    if (simplifiedBase is Multiply && simplifiedExponent is Literal) {
+      var ev = litVal(simplifiedExponent);
+      if (ev is int || (ev is num && ev == ev.toInt())) {
+        return Multiply(
+          Pow(simplifiedBase.left, simplifiedExponent),
+          Pow(simplifiedBase.right, simplifiedExponent),
+        ).simplifyBasic();
+      }
+    }
+
+    // (a / b)^n = a^n / b^n for literal integer n
+    if (simplifiedBase is Divide && simplifiedExponent is Literal) {
+      var ev = litVal(simplifiedExponent);
+      if (ev is int || (ev is num && ev == ev.toInt())) {
+        return Divide(
+          Pow(simplifiedBase.left, simplifiedExponent),
+          Pow(simplifiedBase.right, simplifiedExponent),
+        ).simplifyBasic();
+      }
+    }
+
     return Pow(simplifiedBase, simplifiedExponent);
   }
 

@@ -1,6 +1,17 @@
 # 5.6.1
 
-* **[IMPROVEMENT]** Fixed bugs
+## Computer Algebra System (CAS) & Simplifier Overhaul
+
+- **[FEATURE]** Completely overhauled the core expression `Simplifier` into a robust fixed-point iteration engine (max 20 iterations) to guarantee convergence of multi-pass simplifications.
+- **[FEATURE]** Added recursive deep child simplification (`_deepSimp`), logarithmic simplifications (`_logSimp`), exponential simplifications (`_expSimp`), and power algebraic simplifications (`_powSimp`).
+- **[IMPROVEMENT]** Enhanced fraction and rational simplification passes (`_fracSimp` and `_ratSimp`) to support recursive tree traversal, symbolic variable cancellations (e.g. `(c * A) / A -> c`), negative sign normalization, and rational addition/subtraction with different denominators.
+- **[FEATURE]** Replaced fragile string-matching `isSymbolic` logic with type-based checking (`_isSymbolicExpression`) across all expression types.
+- **[FEATURE]** Added trigonometric identity simplification (e.g. $sin^2(x) + cos^2(x) = 1$, $1 + tan^2(x) = sec^2(x)$, and double-angle formulas) recursively across terms.
+- **[IMPROVEMENT]** Added trigonometric constant folding and parity rules (e.g., $sin(-x) \to -sin(x)$) to `Sin`, `Cos`, `Tan`, and base `Trigonometric` expressions.
+- **[IMPROVEMENT]** Added logarithm base and product/quotient splitting properties for literal inputs to `Ln` and `Log` functions.
+- **[IMPROVEMENT]** Added algebraic power expansion rules for products and quotients inside `Pow` expressions.
+- **[FEATURE]** Implemented 42 new high-coverage unit tests verifying arithmetic, power, fraction, logarithm, exponential, trigonometric, and complex nested/edge-case expressions, with zero regressions on existing suites.
+
 
 # 5.6.0
 

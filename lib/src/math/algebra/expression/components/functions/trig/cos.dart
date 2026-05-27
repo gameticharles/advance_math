@@ -66,6 +66,37 @@ class Cos extends TrigonometricExpression {
 
   @override
   Expression simplifyBasic() {
+    var simplifiedOperand = operand.simplify();
+
+    // Constant folding for known values
+    if (simplifiedOperand is Literal) {
+      var val = simplifiedOperand.value;
+      if (val is num) {
+        if (val == 0) return Literal(1); // cos(0) = 1
+        // cos(π) = -1
+        if ((val - pi).abs() < 1e-15) return Literal(-1);
+        // cos(π/2) = 0
+        if ((val - pi / 2).abs() < 1e-15) return Literal(0);
+        // cos(-π/2) = 0
+        if ((val + pi / 2).abs() < 1e-15) return Literal(0);
+        // Evaluate numeric literals
+        return Literal(cos(val));
+      }
+    }
+
+    // Parity: cos(-x) = cos(x) (even function)
+    if (simplifiedOperand is Negate) {
+      return Cos(simplifiedOperand.operand).simplifyBasic();
+    }
+    if (simplifiedOperand is Multiply &&
+        simplifiedOperand.left is Literal &&
+        (simplifiedOperand.left as Literal).value == -1) {
+      return Cos(simplifiedOperand.right).simplifyBasic();
+    }
+
+    if (simplifiedOperand != operand) {
+      return Cos(simplifiedOperand);
+    }
     return this;
   }
 

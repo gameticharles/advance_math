@@ -102,9 +102,27 @@ class Trigonometric extends Expression {
   }
 
   @override
-  Trigonometric simplify() {
-    // Simplification can involve rules like sin(0) = 0, cos(0) = 1, etc.
-    // Placeholder for now.
+  Expression simplify() {
+    var simplifiedOperand = operand.simplify();
+
+    // Constant folding: if operand is a numeric literal, evaluate directly
+    if (simplifiedOperand is Literal) {
+      var val = simplifiedOperand.value;
+      if (val is num || val is Complex) {
+        try {
+          var result = Trigonometric(functionName, simplifiedOperand).evaluate();
+          if (result is num || result is Complex) {
+            return Literal(result);
+          }
+        } catch (_) {
+          // Fall through if evaluation fails (e.g., domain errors)
+        }
+      }
+    }
+
+    if (simplifiedOperand != operand) {
+      return Trigonometric(functionName, simplifiedOperand);
+    }
     return this;
   }
 

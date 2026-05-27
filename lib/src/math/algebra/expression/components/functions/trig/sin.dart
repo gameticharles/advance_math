@@ -51,6 +51,37 @@ class Sin extends TrigonometricExpression {
 
   @override
   Expression simplifyBasic() {
+    var simplifiedOperand = operand.simplify();
+
+    // Constant folding for known values
+    if (simplifiedOperand is Literal) {
+      var val = simplifiedOperand.value;
+      if (val is num) {
+        if (val == 0) return Literal(0); // sin(0) = 0
+        // sin(π) = 0
+        if ((val - pi).abs() < 1e-15) return Literal(0);
+        // sin(π/2) = 1
+        if ((val - pi / 2).abs() < 1e-15) return Literal(1);
+        // sin(-π/2) = -1
+        if ((val + pi / 2).abs() < 1e-15) return Literal(-1);
+        // Evaluate numeric literals
+        return Literal(sin(val));
+      }
+    }
+
+    // Parity: sin(-x) = -sin(x)
+    if (simplifiedOperand is Negate) {
+      return Negate(Sin(simplifiedOperand.operand)).simplifyBasic();
+    }
+    if (simplifiedOperand is Multiply &&
+        simplifiedOperand.left is Literal &&
+        (simplifiedOperand.left as Literal).value == -1) {
+      return Negate(Sin(simplifiedOperand.right)).simplifyBasic();
+    }
+
+    if (simplifiedOperand != operand) {
+      return Sin(simplifiedOperand);
+    }
     return this;
   }
 

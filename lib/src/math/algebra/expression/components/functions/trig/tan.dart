@@ -50,7 +50,36 @@ class Tan extends TrigonometricExpression {
   }
 
   @override
-  Expression simplify() {
+  Expression simplifyBasic() {
+    var simplifiedOperand = operand.simplify();
+
+    // Constant folding for known values
+    if (simplifiedOperand is Literal) {
+      var val = simplifiedOperand.value;
+      if (val is num) {
+        if (val == 0) return Literal(0); // tan(0) = 0
+        // tan(π) = 0
+        if ((val - pi).abs() < 1e-15) return Literal(0);
+        // Evaluate numeric literals (but not π/2 where tan is undefined)
+        if ((val - pi / 2).abs() > 1e-15 && (val + pi / 2).abs() > 1e-15) {
+          return Literal(tan(val));
+        }
+      }
+    }
+
+    // Parity: tan(-x) = -tan(x) (odd function)
+    if (simplifiedOperand is Negate) {
+      return Negate(Tan(simplifiedOperand.operand)).simplifyBasic();
+    }
+    if (simplifiedOperand is Multiply &&
+        simplifiedOperand.left is Literal &&
+        (simplifiedOperand.left as Literal).value == -1) {
+      return Negate(Tan(simplifiedOperand.right)).simplifyBasic();
+    }
+
+    if (simplifiedOperand != operand) {
+      return Tan(simplifiedOperand);
+    }
     return this;
   }
 

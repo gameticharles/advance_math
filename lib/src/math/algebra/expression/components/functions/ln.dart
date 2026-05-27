@@ -37,11 +37,66 @@ class Ln extends Expression {
 
   @override
   Expression simplify() {
-    // If the operand is a literal, evaluate and return a new Literal with the ln value.
-    if (operand is Literal) {
-      return Literal(evaluate());
+    var simplifiedOperand = operand.simplify();
+
+    // ln(1) = 0
+    if (simplifiedOperand is Literal) {
+      var val = simplifiedOperand.value;
+      if (val is num) {
+        if (val == 1) return Literal(0);
+        // ln(e) = 1
+        if ((val - dmath.e).abs() < 1e-15) return Literal(1);
+        // Evaluate positive numeric literals
+        if (val > 0) return Literal(math.log(val));
+      }
     }
-    // More complex simplification, like ln(e) = 1, can be added later.
+
+    // ln(e^x) = x — when operand is Pow with base e
+    if (simplifiedOperand is Pow) {
+      var base = simplifiedOperand.base;
+      if (base is Literal) {
+        var bv = base.value;
+        if (bv is num && (bv - dmath.e).abs() < 1e-15) {
+          return simplifiedOperand.exponent;
+        }
+      }
+    }
+
+    // ln(Exp(x)) = x
+    if (simplifiedOperand is Exp) {
+      return simplifiedOperand.operand;
+    }
+
+    // ln(a * b) = ln(a) + ln(b) — for positive numeric literals
+    if (simplifiedOperand is Multiply) {
+      if (simplifiedOperand.left is Literal &&
+          simplifiedOperand.right is Literal) {
+        var lv = (simplifiedOperand.left as Literal).value;
+        var rv = (simplifiedOperand.right as Literal).value;
+        if (lv is num && rv is num && lv > 0 && rv > 0) {
+          return Add(Ln(simplifiedOperand.left), Ln(simplifiedOperand.right))
+              .simplify();
+        }
+      }
+    }
+
+    // ln(a / b) = ln(a) - ln(b) — for positive numeric literals
+    if (simplifiedOperand is Divide) {
+      if (simplifiedOperand.left is Literal &&
+          simplifiedOperand.right is Literal) {
+        var lv = (simplifiedOperand.left as Literal).value;
+        var rv = (simplifiedOperand.right as Literal).value;
+        if (lv is num && rv is num && lv > 0 && rv > 0) {
+          return Subtract(
+                  Ln(simplifiedOperand.left), Ln(simplifiedOperand.right))
+              .simplify();
+        }
+      }
+    }
+
+    if (simplifiedOperand != operand) {
+      return Ln(simplifiedOperand);
+    }
     return this;
   }
 
