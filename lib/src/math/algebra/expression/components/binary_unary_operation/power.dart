@@ -27,15 +27,14 @@ class Pow extends BinaryOperationsExpression {
           : (leftEval as num).toInt();
       return (rightEval ^ exp);
     }
-    
+
     if ((leftEval is num || leftEval is Complex || leftEval is Rational) &&
         (rightEval is num || rightEval is Complex || rightEval is Rational)) {
       return _normalizeResult(Complex(leftEval).pow(Complex(rightEval)));
     }
-    
+
     dynamic result;
-    if (arg == null &&
-        (_containsVariable(left) || _containsVariable(right))) {
+    if (arg == null && (_containsVariable(left) || _containsVariable(right))) {
       result = simplify();
     } else if (leftEval is Expression && rightEval is Expression) {
       result = Pow(leftEval, rightEval).simplify();
@@ -126,11 +125,15 @@ class Pow extends BinaryOperationsExpression {
               final C = coeffMap[0] ?? Literal(0);
 
               // Check if discriminant B^2 - 4*A*C simplifies to 0
-              final disc = Subtract(Multiply(B, B), Multiply(Literal(4), Multiply(A, C))).simplify();
+              final disc =
+                  Subtract(Multiply(B, B), Multiply(Literal(4), Multiply(A, C)))
+                      .simplify();
               if (disc is Literal && litVal(disc) == 0) {
                 final sqrtA = Pow(A, Literal(0.5)).simplify();
-                final term = Add(v, Divide(B, Multiply(Literal(2), A))).simplify();
-                if (sqrtA is Literal && (sqrtA.value == 1 || sqrtA.value == 1.0)) {
+                final term =
+                    Add(v, Divide(B, Multiply(Literal(2), A))).simplify();
+                if (sqrtA is Literal &&
+                    (sqrtA.value == 1 || sqrtA.value == 1.0)) {
                   return term;
                 }
                 return Multiply(sqrtA, term).simplify();
@@ -158,8 +161,64 @@ class Pow extends BinaryOperationsExpression {
     }
 
     if (simplifiedBase is Literal && simplifiedExponent is Literal) {
-      var b = litVal(simplifiedBase);
-      var e = litVal(simplifiedExponent);
+      final b = litVal(simplifiedBase);
+      final e = litVal(simplifiedExponent);
+
+      bool isRealNum(dynamic v) {
+        return v is num || v is Rational;
+      }
+
+      if (isRealNum(b) && isRealNum(e)) {
+        final ratB = Rational(b);
+        final ratE = Rational(e);
+
+        if (ratE == Rational(1, 2)) {
+          if (ratB.isNegative) {
+            // Extract i: sqrt(b) = i * sqrt(-b)
+            return Multiply(
+              Literal(Complex(0, 1)),
+              Pow(Literal(-ratB), simplifiedExponent),
+            ).simplify();
+          } else {
+            // Positive base: simplify square root of integer or rational
+            if (ratB.denominator == BigInt.one) {
+              final N = ratB.numerator;
+              BigInt squareFactor = BigInt.one;
+              BigInt remaining = N;
+              double d = N.toDouble();
+              if (!d.isInfinite && !d.isNaN) {
+                int limit = dmath.sqrt(d).floor();
+                for (int i = 2; i <= limit; i++) {
+                  BigInt i2 = BigInt.from(i * i);
+                  while (remaining % i2 == BigInt.zero) {
+                    squareFactor *= BigInt.from(i);
+                    remaining ~/= i2;
+                  }
+                }
+              }
+              if (remaining == BigInt.one) {
+                return Literal(Rational(squareFactor));
+              }
+              if (squareFactor > BigInt.one) {
+                return Multiply(
+                  Literal(Rational(squareFactor)),
+                  Pow(Literal(Rational(remaining)), simplifiedExponent),
+                ).simplify();
+              }
+              return Pow(Literal(Rational(remaining)), simplifiedExponent);
+            } else {
+              final numPart =
+                  Pow(Literal(Rational(ratB.numerator)), simplifiedExponent)
+                      .simplify();
+              final denPart =
+                  Pow(Literal(Rational(ratB.denominator)), simplifiedExponent)
+                      .simplify();
+              return Divide(numPart, denPart).simplify();
+            }
+          }
+        }
+      }
+
       if (b is num && e is num) {
         if (b < 0 && e % 1 != 0) {
           return Literal(Complex(b).pow(e));
@@ -233,6 +292,14 @@ class Pow extends BinaryOperationsExpression {
 
   @override
   String toString() {
+    // if (exponent is Literal) {
+    //   final ev = (exponent as Literal).value;
+    //   final val = (ev is Complex) ? ev.simplify() : ev;
+    //   if (val == 0.5 || val == Rational(1, 2)) {
+    //     return "sqrt($base)";
+    //   }
+    // }
+
     var baseStr = base.toString();
     bool needsParentheses = base is Add ||
         base is Subtract ||
@@ -284,8 +351,7 @@ Map<int, Expression>? _collectPolynomialCoeffs(Expression expr, Variable v) {
       var inner = parsePolynomialTerm(t.operand);
       if (inner == null) return null;
       return _TermCoeff(
-          Multiply(Literal(-1), inner.coefficient).simplify(),
-          inner.degree);
+          Multiply(Literal(-1), inner.coefficient).simplify(), inner.degree);
     }
     if (t is GroupExpression) {
       return parsePolynomialTerm(t.expression);
@@ -323,21 +389,18 @@ Map<int, Expression>? _collectPolynomialCoeffs(Expression expr, Variable v) {
         var varTerm = parsePolynomialTerm(t.left);
         if (varTerm == null) return null;
         return _TermCoeff(
-            Multiply(t.right, varTerm.coefficient).simplify(),
-            varTerm.degree);
+            Multiply(t.right, varTerm.coefficient).simplify(), varTerm.degree);
       } else if (!leftHasVar && rightHasVar) {
         var varTerm = parsePolynomialTerm(t.right);
         if (varTerm == null) return null;
         return _TermCoeff(
-            Multiply(t.left, varTerm.coefficient).simplify(),
-            varTerm.degree);
+            Multiply(t.left, varTerm.coefficient).simplify(), varTerm.degree);
       } else {
         var leftTerm = parsePolynomialTerm(t.left);
         var rightTerm = parsePolynomialTerm(t.right);
         if (leftTerm == null || rightTerm == null) return null;
         return _TermCoeff(
-          Multiply(leftTerm.coefficient, rightTerm.coefficient)
-              .simplify(),
+          Multiply(leftTerm.coefficient, rightTerm.coefficient).simplify(),
           leftTerm.degree + rightTerm.degree,
         );
       }
@@ -349,8 +412,8 @@ Map<int, Expression>? _collectPolynomialCoeffs(Expression expr, Variable v) {
       if (!denHasVar) {
         var numTerm = parsePolynomialTerm(t.left);
         if (numTerm == null) return null;
-        return _TermCoeff(Divide(numTerm.coefficient, t.right).simplify(),
-            numTerm.degree);
+        return _TermCoeff(
+            Divide(numTerm.coefficient, t.right).simplify(), numTerm.degree);
       }
     }
     return null;

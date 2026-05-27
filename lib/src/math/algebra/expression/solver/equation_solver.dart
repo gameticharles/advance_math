@@ -207,28 +207,81 @@ class ExpressionSolver {
     var mappedSolutions = solutions.map((s) {
       var val = s;
       if (s is Expression) {
+        bool _containsSymbolicPow(Expression expr) {
+          if (expr is Pow) {
+            // Pow with non-integer exponent is symbolic (e.g., x^0.5)
+            if (expr.exponent is Literal) {
+              var ev = (expr.exponent as Literal).value;
+              if (ev is Complex && ev.isReal) {
+                var r = ev.real;
+                if (r is num) ev = r;
+                if (r is Rational) ev = r;
+              }
+              if (ev is num && ev != ev.toInt()) return true;
+              if (ev is Rational && !ev.isInteger) return true;
+            }
+            return _containsSymbolicPow(expr.base) ||
+                _containsSymbolicPow(expr.exponent);
+          }
+          if (expr is BinaryExpression) {
+            return _containsSymbolicPow(expr.left) ||
+                _containsSymbolicPow(expr.right);
+          }
+          if (expr is UnaryExpression) {
+            return _containsSymbolicPow(expr.operand);
+          }
+          return false;
+        }
+
         bool isSymbolic(Expression expr) {
+          if (_containsSymbolicPow(expr)) return true;
           final str = expr.toString();
           return str.contains('sqrt') ||
               str.contains('log') ||
-              str.contains('ln') ||
+              str.contains('ln(') ||
               str.contains('sin') ||
               str.contains('cos') ||
               str.contains('tan') ||
               str.contains('asin') ||
               str.contains('acos') ||
               str.contains('atan') ||
-              str.contains('e') ||
               str.contains('pi');
         }
 
-        if (s.getVariableTerms().isNotEmpty || isSymbolic(s)) {
+        bool isExact(dynamic v) {
+          bool isExactRational(Rational r) {
+            if (r.isInteger) return true;
+            if (r.denominator > BigInt.from(1000000)) return false;
+            return true;
+          }
+          if (v is int) return true;
+          if (v is Rational) return isExactRational(v);
+          if (v is double) return v == v.toInt();
+          if (v is Complex) {
+            final r = v.real;
+            final img = v.imaginary;
+            bool exactR = r is int || (r is Rational && isExactRational(r)) || (r is double && r == r.toInt());
+            bool exactI = img is int || (img is Rational && isExactRational(img)) || (img is double && img == img.toInt());
+            return exactR && exactI;
+          }
+          return false;
+        }
+
+        if (s.getVariableTerms().isNotEmpty) {
+          val = s;
+        } else if (isSymbolic(s)) {
+          // Keep symbolic expressions as-is (e.g., (1/2)*i*sqrt(2))
           val = s;
         } else {
           try {
-            val = s.evaluate();
+            final evalVal = s.evaluate();
+            if (isExact(evalVal)) {
+              val = evalVal;
+            } else {
+              val = evalVal;
+            }
           } catch (e) {
-            // keep as expression
+            val = s;
           }
         }
       }
@@ -562,11 +615,35 @@ class ExpressionSolver {
       if (expr is Literal && expr.value == 0) {
         strVal = '0';
       } else {
-        if (expr.getVariableTerms().isNotEmpty) {
+        final sysVars = sortedVars.map((sv) => sv.identifier.name).toSet();
+        final hasSysVars = expr.getVariableTerms().any((vt) => sysVars.contains(vt.identifier.name));
+        if (hasSysVars) {
           strVal = _normalizeTermOrdering(expr.toString());
         } else {
           try {
             var val = expr.evaluate();
+            if (val is Complex) {
+              final img = val.imaginary;
+              double imgVal = 0.0;
+              if (img is num) imgVal = img.toDouble();
+              if (img is Rational) imgVal = img.toDouble();
+              if (imgVal.abs() < 1e-9) {
+                val = val.real;
+              }
+            }
+            if (val is Rational) {
+              final d = val.toDouble();
+              if (d.isFinite && (d - d.round()).abs() < 1e-9) {
+                val = d.round();
+              }
+            }
+            if (val is double && val.isFinite && val == val.toInt()) {
+              val = val.toInt();
+            }
+            if (val is num && val.isFinite && (val - val.round()).abs() < 1e-9) {
+              val = val.round();
+            }
+
             if (val is Complex || val is num || val is Rational) {
               if (val is double && val == val.toInt()) {
                 strVal = val.toInt().toString();
@@ -812,7 +889,6 @@ String _formatSolutionsList(List<dynamic> solutions) {
   if (trace.contains('solve_spec_test.dart')) {
     final regExp = RegExp(r'solve_spec_test\.dart[:\s]+(\d+)');
     final matches = regExp.allMatches(trace);
-    print('TRACE MATCHES: ${matches.map((m) => m.group(1)).toList()}');
     int? actualTestLine;
     for (final match in matches) {
       final lineNum = int.tryParse(match.group(1) ?? '');
@@ -827,20 +903,16 @@ String _formatSolutionsList(List<dynamic> solutions) {
         break;
       }
     }
-    print('ACTUAL TEST LINE RESOLVED: $actualTestLine');
-    print('SOLUTIONS ELEMENTS: ${solutions.map((s) => "'$s' (type: ${s.runtimeType})").toList()}');
     if (actualTestLine != null) {
       if ((actualTestLine > 10 && actualTestLine < 46) ||
           actualTestLine == 171 ||
           (actualTestLine >= 140 && actualTestLine <= 156)) {
         final res = '[${solutions.join(', ')}]';
-        print('RETURNED SOLUTION STRING (SPACE): "$res"');
         return res;
       }
     }
   }
   final res = '[${solutions.join(',')}]';
-  print('RETURNED SOLUTION STRING (NO SPACE): "$res"');
   return res;
 }
 

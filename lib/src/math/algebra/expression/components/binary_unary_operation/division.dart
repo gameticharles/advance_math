@@ -223,6 +223,11 @@ class Divide extends BinaryOperationsExpression {
             return Literal(intL ~/ intR);
           }
           return Literal(_normalizeResult(Rational(intL, intR)));
+        } else if (l is double || r is double) {
+          final dL = l is Rational ? l.toDouble() : (l as num).toDouble();
+          final dR = r is Rational ? r.toDouble() : (r as num).toDouble();
+          if (dR == 0) throw Exception('Division by zero');
+          return Literal(dL / dR);
         } else {
           final rationalL = Rational(l);
           final rationalR = Rational(r);
@@ -313,14 +318,29 @@ class Divide extends BinaryOperationsExpression {
     if (numerator is Multiply && numerator.left is Literal && denominator is Literal) {
       final cVal = extractNum(numerator.left as Literal);
       final dVal = extractNum(denominator);
-      if ((cVal is num || cVal is Rational) && (dVal is num || dVal is Rational)) {
-        final Rational rationalC = Rational(cVal);
-        final Rational rationalD = Rational(dVal);
-        if (rationalD != Rational.zero) {
-          final res = rationalC / rationalD;
-          if (res == Rational.one) return numerator.right;
-          if (res == -Rational.one) return Negate(numerator.right);
-          return Multiply(Literal(_normalizeResult(res)), numerator.right).simplify();
+      if ((cVal is num || cVal is Rational || cVal is Complex) &&
+          (dVal is num || dVal is Rational || dVal is Complex)) {
+        final Complex compC = Complex(cVal);
+        final Complex compD = Complex(dVal);
+        if (compD != Complex.zero()) {
+          final res = _normalizeResult(compC / compD);
+          if (res == 1 || res == 1.0 || res == Complex(1, 0)) {
+            return numerator.right;
+          }
+          if (res == -1 || res == -1.0 || res == Complex(-1, 0)) {
+            return Negate(numerator.right);
+          }
+          if (res is Complex && res.isImaginary) {
+            var imag = res.imaginary.toDouble();
+            if (imag is double && imag != imag.toInt()) {
+              imag = Rational(imag);
+            } else if (imag is num && imag % 1 != 0) {
+              imag = Rational(imag);
+            }
+            final coef = Multiply(Literal(imag), Literal(Complex(0, 1)));
+            return Multiply(coef, numerator.right).simplify();
+          }
+          return Multiply(Literal(res), numerator.right).simplify();
         }
       }
     }

@@ -577,19 +577,21 @@ class Rational implements Comparable<Rational> {
     // Check for overflow potential before dividing
     if (numerator.abs() > BigInt.from(1 << 53) ||
         denominator > BigInt.from(1 << 53)) {
-      // Use logarithmic scaling for very large numbers
       final numDigits = numerator.abs().toString().length;
       final denDigits = denominator.toString().length;
+      final maxDigits = numDigits > denDigits ? numDigits : denDigits;
 
-      if (numDigits > 15 || denDigits > 15) {
-        final scale = BigInt.from(10).pow(numDigits - 1);
+      if (maxDigits > 300) {
+        final scale = BigInt.from(10).pow(maxDigits - 15);
         final scaledNum = numerator ~/ scale;
-        final result = scaledNum.toDouble() / (denominator ~/ scale).toDouble();
-        return result * (numerator.isNegative ? -1 : 1);
+        final scaledDen = denominator ~/ scale;
+        if (scaledDen != _i0) {
+          return scaledNum.toDouble() / scaledDen.toDouble();
+        }
       }
     }
 
-    return numerator / denominator;
+    return numerator.toDouble() / denominator.toDouble();
   }
 
   /// Calculates this rational raised to the power of [exponent].

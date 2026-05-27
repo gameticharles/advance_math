@@ -156,6 +156,10 @@ class Multiply extends BinaryOperationsExpression {
       if ((v1 is num || v1 is Rational) && (v2 is num || v2 is Rational)) {
         if (isIntegerVal(v1) && isIntegerVal(v2)) {
           val = toIntVal(v1) * toIntVal(v2);
+        } else if (v1 is double || v2 is double) {
+          final d1 = v1 is Rational ? v1.toDouble() : (v1 as num).toDouble();
+          final d2 = v2 is Rational ? v2.toDouble() : (v2 as num).toDouble();
+          val = d1 * d2;
         } else {
           val = Rational(v1) * Rational(v2);
         }
@@ -207,9 +211,38 @@ class Multiply extends BinaryOperationsExpression {
     if (simpleLeft is Literal && simpleRight is Literal) {
       var leftVal = litVal(simpleLeft);
       var rightVal = litVal(simpleRight);
-      var val = multiplyVals(leftVal, rightVal);
-      if (val is Complex && val.isReal) val = val.simplify();
-      return Literal(val).simplify();
+
+      bool doubleConverted = false;
+      if (leftVal is double && leftVal != leftVal.toInt()) {
+        leftVal = Rational(leftVal);
+        simpleLeft = Literal(leftVal);
+        doubleConverted = true;
+      }
+      if (rightVal is double && rightVal != rightVal.toInt()) {
+        rightVal = Rational(rightVal);
+        simpleRight = Literal(rightVal);
+        doubleConverted = true;
+      }
+
+      bool isFraction(dynamic v) => v is Rational && !v.isInteger;
+      bool isImaginaryUnit(dynamic v) {
+        if (v is! Complex || !v.isImaginary) return false;
+        final img = v.imaginary;
+        double imgVal = 0.0;
+        if (img is num) imgVal = img.toDouble();
+        if (img is Rational) imgVal = img.toDouble();
+        return imgVal == 1.0 || imgVal == -1.0;
+      }
+
+      if ((isFraction(leftVal) && isImaginaryUnit(rightVal)) ||
+          (isFraction(rightVal) && isImaginaryUnit(leftVal))) {
+        // Do not fold fractional Rational and imaginary unit i into a single complex literal
+        return Multiply(simpleLeft, simpleRight);
+      } else {
+        var val = multiplyVals(leftVal, rightVal);
+        if (val is Complex && val.isReal) val = val.simplify();
+        return Literal(val).simplify();
+      }
     }
 
     // Enforce right-associativity: (A * B) * C -> A * (B * C)
@@ -316,21 +349,56 @@ class Multiply extends BinaryOperationsExpression {
           .simplifyBasic();
     }
 
+    Expression buildSimplifiedProduct(dynamic val, Expression x) {
+      if (val is Complex && val.isImaginary) {
+        var img = val.imaginary.toDouble();
+        if (img is double && img != img.toInt()) {
+          img = Rational(img);
+        } else if (img is num && img % 1 != 0) {
+          img = Rational(img);
+        }
+        if (img is Rational && !img.isInteger) {
+          final coef = Multiply(Literal(img), Literal(Complex(0, 1)));
+          return Multiply(coef, x);
+        }
+      }
+      if (isOneVal(val)) {
+        return x;
+      }
+      if (isMinusOneVal(val)) {
+        return Multiply(Literal(-1), x).simplifyBasic();
+      }
+      return Multiply(Literal(val), x).simplifyBasic();
+    }
+
+    // Guard: do not merge two literal coefficients if one is a fraction and
+    // the other is an imaginary unit (±i). Merging would produce a
+    // fractional-imaginary Complex that buildSimplifiedProduct immediately
+    // decomposes back, creating an infinite loop.
+    bool _wouldProduceFracI(dynamic v1, dynamic v2) {
+      bool isFrac(dynamic v) => v is Rational && !v.isInteger;
+      bool isIUnit(dynamic v) {
+        if (v is! Complex || !v.isImaginary) return false;
+        final img = v.imaginary;
+        double iv = 0.0;
+        if (img is num) iv = img.toDouble();
+        if (img is Rational) iv = img.toDouble();
+        return iv == 1.0 || iv == -1.0;
+      }
+      return (isFrac(v1) && isIUnit(v2)) || (isFrac(v2) && isIUnit(v1));
+    }
+
     // Associativity: c1 * (c2 * x) = (c1 * c2) * x
     if (simpleLeft is Literal &&
         simpleRight is Multiply &&
         simpleRight.left is Literal) {
       var c1 = litVal(simpleLeft);
       var c2 = litVal(simpleRight.left as Literal);
-      var val = multiplyVals(c1, c2);
-      if (val is Complex && val.isReal) val = val.simplify();
-      if (isOneVal(val)) {
-        return simpleRight.right;
+      if (!_wouldProduceFracI(c1, c2)) {
+        var val = multiplyVals(c1, c2);
+        if (val is Complex && val.isReal) val = val.simplify();
+        return buildSimplifiedProduct(val, simpleRight.right);
       }
-      if (isMinusOneVal(val)) {
-        return Multiply(Literal(-1), simpleRight.right).simplifyBasic();
-      }
-      return Multiply(Literal(val), simpleRight.right).simplifyBasic();
     }
 
     // Associativity: (c1 * x) * c2 = (c1 * c2) * x
@@ -339,15 +407,11 @@ class Multiply extends BinaryOperationsExpression {
         simpleRight is Literal) {
       var c1 = litVal(simpleLeft.left as Literal);
       var c2 = litVal(simpleRight);
-      var val = multiplyVals(c1, c2);
-      if (val is Complex && val.isReal) val = val.simplify();
-      if (isOneVal(val)) {
-        return simpleLeft.right;
+      if (!_wouldProduceFracI(c1, c2)) {
+        var val = multiplyVals(c1, c2);
+        if (val is Complex && val.isReal) val = val.simplify();
+        return buildSimplifiedProduct(val, simpleLeft.right);
       }
-      if (isMinusOneVal(val)) {
-        return Multiply(Literal(-1), simpleLeft.right).simplifyBasic();
-      }
-      return Multiply(Literal(val), simpleLeft.right).simplifyBasic();
     }
 
     // Associativity: c1 * (x * c2) = (c1 * c2) * x
@@ -356,15 +420,11 @@ class Multiply extends BinaryOperationsExpression {
         simpleRight.right is Literal) {
       var c1 = litVal(simpleLeft);
       var c2 = litVal(simpleRight.right as Literal);
-      var val = multiplyVals(c1, c2);
-      if (val is Complex && val.isReal) val = val.simplify();
-      if (isOneVal(val)) {
-        return simpleRight.left;
+      if (!_wouldProduceFracI(c1, c2)) {
+        var val = multiplyVals(c1, c2);
+        if (val is Complex && val.isReal) val = val.simplify();
+        return buildSimplifiedProduct(val, simpleRight.left);
       }
-      if (isMinusOneVal(val)) {
-        return Multiply(Literal(-1), simpleRight.left).simplifyBasic();
-      }
-      return Multiply(Literal(val), simpleRight.left).simplifyBasic();
     }
 
     // Associativity: (x * c1) * c2 = (c1 * c2) * x
@@ -373,15 +433,11 @@ class Multiply extends BinaryOperationsExpression {
         simpleRight is Literal) {
       var c1 = litVal(simpleLeft.right as Literal);
       var c2 = litVal(simpleRight);
-      var val = multiplyVals(c1, c2);
-      if (val is Complex && val.isReal) val = val.simplify();
-      if (isOneVal(val)) {
-        return simpleLeft.left;
+      if (!_wouldProduceFracI(c1, c2)) {
+        var val = multiplyVals(c1, c2);
+        if (val is Complex && val.isReal) val = val.simplify();
+        return buildSimplifiedProduct(val, simpleLeft.left);
       }
-      if (isMinusOneVal(val)) {
-        return Multiply(Literal(-1), simpleLeft.left).simplifyBasic();
-      }
-      return Multiply(Literal(val), simpleLeft.left).simplifyBasic();
     }
 
     // Combine constant coefficients: c1 * (c2 * A) -> (c1 * c2) * A
@@ -390,15 +446,11 @@ class Multiply extends BinaryOperationsExpression {
         simpleRight.left is Literal) {
       var c1 = litVal(simpleLeft);
       var c2 = litVal(simpleRight.left as Literal);
-      var val = multiplyVals(c1, c2);
-      if (val is Complex && val.isReal) val = val.simplify();
-      if (isOneVal(val)) {
-        return simpleRight.right;
+      if (!_wouldProduceFracI(c1, c2)) {
+        var val = multiplyVals(c1, c2);
+        if (val is Complex && val.isReal) val = val.simplify();
+        return buildSimplifiedProduct(val, simpleRight.right);
       }
-      if (isMinusOneVal(val)) {
-        return Multiply(Literal(-1), simpleRight.right).simplifyBasic();
-      }
-      return Multiply(Literal(val), simpleRight.right).simplifyBasic();
     }
 
     // Multiplication of similar terms: ax * bx = abx^2
@@ -624,6 +676,23 @@ class Multiply extends BinaryOperationsExpression {
       }
       if (val == 1) {
         return leftStr;
+      }
+    }
+
+    if (left is Literal) {
+      final val = (left as Literal).value;
+      if (val is Rational && !val.isInteger) {
+        if (rightStr == 'i' || rightStr.startsWith('i*') || rightStr.startsWith('i^')) {
+          leftStr = '($leftStr)';
+        }
+      }
+    }
+    if (right is Literal) {
+      final val = (right as Literal).value;
+      if (val is Rational && !val.isInteger) {
+        if (leftStr == 'i' || leftStr.startsWith('i*') || leftStr.startsWith('i^')) {
+          rightStr = '($rightStr)';
+        }
       }
     }
 

@@ -20,7 +20,7 @@ class CallExpression extends Expression {
       try {
         if (aevArguments.any((e) => e is Expression)) {
           return CallExpression(
-            callee is Expression ? callee : Literal(callee),
+            callee,
             aevArguments.map((e) => e is Expression ? e : Literal(e)).toList(),
           );
         }
@@ -30,7 +30,7 @@ class CallExpression extends Expression {
             "Function call mismatched for '$callee': $e");
       } catch (e) {
         return CallExpression(
-          callee is Expression ? callee : Literal(callee),
+          callee,
           aevArguments.map((e) => e is Expression ? e : Literal(e)).toList(),
         );
       }

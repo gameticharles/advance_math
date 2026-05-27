@@ -1,7 +1,6 @@
 part of 'expression.dart';
 
 /// Returns a list of all the variables in the expression.
-/// Returns a list of all the variables in the expression.
 final Map<String, dynamic> defaultContext =
     ExpressionContext.buildDefaultContext();
 
@@ -204,8 +203,10 @@ class ExpressionContext {
         'sqrt': (dynamic x) => sqrt(_toEvaluable(x)),
 
         'cbrt': (dynamic x) => cbrt(_toEvaluable(x)),
-        'nthRoot': (dynamic x, dynamic n) => nthRoot(_toEvaluable(x), _toEvaluable(n)),
-        'logBase': (dynamic b, dynamic x) => logBase(_toEvaluable(b), _toEvaluable(x)),
+        'nthRoot': (dynamic x, dynamic n) =>
+            nthRoot(_toEvaluable(x), _toEvaluable(n)),
+        'logBase': (dynamic b, dynamic x) =>
+            logBase(_toEvaluable(b), _toEvaluable(x)),
         'log10': (dynamic x) => log10(_toEvaluable(x)),
 
         'fact': (dynamic x) => factorial(_toInt(x)),
