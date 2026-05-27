@@ -142,7 +142,8 @@ void main() {
 
         final testValues = {'x': 1, 'y': 1};
         final result = expr.evaluate(testValues);
-        expect(result, isApprox(1.5)); // (2+1) * (3-1) / 4 = 6/4 = 1.5
+        expect(
+            result.toDouble(), isApprox(1.5)); // (2+1) * (3-1) / 4 = 6/4 = 1.5
       });
 
       test('should handle complex mathematical expressions', () {
@@ -164,7 +165,8 @@ void main() {
 
         final testValues = {'x': 2, 'y': 3};
         final result = expr.evaluate(testValues);
-        expect(result, isApprox(2.6)); // (5*2 + 3) / (2*3 - 1) = 13/5 = 2.6
+        expect(result.toDouble(),
+            isApprox(2.6)); // (5*2 + 3) / (2*3 - 1) = 13/5 = 2.6
       });
     });
 

@@ -150,7 +150,8 @@ void main() {
         final expr = (ex(2) + x) * (ex(3) - y) / ex(4);
         expect(expr, isA<Divide>());
         final result = expr.evaluate({'x': 1, 'y': 1});
-        expect(result, equals(1.5)); // (2 + 1) * (3 - 1) / 4 = 6 / 4 = 1.5
+        expect(result.toDouble(),
+            equals(1.5)); // (2 + 1) * (3 - 1) / 4 = 6 / 4 = 1.5
       });
     });
 

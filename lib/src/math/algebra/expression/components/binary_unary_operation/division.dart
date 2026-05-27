@@ -183,6 +183,19 @@ class Divide extends BinaryOperationsExpression {
       return v;
     }
 
+    bool fitsInInt(dynamic val) {
+      if (val is int) return true;
+      if (val is Rational) return val.isInteger && val.numerator.isValidInt;
+      if (val is double) return val == val.toInt();
+      if (val is Complex && val.isReal) {
+        final r = val.real;
+        if (r is Rational) return r.isInteger && r.numerator.isValidInt;
+        if (r is int) return true;
+        if (r is double) return r == r.toInt();
+      }
+      return false;
+    }
+
     bool isIntegerVal(dynamic val) {
       if (val is int) return true;
       if (val is Rational) return val.isInteger;
@@ -215,7 +228,7 @@ class Divide extends BinaryOperationsExpression {
       var r = extractNum(denominator);
 
       if ((l is num || l is Rational) && (r is num || r is Rational)) {
-        if (isIntegerVal(l) && isIntegerVal(r)) {
+        if (isIntegerVal(l) && isIntegerVal(r) && fitsInInt(l) && fitsInInt(r)) {
           final intL = toIntVal(l);
           final intR = toIntVal(r);
           if (intR == 0) throw Exception('Division by zero');
@@ -343,6 +356,10 @@ class Divide extends BinaryOperationsExpression {
           return Multiply(Literal(res), numerator.right).simplify();
         }
       }
+    }
+
+    if (denominator is! Literal) {
+      return Multiply(Pow(denominator, Literal(-1)), numerator).simplifyBasic();
     }
 
     return Divide(numerator, denominator);

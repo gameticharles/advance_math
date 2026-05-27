@@ -1602,7 +1602,12 @@ class Complex implements Comparable<dynamic> {
   /// Complex(3, 0).isReal     // true
   /// Complex(3, 4).isReal     // false
   /// ```
-  bool get isReal => imaginary == 0;
+  bool get isReal {
+    final img = imaginary;
+    if (img is Rational) return img.numerator == BigInt.zero;
+    if (img is num) return img == 0 || img == 0.0;
+    return img == 0;
+  }
 
   /// Returns `true` if this complex number has a zero real part.
   ///
@@ -1613,7 +1618,12 @@ class Complex implements Comparable<dynamic> {
   /// Complex(0, 4).isImaginary    // true
   /// Complex(3, 4).isImaginary    // false
   /// ```
-  bool get isImaginary => real == 0;
+  bool get isImaginary {
+    final r = real;
+    if (r is Rational) return r.numerator == BigInt.zero;
+    if (r is num) return r == 0 || r == 0.0;
+    return r == 0;
+  }
 
   /// Returns the complex number with the same phase but unit magnitude.
   ///

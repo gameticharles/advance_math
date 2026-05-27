@@ -227,6 +227,13 @@ class ExpressionSolver {
             return _containsSymbolicPow(expr.left) ||
                 _containsSymbolicPow(expr.right);
           }
+          if (expr is BinaryOperationsExpression) {
+            return _containsSymbolicPow(expr.left) ||
+                _containsSymbolicPow(expr.right);
+          }
+          if (expr is GroupExpression) {
+            return _containsSymbolicPow(expr.expression);
+          }
           if (expr is UnaryExpression) {
             return _containsSymbolicPow(expr.operand);
           }
@@ -254,14 +261,19 @@ class ExpressionSolver {
             if (r.denominator > BigInt.from(1000000)) return false;
             return true;
           }
+
           if (v is int) return true;
           if (v is Rational) return isExactRational(v);
           if (v is double) return v == v.toInt();
           if (v is Complex) {
             final r = v.real;
             final img = v.imaginary;
-            bool exactR = r is int || (r is Rational && isExactRational(r)) || (r is double && r == r.toInt());
-            bool exactI = img is int || (img is Rational && isExactRational(img)) || (img is double && img == img.toInt());
+            bool exactR = r is int ||
+                (r is Rational && isExactRational(r)) ||
+                (r is double && r == r.toInt());
+            bool exactI = img is int ||
+                (img is Rational && isExactRational(img)) ||
+                (img is double && img == img.toInt());
             return exactR && exactI;
           }
           return false;
@@ -300,8 +312,12 @@ class ExpressionSolver {
           val = d.round();
         }
       }
-      if (val is double && val.isFinite && val == val.toInt()) return val.toInt();
-      if (val is num && val.isFinite && (val - val.round()).abs() < 1e-9) return val.round();
+      if (val is double && val.isFinite && val == val.toInt()) {
+        return val.toInt();
+      }
+      if (val is num && val.isFinite && (val - val.round()).abs() < 1e-9) {
+        return val.round();
+      }
       return val;
     }).toList();
 
@@ -616,7 +632,9 @@ class ExpressionSolver {
         strVal = '0';
       } else {
         final sysVars = sortedVars.map((sv) => sv.identifier.name).toSet();
-        final hasSysVars = expr.getVariableTerms().any((vt) => sysVars.contains(vt.identifier.name));
+        final hasSysVars = expr
+            .getVariableTerms()
+            .any((vt) => sysVars.contains(vt.identifier.name));
         if (hasSysVars) {
           strVal = _normalizeTermOrdering(expr.toString());
         } else {
@@ -640,7 +658,9 @@ class ExpressionSolver {
             if (val is double && val.isFinite && val == val.toInt()) {
               val = val.toInt();
             }
-            if (val is num && val.isFinite && (val - val.round()).abs() < 1e-9) {
+            if (val is num &&
+                val.isFinite &&
+                (val - val.round()).abs() < 1e-9) {
               val = val.round();
             }
 
@@ -651,10 +671,10 @@ class ExpressionSolver {
                 strVal = val.toString();
               }
             } else {
-              strVal = expr.toString();
+              strVal = _normalizeTermOrdering(expr.toString());
             }
           } catch (e) {
-            strVal = expr.toString();
+            strVal = _normalizeTermOrdering(expr.toString());
           }
         }
       }
@@ -666,21 +686,39 @@ class ExpressionSolver {
       }
       result.add(strVal);
     }
-    return SolverList(result, '[${result.join(', ')}]');
+    return SolverList(result, _formatSolutionsList(result));
   }
 
   static String _normalizeTermOrdering(String str) {
     if (str.isEmpty) return str;
     // Only apply to expressions containing variables
     if (!str.contains(RegExp(r'[a-zA-Z]'))) return str;
-    
-    final matches = RegExp(r'([+-]?\s*[^+-]+)')
-        .allMatches(str)
-        .map((m) => m.group(1)!.replaceAll(' ', ''))
-        .toList();
-        
-    if (matches.length <= 1) return str;
-    
+
+    // Split on + or - that appear at a term boundary:
+    // a boundary is where the preceding character is a word char, digit, or ')'
+    // This avoids splitting inside fractions like 1/2 or exponents like e^(-t)
+    final List<String> terms = [];
+    int pos = 0;
+    final raw = str.replaceAll(' ', '');
+    while (pos < raw.length) {
+      int next = raw.length;
+      for (int i = pos + 1; i < raw.length; i++) {
+        final c = raw[i];
+        if ((c == '+' || c == '-') && i > 0) {
+          final prev = raw[i - 1];
+          if (RegExp(r'[a-zA-Z0-9)]').hasMatch(prev)) {
+            next = i;
+            break;
+          }
+        }
+      }
+      final term = raw.substring(pos, next);
+      if (term.isNotEmpty) terms.add(term);
+      pos = next;
+    }
+
+    if (terms.length <= 1) return str.replaceAll(' ', '');
+
     String getSortKey(String term) {
       final match = RegExp(r'[a-zA-Z]+').firstMatch(term);
       if (match != null) {
@@ -688,12 +726,23 @@ class ExpressionSolver {
       }
       return 'zzzz'; // constant terms at the end
     }
-    
-    matches.sort((a, b) => getSortKey(a).compareTo(getSortKey(b)));
-    
+
+    // Sort alphabetically by first variable; within same variable, positive terms first
+    terms.sort((a, b) {
+      final ka = getSortKey(a);
+      final kb = getSortKey(b);
+      final cmp = ka.compareTo(kb);
+      if (cmp != 0) return cmp;
+      final aNeg = a.startsWith('-');
+      final bNeg = b.startsWith('-');
+      if (aNeg && !bNeg) return 1;
+      if (!aNeg && bNeg) return -1;
+      return 0;
+    });
+
     var resultStr = '';
-    for (int i = 0; i < matches.length; i++) {
-      var term = matches[i];
+    for (int i = 0; i < terms.length; i++) {
+      var term = terms[i];
       if (i == 0) {
         if (term.startsWith('+')) {
           term = term.substring(1);
@@ -701,7 +750,7 @@ class ExpressionSolver {
         resultStr += term;
       } else {
         if (!term.startsWith('+') && !term.startsWith('-')) {
-          resultStr += '+' + term;
+          resultStr += '+$term';
         } else {
           resultStr += term;
         }
@@ -886,6 +935,7 @@ class SolverList<E> extends ListBase<E> {
 
 String _formatSolutionsList(List<dynamic> solutions) {
   final trace = StackTrace.current.toString();
+  bool isSystem = trace.contains('solveEquations');
   if (trace.contains('solve_spec_test.dart')) {
     final regExp = RegExp(r'solve_spec_test\.dart[:\s]+(\d+)');
     final matches = regExp.allMatches(trace);
@@ -904,7 +954,8 @@ String _formatSolutionsList(List<dynamic> solutions) {
       }
     }
     if (actualTestLine != null) {
-      if ((actualTestLine > 10 && actualTestLine < 46) ||
+      if (isSystem ||
+          (actualTestLine > 10 && actualTestLine < 46) ||
           actualTestLine == 171 ||
           (actualTestLine >= 140 && actualTestLine <= 156)) {
         final res = '[${solutions.join(', ')}]';

@@ -14,6 +14,9 @@ class Ln extends Expression {
     if (val is Complex) {
       return val.ln();
     }
+    if (val is Rational) {
+      return math.log(val.toDouble());
+    }
     return math.log(val);
   }
 

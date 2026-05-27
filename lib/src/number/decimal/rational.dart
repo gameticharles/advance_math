@@ -555,7 +555,7 @@ class Rational implements Comparable<Rational> {
   /// Converts to [int] via truncation.
   int toInt() {
     if (denominator == _i0) throw UnsupportedError("NaN/Inf");
-    if (numerator.abs() > BigInt.from(1 << 63)) {
+    if (numerator.abs() > BigInt.two.pow(63)) {
       throw UnsupportedError("Number too large for int");
     }
     return (numerator ~/ denominator).toInt();

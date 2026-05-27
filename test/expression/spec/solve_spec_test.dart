@@ -59,7 +59,7 @@ void main() {
       check('solve(3*(x+5)*(x-4), x)', '[-5,4]');
       check('solve(3*(x+a)*(x-b), x)', '[-a,b]');
       check('solve(a*x^2+b, x)',
-          '[a^(-1)*i*sqrt(a)*sqrt(b),-a^(-1)*i*sqrt(a)*sqrt(b)]');
+          '[i*sqrt(a)*sqrt(b)/a,-i*sqrt(a)*sqrt(b)/a]');
       check('solve(x^2+2*x+1, x)', '[-1]');
       check('solve(-5 sqrt(14)x-14x^2 sqrt(83)-10=0,x)',
           '[(-1/28)*sqrt(-560*sqrt(83)+350)*sqrt(83)^(-1)+(-5/28)*sqrt(14)*sqrt(83)^(-1),(-5/28)*sqrt(14)*sqrt(83)^(-1)+(1/28)*sqrt(-560*sqrt(83)+350)*sqrt(83)^(-1)]');

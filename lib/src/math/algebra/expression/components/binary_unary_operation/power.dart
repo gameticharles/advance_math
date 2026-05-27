@@ -217,6 +217,34 @@ class Pow extends BinaryOperationsExpression {
             }
           }
         }
+
+        if (ratE.isInteger && ratE.numerator.isValidInt) {
+          final n = ratE.toInt();
+          if (n.abs() <= 100000) {
+            if (n < 0) {
+              try {
+                final inv = Rational.one / ratB;
+                var res = Rational.one;
+                for (int i = 0; i < -n; i++) {
+                  res *= inv;
+                }
+                if (res.denominator == BigInt.one && res.numerator.isValidInt) {
+                  return Literal(res.toInt());
+                }
+                return Literal(res);
+              } catch (_) {}
+            } else {
+              var res = Rational.one;
+              for (int i = 0; i < n; i++) {
+                res *= ratB;
+              }
+              if (res.denominator == BigInt.one && res.numerator.isValidInt) {
+                return Literal(res.toInt());
+              }
+              return Literal(res);
+            }
+          }
+        }
       }
 
       if (b is num && e is num) {
@@ -240,10 +268,13 @@ class Pow extends BinaryOperationsExpression {
       if (bv == 1) return Literal(1);
     }
 
-    // (a * b)^n = a^n * b^n for literal integer n
+    // (a * b)^n = a^n * b^n for literal integer n or 0.5/Rational(1,2)
     if (simplifiedBase is Multiply && simplifiedExponent is Literal) {
       var ev = litVal(simplifiedExponent);
-      if (ev is int || (ev is num && ev == ev.toInt())) {
+      if (ev is int ||
+          (ev is num && ev == ev.toInt()) ||
+          ev == 0.5 ||
+          ev == Rational(1, 2)) {
         return Multiply(
           Pow(simplifiedBase.left, simplifiedExponent),
           Pow(simplifiedBase.right, simplifiedExponent),
@@ -251,10 +282,13 @@ class Pow extends BinaryOperationsExpression {
       }
     }
 
-    // (a / b)^n = a^n / b^n for literal integer n
+    // (a / b)^n = a^n / b^n for literal integer n or 0.5/Rational(1,2)
     if (simplifiedBase is Divide && simplifiedExponent is Literal) {
       var ev = litVal(simplifiedExponent);
-      if (ev is int || (ev is num && ev == ev.toInt())) {
+      if (ev is int ||
+          (ev is num && ev == ev.toInt()) ||
+          ev == 0.5 ||
+          ev == Rational(1, 2)) {
         return Divide(
           Pow(simplifiedBase.left, simplifiedExponent),
           Pow(simplifiedBase.right, simplifiedExponent),
@@ -292,13 +326,13 @@ class Pow extends BinaryOperationsExpression {
 
   @override
   String toString() {
-    // if (exponent is Literal) {
-    //   final ev = (exponent as Literal).value;
-    //   final val = (ev is Complex) ? ev.simplify() : ev;
-    //   if (val == 0.5 || val == Rational(1, 2)) {
-    //     return "sqrt($base)";
-    //   }
-    // }
+    if (exponent is Literal) {
+      final ev = (exponent as Literal).value;
+      final val = (ev is Complex) ? ev.simplify() : ev;
+      if (val == 0.5 || val == Rational(1, 2)) {
+        return "sqrt($base)";
+      }
+    }
 
     var baseStr = base.toString();
     bool needsParentheses = base is Add ||

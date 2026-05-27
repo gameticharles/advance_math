@@ -21,7 +21,7 @@ class Multiply extends BinaryOperationsExpression {
     if (rightEval is Matrix) {
       return (leftEval * rightEval);
     }
-    
+
     if ((leftEval is num || leftEval is Complex || leftEval is Rational) &&
         (rightEval is num || rightEval is Complex || rightEval is Rational)) {
       bool isZero(dynamic val) {
@@ -30,6 +30,7 @@ class Multiply extends BinaryOperationsExpression {
         if (val is Rational) return val == Rational.zero;
         return false;
       }
+
       if (isZero(leftEval) || isZero(rightEval)) {
         return _normalizeResult(Complex.zero());
       }
@@ -125,6 +126,19 @@ class Multiply extends BinaryOperationsExpression {
       return false;
     }
 
+    bool fitsInInt(dynamic val) {
+      if (val is int) return true;
+      if (val is Rational) return val.isInteger && val.numerator.isValidInt;
+      if (val is double) return val == val.toInt();
+      if (val is Complex && val.isReal) {
+        final r = val.real;
+        if (r is Rational) return r.isInteger && r.numerator.isValidInt;
+        if (r is int) return true;
+        if (r is double) return r == r.toInt();
+      }
+      return false;
+    }
+
     bool isIntegerVal(dynamic val) {
       if (val is int) return true;
       if (val is Rational) return val.isInteger;
@@ -154,7 +168,10 @@ class Multiply extends BinaryOperationsExpression {
     dynamic multiplyVals(dynamic v1, dynamic v2) {
       dynamic val;
       if ((v1 is num || v1 is Rational) && (v2 is num || v2 is Rational)) {
-        if (isIntegerVal(v1) && isIntegerVal(v2)) {
+        if (isIntegerVal(v1) &&
+            isIntegerVal(v2) &&
+            fitsInInt(v1) &&
+            fitsInInt(v2)) {
           val = toIntVal(v1) * toIntVal(v2);
         } else if (v1 is double || v2 is double) {
           final d1 = v1 is Rational ? v1.toDouble() : (v1 as num).toDouble();
@@ -385,6 +402,7 @@ class Multiply extends BinaryOperationsExpression {
         if (img is Rational) iv = img.toDouble();
         return iv == 1.0 || iv == -1.0;
       }
+
       return (isFrac(v1) && isIUnit(v2)) || (isFrac(v2) && isIUnit(v1));
     }
 
@@ -682,7 +700,9 @@ class Multiply extends BinaryOperationsExpression {
     if (left is Literal) {
       final val = (left as Literal).value;
       if (val is Rational && !val.isInteger) {
-        if (rightStr == 'i' || rightStr.startsWith('i*') || rightStr.startsWith('i^')) {
+        if (rightStr == 'i' ||
+            rightStr.startsWith('i*') ||
+            rightStr.startsWith('i^')) {
           leftStr = '($leftStr)';
         }
       }
@@ -690,7 +710,9 @@ class Multiply extends BinaryOperationsExpression {
     if (right is Literal) {
       final val = (right as Literal).value;
       if (val is Rational && !val.isInteger) {
-        if (leftStr == 'i' || leftStr.startsWith('i*') || leftStr.startsWith('i^')) {
+        if (leftStr == 'i' ||
+            leftStr.startsWith('i*') ||
+            leftStr.startsWith('i^')) {
           rightStr = '($rightStr)';
         }
       }
@@ -702,6 +724,32 @@ class Multiply extends BinaryOperationsExpression {
     }
     if (right is Add || right is Subtract) {
       rightStr = '($rightStr)';
+    }
+
+    // Display  Variable^(-1) * numerator  as  numerator/variable (e.g. b/a instead of a^(-1)*b)
+    // Also display  numerator * Variable^(-1)  as  numerator/variable.
+    // Only applies when the Pow has a plain Variable base with exponent exactly -1.
+    bool isPowVarMinusOne(Expression e) {
+      if (e is! Pow) return false;
+      final pow = e as Pow;
+      if (pow.base is! Variable) return false;
+      if (pow.exponent is! Literal) return false;
+      final expVal = (pow.exponent as Literal).value;
+      if (expVal == -1) return true;
+      if (expVal is Complex && (expVal as Complex).isReal) {
+        final r = (expVal as Complex).real;
+        return (r is num && r == -1) || (r is Rational && r == Rational.fromInt(-1));
+      }
+      return false;
+    }
+
+    if (isPowVarMinusOne(right)) {
+      final baseStr = (right as Pow).base.toString();
+      return "$leftStr/$baseStr";
+    }
+    if (isPowVarMinusOne(left)) {
+      final baseStr = (left as Pow).base.toString();
+      return "$rightStr/$baseStr";
     }
 
     return "$leftStr*$rightStr";
