@@ -43,29 +43,39 @@ class Simplifier {
       if (currentForm == previousForm) break; // Converged
       previousForm = currentForm;
 
+      print('--- Iteration $iteration ---');
+
       // Pass 1: Recursive deep simplification (simplify children first)
       current = _deepSimp(current);
+      print('After Pass 1 (Deep): $current, eval: ${current.getVariableTerms().isEmpty ? current.evaluate() : "has var"}');
 
       // Pass 2: Basic arithmetic simplification
       current = current.simplifyBasic();
+      print('After Pass 2 (Basic): $current, eval: ${current.getVariableTerms().isEmpty ? current.evaluate() : "has var"}');
 
       // Pass 3: Fraction Simplification (GCD)
       current = _fracSimp(current);
+      print('After Pass 3 (Frac): $current, eval: ${current.getVariableTerms().isEmpty ? current.evaluate() : "has var"}');
 
       // Pass 4: Trigonometric Simplification
       current = _trigSimp(current);
+      print('After Pass 4 (Trig): $current, eval: ${current.getVariableTerms().isEmpty ? current.evaluate() : "has var"}');
 
       // Pass 5: Rational Simplification (Common Denominators)
       current = _ratSimp(current);
+      print('After Pass 5 (Rat): $current, eval: ${current.getVariableTerms().isEmpty ? current.evaluate() : "has var"}');
 
       // Pass 6: Logarithmic Simplification
       current = _logSimp(current);
+      print('After Pass 6 (Log): $current, eval: ${current.getVariableTerms().isEmpty ? current.evaluate() : "has var"}');
 
       // Pass 7: Exponential Simplification
       current = _expSimp(current);
+      print('After Pass 7 (Exp): $current, eval: ${current.getVariableTerms().isEmpty ? current.evaluate() : "has var"}');
 
       // Pass 8: Power Algebra
       current = _powSimp(current);
+      print('After Pass 8 (Pow): $current, eval: ${current.getVariableTerms().isEmpty ? current.evaluate() : "has var"}');
     }
 
     return current;
@@ -87,6 +97,16 @@ class Simplifier {
         expr is Csc ||
         expr is Cot) {
       return true;
+    }
+    if (expr is Pow) {
+      final exp = expr.exponent;
+      if (exp is Literal) {
+        final val = exp.value;
+        if (val is num && val % 1 != 0) return true;
+        if (val is Rational && !val.isInteger) return true;
+      } else {
+        return true;
+      }
     }
     if (expr is BinaryOperationsExpression) {
       return _isSymbolicExpression(expr.left) ||

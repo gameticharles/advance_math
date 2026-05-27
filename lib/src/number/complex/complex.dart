@@ -1118,6 +1118,9 @@ class Complex implements Comparable<dynamic> {
   /// print(z_power); // Output: -1.6401010184280038 + 0.202050398556709i
   /// ```
   Complex pow(dynamic x) {
+    if (x is Rational) {
+      x = x.toDouble();
+    }
     if (x is num) {
       if (x == 0) return Complex.one();
       if (x == 1) return this;

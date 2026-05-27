@@ -23,16 +23,13 @@ class Add extends BinaryOperationsExpression {
     if (rightEval is Matrix) {
       return (leftEval + rightEval);
     }
-    dynamic result;
-    if (leftEval is Complex) {
-      result = (leftEval + rightEval);
-    } else if (rightEval is Complex) {
-      result = (rightEval + leftEval);
-    } else if (leftEval is num && rightEval is num) {
-      result = Complex(leftEval + rightEval);
-    } else {
-      result = Add(Literal(leftEval), Literal(rightEval)).simplify();
+    
+    if ((leftEval is num || leftEval is Complex || leftEval is Rational) &&
+        (rightEval is num || rightEval is Complex || rightEval is Rational)) {
+      return _normalizeResult(Complex(leftEval) + Complex(rightEval));
     }
+    
+    dynamic result = Add(Literal(leftEval), Literal(rightEval)).simplify();
     return _normalizeResult(result);
   }
 
@@ -67,13 +64,8 @@ class Add extends BinaryOperationsExpression {
     if (simplifiedLeft is Literal && simplifiedRight is Literal) {
       var leftVal = simplifiedLeft.evaluate();
       var rightVal = simplifiedRight.evaluate();
-      if (leftVal is num && rightVal is Complex) {
-        return Literal(Complex(leftVal, 0) + rightVal);
-      }
-      if (leftVal is Complex || rightVal is Complex) {
-        return Literal((Complex(leftVal) + Complex(rightVal)));
-      }
-      return Literal(leftVal + rightVal);
+      final res = Complex(leftVal) + Complex(rightVal);
+      return Literal(_normalizeResult(res));
     }
 
     // Check if one of the operands is 0 (identity for addition).
@@ -136,15 +128,22 @@ class Add extends BinaryOperationsExpression {
     dynamic constantTerm = 0;
     List<Expression> symbolicConstantTerms = [];
 
+    // Helper for safe addition of numeric, rational, and complex types
+    dynamic addValues(dynamic a, dynamic b) {
+      if (a is Complex || b is Complex) {
+        return Complex(a) + Complex(b);
+      }
+      if (a is Rational || b is Rational) {
+        return Rational(a) + Rational(b);
+      }
+      return a + b;
+    }
+
     for (var term in terms) {
       if (term is Literal) {
         var val = term.evaluate();
         if (val is Complex || val is num || val is Rational) {
-          if (constantTerm is num && val is Complex) {
-            constantTerm = val + constantTerm;
-          } else {
-            constantTerm += val;
-          }
+          constantTerm = addValues(constantTerm, val);
         } else if (val is Expression) {
           symbolicConstantTerms.add(val);
         } else {
@@ -152,45 +151,65 @@ class Add extends BinaryOperationsExpression {
         }
       } else if (term is Variable) {
         String key = term.toString();
-        likeTerms.update(key, (val) => val + 1, ifAbsent: () => 1);
+        likeTerms.update(key, (val) => addValues(val, 1), ifAbsent: () => 1);
         termExpressions.putIfAbsent(key, () => term);
       } else if (term is Multiply && term.left is Literal) {
         String key = term.right.toString();
         dynamic coefficient = (term.left as Literal).evaluate();
-        likeTerms.update(key, (val) {
-          if (val is num && coefficient is Complex) {
-            return coefficient + val;
-          }
-          return val + coefficient;
-        }, ifAbsent: () => coefficient);
+        likeTerms.update(key, (val) => addValues(val, coefficient), ifAbsent: () => coefficient);
         termExpressions.putIfAbsent(key, () => term.right);
       }
       // Handle terms of type x^2y, x^3, etc.
       else if (term is Multiply || term is Pow) {
         String key = term.toString();
-        likeTerms.update(key, (val) => val + 1, ifAbsent: () => 1);
+        likeTerms.update(key, (val) => addValues(val, 1), ifAbsent: () => 1);
         termExpressions.putIfAbsent(key, () => term);
       } else {
         // Fallback for other types
         String key = term.toString();
-        likeTerms.update(key, (val) => val + 1, ifAbsent: () => 1);
+        likeTerms.update(key, (val) => addValues(val, 1), ifAbsent: () => 1);
         termExpressions.putIfAbsent(key, () => term);
       }
     }
 
+    bool isZeroVal(dynamic val) {
+      if (val is num) return val == 0;
+      if (val is Rational) return val == Rational.zero;
+      if (val is Complex) return val.real == 0 && val.imaginary == 0;
+      return false;
+    }
+
+    bool isOneVal(dynamic val) {
+      if (val is num) return val == 1;
+      if (val is Rational) return val == Rational.one;
+      if (val is Complex) return val.real == 1 && val.imaginary == 0;
+      return false;
+    }
+
+    bool isMinusOneVal(dynamic val) {
+      if (val is num) return val == -1;
+      if (val is Rational) return val == Rational.fromInt(-1);
+      if (val is Complex) return val.real == -1 && val.imaginary == 0;
+      return false;
+    }
+
     // Reconstruct the simplified expression from the likeTerms map and constant term
     List<Expression> simplifiedTerms = [];
-    if (constantTerm != 0) {
+    if (!isZeroVal(constantTerm)) {
       simplifiedTerms.add(Literal(constantTerm));
     }
     simplifiedTerms.addAll(symbolicConstantTerms);
 
     for (var entry in likeTerms.entries) {
-      if (entry.value == 1) {
+      final val = entry.value;
+      if (isZeroVal(val)) continue;
+      if (isOneVal(val)) {
         simplifiedTerms.add(Expression.parse(entry.key));
+      } else if (isMinusOneVal(val)) {
+        simplifiedTerms.add(Multiply(Literal(-1), Expression.parse(entry.key)));
       } else {
         simplifiedTerms
-            .add(Multiply(Literal(entry.value), Expression.parse(entry.key)));
+            .add(Multiply(Literal(val), Expression.parse(entry.key)));
       }
     }
 

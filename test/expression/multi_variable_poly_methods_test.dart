@@ -71,7 +71,7 @@ void main() {
     test('isIndeterminate() works for univariate', () {
       final poly = MultiVariablePolynomial.fromString("x");
       expect(poly.isIndeterminate(double.nan), isTrue);
-      expect(poly.isIndeterminate(1), isTrue);
+      expect(poly.isIndeterminate(1), isFalse);
     });
 
     test('isIndeterminate() throws for multivariate', () {

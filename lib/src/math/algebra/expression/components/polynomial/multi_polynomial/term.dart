@@ -30,7 +30,7 @@ class Term {
   @override
   int get hashCode => coefficient.hashCode ^ variables.hashCode;
 
-  dynamic evaluate(Map<String, num> values) {
+  dynamic evaluate(Map<String, dynamic> values) {
     dynamic result = coefficient is Complex ? coefficient : Complex(coefficient);
     variables.forEach((varName, power) {
       if (values.containsKey(varName)) {

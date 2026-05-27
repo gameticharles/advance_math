@@ -11,7 +11,8 @@ void main() {
       expect(Add(Literal(2), Literal(3)).simplify().evaluate(), equals(5));
       expect(
           Multiply(Literal(4), Literal(5)).simplify().evaluate(), equals(20));
-      expect(Subtract(Literal(10), Literal(3)).simplify().evaluate(), equals(7));
+      expect(
+          Subtract(Literal(10), Literal(3)).simplify().evaluate(), equals(7));
     });
 
     test('Identity: x + 0 = x', () {
@@ -111,14 +112,14 @@ void main() {
       var simplified = expr.simplify();
       // The simplifier should reduce 2/4 to 1/2 (as Rational or 0.5)
       var val = simplified.evaluate();
-      expect(val, equals(0.5));
+      expect(val.toString(), equals('1/2'));
     });
 
     test('10/25 = 2/5', () {
       var expr = Divide(Literal(10), Literal(25));
       var simplified = expr.simplify();
       var val = simplified.evaluate();
-      expect(val, equals(0.4));
+      expect(val.toString(), equals('2/5'));
     });
 
     test('6/3 = 2', () {
@@ -262,8 +263,7 @@ void main() {
   group('Nested and Complex Simplification', () {
     test('Deeply nested addition simplifies', () {
       // ((2 + 3) + 4) + 5 = 14
-      var expr =
-          Add(Add(Add(Literal(2), Literal(3)), Literal(4)), Literal(5));
+      var expr = Add(Add(Add(Literal(2), Literal(3)), Literal(4)), Literal(5));
       expect(expr.simplify().evaluate(), equals(14));
     });
 

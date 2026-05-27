@@ -67,8 +67,8 @@ class Quadratic extends Polynomial {
   /// If the discriminant is greater than zero, there are two real roots, which are returned as a list with two numbers.
   @override
   List<Expression> roots() {
-    final disc = discriminant().simplify();
-    final twoA = Literal(2) * a;
+    final disc = discriminant().expand().simplify();
+    final twoA = (Literal(2) * a).simplify();
     final rootDisc = Pow(disc, Literal(0.5)).simplify();
 
     final negB = (-b).simplify();

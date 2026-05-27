@@ -12,9 +12,33 @@ class Literal extends Expression {
   @override
   dynamic evaluate([dynamic arg]) {
     if (value is List) {
-      return (value as List)
-          .map((e) => (e is Expression) ? e.evaluate(arg) : e)
+      final mapped = (value as List)
+          .map((e) {
+            if (e is Expression) {
+              if (e.getVariableTerms().isEmpty) {
+                try {
+                  return e.evaluate(arg);
+                } catch (_) {
+                  return e;
+                }
+              }
+              if (arg is Map &&
+                  e.getVariableTerms().every((v) => arg.containsKey(v.identifier.name))) {
+                try {
+                  return e.evaluate(arg);
+                } catch (_) {
+                  return e;
+                }
+              }
+              return e;
+            }
+            return e;
+          })
           .toList();
+      if (value is SolverList) {
+        return SolverList(mapped, (value as SolverList)._customString);
+      }
+      return mapped;
     }
     if (value is Map) {
       return (value as Map).map((key, value) => MapEntry(

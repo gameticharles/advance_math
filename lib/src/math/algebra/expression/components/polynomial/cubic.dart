@@ -56,7 +56,7 @@ class Cubic extends Polynomial {
     var two = Literal(2);
     var three = Literal(3);
     // sigma = -1/2 + i*sqrt(3)/2
-    final sigma = Literal(Complex(-0.5, 0.5 * sqrt(3)));
+    final sigma = Literal(Complex(-0.5, 0.5 * dmath.sqrt(3)));
 
     final d0 = b * b - a * c * three;
 

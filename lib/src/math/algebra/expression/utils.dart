@@ -5,24 +5,72 @@ part of 'expression.dart';
 final Map<String, dynamic> defaultContext =
     ExpressionContext.buildDefaultContext();
 
-int _toInt(dynamic v) => v is Complex ? v.real.toInt() : (v as num).toInt();
-num _toNum(dynamic v) => v is Complex ? v.real : (v as num);
-double _toDouble(dynamic v) =>
-    v is Complex ? v.real.toDouble() : (v as num).toDouble();
+int _toInt(dynamic v) {
+  if (v is Complex) {
+    final r = v.real;
+    return r is Rational ? r.toInt() : (r as num).toInt();
+  }
+  if (v is Rational) {
+    return v.toInt();
+  }
+  return (v as num).toInt();
+}
+
+num _toNum(dynamic v) {
+  if (v is Complex) {
+    final r = v.real;
+    return r is Rational ? r.toDouble() : (r as num);
+  }
+  if (v is Rational) {
+    return v.toDouble();
+  }
+  return (v as num);
+}
+
+double _toDouble(dynamic v) {
+  if (v is Complex) {
+    final r = v.real;
+    return r is Rational ? r.toDouble() : (r as num).toDouble();
+  }
+  if (v is Rational) {
+    return v.toDouble();
+  }
+  return (v as num).toDouble();
+}
+
+dynamic _toEvaluable(dynamic x) {
+  if (x is Rational) return x.toDouble();
+  if (x is Complex) {
+    final r = x.real;
+    final i = x.imaginary;
+    final numReal = r is Rational ? r.toDouble() : (r as num);
+    final numImag = i is Rational ? i.toDouble() : (i as num);
+    return Complex(numReal, numImag);
+  }
+  return x;
+}
 
 dynamic _normalizeResult(dynamic result) {
   if (result is Complex) {
     if (result.imaginary == 0) {
       final r = result.real;
       if (r is Rational) {
-        return r.isInteger ? r.toInt() : r;
+        try {
+          return r.isInteger ? r.toInt() : r;
+        } catch (_) {
+          return r;
+        }
       }
       return r;
     }
     return result;
   }
   if (result is Rational) {
-    return result.isInteger ? result.toInt() : result;
+    try {
+      return result.isInteger ? result.toInt() : result;
+    } catch (_) {
+      return result;
+    }
   }
   return result;
 }
@@ -148,48 +196,33 @@ class ExpressionContext {
         'rad2deg': AngleConstants.d180OverPi,
 
         // Basic Math functions
-        'log': (dynamic x) => log(x),
-        'ln': (dynamic x) => log(x),
-        'exp': (dynamic x) => exp(x),
-        'pow': (dynamic x, dynamic y) => pow(x, y),
-        'abs': (dynamic x) => abs(x),
-        'sqrt': (dynamic x) => sqrt(x),
+        'log': (dynamic x) => log(_toEvaluable(x)),
+        'ln': (dynamic x) => log(_toEvaluable(x)),
+        'exp': (dynamic x) => exp(_toEvaluable(x)),
+        'pow': (dynamic x, dynamic y) => pow(_toEvaluable(x), _toEvaluable(y)),
+        'abs': (dynamic x) => abs(_toEvaluable(x)),
+        'sqrt': (dynamic x) => sqrt(_toEvaluable(x)),
 
-        'cbrt': (dynamic x) => cbrt(x),
-        'nthRoot': (dynamic x, dynamic n) => nthRoot(x, n),
-        'logBase': (dynamic b, dynamic x) => logBase(b, x),
-        'log10': (dynamic x) => log10(x),
+        'cbrt': (dynamic x) => cbrt(_toEvaluable(x)),
+        'nthRoot': (dynamic x, dynamic n) => nthRoot(_toEvaluable(x), _toEvaluable(n)),
+        'logBase': (dynamic b, dynamic x) => logBase(_toEvaluable(b), _toEvaluable(x)),
+        'log10': (dynamic x) => log10(_toEvaluable(x)),
 
-        'fact': (dynamic x) =>
-            factorial(x is Complex ? x.real.toInt() : (x as num).toInt()),
-        'factorial': (dynamic x) =>
-            factorial(x is Complex ? x.real.toInt() : (x as num).toInt()),
-        'factorial2': (dynamic x) =>
-            factorial2(x is Complex ? x.real.toInt() : (x as num).toInt()),
-        'doubleFactorial': (dynamic x) => doubleFactorial(
-            x is Complex ? x.real.toDouble() : (x as num).toDouble()),
-        'step': (dynamic x) =>
-            step(x is Complex ? x.real.toDouble() : (x as num).toDouble()),
-        'rect': (dynamic x) =>
-            rect(x is Complex ? x.real.toDouble() : (x as num).toDouble()),
-        'sign': (dynamic x) =>
-            sign(x is Complex ? x.real.toDouble() : (x as num).toDouble()),
-        'modF': (dynamic x) =>
-            modF((x is Complex ? x.real : x as num).toDouble()),
+        'fact': (dynamic x) => factorial(_toInt(x)),
+        'factorial': (dynamic x) => factorial(_toInt(x)),
+        'factorial2': (dynamic x) => factorial2(_toInt(x)),
+        'doubleFactorial': (dynamic x) => doubleFactorial(_toDouble(x)),
+        'step': (dynamic x) => step(_toDouble(x)),
+        'rect': (dynamic x) => rect(_toDouble(x)),
+        'sign': (dynamic x) => sign(_toDouble(x)),
+        'modF': (dynamic x) => modF(_toDouble(x)),
 
-        'mod': (dynamic x, dynamic y) => mod(x, y),
-        'modInv': (dynamic a, dynamic m) => modInv(
-            a is Complex ? a.real : a as num, m is Complex ? m.real : m as num),
+        'mod': (dynamic x, dynamic y) => mod(_toEvaluable(x), _toEvaluable(y)),
+        'modInv': (dynamic a, dynamic m) => modInv(_toNum(a), _toNum(m)),
         'nChooseRModPrime': (dynamic n, dynamic r, dynamic p) =>
-            nChooseRModPrime(
-                n is Complex ? n.real.toInt() : (n as num).toInt(),
-                r is Complex ? r.real.toInt() : (r as num).toInt(),
-                p is Complex ? p.real.toInt() : (p as num).toInt()),
+            nChooseRModPrime(_toInt(n), _toInt(r), _toInt(p)),
         'bigIntNChooseRModPrime': (dynamic n, dynamic r, dynamic p) =>
-            bigIntNChooseRModPrime(
-                n is Complex ? n.real.toInt() : (n as num).toInt(),
-                r is Complex ? r.real.toInt() : (r as num).toInt(),
-                p is Complex ? p.real.toInt() : (p as num).toInt()),
+            bigIntNChooseRModPrime(_toInt(n), _toInt(r), _toInt(p)),
         'floor': (dynamic x) => x is Complex ? x.floor() : floor(x as num),
         'ceil': (dynamic x) => x is Complex ? x.ceil() : ceil(x as num),
         'hypot': (dynamic x, dynamic y) => hypot(x, y),

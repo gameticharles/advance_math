@@ -18,12 +18,21 @@ class CallExpression extends Expression {
 
     if (evCallee is Function) {
       try {
+        if (aevArguments.any((e) => e is Expression)) {
+          return CallExpression(
+            callee is Expression ? callee : Literal(callee),
+            aevArguments.map((e) => e is Expression ? e : Literal(e)).toList(),
+          );
+        }
         return Function.apply(evCallee, aevArguments);
       } on NoSuchMethodError catch (e) {
         throw ExpressionEvaluatorException(
             "Function call mismatched for '$callee': $e");
       } catch (e) {
-        rethrow;
+        return CallExpression(
+          callee is Expression ? callee : Literal(callee),
+          aevArguments.map((e) => e is Expression ? e : Literal(e)).toList(),
+        );
       }
     }
 

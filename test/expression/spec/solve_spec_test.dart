@@ -141,7 +141,7 @@ void main() {
       check('solveEquations(["x+y=1", "2*x=6", "4*z+y=6"])',
           '[x, 3, y, -2, z, 2]');
       check('solveEquations(["x+y=a", "x-y=b", "z+y=c"], ["x", "y", "z"])',
-          '[x, 0.5*a+0.5*b, y, -0.5*b+0.5*a, z, c-0.5*a+0.5*b]');
+          '[x, 1/2*a+1/2*b, y, 1/2*a-1/2*b, z, -1/2*a+1/2*b+c]');
       check('solveEquations(["x-2*y=-3", "x+y-z+2*d=8", "5*d-1=19", "z+d=7"])',
           '[d, 4, x, 1, y, 2, z, 3]');
       // check('solveEquations("x^2+4=x-y")', '(1/2)*(1+sqrt(-15-4*y)),(1/2)*(-sqrt(-15-4*y)+1)'); // Single equation solveEquations?

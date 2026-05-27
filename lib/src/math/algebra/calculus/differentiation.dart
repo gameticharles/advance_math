@@ -153,7 +153,8 @@ class NumericalDifferentiation {
       } else if (order == 2) {
         result = secondDerivative(f, point, h: h);
       } else {
-        result = (getVal(point + h, order - 1) - getVal(point - h, order - 1)) / (2 * h);
+        result = (getVal(point + h, order - 1) - getVal(point - h, order - 1)) /
+            (2 * h);
       }
 
       cache.put(key, result);

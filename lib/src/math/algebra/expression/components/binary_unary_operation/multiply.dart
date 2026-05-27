@@ -21,27 +21,22 @@ class Multiply extends BinaryOperationsExpression {
     if (rightEval is Matrix) {
       return (leftEval * rightEval);
     }
-    if ((leftEval is num && leftEval == 0) ||
-        (rightEval is num && rightEval == 0)) {
-      return _normalizeResult(Complex.zero());
-    }
-    if (leftEval is num && leftEval == 1) {
-      return rightEval;
-    }
-    if (rightEval is num && rightEval == 1) {
-      return leftEval;
+    
+    if ((leftEval is num || leftEval is Complex || leftEval is Rational) &&
+        (rightEval is num || rightEval is Complex || rightEval is Rational)) {
+      bool isZero(dynamic val) {
+        if (val is num) return val == 0;
+        if (val is Complex) return val.isZero;
+        if (val is Rational) return val == Rational.zero;
+        return false;
+      }
+      if (isZero(leftEval) || isZero(rightEval)) {
+        return _normalizeResult(Complex.zero());
+      }
+      return _normalizeResult(Complex(leftEval) * Complex(rightEval));
     }
 
-    dynamic result;
-    if (leftEval is Complex) {
-      result = (leftEval * rightEval);
-    } else if (rightEval is Complex) {
-      result = (rightEval * leftEval);
-    } else if (leftEval is num && rightEval is num) {
-      result = Complex(leftEval * rightEval);
-    } else {
-      result = Multiply(Literal(leftEval), Literal(rightEval)).simplify();
-    }
+    dynamic result = Multiply(Literal(leftEval), Literal(rightEval)).simplify();
     return _normalizeResult(result);
   }
 
@@ -109,23 +104,65 @@ class Multiply extends BinaryOperationsExpression {
       return v;
     }
 
-    dynamic multiplyVals(dynamic v1, dynamic v2) {
-      if (v1 is num && v2 is num) return v1 * v2;
-      if (v1 is Complex && v2 is Complex) return v1 * v2;
-      if (v1 is Complex && (v2 is num || v2 is Rational)) return v1 * v2;
-      if (v2 is Complex && (v1 is num || v1 is Rational)) return v2 * v1;
-      if (v1 is Rational && v2 is Rational) return v1 * v2;
-      if (v1 is num && v2 is Rational) return v2 * v1;
-      if (v1 is Rational && v2 is num) return v1 * v2;
-      try {
-        return v1 * v2;
-      } catch (_) {
-        try {
-          return v2 * v1;
-        } catch (_) {
-          rethrow;
-        }
+    bool isZeroVal(dynamic val) {
+      if (val is num) return val == 0;
+      if (val is Rational) return val == Rational.zero;
+      if (val is Complex) return val.real == 0 && val.imaginary == 0;
+      return false;
+    }
+
+    bool isOneVal(dynamic val) {
+      if (val is num) return val == 1;
+      if (val is Rational) return val == Rational.one;
+      if (val is Complex) return val.real == 1 && val.imaginary == 0;
+      return false;
+    }
+
+    bool isMinusOneVal(dynamic val) {
+      if (val is num) return val == -1;
+      if (val is Rational) return val == Rational.fromInt(-1);
+      if (val is Complex) return val.real == -1 && val.imaginary == 0;
+      return false;
+    }
+
+    bool isIntegerVal(dynamic val) {
+      if (val is int) return true;
+      if (val is Rational) return val.isInteger;
+      if (val is double) return val == val.toInt();
+      if (val is Complex && val.isReal) {
+        final r = val.real;
+        if (r is Rational) return r.isInteger;
+        if (r is int) return true;
+        if (r is double) return r == r.toInt();
       }
+      return false;
+    }
+
+    int toIntVal(dynamic val) {
+      if (val is int) return val;
+      if (val is Rational) return val.toInt();
+      if (val is double) return val.toInt();
+      if (val is Complex && val.isReal) {
+        final r = val.real;
+        if (r is Rational) return r.toInt();
+        if (r is int) return r;
+        if (r is double) return r.toInt();
+      }
+      throw ArgumentError('Not an integer val');
+    }
+
+    dynamic multiplyVals(dynamic v1, dynamic v2) {
+      dynamic val;
+      if ((v1 is num || v1 is Rational) && (v2 is num || v2 is Rational)) {
+        if (isIntegerVal(v1) && isIntegerVal(v2)) {
+          val = toIntVal(v1) * toIntVal(v2);
+        } else {
+          val = Rational(v1) * Rational(v2);
+        }
+      } else {
+        val = Complex(v1) * Complex(v2);
+      }
+      return _normalizeResult(val);
     }
 
     // Normalize Negate(expr) or UnaryExpression('-', expr) to -1 * expr
@@ -150,13 +187,13 @@ class Multiply extends BinaryOperationsExpression {
     }
 
     // Simplify -1 * UnaryExpression('-', a) -> a
-    if (simpleLeft is Literal && litVal(simpleLeft) == -1) {
+    if (simpleLeft is Literal && isMinusOneVal(litVal(simpleLeft))) {
       if (simpleRight is UnaryExpression && simpleRight.operator == '-') {
         return simpleRight.operand.simplifyBasic();
       }
     }
     // Simplify UnaryExpression('-', a) * -1 -> a
-    if (simpleRight is Literal && litVal(simpleRight) == -1) {
+    if (simpleRight is Literal && isMinusOneVal(litVal(simpleRight))) {
       if (simpleLeft is UnaryExpression && simpleLeft.operator == '-') {
         return simpleLeft.operand.simplifyBasic();
       }
@@ -235,15 +272,15 @@ class Multiply extends BinaryOperationsExpression {
     }
 
     // Handle cases like x * 0 = 0, x * 1 = x
-    if (simpleLeft is Literal && litVal(simpleLeft) == 0 ||
-        simpleRight is Literal && litVal(simpleRight) == 0) {
+    if (simpleLeft is Literal && isZeroVal(litVal(simpleLeft)) ||
+        simpleRight is Literal && isZeroVal(litVal(simpleRight))) {
       return Literal(0);
     }
 
-    if (simpleLeft is Literal && litVal(simpleLeft) == 1) {
+    if (simpleLeft is Literal && isOneVal(litVal(simpleLeft))) {
       return simpleRight;
     }
-    if (simpleRight is Literal && litVal(simpleRight) == 1) {
+    if (simpleRight is Literal && isOneVal(litVal(simpleRight))) {
       return simpleLeft;
     }
 
@@ -287,6 +324,12 @@ class Multiply extends BinaryOperationsExpression {
       var c2 = litVal(simpleRight.left as Literal);
       var val = multiplyVals(c1, c2);
       if (val is Complex && val.isReal) val = val.simplify();
+      if (isOneVal(val)) {
+        return simpleRight.right;
+      }
+      if (isMinusOneVal(val)) {
+        return Multiply(Literal(-1), simpleRight.right).simplifyBasic();
+      }
       return Multiply(Literal(val), simpleRight.right).simplifyBasic();
     }
 
@@ -298,6 +341,12 @@ class Multiply extends BinaryOperationsExpression {
       var c2 = litVal(simpleRight);
       var val = multiplyVals(c1, c2);
       if (val is Complex && val.isReal) val = val.simplify();
+      if (isOneVal(val)) {
+        return simpleLeft.right;
+      }
+      if (isMinusOneVal(val)) {
+        return Multiply(Literal(-1), simpleLeft.right).simplifyBasic();
+      }
       return Multiply(Literal(val), simpleLeft.right).simplifyBasic();
     }
 
@@ -309,6 +358,12 @@ class Multiply extends BinaryOperationsExpression {
       var c2 = litVal(simpleRight.right as Literal);
       var val = multiplyVals(c1, c2);
       if (val is Complex && val.isReal) val = val.simplify();
+      if (isOneVal(val)) {
+        return simpleRight.left;
+      }
+      if (isMinusOneVal(val)) {
+        return Multiply(Literal(-1), simpleRight.left).simplifyBasic();
+      }
       return Multiply(Literal(val), simpleRight.left).simplifyBasic();
     }
 
@@ -320,7 +375,30 @@ class Multiply extends BinaryOperationsExpression {
       var c2 = litVal(simpleRight);
       var val = multiplyVals(c1, c2);
       if (val is Complex && val.isReal) val = val.simplify();
+      if (isOneVal(val)) {
+        return simpleLeft.left;
+      }
+      if (isMinusOneVal(val)) {
+        return Multiply(Literal(-1), simpleLeft.left).simplifyBasic();
+      }
       return Multiply(Literal(val), simpleLeft.left).simplifyBasic();
+    }
+
+    // Combine constant coefficients: c1 * (c2 * A) -> (c1 * c2) * A
+    if (simpleLeft is Literal &&
+        simpleRight is Multiply &&
+        simpleRight.left is Literal) {
+      var c1 = litVal(simpleLeft);
+      var c2 = litVal(simpleRight.left as Literal);
+      var val = multiplyVals(c1, c2);
+      if (val is Complex && val.isReal) val = val.simplify();
+      if (isOneVal(val)) {
+        return simpleRight.right;
+      }
+      if (isMinusOneVal(val)) {
+        return Multiply(Literal(-1), simpleRight.right).simplifyBasic();
+      }
+      return Multiply(Literal(val), simpleRight.right).simplifyBasic();
     }
 
     // Multiplication of similar terms: ax * bx = abx^2

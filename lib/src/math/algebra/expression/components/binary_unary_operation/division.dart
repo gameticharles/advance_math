@@ -8,10 +8,6 @@ class Divide extends BinaryOperationsExpression {
     dynamic leftEval = left.evaluate(arg);
     dynamic rightEval = right.evaluate(arg);
 
-    if (rightEval == 0 || rightEval == Complex.zero()) {
-      throw Exception('Division by zero!');
-    }
-
     if (leftEval is Expression || rightEval is Expression) {
       return Divide(
         leftEval is Expression ? leftEval : Literal(leftEval),
@@ -25,21 +21,25 @@ class Divide extends BinaryOperationsExpression {
     if (rightEval is Matrix) {
       return (leftEval / rightEval);
     }
-    if (leftEval is num && rightEval is num) {
-      return _normalizeResult(Complex(leftEval / rightEval));
-    }
-
-    dynamic result;
-    if (leftEval is Complex || rightEval is Complex) {
+    
+    if ((leftEval is num || leftEval is Complex || leftEval is Rational) &&
+        (rightEval is num || rightEval is Complex || rightEval is Rational)) {
       final rC = rightEval is Complex ? rightEval : Complex(rightEval);
       if (rC == Complex.zero()) {
         throw Exception('Division by zero!');
       }
+      // Integer division optimization
+      if (leftEval is int && rightEval is int) {
+        if (leftEval % rightEval == 0) {
+          return leftEval ~/ rightEval;
+        }
+        return Rational(leftEval, rightEval);
+      }
       final lC = leftEval is Complex ? leftEval : Complex(leftEval);
-      result = lC / rC;
-    } else {
-      result = Divide(Literal(leftEval), Literal(rightEval)).simplify();
+      return _normalizeResult(lC / rC);
     }
+
+    dynamic result = Divide(Literal(leftEval), Literal(rightEval)).simplify();
     return _normalizeResult(result);
   }
 
@@ -183,26 +183,61 @@ class Divide extends BinaryOperationsExpression {
       return v;
     }
 
+    bool isIntegerVal(dynamic val) {
+      if (val is int) return true;
+      if (val is Rational) return val.isInteger;
+      if (val is double) return val == val.toInt();
+      if (val is Complex && val.isReal) {
+        final r = val.real;
+        if (r is Rational) return r.isInteger;
+        if (r is int) return true;
+        if (r is double) return r == r.toInt();
+      }
+      return false;
+    }
+
+    int toIntVal(dynamic val) {
+      if (val is int) return val;
+      if (val is Rational) return val.toInt();
+      if (val is double) return val.toInt();
+      if (val is Complex && val.isReal) {
+        final r = val.real;
+        if (r is Rational) return r.toInt();
+        if (r is int) return r;
+        if (r is double) return r.toInt();
+      }
+      throw ArgumentError('Not an integer val');
+    }
+
     // Basic simplification: if both operands are literals, evaluate and return a new Literal.
     if (numerator is Literal && denominator is Literal) {
       var l = extractNum(numerator);
       var r = extractNum(denominator);
-      if (l is num && r is num) {
-        if (r == 0) throw Exception('Division by zero');
-        // If result is integer, return integer
-        if (l % r == 0) return Literal((l ~/ r).toInt());
-        if (l == l.toInt() && r == r.toInt()) {
-          return Literal(Rational(l.toInt(), r.toInt()));
+
+      if ((l is num || l is Rational) && (r is num || r is Rational)) {
+        if (isIntegerVal(l) && isIntegerVal(r)) {
+          final intL = toIntVal(l);
+          final intR = toIntVal(r);
+          if (intR == 0) throw Exception('Division by zero');
+          if (intL % intR == 0) {
+            return Literal(intL ~/ intR);
+          }
+          return Literal(_normalizeResult(Rational(intL, intR)));
+        } else {
+          final rationalL = Rational(l);
+          final rationalR = Rational(r);
+          if (rationalR == Rational.zero) throw Exception('Division by zero');
+          final res = rationalL / rationalR;
+          return Literal(_normalizeResult(res));
         }
-        return Literal(l / r);
       }
 
       // Handle Complex division
       if (l is Complex || r is Complex) {
-        var lC = (l is num) ? Complex(l, 0) : l as Complex;
-        var rC = (r is num) ? Complex(r, 0) : r as Complex;
+        var lC = Complex(l);
+        var rC = Complex(r);
         if (rC == Complex.zero()) throw Exception('Division by zero');
-        return Literal(lC / rC);
+        return Literal(_normalizeResult(lC / rC));
       }
     }
 
@@ -271,6 +306,22 @@ class Divide extends BinaryOperationsExpression {
       }
       if (terms.toString() == denominator.toString()) {
         return c;
+      }
+    }
+
+    // Cancellation: (c * A) / d -> (c/d) * A
+    if (numerator is Multiply && numerator.left is Literal && denominator is Literal) {
+      final cVal = extractNum(numerator.left as Literal);
+      final dVal = extractNum(denominator);
+      if ((cVal is num || cVal is Rational) && (dVal is num || dVal is Rational)) {
+        final Rational rationalC = Rational(cVal);
+        final Rational rationalD = Rational(dVal);
+        if (rationalD != Rational.zero) {
+          final res = rationalC / rationalD;
+          if (res == Rational.one) return numerator.right;
+          if (res == -Rational.one) return Negate(numerator.right);
+          return Multiply(Literal(_normalizeResult(res)), numerator.right).simplify();
+        }
       }
     }
 

@@ -21,16 +21,13 @@ class Subtract extends BinaryOperationsExpression {
     if (rightEval is Matrix) {
       return (leftEval - rightEval);
     }
-    dynamic result;
-    if (leftEval is Complex) {
-      result = (leftEval - rightEval);
-    } else if (rightEval is Complex) {
-      result = (Complex(leftEval) - rightEval);
-    } else if (leftEval is num && rightEval is num) {
-      result = Complex(leftEval - rightEval);
-    } else {
-      result = Subtract(Literal(leftEval), Literal(rightEval)).simplify();
+    
+    if ((leftEval is num || leftEval is Complex || leftEval is Rational) &&
+        (rightEval is num || rightEval is Complex || rightEval is Rational)) {
+      return _normalizeResult(Complex(leftEval) - Complex(rightEval));
     }
+    
+    dynamic result = Subtract(Literal(leftEval), Literal(rightEval)).simplify();
     return _normalizeResult(result);
   }
 
@@ -112,18 +109,26 @@ class Subtract extends BinaryOperationsExpression {
     // Grouping like terms and constants
     Map<String, dynamic> likeTerms = {};
     dynamic constantTerm = 0;
+
+    // Helper for safe addition of numeric, rational, and complex types
+    dynamic addValues(dynamic a, dynamic b) {
+      if (a is Complex || b is Complex) {
+        return Complex(a) + Complex(b);
+      }
+      if (a is Rational || b is Rational) {
+        return Rational(a) + Rational(b);
+      }
+      return a + b;
+    }
+
     for (var term in terms) {
       if (term is Literal) {
         var val = term.evaluate();
-        if (constantTerm is num && val is Complex) {
-          constantTerm = val + constantTerm;
-        } else {
-          constantTerm += val;
-        }
+        constantTerm = addValues(constantTerm, val);
       } else if (term is Variable) {
         likeTerms.update(
           term.toString(),
-          (value) => value + 1,
+          (value) => addValues(value, 1),
           ifAbsent: () => 1,
         );
       } else if (term is Multiply && term.left is Literal) {
@@ -131,12 +136,7 @@ class Subtract extends BinaryOperationsExpression {
         dynamic coefficient = (term.left as Literal).evaluate();
         likeTerms.update(
           variablePart,
-          (value) {
-            if (value is num && coefficient is Complex) {
-              return coefficient + value;
-            }
-            return value + coefficient;
-          },
+          (value) => addValues(value, coefficient),
           ifAbsent: () => coefficient,
         );
       }
@@ -144,24 +144,49 @@ class Subtract extends BinaryOperationsExpression {
       else if (term is Multiply || term is Pow) {
         likeTerms.update(
           term.toString(),
-          (value) => value + 1,
+          (value) => addValues(value, 1),
           ifAbsent: () => 1,
         );
       }
     }
 
+    bool isZeroVal(dynamic val) {
+      if (val is num) return val == 0;
+      if (val is Rational) return val == Rational.zero;
+      if (val is Complex) return val.real == 0 && val.imaginary == 0;
+      return false;
+    }
+
+    bool isOneVal(dynamic val) {
+      if (val is num) return val == 1;
+      if (val is Rational) return val == Rational.one;
+      if (val is Complex) return val.real == 1 && val.imaginary == 0;
+      return false;
+    }
+
+    bool isMinusOneVal(dynamic val) {
+      if (val is num) return val == -1;
+      if (val is Rational) return val == Rational.fromInt(-1);
+      if (val is Complex) return val.real == -1 && val.imaginary == 0;
+      return false;
+    }
+
     // Reconstruct the simplified expression from the likeTerms map and constant term
     List<Expression> simplifiedTerms = [];
-    if (constantTerm != 0) {
+    if (!isZeroVal(constantTerm)) {
       simplifiedTerms.add(Literal(constantTerm));
     }
 
     for (var entry in likeTerms.entries) {
-      if (entry.value == 1) {
+      final val = entry.value;
+      if (isZeroVal(val)) continue;
+      if (isOneVal(val)) {
         simplifiedTerms.add(Expression.parse(entry.key));
+      } else if (isMinusOneVal(val)) {
+        simplifiedTerms.add(Multiply(Literal(-1), Expression.parse(entry.key)));
       } else {
         simplifiedTerms
-            .add(Multiply(Literal(entry.value), Expression.parse(entry.key)));
+            .add(Multiply(Literal(val), Expression.parse(entry.key)));
       }
     }
 
