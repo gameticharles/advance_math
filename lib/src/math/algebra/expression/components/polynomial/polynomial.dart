@@ -833,14 +833,18 @@ class Polynomial extends Expression {
       return 0;
     }).toList();
 
+    int gcd(int a, int b) {
+      return BigInt.from(a).gcd(BigInt.from(b)).toInt();
+    }
+
     // Compute GCD of real parts (convert to int if possible)
-    num gcdValue = realParts.map((r) {
+    int gcdValue = realParts.map((r) {
       // If the real part is an integer, use it; otherwise, skip GCD simplification
       if (r != r.truncateToDouble()) {
-        return 1.0; // Non-integer, can't simplify
+        return 1; // Non-integer, can't simplify
       }
       return r.abs().toInt();
-    }).reduce((a, b) => math.gcd([a, b]));
+    }).reduce((a, b) => gcd(a, b));
 
     // If GCD is 1 or 0, no simplification needed
     if (gcdValue == 1 || gcdValue == 0) {
@@ -861,9 +865,141 @@ class Polynomial extends Expression {
     return Polynomial(newCoefficients, variable: variable);
   }
 
+  List<dynamic>? solveRationalAndDeflate() {
+    List<double>? getNumericCoeffs(List<Expression> exprs) {
+      List<double> res = [];
+      for (var c in exprs) {
+        if (c is Literal) {
+          final val = c.value;
+          if (val is num) {
+            res.add(val.toDouble());
+          } else if (val is Complex && val.isReal) {
+            res.add(val.real.toDouble());
+          } else if (val is Rational) {
+            res.add(val.toDouble());
+          } else {
+            return null;
+          }
+        } else {
+          return null;
+        }
+      }
+      return res;
+    }
+
+    List<int> getFactors(int n) {
+      n = n.abs();
+      if (n == 0) return [];
+      List<int> factors = [];
+      for (int i = 1; i * i <= n; i++) {
+        if (n % i == 0) {
+          factors.add(i);
+          factors.add(-i);
+          if (i * i != n) {
+            factors.add(n ~/ i);
+            factors.add(-(n ~/ i));
+          }
+        }
+      }
+      return factors;
+    }
+
+    double evalPoly(List<double> coeffs, double x) {
+      double val = 0.0;
+      for (var c in coeffs) {
+        val = val * x + c;
+      }
+      return val;
+    }
+
+    List<double> deflate(List<double> coeffs, double r) {
+      List<double> def = List.filled(coeffs.length - 1, 0.0);
+      def[0] = coeffs[0];
+      for (int i = 1; i < coeffs.length - 1; i++) {
+        def[i] = coeffs[i] + r * def[i - 1];
+      }
+      return def;
+    }
+
+    Expression doubleToExactExpression(double r) {
+      if ((r - r.round()).abs() < 1e-9) {
+        return Literal(r.round());
+      }
+      for (int den = 1; den <= 1000; den++) {
+        double numDouble = r * den;
+        if ((numDouble - numDouble.round()).abs() < 1e-9) {
+          int n = numDouble.round();
+          if (n % den == 0) {
+            return Literal(n ~/ den);
+          }
+          return Literal(Rational(BigInt.from(n), BigInt.from(den)));
+        }
+      }
+      return Literal(r);
+    }
+
+    final doubleCoeffs = getNumericCoeffs(coefficients);
+    if (doubleCoeffs != null && doubleCoeffs.length > 2) {
+      List<double> currentCoeffs = List.from(doubleCoeffs);
+      List<double> foundRoots = [];
+
+      while (currentCoeffs.length > 2) {
+        if (currentCoeffs.last.abs() < 1e-9) {
+          foundRoots.add(0.0);
+          currentCoeffs = currentCoeffs.sublist(0, currentCoeffs.length - 1);
+          continue;
+        }
+
+        double a0 = currentCoeffs.last;
+        double an = currentCoeffs.first;
+
+        Set<double> candidates = {};
+
+        if ((a0 - a0.round()).abs() < 1e-7 && (an - an.round()).abs() < 1e-7) {
+          List<int> pFactors = getFactors(a0.round());
+          List<int> qFactors = getFactors(an.round());
+          for (var p in pFactors) {
+            for (var q in qFactors) {
+              candidates.add(p / q);
+            }
+          }
+        }
+
+        for (int i = -100; i <= 100; i++) {
+          candidates.add(i.toDouble());
+        }
+
+        double? foundRoot;
+        for (var r in candidates) {
+          if (evalPoly(currentCoeffs, r).abs() < 1e-9) {
+            foundRoot = r;
+            break;
+          }
+        }
+
+        if (foundRoot != null) {
+          foundRoots.add(foundRoot);
+          currentCoeffs = deflate(currentCoeffs, foundRoot);
+        } else {
+          break;
+        }
+      }
+
+      if (foundRoots.isNotEmpty) {
+        List<Expression> remainingCoeffs = currentCoeffs.map((c) => Literal(c)).toList();
+        Polynomial remainingPoly = Polynomial.fromList(remainingCoeffs, variable: variable);
+        List<dynamic> remainingRoots = remainingPoly.roots();
+        return [
+          ...foundRoots.map((r) => doubleToExactExpression(r)),
+          ...remainingRoots,
+        ];
+      }
+    }
+    return null;
+  }
+
   List<dynamic> roots() {
     // 1. Simplify the Polynomial
-    //Polynomial simplified = ((expand() as Polynomial).simplify()) as Polynomial;
     Polynomial simplified = simplify();
 
     if (simplified.coefficients.length == 1) {
@@ -875,6 +1011,9 @@ class Polynomial extends Expression {
       return Linear.fromList(simplified.coefficients, variable: variable)
           .roots();
     } else {
+      final rationalRoots = simplified.solveRationalAndDeflate();
+      if (rationalRoots != null) return rationalRoots;
+
       // Check if binomial form: a * x^n + b = 0
       bool isBinomial = true;
       for (int i = 1; i < simplified.coefficients.length - 1; i++) {

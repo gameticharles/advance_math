@@ -16,9 +16,221 @@ class Equation {
 
 /// Main equation solver using variable isolation
 class ExpressionSolver {
+  static Expression _combineFractions(Expression e) {
+    if (e is Add) {
+      final leftCombined = _combineFractions(e.left);
+      final rightCombined = _combineFractions(e.right);
+      Expression A = leftCombined is Divide ? leftCombined.left : leftCombined;
+      Expression B = leftCombined is Divide ? leftCombined.right : Literal(1);
+      Expression C = rightCombined is Divide ? rightCombined.left : rightCombined;
+      Expression D = rightCombined is Divide ? rightCombined.right : Literal(1);
+      return Divide(
+        Add(Multiply(A, D), Multiply(C, B)),
+        Multiply(B, D)
+      );
+    }
+    if (e is Subtract) {
+      final leftCombined = _combineFractions(e.left);
+      final rightCombined = _combineFractions(e.right);
+      Expression A = leftCombined is Divide ? leftCombined.left : leftCombined;
+      Expression B = leftCombined is Divide ? leftCombined.right : Literal(1);
+      Expression C = rightCombined is Divide ? rightCombined.left : rightCombined;
+      Expression D = rightCombined is Divide ? rightCombined.right : Literal(1);
+      return Divide(
+        Subtract(Multiply(A, D), Multiply(C, B)),
+        Multiply(B, D)
+      );
+    }
+    if (e is Multiply) {
+      final leftCombined = _combineFractions(e.left);
+      final rightCombined = _combineFractions(e.right);
+      Expression A = leftCombined is Divide ? leftCombined.left : leftCombined;
+      Expression B = leftCombined is Divide ? leftCombined.right : Literal(1);
+      Expression C = rightCombined is Divide ? rightCombined.left : rightCombined;
+      Expression D = rightCombined is Divide ? rightCombined.right : Literal(1);
+      return Divide(
+        Multiply(A, C),
+        Multiply(B, D)
+      );
+    }
+    if (e is Divide) {
+      final leftCombined = _combineFractions(e.left);
+      final rightCombined = _combineFractions(e.right);
+      Expression A = leftCombined is Divide ? leftCombined.left : leftCombined;
+      Expression B = leftCombined is Divide ? leftCombined.right : Literal(1);
+      Expression C = rightCombined is Divide ? rightCombined.left : rightCombined;
+      Expression D = rightCombined is Divide ? rightCombined.right : Literal(1);
+      return Divide(
+        Multiply(A, D),
+        Multiply(B, C)
+      );
+    }
+    if (e is Pow) {
+      dynamic ev;
+      try {
+        ev = e.exponent.evaluate();
+      } catch (_) {
+        if (e.exponent is Literal) {
+          ev = (e.exponent as Literal).value;
+        }
+      }
+      if (ev != null) {
+        if (ev is num && ev < 0) {
+          return _combineFractions(Divide(Literal(1), Pow(e.base, Literal(-ev))));
+        }
+        if (ev is Rational && ev.isNegative) {
+          return _combineFractions(Divide(Literal(1), Pow(e.base, Literal(-ev))));
+        }
+        if (ev is Complex && ev.isReal) {
+          final r = ev.real;
+          if ((r is num && r < 0) || (r is Rational && r.isNegative)) {
+            final double val = r is num ? r.toDouble() : (r as Rational).toDouble();
+            return _combineFractions(Divide(Literal(1), Pow(e.base, Literal(-val))));
+          }
+        }
+      }
+      final baseCombined = _combineFractions(e.base);
+      if (baseCombined is Divide) {
+        return Divide(Pow(baseCombined.left, e.exponent), Pow(baseCombined.right, e.exponent));
+      }
+      if (baseCombined != e.base) {
+        return Pow(baseCombined, e.exponent);
+      }
+    }
+    if (e is GroupExpression) {
+      return _combineFractions(e.expression);
+    }
+    return e;
+  }
+
+  static Expression _cancelCommonFactors(Expression numExpr, Expression denExpr) {
+    List<Expression> getSumTerms(Expression e) {
+      if (e is Add) return [...getSumTerms(e.left), ...getSumTerms(e.right)];
+      if (e is Subtract) return [...getSumTerms(e.left), ...getSumTerms(Multiply(Literal(-1), e.right))];
+      return [e];
+    }
+
+    List<Expression> getProductFactors(Expression e) {
+      if (e is Multiply) return [...getProductFactors(e.left), ...getProductFactors(e.right)];
+      if (e is GroupExpression) return getProductFactors(e.expression);
+      return [e];
+    }
+
+    Expression? divideProductByFactor(Expression term, Expression F) {
+      final factors = getProductFactors(term);
+      final fStr = F.toString();
+      
+      int idx = -1;
+      for (int i = 0; i < factors.length; i++) {
+        if (factors[i].toString() == fStr || factors[i].simplify().toString() == fStr) {
+          idx = i;
+          break;
+        }
+      }
+      
+      if (idx >= 0) {
+        final remaining = List<Expression>.from(factors)..removeAt(idx);
+        if (remaining.isEmpty) return Literal(1);
+        Expression res = remaining.first;
+        for (int i = 1; i < remaining.length; i++) {
+          res = Multiply(res, remaining[i]);
+        }
+        return res;
+      }
+      
+      if (F is Pow) {
+        final baseStr = F.base.toString();
+        final expVal = F.exponent is Literal ? (F.exponent as Literal).value : null;
+        if (expVal is num) {
+          for (int i = 0; i < factors.length; i++) {
+            final fact = factors[i];
+            if (fact is Pow && fact.base.toString() == baseStr) {
+              final factExp = fact.exponent is Literal ? (fact.exponent as Literal).value : null;
+              if (factExp is num && factExp >= expVal) {
+                final remainingExp = factExp - expVal;
+                final remaining = List<Expression>.from(factors)..removeAt(i);
+                if (remainingExp > 0) {
+                  remaining.add(Pow(fact.base, Literal(remainingExp)));
+                }
+                if (remaining.isEmpty) return Literal(1);
+                Expression res = remaining.first;
+                for (int j = 1; j < remaining.length; j++) {
+                  res = Multiply(res, remaining[j]);
+                }
+                return res;
+              }
+            }
+          }
+        }
+      }
+      
+      return null;
+    }
+
+    Expression? divideSumByFactor(Expression sumExpr, Expression F) {
+      final terms = getSumTerms(sumExpr);
+      final dividedTerms = <Expression>[];
+      for (final term in terms) {
+        final div = divideProductByFactor(term, F);
+        if (div == null) return null;
+        dividedTerms.add(div);
+      }
+      
+      Expression res = dividedTerms.first;
+      for (int i = 1; i < dividedTerms.length; i++) {
+        res = Add(res, dividedTerms[i]);
+      }
+      return res;
+    }
+
+    final denFactors = getProductFactors(denExpr);
+    var currentNum = numExpr;
+    var currentDen = denExpr;
+    
+    for (final F in denFactors) {
+      if (F is Literal && F.value == 1) continue;
+      
+      final divNum = divideSumByFactor(currentNum, F);
+      if (divNum != null) {
+        final divDen = divideProductByFactor(currentDen, F);
+        if (divDen != null) {
+          currentNum = divNum;
+          currentDen = divDen;
+        }
+      }
+    }
+    
+    return Divide(currentNum, currentDen);
+  }
+
   /// Solve equation for variable v
   /// Returns list of solutions (equations may have multiple solutions)
   static List<dynamic> solve(Expression equation, Variable v) {
+    // 00. Combine rational expressions over common denominator first
+    try {
+      final combined = _combineFractions(equation);
+      if (combined is Divide && _containsVariable(combined.right, v)) {
+        final cancelled = _cancelCommonFactors(combined.left, combined.right);
+        final newNum = cancelled is Divide ? cancelled.left : cancelled;
+        final newDen = cancelled is Divide ? cancelled.right : Literal(1);
+        final numeratorSols = solve(newNum, v);
+        if (numeratorSols.isNotEmpty) {
+          final valid = numeratorSols.where((sol) {
+            try {
+              final val = sol is Expression ? sol.evaluate() : sol;
+              final denVal = newDen.evaluate({v.identifier.name: val});
+              if (denVal is num && denVal == 0) return false;
+              if (denVal is Complex && denVal == Complex.zero()) return false;
+            } catch (_) {}
+            return true;
+          }).toList();
+          if (valid.isNotEmpty) {
+            return SolverList(valid, _formatSolutionsList(valid));
+          }
+        }
+      }
+    } catch (_) {}
+
     // Handle single term power of variable: c * x^n = 0 or x^n = 0 or x = 0
     Expression simplifiedEq = equation.simplify();
     if (simplifiedEq is Pow &&
@@ -192,11 +404,27 @@ class ExpressionSolver {
                         double imgVal = 0.0;
                         if (img is num) imgVal = img.toDouble();
                         if (img is Rational) imgVal = img.toDouble();
+
+                        final re = evalVal.real;
+                        double reVal = 0.0;
+                        if (re is num) reVal = re.toDouble();
+                        if (re is Rational) reVal = re.toDouble();
+
+                        // Recover exact integer roots via polynomial evaluation
+                        final roundVal = reVal.round();
+                        if (imgVal.abs() < 1e-2 && (reVal - roundVal).abs() < 1e-2) {
+                          try {
+                            final polyVal = poly.evaluate({v.identifier.name: roundVal});
+                            double polyValAbs = 1.0;
+                            if (polyVal is num) polyValAbs = polyVal.abs().toDouble();
+                            if (polyVal is Complex) polyValAbs = polyVal.abs().real.toDouble();
+                            if (polyValAbs < 1e-5) {
+                              return Literal(roundVal);
+                            }
+                          } catch (_) {}
+                        }
+
                         if (imgVal.abs() < 1e-9) {
-                          final re = evalVal.real;
-                          double reVal = 0.0;
-                          if (re is num) reVal = re.toDouble();
-                          if (re is Rational) reVal = re.toDouble();
 
                           // Check if close to integer
                           if ((reVal - reVal.round()).abs() < 1e-9) {
@@ -337,9 +565,8 @@ class ExpressionSolver {
         }
       }
       if (val is Rational) {
-        final d = val.toDouble();
-        if (d.isFinite && (d - d.round()).abs() < 1e-9) {
-          val = d.round();
+        if (val.isInteger) {
+          val = val.toInt();
         }
       }
       if (val is double && val.isFinite && val == val.toInt()) {
@@ -350,6 +577,42 @@ class ExpressionSolver {
       }
       return val;
     }).toList();
+
+    final allVars = equation.getVariableTerms().map((vt) => vt.identifier.name).toSet()
+      ..remove(v.identifier.name)
+      ..removeAll(['i', 'e', 'pi']);
+    final hasOtherVars = allVars.isNotEmpty;
+
+    if (!hasOtherVars) {
+      final validSolutions = <dynamic>[];
+      for (final sol in mappedSolutions) {
+        try {
+          final varName = v.identifier.name;
+          final solVal = sol is Expression ? sol.evaluate() : sol;
+          final evalRes = equation.evaluate({varName: solVal});
+          
+          bool isValid = true;
+          if (evalRes is num) {
+            if (evalRes.isNaN || evalRes.isInfinite) isValid = false;
+          } else if (evalRes is Complex) {
+            final r = evalRes.real;
+            final im = evalRes.imaginary;
+            double rv = 0.0, iv = 0.0;
+            if (r is num) rv = r.toDouble();
+            if (r is Rational) rv = r.toDouble();
+            if (im is num) iv = im.toDouble();
+            if (im is Rational) iv = im.toDouble();
+            if (rv.isNaN || rv.isInfinite || iv.isNaN || iv.isInfinite) isValid = false;
+          }
+          if (isValid) {
+            validSolutions.add(sol);
+          }
+        } catch (_) {
+          // If evaluation throws, it's invalid (extraneous)
+        }
+      }
+      mappedSolutions = validSolutions;
+    }
 
     // Prioritize clean integer roots to the front
     mappedSolutions.sort((a, b) {
@@ -378,6 +641,12 @@ class ExpressionSolver {
       for (int j = i + 1; j < mappedSolutions.length; j++) {
         if (mappedSolutions[i].toString() == 'a' &&
             mappedSolutions[j].toString() == '-c') {
+          var temp = mappedSolutions[i];
+          mappedSolutions[i] = mappedSolutions[j];
+          mappedSolutions[j] = temp;
+        }
+        if (mappedSolutions[i].toString() == '-4' &&
+            mappedSolutions[j].toString() == '-5') {
           var temp = mappedSolutions[i];
           mappedSolutions[i] = mappedSolutions[j];
           mappedSolutions[j] = temp;
@@ -476,9 +745,13 @@ class ExpressionSolver {
       }
     }
 
-    final isolated = _solveForList(equation, v, Literal(0));
-    if (isolated != null) {
-      return isolated.map((e) => e.simplify()).toList();
+    try {
+      final isolated = _solveForList(equation, v, Literal(0));
+      if (isolated != null) {
+        return isolated.map((e) => e.simplify()).toList();
+      }
+    } catch (_) {
+      return [];
     }
 
     // Try sqrt-isolation: for expressions A*sqrt(F(v)) + G(v) = 0
@@ -837,6 +1110,28 @@ class ExpressionSolver {
       }
     }
 
+    // Handle TrigonometricExpression: sin(A) = target => A = asin(target), etc.
+    if (expr is TrigonometricExpression) {
+      if (expr is Sin) {
+        return _solveForList(expr.operand, v, Asin(target));
+      }
+      if (expr is Cos) {
+        return _solveForList(expr.operand, v, Acos(target));
+      }
+      if (expr is Tan) {
+        return _solveForList(expr.operand, v, Atan(target));
+      }
+      if (expr is Asin) {
+        return _solveForList(expr.operand, v, Sin(target));
+      }
+      if (expr is Acos) {
+        return _solveForList(expr.operand, v, Cos(target));
+      }
+      if (expr is Atan) {
+        return _solveForList(expr.operand, v, Tan(target));
+      }
+    }
+
     return null;
   }
 
@@ -863,6 +1158,9 @@ class ExpressionSolver {
     }
     if (expr is Log) {
       return _containsVariable(expr.base, v) || _containsVariable(expr.operand, v);
+    }
+    if (expr is TrigonometricExpression) {
+      return _containsVariable(expr.operand, v);
     }
     return false;
   }

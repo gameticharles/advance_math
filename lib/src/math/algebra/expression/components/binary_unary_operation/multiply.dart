@@ -334,6 +334,30 @@ class Multiply extends BinaryOperationsExpression {
       return simpleLeft;
     }
 
+    // Associative simplification for Multiply(Multiply(A, B), C)
+    if (simpleLeft is Multiply) {
+      final bc = Multiply(simpleLeft.right, simpleRight).simplifyBasic();
+      if (bc is Literal || bc.size() < simpleLeft.right.size() + simpleRight.size()) {
+        return Multiply(simpleLeft.left, bc).simplifyBasic();
+      }
+      final ac = Multiply(simpleLeft.left, simpleRight).simplifyBasic();
+      if (ac is Literal || ac.size() < simpleLeft.left.size() + simpleRight.size()) {
+        return Multiply(simpleLeft.right, ac).simplifyBasic();
+      }
+    }
+
+    // Associative simplification for Multiply(C, Multiply(A, B))
+    if (simpleRight is Multiply) {
+      final ca = Multiply(simpleLeft, simpleRight.left).simplifyBasic();
+      if (ca is Literal || ca.size() < simpleLeft.size() + simpleRight.left.size()) {
+        return Multiply(ca, simpleRight.right).simplifyBasic();
+      }
+      final cb = Multiply(simpleLeft, simpleRight.right).simplifyBasic();
+      if (cb is Literal || cb.size() < simpleLeft.size() + simpleRight.right.size()) {
+        return Multiply(cb, simpleRight.left).simplifyBasic();
+      }
+    }
+
     // Multiplication involving same base x * x = x^2
     if (simpleLeft.toString() == simpleRight.toString()) {
       return Pow(simpleLeft, Literal(2)).simplifyBasic();
@@ -350,17 +374,17 @@ class Multiply extends BinaryOperationsExpression {
       // a^m * b^m remains as is.
     }
 
-    // Handle Variable * Pow (x * x^n = x^(n+1))
-    if (simpleLeft is Variable &&
+    // Handle Base * Pow (base * base^n = base^(n+1))
+    if (simpleLeft is! Literal &&
         simpleRight is Pow &&
         simpleRight.base.toString() == simpleLeft.toString()) {
       return Pow(simpleLeft, Add(simpleRight.exponent, Literal(1)).simplify())
           .simplifyBasic();
     }
 
-    // Handle Pow * Variable (x^n * x = x^(n+1))
-    if (simpleLeft is Pow &&
-        simpleRight is Variable &&
+    // Handle Pow * Base (base^n * base = base^(n+1))
+    if (simpleRight is! Literal &&
+        simpleLeft is Pow &&
         simpleLeft.base.toString() == simpleRight.toString()) {
       return Pow(simpleRight, Add(simpleLeft.exponent, Literal(1)).simplify())
           .simplifyBasic();

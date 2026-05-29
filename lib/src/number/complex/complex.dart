@@ -1203,8 +1203,10 @@ class Complex implements Comparable<dynamic> {
   /// ```
   Complex exp() {
     if (isNaN) return Complex.nan();
-    final r = dmath.exp(real);
-    return Complex.polar(r, imaginary);
+    final double rVal = real is Rational ? (real as Rational).toDouble() : (real as num).toDouble();
+    final double iVal = imaginary is Rational ? (imaginary as Rational).toDouble() : (imaginary as num).toDouble();
+    final r = dmath.exp(rVal);
+    return Complex.polar(r, iVal);
   }
 
   /// Returns a new complex number representing the natural logarithm (base e) of this number.

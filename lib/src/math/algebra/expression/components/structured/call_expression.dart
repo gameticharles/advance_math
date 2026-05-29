@@ -6,8 +6,26 @@ class CallExpression extends Expression {
 
   CallExpression(this.callee, this.arguments);
 
+  Expression? _asImplicitMultiplication() {
+    if (arguments.length == 1) {
+      final c = callee.simplify();
+      if (c is Literal) {
+        final val = c.value;
+        if (val is num || val is Complex || val is Rational) {
+          return Multiply(c, arguments.first);
+        }
+      }
+    }
+    return null;
+  }
+
   @override
   dynamic evaluate([dynamic arg]) {
+    final impl = _asImplicitMultiplication();
+    if (impl != null) {
+      return impl.evaluate(arg);
+    }
+
     var evCallee = callee.evaluate(arg);
     var aevArguments = arguments.map((e) => e.evaluate(arg)).toList();
 
@@ -42,31 +60,56 @@ class CallExpression extends Expression {
 
   @override
   Expression differentiate([Variable? v]) {
+    final impl = _asImplicitMultiplication();
+    if (impl != null) {
+      return impl.differentiate(v);
+    }
     // The derivative of call is just the derivative.
     return CallExpression(callee.differentiate(v), arguments);
   }
 
   @override
   Expression integrate() {
+    final impl = _asImplicitMultiplication();
+    if (impl != null) {
+      return impl.integrate();
+    }
     // The integral of call the integral.
     return CallExpression(callee.integrate(), arguments);
   }
 
   @override
   Expression simplify() {
-    return this;
+    final impl = _asImplicitMultiplication();
+    if (impl != null) {
+      return impl.simplify();
+    }
+    return CallExpression(
+      callee.simplify(),
+      arguments.map((arg) => arg.simplify()).toList(),
+    );
   }
 
   @override
   Expression expand() {
-    // Call doesn't expand further, return as-is.
-    return this;
+    final impl = _asImplicitMultiplication();
+    if (impl != null) {
+      return impl.expand();
+    }
+    return CallExpression(
+      callee.expand(),
+      arguments.map((arg) => arg.expand()).toList(),
+    );
   }
 
   @override
   Expression substitute(Expression oldExpr, Expression newExpr) {
     if (this == oldExpr) {
       return newExpr;
+    }
+    final impl = _asImplicitMultiplication();
+    if (impl != null) {
+      return impl.substitute(oldExpr, newExpr);
     }
     return CallExpression(
       callee.substitute(oldExpr, newExpr),
@@ -99,16 +142,30 @@ class CallExpression extends Expression {
   }
 
   @override
-  bool isPoly([bool strict = false]) => false;
+  bool isPoly([bool strict = false]) {
+    final impl = _asImplicitMultiplication();
+    if (impl != null) {
+      return impl.isPoly(strict);
+    }
+    return false;
+  }
 
   @override
   int depth() {
+    final impl = _asImplicitMultiplication();
+    if (impl != null) {
+      return impl.depth();
+    }
     return 1 +
-        [callee.depth(), ...arguments.map((arg) => arg.depth())].reduce(max);
+        [callee.depth(), ...arguments.map((arg) => arg.depth())].reduce(dmath.max);
   }
 
   @override
   int size() {
+    final impl = _asImplicitMultiplication();
+    if (impl != null) {
+      return impl.size();
+    }
     return 1 +
         callee.size() +
         arguments.fold(0, (acc, arg) => acc + arg.size());
@@ -116,6 +173,10 @@ class CallExpression extends Expression {
 
   @override
   Set<Variable> getVariableTerms() {
+    final impl = _asImplicitMultiplication();
+    if (impl != null) {
+      return impl.getVariableTerms();
+    }
     return {
       ...callee.getVariableTerms(),
       ...arguments.expand((arg) => arg.getVariableTerms())

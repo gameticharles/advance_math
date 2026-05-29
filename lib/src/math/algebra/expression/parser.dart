@@ -386,7 +386,7 @@ class ExpressionParser {
   // e.g. `foo`, `bar.baz`, `foo['bar'].baz`
   // It also gobbles function calls:
   // e.g. `Math.acos(obj.angle)`
-  Parser<Expression> get variable => groupOrIdentifier
+  Parser<Expression> get variable => ((groupOrIdentifierNoNumeric
           .seq((memberArgument.cast() | indexArgument | callArgument).star())
           .map((l) {
         var a = l[0] as Expression;
@@ -730,7 +730,7 @@ class ExpressionParser {
           }
           throw ArgumentError('Invalid type ${argument.runtimeType}');
         });
-      });
+      })) | numericLiteral).cast<Expression>();
 
   // Responsible for parsing a group of things within parentheses `()`
   // This function assumes that it needs to gobble the opening parenthesis
@@ -740,6 +740,17 @@ class ExpressionParser {
   Parser<Expression> get group => (char('(') & expression.trim() & char(')'))
       .pick(1)
       .map((e) => GroupExpression(e as Expression));
+
+  Parser<Literal> get otherLiteral => (stringLiteral |
+          boolLiteral |
+          nullLiteral |
+          arrayLiteral |
+          mapLiteral)
+      .cast();
+
+  Parser<Expression> get groupOrIdentifierNoNumeric =>
+      (group | thisExpression | otherLiteral | identifier.map((v) => Variable(v)))
+          .cast();
 
   Parser<Expression> get groupOrIdentifier =>
       (group | thisExpression | literal | identifier.map((v) => Variable(v)))

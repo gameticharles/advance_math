@@ -45,7 +45,7 @@ abstract class BinaryOperationsExpression extends Expression {
 
   @override
   int depth() {
-    return 1 + (max(left.depth(), right.depth()) as num).toInt();
+    return 1 + dmath.max(left.depth(), right.depth());
   }
 
   @override

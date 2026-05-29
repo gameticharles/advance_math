@@ -204,6 +204,9 @@ final class DurandKerner extends Polynomial {
 
   @override
   List<dynamic> roots() {
+    final rationalRoots = solveRationalAndDeflate();
+    if (rationalRoots != null) return rationalRoots;
+
     // Check if binomial form: a * x^n + b = 0
     bool isBinomial = true;
     for (int i = 1; i < coefficients.length - 1; i++) {

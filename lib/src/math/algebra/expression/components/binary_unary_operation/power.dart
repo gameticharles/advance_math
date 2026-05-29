@@ -302,15 +302,29 @@ class Pow extends BinaryOperationsExpression {
   @override
   Expression expand() {
     final simplifiedExponent = exponent.simplify();
-    if (simplifiedExponent is Literal && simplifiedExponent.value is num) {
-      final val = (simplifiedExponent.value as num).toInt();
-      if (val > 1 && val <= 10) {
-        final expandedBase = base.expand();
-        Expression result = expandedBase;
-        for (int i = 1; i < val; i++) {
-          result = Multiply(result, expandedBase).expand();
+    if (simplifiedExponent is Literal) {
+      final ev = simplifiedExponent.value;
+      int? val;
+      if (ev is num) {
+        val = ev.toInt();
+      } else if (ev is Rational && ev.isInteger) {
+        val = ev.toInt();
+      }
+      if (val != null) {
+        if (val == 0) {
+          return Literal(1);
         }
-        return result.simplify();
+        if (val == 1) {
+          return base.expand();
+        }
+        if (val > 1 && val <= 10) {
+          final expandedBase = base.expand();
+          Expression result = expandedBase;
+          for (int i = 1; i < val; i++) {
+            result = Multiply(result, expandedBase).expand();
+          }
+          return result.simplify();
+        }
       }
     }
     return Pow(base.expand(), exponent.expand());
@@ -354,7 +368,7 @@ class Pow extends BinaryOperationsExpression {
       baseStr = '($baseStr)';
     }
     var expStr = exponent.toString();
-    bool expNeedsParentheses = exponent is BinaryOperationsExpression ||
+    bool expNeedsParentheses = (exponent is BinaryOperationsExpression && exponent is! Pow) ||
         exponent is BinaryExpression ||
         expStr.startsWith('-') ||
         expStr.startsWith('+');
