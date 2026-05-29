@@ -438,9 +438,11 @@ class ExpressionParser {
               if (name == 'abs' && args.length == 1) return Abs(args[0]);
               if (name == 'ln' && args.length == 1) return Ln(args[0]);
               if (name == 'log' && args.length == 1) {
-                return Log(args[0], Literal(10)); // Default base 10
+                // log(x) treated as natural logarithm for solver compatibility
+                return Ln(args[0]);
               }
               if (name == 'log' && args.length == 2) {
+                // log(base, x) => Log(base, operand)
                 return Log(args[0], args[1]);
               }
 
@@ -920,7 +922,8 @@ class ExpressionParser {
     if (name == 'abs' && args.length == 1) return Abs(args[0]);
     if (name == 'ln' && args.length == 1) return Ln(args[0]);
     if (name == 'log' && args.length == 1) {
-      return Log(args[0], Literal(10)); // Default base 10
+      // log(x) treated as natural logarithm for solver compatibility
+      return Ln(args[0]);
     }
     if (name == 'log' && args.length == 2) {
       return Log(args[0], args[1]);

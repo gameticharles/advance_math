@@ -107,7 +107,10 @@ class Subtract extends BinaryOperationsExpression {
     flatten(simplifiedRight, true);
 
     // Grouping like terms and constants
+    // likeTerms maps string key -> coefficient
+    // termExpressions maps string key -> canonical Expression (avoids re-parsing)
     Map<String, dynamic> likeTerms = {};
+    Map<String, Expression> termExpressions = {};
     dynamic constantTerm = 0;
 
     // Helper for safe addition of numeric, rational, and complex types
@@ -121,32 +124,26 @@ class Subtract extends BinaryOperationsExpression {
       return a + b;
     }
 
+    void registerTerm(Expression termExpr, String key, dynamic coeff) {
+      termExpressions.putIfAbsent(key, () => termExpr);
+      likeTerms.update(key, (value) => addValues(value, coeff),
+          ifAbsent: () => coeff);
+    }
+
     for (var term in terms) {
       if (term is Literal) {
         var val = term.evaluate();
         constantTerm = addValues(constantTerm, val);
       } else if (term is Variable) {
-        likeTerms.update(
-          term.toString(),
-          (value) => addValues(value, 1),
-          ifAbsent: () => 1,
-        );
+        registerTerm(term, term.toString(), 1);
       } else if (term is Multiply && term.left is Literal) {
-        String variablePart = term.right.toString();
-        dynamic coefficient = (term.left as Literal).evaluate();
-        likeTerms.update(
-          variablePart,
-          (value) => addValues(value, coefficient),
-          ifAbsent: () => coefficient,
-        );
-      }
-      // Handle terms of type x^2y, x^3, etc.
-      else if (term is Multiply || term is Pow) {
-        likeTerms.update(
-          term.toString(),
-          (value) => addValues(value, 1),
-          ifAbsent: () => 1,
-        );
+        final coefficient = (term.left as Literal).evaluate();
+        registerTerm(term.right, term.right.toString(), coefficient);
+      } else if (term is Multiply || term is Pow) {
+        registerTerm(term, term.toString(), 1);
+      } else {
+        // Fallback for other types (e.g., CallExpression, UnaryExpression)
+        registerTerm(term, term.toString(), 1);
       }
     }
 
@@ -180,13 +177,21 @@ class Subtract extends BinaryOperationsExpression {
     for (var entry in likeTerms.entries) {
       final val = entry.value;
       if (isZeroVal(val)) continue;
+      // Retrieve the stored Expression object; fall back to parsing only if missing
+      final termExpr = termExpressions[entry.key];
+      Expression baseExpr;
+      try {
+        baseExpr = termExpr ?? Expression.parse(entry.key);
+      } catch (_) {
+        // If parse also fails, skip this term rather than crash
+        continue;
+      }
       if (isOneVal(val)) {
-        simplifiedTerms.add(Expression.parse(entry.key));
+        simplifiedTerms.add(baseExpr);
       } else if (isMinusOneVal(val)) {
-        simplifiedTerms.add(Multiply(Literal(-1), Expression.parse(entry.key)));
+        simplifiedTerms.add(Multiply(Literal(-1), baseExpr));
       } else {
-        simplifiedTerms
-            .add(Multiply(Literal(val), Expression.parse(entry.key)));
+        simplifiedTerms.add(Multiply(Literal(val), baseExpr));
       }
     }
 

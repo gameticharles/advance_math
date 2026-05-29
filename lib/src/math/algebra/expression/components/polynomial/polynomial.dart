@@ -874,20 +874,56 @@ class Polynomial extends Expression {
       // linear
       return Linear.fromList(simplified.coefficients, variable: variable)
           .roots();
-    } else if (simplified.coefficients.length == 3) {
-      // quadratic
-      return Quadratic.fromList(simplified.coefficients, variable: variable)
-          .roots();
-    } else if (simplified.coefficients.length == 4) {
-      // cubic
-      return Cubic.fromList(simplified.coefficients, variable: variable)
-          .roots();
-    } else if (simplified.coefficients.length == 5) {
-      return Quartic.fromList(simplified.coefficients, variable: variable)
-          .roots();
     } else {
-      // 3. For higher degree Polynomials, use a numerical method like Durand-Kerner or NewtonsMethod
-      return DurandKerner(simplified.coefficients, variable: variable).roots();
+      // Check if binomial form: a * x^n + b = 0
+      bool isBinomial = true;
+      for (int i = 1; i < simplified.coefficients.length - 1; i++) {
+        var c = simplified.coefficients[i];
+        if (c is Literal) {
+          var val = c.value;
+          if (val == Complex.zero() || val == 0) continue;
+        }
+        isBinomial = false;
+        break;
+      }
+
+      if (isBinomial && simplified.coefficients.length >= 4) {
+        var a = simplified.coefficients.first;
+        var b = simplified.coefficients.last;
+        int n = simplified.coefficients.length - 1;
+
+        // base = -b / a
+        var base = Divide(Multiply(Literal(-1), b), a).simplify();
+        List<dynamic> rootsList = [];
+        for (int k = 0; k < n; k++) {
+          var termBase = Pow(base, Divide(Literal(1), Literal(n))).simplify();
+          if (k == 0) {
+            rootsList.add(termBase);
+          } else {
+            // e^( (2*k/n) * i * pi )
+            var exponent = Multiply(Divide(Literal(2 * k), Literal(n)), Multiply(Variable('i'), Variable('pi'))).simplify();
+            var rootOfUnity = Pow(Variable('e'), exponent).simplify();
+            rootsList.add(Multiply(rootOfUnity, termBase).simplify());
+          }
+        }
+        return rootsList;
+      }
+
+      if (simplified.coefficients.length == 3) {
+        // quadratic
+        return Quadratic.fromList(simplified.coefficients, variable: variable)
+            .roots();
+      } else if (simplified.coefficients.length == 4) {
+        // cubic
+        return Cubic.fromList(simplified.coefficients, variable: variable)
+            .roots();
+      } else if (simplified.coefficients.length == 5) {
+        return Quartic.fromList(simplified.coefficients, variable: variable)
+            .roots();
+      } else {
+        // 3. For higher degree Polynomials, use a numerical method like Durand-Kerner or NewtonsMethod
+        return DurandKerner(simplified.coefficients, variable: variable).roots();
+      }
     }
   }
 

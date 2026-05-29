@@ -109,6 +109,18 @@ class Quartic extends Polynomial {
 
   @override
   List<Expression> roots() {
+    bool isZero(Expression expr) {
+      if (expr is Literal) {
+        var val = expr.value;
+        if (val == Complex.zero() || val == 0) return true;
+      }
+      return false;
+    }
+
+    if (isZero(b) && isZero(c) && isZero(d)) {
+      return List<Expression>.from(super.roots());
+    }
+
     final fb = b / a;
     final fc = c / a;
     final fd = d / a;

@@ -204,6 +204,22 @@ final class DurandKerner extends Polynomial {
 
   @override
   List<dynamic> roots() {
+    // Check if binomial form: a * x^n + b = 0
+    bool isBinomial = true;
+    for (int i = 1; i < coefficients.length - 1; i++) {
+      var c = coefficients[i];
+      if (c is Literal) {
+        var val = c.value;
+        if (val == Complex.zero() || val == 0) continue;
+      }
+      isBinomial = false;
+      break;
+    }
+
+    if (isBinomial) {
+      return super.roots();
+    }
+
     final sig =
         '${coefficients.map((e) => e.hashCode).join(',')}:$precision:$maxSteps:${initialGuess.map((e) => e.hashCode).join(',')}';
     final cached = _rootsCache.get(sig);

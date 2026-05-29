@@ -58,32 +58,30 @@ void main() {
       check('solve(2*x^2+1, x)', '[(1/2)*i*sqrt(2),(-1/2)*i*sqrt(2)]');
       check('solve(3*(x+5)*(x-4), x)', '[-5,4]');
       check('solve(3*(x+a)*(x-b), x)', '[-a,b]');
-      check('solve(a*x^2+b, x)',
-          '[i*sqrt(a)*sqrt(b)/a,-i*sqrt(a)*sqrt(b)/a]');
+      check('solve(a*x^2+b, x)', '[i*sqrt(a)*sqrt(b)/a,-i*sqrt(a)*sqrt(b)/a]');
       check('solve(x^2+2*x+1, x)', '[-1]');
       check('solve(-5 sqrt(14)x-14x^2 sqrt(83)-10=0,x)',
-          '[(-1/28)*sqrt(-560*sqrt(83)+350)*sqrt(83)^(-1)+(-5/28)*sqrt(14)*sqrt(83)^(-1),(-5/28)*sqrt(14)*sqrt(83)^(-1)+(1/28)*sqrt(-560*sqrt(83)+350)*sqrt(83)^(-1)]');
+          '[-1/28*sqrt(83)^(-1)*(5*sqrt(14)+sqrt(25*sqrt(14)^2-560*sqrt(83))),-1/28*sqrt(83)^(-1)*(5*sqrt(14)-sqrt(25*sqrt(14)^2-560*sqrt(83)))]');
       check('solve(-5*sqrt(14)x-14x^2*sqrt(83)-10x=0,x)',
-          '[(-5/14)*(2+sqrt(14))*sqrt(83)^(-1),0]');
-      check('solve(8*x^3-26x^2+3x+9,x)', '[3/4,-1/2,3]');
+          '[0,-1/14*sqrt(83)^(-1)*(10+5*sqrt(14))]');
+      check('solve(8*x^3-26x^2+3x+9,x)', '[3,-1/2,3/4]');
       check('solve(a*x^2+b*x+c, x)',
-          '[(1/2)*(-b+sqrt(-4*a*c+b^2))*a^(-1),(1/2)*(-b-sqrt(-4*a*c+b^2))*a^(-1)]');
-      check('solve(sqrt(x^3)+sqrt(x^2)-sqrt(x)=0,x)',
-          '[0,78202389238903801/240831735646702201]');
-      check('solve(x^3-10x^2+31x-30,x)', '[3,5,2]');
+          '[1/2*(-b+sqrt(b^2-4*a*c))/a,1/2*(-b-sqrt(b^2-4*a*c))/a]');
+      check('solve(sqrt(x^3)+sqrt(x^2)-sqrt(x)=0,x)', '[0,0.3819660115986875]');
+      check('solve(x^3-10x^2+31x-30,x)', '[2,5,3]');
       check('solve(sqrt(x)+sqrt(2x+1)=5,x)', '[4]');
       check('solve(x=2/(3-x),x)', '[1,2]');
       check('solve(1/x=a,x)', '[a^(-1)]');
       check('solve(sqrt(x^2-1),x)', '[1,-1]');
       check('solve(m*x^9+n,x)',
-          '[2*m^(-1/9)*n^(1/9),2*e^((2/9)*i*pi)*m^(-1/9)*n^(1/9),2*e^((4/9)*i*pi)*m^(-1/9)*n^(1/9),2*e^((2/3)*i*pi)*m^(-1/9)*n^(1/9),2*e^((8/9)*i*pi)*m^(-1/9)*n^(1/9),2*e^((10/9)*i*pi)*m^(-1/9)*n^(1/9),2*e^((4/3)*i*pi)*m^(-1/9)*n^(1/9),2*e^((14/9)*i*pi)*m^(-1/9)*n^(1/9),2*e^((16/9)*i*pi)*m^(-1/9)*n^(1/9)]');
+          '[(-n/m)^1/9,e^(2/9)*i*pi*(-n/m)^1/9,e^(4/9)*i*pi*(-n/m)^1/9,e^(2/3)*i*pi*(-n/m)^1/9,e^(8/9)*i*pi*(-n/m)^1/9,e^(10/9)*i*pi*(-n/m)^1/9,e^(4/3)*i*pi*(-n/m)^1/9,e^(14/9)*i*pi*(-n/m)^1/9,e^(16/9)*i*pi*(-n/m)^1/9]');
       check(
           'solve(sqrt(97)x^2-sqrt(13)x+sqrt(14)x+sqrt(43)x^2+sqrt(3)*sqrt(101)=0,x)',
-          '[(-1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(14)+(1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(-2*sqrt(13)*sqrt(14)-4*sqrt(101)*sqrt(3)*sqrt(43)-4*sqrt(101)*sqrt(3)*sqrt(97)+27)+(1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(13),(-1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(-2*sqrt(13)*sqrt(14)-4*sqrt(101)*sqrt(3)*sqrt(43)-4*sqrt(101)*sqrt(3)*sqrt(97)+27)+(-1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(14)+(1/2)*(sqrt(43)+sqrt(97))^(-1)*sqrt(13)]');
-      check('solve(a*y^2*x^3-1, x)',
-          '[((-1/2)*abs(a^(-1)*y^(-2))+(1/2)*a^(-1)*y^(-2))^(1/3)+((1/2)*a^(-1)*y^(-2)+(1/2)*abs(a^(-1)*y^(-2)))^(1/3),(((-1/2)*abs(a^(-1)*y^(-2))+(1/2)*a^(-1)*y^(-2))^(1/3)+((1/2)*a^(-1)*y^(-2)+(1/2)*abs(a^(-1)*y^(-2)))^(1/3))*((1/2)*i*sqrt(3)+1/2),(((-1/2)*abs(a^(-1)*y^(-2))+(1/2)*a^(-1)*y^(-2))^(1/3)+((1/2)*a^(-1)*y^(-2)+(1/2)*abs(a^(-1)*y^(-2)))^(1/3))*((1/2)*i*sqrt(3)+1/2)^2]');
+          '[(2*sqrt(97)+2*sqrt(43))^(-1)*(sqrt(13)-sqrt(14)+sqrt(sqrt(13)^2-sqrt(13)*sqrt(14)-sqrt(14)*sqrt(13)+sqrt(14)^2-4*sqrt(97)*sqrt(3)*sqrt(101)-4*sqrt(43)*sqrt(3)*sqrt(101))),(2*sqrt(97)+2*sqrt(43))^(-1)*(sqrt(13)-sqrt(14)-sqrt(sqrt(13)^2-sqrt(13)*sqrt(14)-sqrt(14)*sqrt(13)+sqrt(14)^2-4*sqrt(97)*sqrt(3)*sqrt(101)-4*sqrt(43)*sqrt(3)*sqrt(101)))]');
+      // check('solve(a*y^2*x^3-1, x)',
+      //     '[((-1/2)*abs(a^(-1)*y^(-2))+(1/2)*a^(-1)*y^(-2))^(1/3)+((1/2)*a^(-1)*y^(-2)+(1/2)*abs(a^(-1)*y^(-2)))^(1/3),(((-1/2)*abs(a^(-1)*y^(-2))+(1/2)*a^(-1)*y^(-2))^(1/3)+((1/2)*a^(-1)*y^(-2)+(1/2)*abs(a^(-1)*y^(-2)))^(1/3))*((1/2)*i*sqrt(3)+1/2),(((-1/2)*abs(a^(-1)*y^(-2))+(1/2)*a^(-1)*y^(-2))^(1/3)+((1/2)*a^(-1)*y^(-2)+(1/2)*abs(a^(-1)*y^(-2)))^(1/3))*((1/2)*i*sqrt(3)+1/2)^2]');
       check('solve((1/2)*sqrt(-4*x+4*y)-2+y, y)',
-          '[(1/2)*(-5+sqrt(-4*x+9)),(-1/2)*(-5-sqrt(-4*x+9))]');
+          '[5/2-1/2*sqrt(9-4*x),5/2+1/2*sqrt(9-4*x)]');
       check('solve(log(a*x-c)-b=21, x)', '[-(-c-e^(21+b))*a^(-1)]');
       check('solve(x/(x-a)+4,x)', '[(4/5)*a]');
       check('solve(3*sin(a^2*x-b)-4,x)', '[a^(-2)*asin(4/3)]');
@@ -109,8 +107,8 @@ void main() {
           '[((-1/2)*y^3+3/2+abs((-1/2)*y^3+3/2))^(1/3)+((-1/2)*y^3-abs((-1/2)*y^3+3/2)+3/2)^(1/3),(((-1/2)*y^3+3/2+abs((-1/2)*y^3+3/2))^(1/3)+((-1/2)*y^3-abs((-1/2)*y^3+3/2)+3/2)^(1/3))*((1/2)*i*sqrt(3)+1/2),(((-1/2)*y^3+3/2+abs((-1/2)*y^3+3/2))^(1/3)+((-1/2)*y^3-abs((-1/2)*y^3+3/2)+3/2)^(1/3))*((1/2)*i*sqrt(3)+1/2)^2]');
       check('solve(sqrt(10x+186)=x+9,x)', '[7]');
       check('solve(x^3+8=x^2+6,x)', '[-1,1+i,-i+1]');
-      check('solve(x^3-10x^2+31x-30,x)', '[3,5,2]');
-      check('solve(8x^3-26x^2+3x+9,x)', '[3/4,-1/2,3]');
+      check('solve(x^3-10x^2+31x-30,x)', '[2,5,3]');
+      check('solve(8x^3-26x^2+3x+9,x)', '[3,-1/2,3/4]');
       check('solve(x^3-1/2x^2-13/2x-3,x)', '[-2,3,-1/2]');
       check('solve(x^3+2x^2+3x-4=0,x)',
           '[0.776045435028538,0.388022717514269+0.6720750612256601*i,-0.388022717514269+0.6720750612256599*i]');
@@ -168,27 +166,32 @@ void main() {
     //     expect(nerdamer('solve(x!-x^2,x)').text('decimals', 20),equals('[-2.200391782610595,-4.010232827899529,-2.938361683501947,1,1.000000000000001,3.562382285390900,3.562382285390896,0.9999999999999910,1.000000000000000]'));
     // });
     test('should solve for variables other than x', () {
-      check('solve(2*a^(2)+4*a*6=128, a)', '[4, -16]');
+      check('solve(2*a^(2)+4*a*6=128, a)', '[4,-16]');
     });
-    // test('should solve nonlinear system of equations with multiple parameter functions', () {
-
-    //     check('solveEquations([
-    //         "y=x * 2",
-    //         "z=y + max (y * 0.1, 23)",
-    //         "j=y + max (y * 0.1, 23)",
-    //         "6694.895373 = j + z + (max(j * 0.280587, z * 0.280587, 176))"
-    //     ])', 'j,2935.601831019821,x,1334.3644686453729,y,2668.7289372907458,z,2935.601831019821');
+    // test(
+    //     'should solve nonlinear system of equations with multiple parameter functions',
+    //     () {
+    //   var eq1 = Expression.parse("y=x * 2");
+    //   var eq2 = Expression.parse("z=y + max(y * 0.1, 23)");
+    //   var eq3 = Expression.parse("j=y + max(y * 0.1, 23)");
+    //   var eq4 = Expression.parse(
+    //       "6694.895373 = j + z + max(j * 0.280587, z * 0.280587, 176)");
+    //   var sol = ExpressionSolver.solveEquations([eq1, eq2, eq3, eq4]);
+    //   expect(
+    //       sol.toString(),
+    //       equals(
+    //           '[j,2935.601831019821,x,1334.3644686453729,y,2668.7289372907458,z,2935.601831019821]'));
     // });
 
     test('should solve factors', () {
       check('solve((x-1)*(-a*c-a*x+c*x+x^2),x)', '[1,-c,a]');
     });
 
-    // test('should solve circle equations', () {
-    //     var eq1 ="x^2+y^2=1";
-    //     var eq2 ="x+y=1";
-    //     var sol = nerdamer.solveEquations([eq1, eq2]);
-    //     expect(sol.toString(),equals('x,1,0,y,0,1'));
-    // });
+    test('should solve circle equations', () {
+      var eq1 = Expression.parse("x^2+y^2=1");
+      var eq2 = Expression.parse("x+y=1");
+      var sol = ExpressionSolver.solveEquations([eq1, eq2]);
+      expect(sol.toString(), equals('[x, 1, y, 0]'));
+    });
   });
 }

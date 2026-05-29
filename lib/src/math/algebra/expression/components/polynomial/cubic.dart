@@ -53,6 +53,18 @@ class Cubic extends Polynomial {
 
   @override
   List<Expression> roots() {
+    bool isZero(Expression expr) {
+      if (expr is Literal) {
+        var val = expr.value;
+        if (val == Complex.zero() || val == 0) return true;
+      }
+      return false;
+    }
+
+    if (isZero(b) && isZero(c)) {
+      return List<Expression>.from(super.roots());
+    }
+
     var two = Literal(2);
     var three = Literal(3);
     // sigma = -1/2 + i*sqrt(3)/2

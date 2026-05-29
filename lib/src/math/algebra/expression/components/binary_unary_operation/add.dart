@@ -203,13 +203,20 @@ class Add extends BinaryOperationsExpression {
     for (var entry in likeTerms.entries) {
       final val = entry.value;
       if (isZeroVal(val)) continue;
+      // Use the stored Expression to avoid re-parsing which can fail for complex exprs
+      final termExpr = termExpressions[entry.key];
+      Expression baseExpr;
+      try {
+        baseExpr = termExpr ?? Expression.parse(entry.key);
+      } catch (_) {
+        continue; // skip unparseable terms rather than crash
+      }
       if (isOneVal(val)) {
-        simplifiedTerms.add(Expression.parse(entry.key));
+        simplifiedTerms.add(baseExpr);
       } else if (isMinusOneVal(val)) {
-        simplifiedTerms.add(Multiply(Literal(-1), Expression.parse(entry.key)));
+        simplifiedTerms.add(Multiply(Literal(-1), baseExpr));
       } else {
-        simplifiedTerms
-            .add(Multiply(Literal(val), Expression.parse(entry.key)));
+        simplifiedTerms.add(Multiply(Literal(val), baseExpr));
       }
     }
 

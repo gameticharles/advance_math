@@ -354,7 +354,11 @@ class Pow extends BinaryOperationsExpression {
       baseStr = '($baseStr)';
     }
     var expStr = exponent.toString();
-    if (expStr.startsWith('-')) {
+    bool expNeedsParentheses = exponent is BinaryOperationsExpression ||
+        exponent is BinaryExpression ||
+        expStr.startsWith('-') ||
+        expStr.startsWith('+');
+    if (expNeedsParentheses) {
       expStr = '($expStr)';
     }
     return "$baseStr^$expStr";

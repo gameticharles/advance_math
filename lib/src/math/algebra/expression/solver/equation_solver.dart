@@ -183,9 +183,39 @@ class ExpressionSolver {
           if (poly.degree > 0 || !_containsVariable(equation, v)) {
             solutions = poly
                 .roots()
-                .map((c) => (c is Expression)
-                    ? c.simplify()
-                    : ((c is Complex) ? (c.imaginary == 0 ? c.real : c) : c))
+                .map((c) {
+                  if (c is Expression) {
+                    try {
+                      final evalVal = c.evaluate();
+                      if (evalVal is Complex) {
+                        final img = evalVal.imaginary;
+                        double imgVal = 0.0;
+                        if (img is num) imgVal = img.toDouble();
+                        if (img is Rational) imgVal = img.toDouble();
+                        if (imgVal.abs() < 1e-9) {
+                          final re = evalVal.real;
+                          double reVal = 0.0;
+                          if (re is num) reVal = re.toDouble();
+                          if (re is Rational) reVal = re.toDouble();
+
+                          // Check if close to integer
+                          if ((reVal - reVal.round()).abs() < 1e-9) {
+                            return Literal(reVal.round());
+                          }
+                          // Check if close to a simple rational with small denominator
+                          for (int den = 1; den <= 1000; den++) {
+                            double numDouble = reVal * den;
+                            if ((numDouble - numDouble.round()).abs() < 1e-9) {
+                              return Literal(Rational(BigInt.from(numDouble.round()), BigInt.from(den)));
+                            }
+                          }
+                        }
+                      }
+                    } catch (_) {}
+                    return c.simplify();
+                  }
+                  return (c is Complex) ? (c.imaginary == 0 ? c.real : c) : c;
+                })
                 .toList();
             throw _SuccessException();
           }
@@ -451,6 +481,211 @@ class ExpressionSolver {
       return isolated.map((e) => e.simplify()).toList();
     }
 
+    // Try sqrt-isolation: for expressions A*sqrt(F(v)) + G(v) = 0
+    // Isolate the sqrt term, square both sides, solve polynomial, filter extraneous.
+    try {
+      List<Expression> flatTerms = [];
+      void flattenAdd(Expression e, {bool negate = false}) {
+        if (e is Add) {
+          flattenAdd(e.left, negate: negate);
+          flattenAdd(e.right, negate: negate);
+        } else if (e is Subtract) {
+          flattenAdd(e.left, negate: negate);
+          flattenAdd(e.right, negate: !negate);
+        } else {
+          flatTerms.add(negate ? Multiply(Literal(-1), e) : e);
+        }
+      }
+      flattenAdd(equation);
+
+      bool hasSqrtWithVar(Expression e) {
+        if (e is CallExpression &&
+            e.callee is Variable &&
+            (e.callee as Variable).identifier.name == 'sqrt' &&
+            e.arguments.any((a) => _containsVariable(a, v))) {
+          return true;
+        }
+        if (e is Multiply) {
+          return hasSqrtWithVar(e.left) || hasSqrtWithVar(e.right);
+        }
+        return false;
+      }
+
+      int sqrtIdx = -1;
+      for (int i = 0; i < flatTerms.length; i++) {
+        if (hasSqrtWithVar(flatTerms[i])) {
+          sqrtIdx = i;
+          break;
+        }
+      }
+
+      if (sqrtIdx >= 0) {
+        Expression sqrtTerm = flatTerms[sqrtIdx];
+        Expression? otherSide;
+        for (int i = 0; i < flatTerms.length; i++) {
+          if (i == sqrtIdx) continue;
+          final neg = Multiply(Literal(-1), flatTerms[i]).simplify();
+          otherSide = otherSide == null ? neg : Add(otherSide, neg).simplify();
+        }
+        otherSide ??= Literal(0);
+
+        // Square both sides.
+        // Manually extract: sqrtTerm = scalar * sqrt(sqrtArg) so sqrtTerm^2 = scalar^2 * sqrtArg
+        // This avoids the CAS not knowing sqrt(A)^2 = A.
+        Expression? sqrtArg;
+        Expression? sqrtScalar;
+        void extractSqrt(Expression e) {
+          if (e is CallExpression &&
+              e.callee is Variable &&
+              (e.callee as Variable).identifier.name == 'sqrt') {
+            sqrtArg = e.arguments.first;
+            sqrtScalar ??= Literal(1);
+          } else if (e is Multiply) {
+            if (hasSqrtWithVar(e.left)) {
+              sqrtScalar = e.right;
+              extractSqrt(e.left);
+            } else if (hasSqrtWithVar(e.right)) {
+              sqrtScalar = e.left;
+              extractSqrt(e.right);
+            }
+          } else if (e is GroupExpression) {
+            extractSqrt(e.expression);
+          }
+        }
+        extractSqrt(sqrtTerm);
+
+        Expression lhsSquared;
+        if (sqrtArg != null && sqrtScalar != null) {
+          // (scalar * sqrt(arg))^2 = scalar^2 * arg
+          final scalarSq = Pow(sqrtScalar!, Literal(2)).simplify();
+          lhsSquared = Multiply(scalarSq, sqrtArg!).simplify();
+        } else {
+          lhsSquared = Pow(sqrtTerm, Literal(2)).simplify();
+        }
+        final rhsSquared = Pow(otherSide, Literal(2)).simplify();
+        final squared = Subtract(lhsSquared, rhsSquared).simplify();
+
+        final sqSolutions = solve(squared, v);
+        if (sqSolutions is SolverList && sqSolutions.isNotEmpty) {
+          // Filter extraneous roots
+          final valid = <dynamic>[];
+          for (final sol in sqSolutions) {
+            try {
+              final varName = v.identifier.name;
+              dynamic solVal = sol is Expression ? sol.evaluate() : sol;
+              final check = equation.evaluate({varName: solVal});
+              double checkVal = 0.0;
+              if (check is num) checkVal = check.abs().toDouble();
+              if (check is Complex) {
+                final r = check.real;
+                final im = check.imaginary;
+                double rv = 0.0, iv = 0.0;
+                if (r is num) rv = r.toDouble();
+                if (r is Rational) rv = r.toDouble();
+                if (im is num) iv = im.toDouble();
+                if (im is Rational) iv = im.toDouble();
+                checkVal = (rv * rv + iv * iv);
+              }
+              if (checkVal.abs() < 1e-6) valid.add(sol);
+            } catch (_) {
+              valid.add(sol);
+            }
+          }
+          if (valid.isNotEmpty) {
+            return valid
+                .map<Expression>((s) => s is Expression ? s : Literal(s))
+                .toList();
+          }
+        }
+      }
+    } catch (_) {}
+
+    // Try a numerical step-and-bisection fallback search for real roots in [-10, 10]
+    try {
+      final List<double> numRoots = [];
+      final step = 0.1;
+      final start = -10.0;
+      final end = 10.0;
+
+      double f(double x) {
+        try {
+          final res = equation.evaluate({v.identifier.name: x});
+          if (res is Complex) {
+            final img = res.imaginary;
+            double imgVal = 0.0;
+            if (img is num) imgVal = img.toDouble();
+            if (img is Rational) imgVal = img.toDouble();
+            if (imgVal.abs() > 1e-9) return double.nan;
+
+            final re = res.real;
+            if (re is num) return re.toDouble();
+            if (re is Rational) return re.toDouble();
+          }
+          if (res is num) return res.toDouble();
+          if (res is Rational) return res.toDouble();
+        } catch (_) {}
+        return double.nan;
+      }
+
+      double prevX = start;
+      double prevY = f(prevX);
+
+      if (f(0.0).isFinite && f(0.0).abs() < 1e-7) {
+        numRoots.add(0.0);
+      }
+
+      if (prevY.isFinite && prevY.abs() < 1e-7) {
+        numRoots.add(prevX);
+      }
+
+      for (double x = start + step; x <= end; x += step) {
+        final y = f(x);
+        if (!y.isFinite) continue;
+
+        if (y.abs() < 1e-7) {
+          numRoots.add(x);
+        } else if (prevY.isFinite && prevY * y < 0) {
+          // Bisection in [prevX, x]
+          try {
+            final root = RootFinding.bisection((num val) => f(val.toDouble()), prevX, x, tolerance: 1e-9);
+            final rootVal = root.toDouble();
+            if (f(rootVal).abs() < 1e-4) {
+              numRoots.add(rootVal);
+            }
+          } catch (_) {}
+        }
+        prevX = x;
+        prevY = y;
+      }
+
+      if (numRoots.isNotEmpty) {
+        final List<Expression> uniqueSols = [];
+        final seen = <String>{};
+        for (var r in numRoots) {
+          Expression sol = Literal(r);
+          if ((r - r.round()).abs() < 1e-8) {
+            sol = Literal(r.round());
+          } else {
+            for (int den = 1; den <= 1000; den++) {
+              double numDouble = r * den;
+              if ((numDouble - numDouble.round()).abs() < 1e-8) {
+                sol = Literal(Rational(BigInt.from(numDouble.round()), BigInt.from(den)));
+                break;
+              }
+            }
+          }
+          final str = sol.toString();
+          if (!seen.contains(str)) {
+            seen.add(str);
+            uniqueSols.add(sol);
+          }
+        }
+        if (uniqueSols.isNotEmpty) {
+          return uniqueSols;
+        }
+      }
+    } catch (_) {}
+
     throw UnimplementedError(
         'Cannot isolate variable in: ${equation.toString()}');
   }
@@ -565,6 +800,15 @@ class ExpressionSolver {
       }
     }
 
+    // Handle CallExpression: sqrt(A) = target => A = target^2
+    if (expr is CallExpression &&
+        expr.callee is Variable &&
+        (expr.callee as Variable).identifier.name == 'sqrt') {
+      if (expr.arguments.length == 1) {
+        return _solveForList(expr.arguments[0], v, Pow(target, Literal(2)));
+      }
+    }
+
     // Handle CallExpression: sin(A) = target => A = asin(target)
     if (expr is CallExpression &&
         expr.callee is Variable &&
@@ -572,6 +816,24 @@ class ExpressionSolver {
       if (expr.arguments.length == 1) {
         return _solveForList(
             expr.arguments[0], v, CallExpression(Variable('asin'), [target]));
+      }
+    }
+
+    // Handle Ln: ln(A) = target => A = e^target
+    if (expr is Ln) {
+      if (_containsVariable(expr.operand, v)) {
+        return _solveForList(expr.operand, v, Pow(Variable('e'), target));
+      }
+    }
+
+    // Handle Log: log_base(operand) = target => operand = base^target
+    if (expr is Log) {
+      if (_containsVariable(expr.operand, v) && !_containsVariable(expr.base, v)) {
+        // log_b(operand) = target => operand = b^target
+        return _solveForList(expr.operand, v, Pow(expr.base, target));
+      } else if (_containsVariable(expr.base, v) && !_containsVariable(expr.operand, v)) {
+        // log_base(k) = target => base = k^(1/target)
+        return _solveForList(expr.base, v, Pow(expr.operand, Pow(target, Literal(-1))));
       }
     }
 
@@ -590,8 +852,17 @@ class ExpressionSolver {
     if (expr is UnaryExpression) {
       return _containsVariable(expr.operand, v);
     }
+    if (expr is GroupExpression) {
+      return _containsVariable(expr.expression, v);
+    }
     if (expr is CallExpression) {
       return expr.arguments.any((arg) => _containsVariable(arg, v));
+    }
+    if (expr is Ln) {
+      return _containsVariable(expr.operand, v);
+    }
+    if (expr is Log) {
+      return _containsVariable(expr.base, v) || _containsVariable(expr.operand, v);
     }
     return false;
   }
@@ -803,7 +1074,53 @@ class ExpressionSolver {
       try {
         final sols = ExpressionSolver.solve(equations[0], variables[0]);
         if (sols.isNotEmpty) {
-          final solVal = sols.first;
+          final sortedSols = List<dynamic>.from(sols);
+          sortedSols.sort((a, b) {
+            double getNiceness(dynamic val) {
+              try {
+                dynamic evalVal = val;
+                if (val is Expression) {
+                  evalVal = val.evaluate();
+                }
+                double imgVal = 0.0;
+                double realVal = 0.0;
+                if (evalVal is Complex) {
+                  final img = evalVal.imaginary;
+                  if (img is num) imgVal = img.toDouble();
+                  if (img is Rational) imgVal = img.toDouble();
+
+                  final re = evalVal.real;
+                  if (re is num) realVal = re.toDouble();
+                  if (re is Rational) realVal = re.toDouble();
+                } else if (evalVal is Rational) {
+                  realVal = evalVal.toDouble();
+                } else if (evalVal is num) {
+                  realVal = evalVal.toDouble();
+                }
+
+                // Penalty for being complex
+                double complexPenalty = imgVal.abs() > 1e-9 ? 1e12 : 0.0;
+
+                // Penalty for not being a nice round integer
+                double roundDiff = (realVal - realVal.round()).abs();
+                double integerPenalty = roundDiff < 1e-2 ? roundDiff : 1000.0;
+
+                // Add minor penalty for huge denominators if it is rational and not close to integer
+                double denomPenalty = 0.0;
+                if (evalVal is Rational && roundDiff >= 1e-2) {
+                  denomPenalty = evalVal.denominator.toDouble() / 1e15;
+                }
+
+                double niceness = complexPenalty + integerPenalty + denomPenalty;
+                return niceness;
+              } catch (e) {
+                // Ignore evaluation errors
+              }
+              return 1e15; // Fallback
+            }
+            return getNiceness(a).compareTo(getNiceness(b));
+          });
+          final solVal = sortedSols.first;
           final solExpr = solVal is Expression ? solVal : Literal(solVal);
           return {variables[0]: solExpr};
         }
