@@ -17,6 +17,8 @@ import 'package:advance_math/advance_math.dart' show LRUCache;
 import 'expression/expression.dart';
 export 'expression/expression.dart';
 
+export 'calculus/calculus.dart';
+
 part 'utils/utils.dart';
 part 'matrix/matrix.dart';
 

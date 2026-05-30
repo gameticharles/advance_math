@@ -146,6 +146,7 @@ class ExpressionContext {
 
         // Constants
         'pi': pi,
+        'π': pi,
         'e': e,
         'ex': ex,
         'tau': tau,
@@ -162,6 +163,8 @@ class ExpressionContext {
         'NaN': double.nan,
         'inf': double.infinity,
         'Infinity': double.infinity,
+        '∞': double.infinity,
+        '−∞': double.negativeInfinity,
         'i': Complex.i(),
         'I': Complex.i(),
         'goldenRatio': 1.618033988749895,

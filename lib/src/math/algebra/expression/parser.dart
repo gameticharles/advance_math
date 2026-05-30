@@ -43,7 +43,7 @@ class ExpressionParser {
   // Gobbles only identifiers
   // e.g.: `foo`, `_value`, `$x1`
   Parser<Identifier> get identifier =>
-      (digit().not() & (word() | char(r'$')).plus())
+      (digit().not() & (word() | char(r'$') | char('∞') | char('−') | char('π')).plus())
           .flatten()
           .map((v) => Identifier(v));
 

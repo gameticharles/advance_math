@@ -42,7 +42,7 @@ String? _bestRational(double value, {int maxDenom = 1000000000}) {
     } else {
       break;
     }
-    if (bestErr < 1e-10) break;
+    if (bestErr < 1e-15) break;
   }
 
   // Require the rational approximation to be within 1e-9
@@ -59,9 +59,14 @@ String formatDecimal(double value) {
   if (value.isNaN) return 'NaN';
   if (value.isInfinite) return value > 0 ? 'Infinity' : '-Infinity';
 
+  // Negative zero check
+  if (value == 0.0 && value.isNegative) {
+    return '-0';
+  }
+
   // Check for exact integer
   final rounded = value.roundToDouble();
-  if ((value - rounded).abs() < 1e-9 && rounded.abs() < 1e15) {
+  if ((value - rounded).abs() < 1e-6 && rounded.abs() < 1e15) {
     return rounded.toInt().toString();
   }
 
@@ -157,7 +162,18 @@ class SymbolicSum {
     final start = startVal.round();
     final end = endVal.round();
 
-    if (end - start > 10000) {
+    // Optimize purely numeric sums: if there are no other variables in the expression
+    // other than the summation variable and mathematical constants, we can compute it numerically directly!
+    final otherVars = expr.getVariableTerms().where((v) {
+      final name = v.identifier.name;
+      return v != variable &&
+          name != 'e' &&
+          name != 'π' &&
+          name != 'pi' &&
+          name != 'Infinity' &&
+          name != '∞';
+    });
+    if (otherVars.isEmpty || end - start > 10000) {
       return _numericSum(expr, variable, start, end);
     }
 
@@ -249,14 +265,29 @@ class DefiniteIntegral {
       num f(num x) {
         try {
           final val = expr.evaluate({varName: x.toDouble()});
-          return _toDbl(val) ?? double.nan;
+          final d = _toDbl(val) ?? double.nan;
+          if (d.isInfinite || d.isNaN) {
+            final mid = (a + b) / 2;
+            final nudgeX = x + (mid - x).sign * 1e-10 * (b - a).abs();
+            final valNudge = expr.evaluate({varName: nudgeX.toDouble()});
+            final dNudge = _toDbl(valNudge) ?? double.nan;
+            if (dNudge.isFinite) return dNudge;
+          }
+          return d;
         } catch (_) {
+          try {
+            final mid = (a + b) / 2;
+            final nudgeX = x + (mid - x).sign * 1e-10 * (b - a).abs();
+            final valNudge = expr.evaluate({varName: nudgeX.toDouble()});
+            final dNudge = _toDbl(valNudge) ?? double.nan;
+            if (dNudge.isFinite) return dNudge;
+          } catch (_) {}
           return double.nan;
         }
       }
 
       final result = NumericalIntegration.adaptiveSimpson(f, a, b,
-          tolerance: 1e-10, maxDepth: 60);
+          tolerance: 1e-12, maxDepth: 25);
 
       final s = formatDecimal(result.toDouble());
       return Literal(result, s);
@@ -413,6 +444,10 @@ class SymbolicLimit {
 
   static Expression _limitAtInfinity(Expression expr, String varName,
       {required bool positive}) {
+    final c = positive ? double.infinity : double.negativeInfinity;
+    final hopital = _tryLHopital(expr, varName, c);
+    if (hopital != null) return hopital;
+
     final signs = positive
         ? [1e6, 1e9, 1e12, 1e15, 1e18]
         : [-1e6, -1e9, -1e12, -1e15, -1e18];
@@ -483,13 +518,24 @@ class SymbolicLimit {
     if (leftLim != null && rightLim != null) {
       // Two-sided limit
       if ((leftLim - rightLim).abs() < 1e-5 * (1 + leftLim.abs())) {
-        return (leftLim + rightLim) / 2;
+        final avg = (leftLim + rightLim) / 2;
+        if (avg.abs() > 1e11) {
+          return avg > 0 ? double.infinity : double.negativeInfinity;
+        }
+        return avg;
       }
       // Limits disagree → take left (for abs-value type problems)
+      if (leftLim.abs() > 1e11) {
+        return leftLim > 0 ? double.infinity : double.negativeInfinity;
+      }
       return leftLim;
     }
 
-    return leftLim ?? rightLim;
+    final res = leftLim ?? rightLim;
+    if (res != null && res.abs() > 1e11) {
+      return res > 0 ? double.infinity : double.negativeInfinity;
+    }
+    return res;
   }
 
   // ----------- Helpers -----------
