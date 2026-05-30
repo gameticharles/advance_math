@@ -725,11 +725,9 @@ class Multiply extends BinaryOperationsExpression {
     if (left is Literal) {
       final val = (left as Literal).value;
       if (val is Rational && !val.isInteger) {
-        if (rightStr == 'i' ||
-            rightStr.startsWith('i*') ||
-            rightStr.startsWith('i^')) {
-          leftStr = '($leftStr)';
-        }
+        // Always wrap non-integer rational fractions in parens to avoid ambiguity.
+        // e.g. (1/4)*log(y) instead of 1/4*log(y), which could be read as 1/(4*log(y)).
+        leftStr = '($leftStr)';
       }
     }
     if (right is Literal) {
@@ -742,6 +740,7 @@ class Multiply extends BinaryOperationsExpression {
         }
       }
     }
+
 
     // Avoid excessive parentheses
     if (left is Add || left is Subtract) {

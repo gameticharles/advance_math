@@ -174,7 +174,7 @@ void main() {
         skip: 'Integration of custom base exponentiation');
     test('integrate(cos(x), x)', () => check('integrate(cos(x), x)', 'sin(x)'));
     test('integrate(2*x^2+x, x)',
-        () => check('integrate(2*x^2+x, x)', '2/3*x^3+1/2*x^2'));
+        () => check('integrate(2*x^2+x, x)', '(2/3)*x^3+(1/2)*x^2'));
     test('integrate(log(x), x)',
         () => check('integrate(log(x), x)', '-x+log(x)*x'),
         skip: 'log() default base is 10 vs base e in Nerdamer');
@@ -223,7 +223,7 @@ void main() {
             'integrate(11/(a+5*r*x)^2,x)', '(-11/5)*(5*r*x+a)^(-1)*r^(-1)'),
         skip: 'Rational power integration not supported');
     test('integrate(cos(x)*sin(x), x)',
-        () => check('integrate(cos(x)*sin(x), x)', '-1/2*cos(x)^2'));
+        () => check('integrate(cos(x)*sin(x), x)', '(-1/2)*cos(x)^2'));
     test(
         'integrate(x*cos(x)*sin(x), x)',
         () => check('integrate(x*cos(x)*sin(x), x)',
