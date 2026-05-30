@@ -229,16 +229,13 @@ class Multiply extends BinaryOperationsExpression {
       var leftVal = litVal(simpleLeft);
       var rightVal = litVal(simpleRight);
 
-      bool doubleConverted = false;
       if (leftVal is double && leftVal != leftVal.toInt()) {
         leftVal = Rational(leftVal);
         simpleLeft = Literal(leftVal);
-        doubleConverted = true;
       }
       if (rightVal is double && rightVal != rightVal.toInt()) {
         rightVal = Rational(rightVal);
         simpleRight = Literal(rightVal);
-        doubleConverted = true;
       }
 
       bool isFraction(dynamic v) => v is Rational && !v.isInteger;
@@ -337,11 +334,13 @@ class Multiply extends BinaryOperationsExpression {
     // Associative simplification for Multiply(Multiply(A, B), C)
     if (simpleLeft is Multiply) {
       final bc = Multiply(simpleLeft.right, simpleRight).simplifyBasic();
-      if (bc is Literal || bc.size() < simpleLeft.right.size() + simpleRight.size()) {
+      if (bc is Literal ||
+          bc.size() < simpleLeft.right.size() + simpleRight.size()) {
         return Multiply(simpleLeft.left, bc).simplifyBasic();
       }
       final ac = Multiply(simpleLeft.left, simpleRight).simplifyBasic();
-      if (ac is Literal || ac.size() < simpleLeft.left.size() + simpleRight.size()) {
+      if (ac is Literal ||
+          ac.size() < simpleLeft.left.size() + simpleRight.size()) {
         return Multiply(simpleLeft.right, ac).simplifyBasic();
       }
     }
@@ -349,11 +348,13 @@ class Multiply extends BinaryOperationsExpression {
     // Associative simplification for Multiply(C, Multiply(A, B))
     if (simpleRight is Multiply) {
       final ca = Multiply(simpleLeft, simpleRight.left).simplifyBasic();
-      if (ca is Literal || ca.size() < simpleLeft.size() + simpleRight.left.size()) {
+      if (ca is Literal ||
+          ca.size() < simpleLeft.size() + simpleRight.left.size()) {
         return Multiply(ca, simpleRight.right).simplifyBasic();
       }
       final cb = Multiply(simpleLeft, simpleRight.right).simplifyBasic();
-      if (cb is Literal || cb.size() < simpleLeft.size() + simpleRight.right.size()) {
+      if (cb is Literal ||
+          cb.size() < simpleLeft.size() + simpleRight.right.size()) {
         return Multiply(cb, simpleRight.left).simplifyBasic();
       }
     }
@@ -755,14 +756,15 @@ class Multiply extends BinaryOperationsExpression {
     // Only applies when the Pow has a plain Variable base with exponent exactly -1.
     bool isPowVarMinusOne(Expression e) {
       if (e is! Pow) return false;
-      final pow = e as Pow;
+      final pow = e;
       if (pow.base is! Variable) return false;
       if (pow.exponent is! Literal) return false;
       final expVal = (pow.exponent as Literal).value;
       if (expVal == -1) return true;
-      if (expVal is Complex && (expVal as Complex).isReal) {
-        final r = (expVal as Complex).real;
-        return (r is num && r == -1) || (r is Rational && r == Rational.fromInt(-1));
+      if (expVal is Complex && (expVal).isReal) {
+        final r = (expVal).real;
+        return (r is num && r == -1) ||
+            (r is Rational && r == Rational.fromInt(-1));
       }
       return false;
     }

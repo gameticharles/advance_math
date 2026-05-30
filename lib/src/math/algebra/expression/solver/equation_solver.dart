@@ -104,17 +104,19 @@ class ExpressionSolver {
       Expression numExpr, Expression denExpr) {
     List<Expression> getSumTerms(Expression e) {
       if (e is Add) return [...getSumTerms(e.left), ...getSumTerms(e.right)];
-      if (e is Subtract)
+      if (e is Subtract) {
         return [
           ...getSumTerms(e.left),
           ...getSumTerms(Multiply(Literal(-1), e.right))
         ];
+      }
       return [e];
     }
 
     List<Expression> getProductFactors(Expression e) {
-      if (e is Multiply)
+      if (e is Multiply) {
         return [...getProductFactors(e.left), ...getProductFactors(e.right)];
+      }
       if (e is GroupExpression) return getProductFactors(e.expression);
       return [e];
     }
@@ -426,10 +428,12 @@ class ExpressionSolver {
                           final polyVal =
                               poly.evaluate({v.identifier.name: roundVal});
                           double polyValAbs = 1.0;
-                          if (polyVal is num)
+                          if (polyVal is num) {
                             polyValAbs = polyVal.abs().toDouble();
-                          if (polyVal is Complex)
+                          }
+                          if (polyVal is Complex) {
                             polyValAbs = polyVal.abs().real.toDouble();
+                          }
                           if (polyValAbs < 1e-5) {
                             return Literal(roundVal);
                           }
@@ -635,8 +639,9 @@ class ExpressionSolver {
 
           bool isValid = true;
           if (evalRes is num) {
-            if (evalRes.isNaN || evalRes.isInfinite || evalRes.abs() > 1e-5)
+            if (evalRes.isNaN || evalRes.isInfinite || evalRes.abs() > 1e-5) {
               isValid = false;
+            }
           } else if (evalRes is Complex) {
             final r = evalRes.real;
             final im = evalRes.imaginary;
