@@ -717,7 +717,8 @@ class Polynomial extends Expression {
     var buffer = StringBuffer();
     for (var i = 0; i < coefficients.length; i++) {
       final coeff = coefficients[i];
-      if (coeff is Literal && (coeff.value == Complex.zero() || coeff.value == 0)) {
+      if (coeff is Literal &&
+          (coeff.value == Complex.zero() || coeff.value == 0)) {
         continue;
       }
 
@@ -986,8 +987,10 @@ class Polynomial extends Expression {
       }
 
       if (foundRoots.isNotEmpty) {
-        List<Expression> remainingCoeffs = currentCoeffs.map((c) => Literal(c)).toList();
-        Polynomial remainingPoly = Polynomial.fromList(remainingCoeffs, variable: variable);
+        List<Expression> remainingCoeffs =
+            currentCoeffs.map((c) => Literal(c)).toList();
+        Polynomial remainingPoly =
+            Polynomial.fromList(remainingCoeffs, variable: variable);
         List<dynamic> remainingRoots = remainingPoly.roots();
         return [
           ...foundRoots.map((r) => doubleToExactExpression(r)),
@@ -1040,7 +1043,9 @@ class Polynomial extends Expression {
             rootsList.add(termBase);
           } else {
             // e^( (2*k/n) * i * pi )
-            var exponent = Multiply(Divide(Literal(2 * k), Literal(n)), Multiply(Variable('i'), Variable('pi'))).simplify();
+            var exponent = Multiply(Divide(Literal(2 * k), Literal(n)),
+                    Multiply(Variable('i'), Variable('pi')))
+                .simplify();
             var rootOfUnity = Pow(Variable('e'), exponent).simplify();
             rootsList.add(Multiply(rootOfUnity, termBase).simplify());
           }
@@ -1061,7 +1066,8 @@ class Polynomial extends Expression {
             .roots();
       } else {
         // 3. For higher degree Polynomials, use a numerical method like Durand-Kerner or NewtonsMethod
-        return DurandKerner(simplified.coefficients, variable: variable).roots();
+        return DurandKerner(simplified.coefficients, variable: variable)
+            .roots();
       }
     }
   }
