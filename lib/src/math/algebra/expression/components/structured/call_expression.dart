@@ -6,6 +6,15 @@ class CallExpression extends Expression {
 
   CallExpression(this.callee, this.arguments);
 
+  static const Set<String> _knownFunctions = {
+    'sin', 'cos', 'tan', 'sec', 'csc', 'cot',
+    'asin', 'acos', 'atan', 'asec', 'acsc', 'acot',
+    'sinh', 'cosh', 'tanh', 'sech', 'csch', 'coth',
+    'asinh', 'acosh', 'atanh', 'asech', 'acsch', 'acoth',
+    'exp', 'abs', 'ln', 'log', 'sqrt', 'integrate', 'solve',
+    'solveEquations', 'diff', 'differentiate', 'max', 'min'
+  };
+
   Expression? _asImplicitMultiplication() {
     if (arguments.length == 1) {
       final c = callee.simplify();
@@ -14,6 +23,9 @@ class CallExpression extends Expression {
         if (val is num || val is Complex || val is Rational) {
           return Multiply(c, arguments.first);
         }
+      }
+      if (c is! Variable || !_knownFunctions.contains(c.identifier.name)) {
+        return Multiply(c, arguments.first);
       }
     }
     return null;

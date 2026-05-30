@@ -22,48 +22,40 @@ class ExpressionSolver {
       final rightCombined = _combineFractions(e.right);
       Expression A = leftCombined is Divide ? leftCombined.left : leftCombined;
       Expression B = leftCombined is Divide ? leftCombined.right : Literal(1);
-      Expression C = rightCombined is Divide ? rightCombined.left : rightCombined;
+      Expression C =
+          rightCombined is Divide ? rightCombined.left : rightCombined;
       Expression D = rightCombined is Divide ? rightCombined.right : Literal(1);
-      return Divide(
-        Add(Multiply(A, D), Multiply(C, B)),
-        Multiply(B, D)
-      );
+      return Divide(Add(Multiply(A, D), Multiply(C, B)), Multiply(B, D));
     }
     if (e is Subtract) {
       final leftCombined = _combineFractions(e.left);
       final rightCombined = _combineFractions(e.right);
       Expression A = leftCombined is Divide ? leftCombined.left : leftCombined;
       Expression B = leftCombined is Divide ? leftCombined.right : Literal(1);
-      Expression C = rightCombined is Divide ? rightCombined.left : rightCombined;
+      Expression C =
+          rightCombined is Divide ? rightCombined.left : rightCombined;
       Expression D = rightCombined is Divide ? rightCombined.right : Literal(1);
-      return Divide(
-        Subtract(Multiply(A, D), Multiply(C, B)),
-        Multiply(B, D)
-      );
+      return Divide(Subtract(Multiply(A, D), Multiply(C, B)), Multiply(B, D));
     }
     if (e is Multiply) {
       final leftCombined = _combineFractions(e.left);
       final rightCombined = _combineFractions(e.right);
       Expression A = leftCombined is Divide ? leftCombined.left : leftCombined;
       Expression B = leftCombined is Divide ? leftCombined.right : Literal(1);
-      Expression C = rightCombined is Divide ? rightCombined.left : rightCombined;
+      Expression C =
+          rightCombined is Divide ? rightCombined.left : rightCombined;
       Expression D = rightCombined is Divide ? rightCombined.right : Literal(1);
-      return Divide(
-        Multiply(A, C),
-        Multiply(B, D)
-      );
+      return Divide(Multiply(A, C), Multiply(B, D));
     }
     if (e is Divide) {
       final leftCombined = _combineFractions(e.left);
       final rightCombined = _combineFractions(e.right);
       Expression A = leftCombined is Divide ? leftCombined.left : leftCombined;
       Expression B = leftCombined is Divide ? leftCombined.right : Literal(1);
-      Expression C = rightCombined is Divide ? rightCombined.left : rightCombined;
+      Expression C =
+          rightCombined is Divide ? rightCombined.left : rightCombined;
       Expression D = rightCombined is Divide ? rightCombined.right : Literal(1);
-      return Divide(
-        Multiply(A, D),
-        Multiply(B, C)
-      );
+      return Divide(Multiply(A, D), Multiply(B, C));
     }
     if (e is Pow) {
       dynamic ev;
@@ -76,22 +68,27 @@ class ExpressionSolver {
       }
       if (ev != null) {
         if (ev is num && ev < 0) {
-          return _combineFractions(Divide(Literal(1), Pow(e.base, Literal(-ev))));
+          return _combineFractions(
+              Divide(Literal(1), Pow(e.base, Literal(-ev))));
         }
         if (ev is Rational && ev.isNegative) {
-          return _combineFractions(Divide(Literal(1), Pow(e.base, Literal(-ev))));
+          return _combineFractions(
+              Divide(Literal(1), Pow(e.base, Literal(-ev))));
         }
         if (ev is Complex && ev.isReal) {
           final r = ev.real;
           if ((r is num && r < 0) || (r is Rational && r.isNegative)) {
-            final double val = r is num ? r.toDouble() : (r as Rational).toDouble();
-            return _combineFractions(Divide(Literal(1), Pow(e.base, Literal(-val))));
+            final double val =
+                r is num ? r.toDouble() : (r as Rational).toDouble();
+            return _combineFractions(
+                Divide(Literal(1), Pow(e.base, Literal(-val))));
           }
         }
       }
       final baseCombined = _combineFractions(e.base);
       if (baseCombined is Divide) {
-        return Divide(Pow(baseCombined.left, e.exponent), Pow(baseCombined.right, e.exponent));
+        return Divide(Pow(baseCombined.left, e.exponent),
+            Pow(baseCombined.right, e.exponent));
       }
       if (baseCombined != e.base) {
         return Pow(baseCombined, e.exponent);
@@ -103,15 +100,21 @@ class ExpressionSolver {
     return e;
   }
 
-  static Expression _cancelCommonFactors(Expression numExpr, Expression denExpr) {
+  static Expression _cancelCommonFactors(
+      Expression numExpr, Expression denExpr) {
     List<Expression> getSumTerms(Expression e) {
       if (e is Add) return [...getSumTerms(e.left), ...getSumTerms(e.right)];
-      if (e is Subtract) return [...getSumTerms(e.left), ...getSumTerms(Multiply(Literal(-1), e.right))];
+      if (e is Subtract)
+        return [
+          ...getSumTerms(e.left),
+          ...getSumTerms(Multiply(Literal(-1), e.right))
+        ];
       return [e];
     }
 
     List<Expression> getProductFactors(Expression e) {
-      if (e is Multiply) return [...getProductFactors(e.left), ...getProductFactors(e.right)];
+      if (e is Multiply)
+        return [...getProductFactors(e.left), ...getProductFactors(e.right)];
       if (e is GroupExpression) return getProductFactors(e.expression);
       return [e];
     }
@@ -119,15 +122,16 @@ class ExpressionSolver {
     Expression? divideProductByFactor(Expression term, Expression F) {
       final factors = getProductFactors(term);
       final fStr = F.toString();
-      
+
       int idx = -1;
       for (int i = 0; i < factors.length; i++) {
-        if (factors[i].toString() == fStr || factors[i].simplify().toString() == fStr) {
+        if (factors[i].toString() == fStr ||
+            factors[i].simplify().toString() == fStr) {
           idx = i;
           break;
         }
       }
-      
+
       if (idx >= 0) {
         final remaining = List<Expression>.from(factors)..removeAt(idx);
         if (remaining.isEmpty) return Literal(1);
@@ -137,15 +141,18 @@ class ExpressionSolver {
         }
         return res;
       }
-      
+
       if (F is Pow) {
         final baseStr = F.base.toString();
-        final expVal = F.exponent is Literal ? (F.exponent as Literal).value : null;
+        final expVal =
+            F.exponent is Literal ? (F.exponent as Literal).value : null;
         if (expVal is num) {
           for (int i = 0; i < factors.length; i++) {
             final fact = factors[i];
             if (fact is Pow && fact.base.toString() == baseStr) {
-              final factExp = fact.exponent is Literal ? (fact.exponent as Literal).value : null;
+              final factExp = fact.exponent is Literal
+                  ? (fact.exponent as Literal).value
+                  : null;
               if (factExp is num && factExp >= expVal) {
                 final remainingExp = factExp - expVal;
                 final remaining = List<Expression>.from(factors)..removeAt(i);
@@ -163,7 +170,7 @@ class ExpressionSolver {
           }
         }
       }
-      
+
       return null;
     }
 
@@ -175,7 +182,7 @@ class ExpressionSolver {
         if (div == null) return null;
         dividedTerms.add(div);
       }
-      
+
       Expression res = dividedTerms.first;
       for (int i = 1; i < dividedTerms.length; i++) {
         res = Add(res, dividedTerms[i]);
@@ -186,10 +193,10 @@ class ExpressionSolver {
     final denFactors = getProductFactors(denExpr);
     var currentNum = numExpr;
     var currentDen = denExpr;
-    
+
     for (final F in denFactors) {
       if (F is Literal && F.value == 1) continue;
-      
+
       final divNum = divideSumByFactor(currentNum, F);
       if (divNum != null) {
         final divDen = divideProductByFactor(currentDen, F);
@@ -199,7 +206,7 @@ class ExpressionSolver {
         }
       }
     }
-    
+
     return Divide(currentNum, currentDen);
   }
 
@@ -393,58 +400,64 @@ class ExpressionSolver {
 
           Polynomial poly = Polynomial.fromList(coeffList, variable: v);
           if (poly.degree > 0 || !_containsVariable(equation, v)) {
-            solutions = poly
-                .roots()
-                .map((c) {
-                  if (c is Expression) {
-                    try {
-                      final evalVal = c.evaluate();
-                      if (evalVal is Complex) {
-                        final img = evalVal.imaginary;
-                        double imgVal = 0.0;
-                        if (img is num) imgVal = img.toDouble();
-                        if (img is Rational) imgVal = img.toDouble();
+            solutions = poly.roots().map((c) {
+              if (c is Expression) {
+                try {
+                  final evalVal = c.evaluate();
+                  if (evalVal is Complex) {
+                    final img = evalVal.imaginary;
+                    double imgVal = 0.0;
+                    if (img is num) imgVal = img.toDouble();
+                    if (img is Rational) imgVal = img.toDouble();
 
-                        final re = evalVal.real;
-                        double reVal = 0.0;
-                        if (re is num) reVal = re.toDouble();
-                        if (re is Rational) reVal = re.toDouble();
+                    final re = evalVal.real;
+                    double reVal = 0.0;
+                    if (re is num) reVal = re.toDouble();
+                    if (re is Rational) reVal = re.toDouble();
 
-                        // Recover exact integer roots via polynomial evaluation
-                        final roundVal = reVal.round();
-                        if (imgVal.abs() < 1e-2 && (reVal - roundVal).abs() < 1e-2) {
-                          try {
-                            final polyVal = poly.evaluate({v.identifier.name: roundVal});
-                            double polyValAbs = 1.0;
-                            if (polyVal is num) polyValAbs = polyVal.abs().toDouble();
-                            if (polyVal is Complex) polyValAbs = polyVal.abs().real.toDouble();
-                            if (polyValAbs < 1e-5) {
-                              return Literal(roundVal);
-                            }
-                          } catch (_) {}
-                        }
+                    final isExact = _isExactExpression(c);
 
-                        if (imgVal.abs() < 1e-9) {
-
-                          // Check if close to integer
-                          if ((reVal - reVal.round()).abs() < 1e-9) {
-                            return Literal(reVal.round());
+                    if (!isExact) {
+                      // Recover exact integer roots via polynomial evaluation
+                      final roundVal = reVal.round();
+                      if (imgVal.abs() < 1e-2 &&
+                          (reVal - roundVal).abs() < 1e-2) {
+                        try {
+                          final polyVal =
+                              poly.evaluate({v.identifier.name: roundVal});
+                          double polyValAbs = 1.0;
+                          if (polyVal is num)
+                            polyValAbs = polyVal.abs().toDouble();
+                          if (polyVal is Complex)
+                            polyValAbs = polyVal.abs().real.toDouble();
+                          if (polyValAbs < 1e-5) {
+                            return Literal(roundVal);
                           }
-                          // Check if close to a simple rational with small denominator
-                          for (int den = 1; den <= 1000; den++) {
-                            double numDouble = reVal * den;
-                            if ((numDouble - numDouble.round()).abs() < 1e-9) {
-                              return Literal(Rational(BigInt.from(numDouble.round()), BigInt.from(den)));
-                            }
+                        } catch (_) {}
+                      }
+
+                      if (imgVal.abs() < 1e-9) {
+                        // Check if close to integer
+                        if ((reVal - reVal.round()).abs() < 1e-9) {
+                          return Literal(reVal.round());
+                        }
+                        // Check if close to a simple rational with small denominator
+                        for (int den = 1; den <= 1000; den++) {
+                          double numDouble = reVal * den;
+                          if ((numDouble - numDouble.round()).abs() < 1e-9) {
+                            return Literal(Rational(
+                                BigInt.from(numDouble.round()),
+                                BigInt.from(den)));
                           }
                         }
                       }
-                    } catch (_) {}
-                    return c.simplify();
+                    }
                   }
-                  return (c is Complex) ? (c.imaginary == 0 ? c.real : c) : c;
-                })
-                .toList();
+                } catch (_) {}
+                return c.simplify();
+              }
+              return (c is Complex) ? (c.imaginary == 0 ? c.real : c) : c;
+            }).toList();
             throw _SuccessException();
           }
         }
@@ -578,9 +591,38 @@ class ExpressionSolver {
       return val;
     }).toList();
 
-    final allVars = equation.getVariableTerms().map((vt) => vt.identifier.name).toSet()
-      ..remove(v.identifier.name)
-      ..removeAll(['i', 'e', 'pi']);
+    final allVars =
+        equation.getVariableTerms().map((vt) => vt.identifier.name).toSet()
+          ..remove(v.identifier.name)
+          ..removeAll(['i', 'e', 'pi'])
+          ..removeAll([
+            'sin',
+            'cos',
+            'tan',
+            'sec',
+            'csc',
+            'cot',
+            'asin',
+            'acos',
+            'atan',
+            'sinh',
+            'cosh',
+            'tanh',
+            'sech',
+            'csch',
+            'coth',
+            'asinh',
+            'acosh',
+            'atanh',
+            'asech',
+            'acsch',
+            'acoth',
+            'exp',
+            'abs',
+            'ln',
+            'log',
+            'sqrt'
+          ]);
     final hasOtherVars = allVars.isNotEmpty;
 
     if (!hasOtherVars) {
@@ -590,10 +632,11 @@ class ExpressionSolver {
           final varName = v.identifier.name;
           final solVal = sol is Expression ? sol.evaluate() : sol;
           final evalRes = equation.evaluate({varName: solVal});
-          
+
           bool isValid = true;
           if (evalRes is num) {
-            if (evalRes.isNaN || evalRes.isInfinite) isValid = false;
+            if (evalRes.isNaN || evalRes.isInfinite || evalRes.abs() > 1e-5)
+              isValid = false;
           } else if (evalRes is Complex) {
             final r = evalRes.real;
             final im = evalRes.imaginary;
@@ -602,7 +645,12 @@ class ExpressionSolver {
             if (r is Rational) rv = r.toDouble();
             if (im is num) iv = im.toDouble();
             if (im is Rational) iv = im.toDouble();
-            if (rv.isNaN || rv.isInfinite || iv.isNaN || iv.isInfinite) isValid = false;
+            if (rv.isNaN || rv.isInfinite || iv.isNaN || iv.isInfinite) {
+              isValid = false;
+            } else {
+              final magSq = rv * rv + iv * iv;
+              if (magSq > 1e-10) isValid = false;
+            }
           }
           if (isValid) {
             validSolutions.add(sol);
@@ -769,6 +817,7 @@ class ExpressionSolver {
           flatTerms.add(negate ? Multiply(Literal(-1), e) : e);
         }
       }
+
       flattenAdd(equation);
 
       bool hasSqrtWithVar(Expression e) {
@@ -825,6 +874,7 @@ class ExpressionSolver {
             extractSqrt(e.expression);
           }
         }
+
         extractSqrt(sqrtTerm);
 
         Expression lhsSquared;
@@ -920,7 +970,9 @@ class ExpressionSolver {
         } else if (prevY.isFinite && prevY * y < 0) {
           // Bisection in [prevX, x]
           try {
-            final root = RootFinding.bisection((num val) => f(val.toDouble()), prevX, x, tolerance: 1e-9);
+            final root = RootFinding.bisection(
+                (num val) => f(val.toDouble()), prevX, x,
+                tolerance: 1e-9);
             final rootVal = root.toDouble();
             if (f(rootVal).abs() < 1e-4) {
               numRoots.add(rootVal);
@@ -942,7 +994,8 @@ class ExpressionSolver {
             for (int den = 1; den <= 1000; den++) {
               double numDouble = r * den;
               if ((numDouble - numDouble.round()).abs() < 1e-8) {
-                sol = Literal(Rational(BigInt.from(numDouble.round()), BigInt.from(den)));
+                sol = Literal(
+                    Rational(BigInt.from(numDouble.round()), BigInt.from(den)));
                 break;
               }
             }
@@ -1099,14 +1152,24 @@ class ExpressionSolver {
       }
     }
 
+    // Handle Exp: exp(A) = target => A = ln(target)
+    if (expr is Exp) {
+      if (_containsVariable(expr.operand, v)) {
+        return _solveForList(expr.operand, v, Ln(target));
+      }
+    }
+
     // Handle Log: log_base(operand) = target => operand = base^target
     if (expr is Log) {
-      if (_containsVariable(expr.operand, v) && !_containsVariable(expr.base, v)) {
+      if (_containsVariable(expr.operand, v) &&
+          !_containsVariable(expr.base, v)) {
         // log_b(operand) = target => operand = b^target
         return _solveForList(expr.operand, v, Pow(expr.base, target));
-      } else if (_containsVariable(expr.base, v) && !_containsVariable(expr.operand, v)) {
+      } else if (_containsVariable(expr.base, v) &&
+          !_containsVariable(expr.operand, v)) {
         // log_base(k) = target => base = k^(1/target)
-        return _solveForList(expr.base, v, Pow(expr.operand, Pow(target, Literal(-1))));
+        return _solveForList(
+            expr.base, v, Pow(expr.operand, Pow(target, Literal(-1))));
       }
     }
 
@@ -1156,8 +1219,12 @@ class ExpressionSolver {
     if (expr is Ln) {
       return _containsVariable(expr.operand, v);
     }
+    if (expr is Exp) {
+      return _containsVariable(expr.operand, v);
+    }
     if (expr is Log) {
-      return _containsVariable(expr.base, v) || _containsVariable(expr.operand, v);
+      return _containsVariable(expr.base, v) ||
+          _containsVariable(expr.operand, v);
     }
     if (expr is TrigonometricExpression) {
       return _containsVariable(expr.operand, v);
@@ -1409,13 +1476,15 @@ class ExpressionSolver {
                   denomPenalty = evalVal.denominator.toDouble() / 1e15;
                 }
 
-                double niceness = complexPenalty + integerPenalty + denomPenalty;
+                double niceness =
+                    complexPenalty + integerPenalty + denomPenalty;
                 return niceness;
               } catch (e) {
                 // Ignore evaluation errors
               }
               return 1e15; // Fallback
             }
+
             return getNiceness(a).compareTo(getNiceness(b));
           });
           final solVal = sortedSols.first;
@@ -1588,4 +1657,80 @@ class _TermCoeff {
   final Expression coefficient;
   final int degree;
   _TermCoeff(this.coefficient, this.degree);
+}
+
+bool _isExactExpression(Expression e) {
+  if (e is Literal) {
+    final val = e.value;
+    if (val is double) return false;
+    if (val is Complex) {
+      final r = val.real;
+      final im = val.imaginary;
+      if (r is double || im is double) return false;
+    }
+    return true;
+  }
+  if (e is Variable) {
+    return true;
+  }
+  if (e is Negate) {
+    return _isExactExpression(e.operand);
+  }
+  if (e is GroupExpression) {
+    return _isExactExpression(e.expression);
+  }
+  if (e is UnaryExpression) {
+    if (e.operator == '-' || e.operator == '+') {
+      return _isExactExpression(e.operand);
+    }
+    if (e.operator == '!') {
+      return _isExactExpression(e.operand);
+    }
+    return false;
+  }
+  if (e is Add) {
+    return _isExactExpression(e.left) && _isExactExpression(e.right);
+  }
+  if (e is Subtract) {
+    return _isExactExpression(e.left) && _isExactExpression(e.right);
+  }
+  if (e is Multiply) {
+    return _isExactExpression(e.left) && _isExactExpression(e.right);
+  }
+  if (e is Divide) {
+    return _isExactExpression(e.left) && _isExactExpression(e.right);
+  }
+  if (e is Modulo) {
+    return _isExactExpression(e.left) && _isExactExpression(e.right);
+  }
+  if (e is BinaryExpression) {
+    if (e.operator == '+' ||
+        e.operator == '-' ||
+        e.operator == '*' ||
+        e.operator == '/' ||
+        e.operator == '%') {
+      return _isExactExpression(e.left) && _isExactExpression(e.right);
+    }
+    return false;
+  }
+  if (e is Pow) {
+    final exp = e.exponent;
+    if (exp is Literal) {
+      final val = exp.value;
+      if (val is int) {
+        return _isExactExpression(e.base);
+      }
+      if (val is Rational && val.isInteger) {
+        return _isExactExpression(e.base);
+      }
+      if (val is Complex && val.isReal) {
+        final r = val.real;
+        if (r is int || (r is Rational && r.isInteger)) {
+          return _isExactExpression(e.base);
+        }
+      }
+    }
+    return false;
+  }
+  return false;
 }

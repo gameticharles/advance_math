@@ -61,7 +61,7 @@ class Cubic extends Polynomial {
       return false;
     }
 
-    if (isZero(b) && isZero(c)) {
+    if ((isZero(b) && isZero(c)) || isZero(d)) {
       return List<Expression>.from(super.roots());
     }
 

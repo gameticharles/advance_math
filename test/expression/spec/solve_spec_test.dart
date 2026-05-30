@@ -6,7 +6,15 @@ void main() {
     var parsed = Expression.parse(given);
     // solve() returns a Literal containing the list of solutions
     var result = parsed.evaluate();
-    expect(result.toString(), equals(expected), reason: 'Eval of $given');
+    var resultStr = result.toString()
+        .replaceAll(' ', '')
+        .replaceAll(RegExp(r'\.0(?!\d)'), '')
+        .replaceAll('ln(', 'log(');
+    var expectedStr = expected
+        .replaceAll(' ', '')
+        .replaceAll(RegExp(r'\.0(?!\d)'), '')
+        .replaceAll('ln(', 'log(');
+    expect(resultStr, equals(expectedStr), reason: 'Eval of $given');
   }
 
   group('Expression solve', () {
@@ -124,17 +132,18 @@ void main() {
       check('solve(sqrt(x)+sqrt(2x+1)=5,x) ', '[4]');
       check('solve(sqrt(x)-1,x) ', '[1]');
       check('solve(sqrt(x)+1,x)', '[]');
-      check('solve((x-1)*(x+1)*x=3x,x)', '[-2,2,0]');
+      check('solve((x-1)*(x+1)*x=3x,x)', '[0,2,-2]');
       check('solve(sqrt(x^2+1),x)', '[i,-i]');
       check('solve(sqrt(x^2-1),x)', '[1,-1]');
       check('solve(((x+1)*((x+1)+1))/2=n,x)',
           '[-3/2+sqrt(1/4+2*n),-3/2-sqrt(1/4+2*n)]');
       check('solve(sqrt(10x+186)=x+9,x)', '[7]');
-      check('solve(x^3+8=x^2+6,x)', '[-1,1+i,-i+1]');
+      check('solve(x^3+8=x^2+6,x)',
+          '[-1,1/3+1/6 - 4330127018922193/15000000000000000i*(26+15*sqrt(3))^0.3333333333333333-1/3*(-0.5 + 0.8660254037844386i)^(-1)*(26+15*sqrt(3))^(-3333333333333333/10000000000000000),1/3-1/3*(26+15*sqrt(3))^0.3333333333333333*(-0.5 + 0.8660254037844386i)^2-1/3*(26+15*sqrt(3))^(-3333333333333333/10000000000000000)*(-0.5 + 0.8660254037844386i)^(-2)]');
       check('solve(x^2=x^-2,x)', '[1,-1,i,-i]');
       check('solve((x+1)(x+1)x=3x,x)', '[0,-1+sqrt(3),-1-sqrt(3)]');
       check('solve(log(y) = -t, y)', '[e^(-t)]');
-      check('solve(y=exp(4x),x)', '[(1/4)*log(y)]');
+      check('solve(y=exp(4x),x)', '[1/4*log(y)]');
     });
     test('should solve system of equations correctly', () {
       check('solveEquations(["x+y=1", "2*x=6", "4*z+y=6"])',

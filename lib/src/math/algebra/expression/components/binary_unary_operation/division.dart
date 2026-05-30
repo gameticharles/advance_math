@@ -367,8 +367,21 @@ class Divide extends BinaryOperationsExpression {
 
   @override
   Expression expand() {
-    // Division doesn't have a direct expanded form, return as-is.
-    return this;
+    var expandedLeft = left.expand();
+    var expandedRight = right.expand();
+    if (expandedRight is Literal) {
+      final v = expandedRight.value;
+      if (v is num || v is Rational || v is Complex) {
+        try {
+          final c = Complex(v);
+          if (c != Complex.zero()) {
+            final reciprocal = _normalizeResult(Complex.one() / c);
+            return Multiply(Literal(reciprocal), expandedLeft).expand();
+          }
+        } catch (_) {}
+      }
+    }
+    return Divide(expandedLeft, expandedRight);
   }
 
   @override
