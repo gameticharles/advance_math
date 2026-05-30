@@ -92,14 +92,17 @@ void main() {
     });
 
     group('sums', () {
-      test('should calculate sums correctly', () {
-        check('sum(x+y, x, 0, 3)', '4*y+6');
-        check('sum(x^2+x, x, 0, 10)', '440');
-        check('sum(x^2*z^2+x*y-z+1, x, 0, 10)', '-11*z+385*z^2+11+55*y');
-        check('sum(x^2*z^2+x*y-z+1, z, 0, 10)', '-44+11*x*y+385*x^2');
-        check('sum(sqrt(x)*sin(x), x, 0, 10)', '775334583/372372283');
-        check('sum(e^(-x^2*π/9),x,1,100)', '633863423979/633863423978');
-      }, skip: 'Sums are not symbolically/numerically implemented');
+      test(
+        'should calculate sums correctly',
+        () {
+          check('sum(x+y, x, 0, 3)', '6+4*y');
+          check('sum(x^2+x, x, 0, 10)', '440');
+          check('sum(x^2*z^2+x*y-z+1, x, 0, 10)', '11-11*z+385*z^2+55*y');
+          check('sum(x^2*z^2+x*y-z+1, z, 0, 10)', '-44+11*x*y+385*x^2');
+          check('sum(sqrt(x)*sin(x), x, 0, 10)', '775334583/372372283');
+          check('sum(e^(-x^2*π/9),x,1,100)', '633863423979/633863423978');
+        },
+      );
     });
 
     group('definite integrals', () {
@@ -115,15 +118,13 @@ void main() {
         check('defint((x^2-3)/(-x^3+9x+1), 1, 3, x)', '0.732408192445406585');
         check('defint(x*(x-5)^(1/2),5,8)', '23.555890982936999348');
         check('defint(sqrt(4(x^2)+4), 0, 3)', '11.305279439735999908');
-      },
-          skip:
-              'Definite integrals are not symbolically/numerically implemented');
+      });
     });
 
     test('should calculate limits correctly', () {
       check('limit((2-2*x^2)/(x-1), x, 1)', '-4');
-      check('limit(1/2*(x^2 - 1)/(x^2 + 1), x, 3)', '-2/5');
-      check('limit(tan(3*x)/tan(x), x, pi/2)', '-1/3');
+      check('limit(1/2*(x^2 - 1)/(x^2 + 1), x, 3)', '2/5');
+      check('limit(tan(3*x)/tan(x), x, pi/2)', '1/3');
       check('limit(x/(3*abs(4*x)),x, 0)', '-1/12');
       check('limit((4x^2-x)/(3x^2+x),x,∞)', '-4/3');
       check('limit((x^(1/2)+x^(-1/2))/(x^(1/2)-x^(-1/2)),x,Infinity)', '1');
@@ -139,7 +140,7 @@ void main() {
          check('limit((3*sin(x)-sin(2*x))/(x-sin(x)),x,0)').toString()).toEqual('Infinity');
          check('limit(log(x),x, 0)').toString()).toEqual('Infinity');
          */
-    }, skip: 'Limits are not symbolically/numerically implemented');
+    });
   });
 
   group('integration', () {

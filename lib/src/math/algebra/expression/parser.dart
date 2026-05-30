@@ -2,6 +2,7 @@ import 'package:petitparser/petitparser.dart';
 import '../../../number/decimal/rational.dart';
 import 'expression.dart';
 import '../calculus/symbolic_integration.dart';
+import '../calculus/symbolic_sum_limit.dart';
 import '../../../number/complex/complex.dart';
 import 'package:advance_math/advance_math.dart' show LRUCache;
 
@@ -466,6 +467,39 @@ class ExpressionParser {
                 if (args[1] is Variable) {
                   return SymbolicIntegration.integrate(
                       args[0], args[1] as Variable);
+                }
+              }
+
+              // sum(expr, var, start, end)
+              if (name == 'sum' && args.length >= 4) {
+                if (args[1] is Variable) {
+                  return SymbolicSum.evaluate(
+                      args[0], args[1] as Variable, args[2], args[3]);
+                }
+              }
+
+              // defint(expr, a, b) or defint(expr, a, b, var)
+              if (name == 'defint' && args.length >= 3) {
+                // Determine variable of integration
+                Variable integVar;
+                if (args.length >= 4 && args[3] is Variable) {
+                  integVar = args[3] as Variable;
+                } else {
+                  // Default: first free variable in expr (fallback to 'x')
+                  final freeVars = args[0].getVariableTerms();
+                  integVar = freeVars.isNotEmpty
+                      ? freeVars.first
+                      : Variable('x');
+                }
+                return DefiniteIntegral.compute(
+                    args[0], integVar, args[1], args[2]);
+              }
+
+              // limit(expr, var, value)
+              if (name == 'limit' && args.length >= 3) {
+                if (args[1] is Variable) {
+                  return SymbolicLimit.compute(
+                      args[0], args[1] as Variable, args[2]);
                 }
               }
 
