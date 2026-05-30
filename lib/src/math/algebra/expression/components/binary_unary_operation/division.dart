@@ -408,10 +408,13 @@ class Divide extends BinaryOperationsExpression {
     // a / b * c = (a / b) * c.
     // a / (b * c).
     // So if right is Multiply or Divide, we need parens.
+    final val = right is Literal ? (right as Literal).value : null;
+    final isNonIntRational = val is Rational && !val.isInteger;
     if (right is Add ||
         right is Subtract ||
         right is Multiply ||
-        right is Divide) {
+        right is Divide ||
+        isNonIntRational) {
       rightStr = '($rightStr)';
     }
 

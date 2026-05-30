@@ -436,6 +436,12 @@ class ExpressionParser {
               // Exponential / Logarithmic
               if (name == 'exp' && args.length == 1) return Exp(args[0]);
               if (name == 'abs' && args.length == 1) return Abs(args[0]);
+              if (name == 'sqrt' && args.length == 1) {
+                return Pow(args[0], Literal(Rational(1, 2)));
+              }
+              if (name == 'sinc' && args.length == 1) {
+                return Divide(Sin(args[0]), args[0]);
+              }
               if (name == 'ln' && args.length == 1) return Ln(args[0]);
               if (name == 'log' && args.length == 1) {
                 // log(x) treated as natural logarithm for solver compatibility

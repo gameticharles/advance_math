@@ -53,6 +53,13 @@ class Literal extends Expression {
 
   @override
   Expression differentiate([Variable? v]) {
+    if (value is List) {
+      final diffList = (value as List).map((e) {
+        if (e is Expression) return e.differentiate(v).simplify();
+        return Literal(0);
+      }).toList();
+      return Literal(diffList, diffList.toString());
+    }
     // The derivative of a constant is always 0
     return Literal(0);
   }

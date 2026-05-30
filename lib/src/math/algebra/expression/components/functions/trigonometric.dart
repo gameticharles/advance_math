@@ -79,19 +79,49 @@ class Trigonometric extends Expression {
   @override
   Expression differentiate([Variable? v]) {
     // Differentiation rules for trigonometric functions.
-    switch (functionName) {
+    Expression der;
+    switch (functionName.toLowerCase()) {
       case 'sin':
-        return Trigonometric('cos', operand);
+        der = Cos(operand);
+        break;
       case 'cos':
-        // Note: Actually negative sine, but for simplicity, we keep it as sine here.
-        return Negate(Trigonometric('sin', operand));
+        der = Negate(Sin(operand));
+        break;
       case 'tan':
-        return Pow(Sec(operand), Literal(2));
-      // Other differentiation rules can be added for csc, sec, and cot.
+        der = Pow(Sec(operand), Literal(2));
+        break;
+      case 'sec':
+        der = Multiply(Sec(operand), Tan(operand));
+        break;
+      case 'csc':
+        der = Negate(Multiply(Csc(operand), Cot(operand)));
+        break;
+      case 'cot':
+        der = Negate(Pow(Csc(operand), Literal(2)));
+        break;
+      case 'sinh':
+        der = Trigonometric('cosh', operand);
+        break;
+      case 'cosh':
+        der = Trigonometric('sinh', operand);
+        break;
+      case 'tanh':
+        der = Pow(Trigonometric('sech', operand), Literal(2));
+        break;
+      case 'sech':
+        der = Negate(Multiply(Trigonometric('sech', operand), Trigonometric('tanh', operand)));
+        break;
+      case 'csch':
+        der = Negate(Multiply(Trigonometric('csch', operand), Trigonometric('coth', operand)));
+        break;
+      case 'coth':
+        der = Negate(Pow(Trigonometric('csch', operand), Literal(2)));
+        break;
       default:
         throw Exception(
             'Differentiation not implemented for trigonometric function: $functionName');
     }
+    return Multiply(der, operand.differentiate(v));
   }
 
   @override

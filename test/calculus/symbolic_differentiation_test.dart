@@ -84,7 +84,7 @@ void main() {
         final expr = Pow(x, Literal(-1));
         final result = expr.differentiate(x);
 
-        expect(result.toString(), contains('-1'));
+        expect(result.toString(), contains('-x'));
       });
 
       test('d/dx(2^x) uses exponential rule', () {

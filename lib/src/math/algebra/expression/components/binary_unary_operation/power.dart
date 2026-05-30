@@ -371,7 +371,9 @@ class Pow extends BinaryOperationsExpression {
     bool expNeedsParentheses = (exponent is BinaryOperationsExpression && exponent is! Pow) ||
         exponent is BinaryExpression ||
         expStr.startsWith('-') ||
-        expStr.startsWith('+');
+        expStr.startsWith('+') ||
+        (exponent is Literal && (exponent as Literal).value is Rational && !((exponent as Literal).value as Rational).isInteger) ||
+        expStr.contains('/');
     if (expNeedsParentheses) {
       expStr = '($expStr)';
     }

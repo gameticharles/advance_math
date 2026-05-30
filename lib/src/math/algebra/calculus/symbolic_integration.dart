@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import '../expression/expression.dart';
 import '../../../number/complex/complex.dart';
+import '../../../number/decimal/rational.dart';
 
 /// Strategy pattern for symbolic integration
 abstract class IntegrationStrategy {
@@ -50,9 +51,16 @@ class PowerRuleStrategy implements IntegrationStrategy {
   @override
   Expression? tryIntegrate(Expression expr, Variable v) {
     // print('PowerRule trying: $expr');
-    // Case 1: Variable itself → ∫x dx = x²/2
+    Rational? toRational(dynamic val) {
+      if (val is Rational) return val;
+      if (val is num) return Rational(val);
+      if (val is Complex && val.isReal) return Rational(val.real);
+      return null;
+    }
+
+    // Case 1: Variable itself → ∫x dx = (1/2)*x^2
     if (expr is Variable && expr.identifier.name == v.identifier.name) {
-      return Divide(Pow(v, Literal(2)), Literal(2));
+      return Multiply(Literal(Rational(1, 2)), Pow(v, Literal(2)));
     }
 
     // Case 2: Power of variable → ∫x^n dx
@@ -60,20 +68,14 @@ class PowerRuleStrategy implements IntegrationStrategy {
       if (expr.base is Variable &&
           (expr.base as Variable).identifier.name == v.identifier.name) {
         // Check if exponent is a constant number
-        num? n;
+        Rational? n;
         if (expr.exponent is Literal) {
-          final val = (expr.exponent as Literal).value;
-          if (val is num) {
-            n = val;
-          } else if (val is Complex && val.imaginary == 0) {
-            n = val.real;
-          }
+          n = toRational((expr.exponent as Literal).value);
         } else if (!expr.exponent
             .getVariableTerms()
             .any((t) => t.identifier.name == v.identifier.name)) {
           try {
-            final val = expr.exponent.evaluate();
-            if (val is num) n = val;
+            n = toRational(expr.exponent.evaluate());
           } catch (e) {
             // Ignore evaluation errors
           }
@@ -81,13 +83,14 @@ class PowerRuleStrategy implements IntegrationStrategy {
 
         if (n != null) {
           // Special case: ∫x^(-1) dx = ln|x|
-          if (n == -1) {
+          if (n == Rational.zero - Rational.one) {
             return Ln(v);
           }
 
-          // General case: ∫x^n dx = x^(n+1)/(n+1)
-          final newExponent = n + 1;
-          return Divide(Pow(v, Literal(newExponent)), Literal(newExponent));
+          // General case: ∫x^n dx = (1/(n+1)) * x^(n+1)
+          final newExponent = n + Rational.one;
+          return Multiply(Literal(Rational.one / newExponent),
+              Pow(v, Literal(newExponent)));
         }
       }
     }
@@ -143,13 +146,17 @@ class PowerRuleStrategy implements IntegrationStrategy {
           Expression? exponent = denomPow.exponent;
           // We need to negate the exponent.
           // If exponent is literal, easy.
-          if (exponent is Literal && exponent.value is num) {
-            final n = -(exponent.value as num);
-            if (n == -1) return Multiply(expr.left, Ln(v));
+          final val = exponent is Literal ? exponent.value : null;
+          final ratN = toRational(val);
+          if (ratN != null) {
+            final n = Rational.zero - ratN;
+            if (n == Rational.zero - Rational.one) {
+              return Multiply(expr.left, Ln(v));
+            }
 
-            final newExponent = n + 1;
-            final integral =
-                Divide(Pow(v, Literal(newExponent)), Literal(newExponent));
+            final newExponent = n + Rational.one;
+            final integral = Multiply(Literal(Rational.one / newExponent),
+                Pow(v, Literal(newExponent)));
 
             if (expr.left is Literal && (expr.left as Literal).value == 1) {
               return integral;
@@ -276,13 +283,21 @@ class InverseTrigStrategy implements IntegrationStrategy {
   @override
   String get name => 'Inverse Trigonometric';
 
+  Expression _unwrap(Expression expr) {
+    while (expr is GroupExpression) {
+      expr = expr.expression;
+    }
+    return expr;
+  }
+
   @override
   Expression? tryIntegrate(Expression expr, Variable v) {
-    if (expr is! Divide) return null;
+    final div = _asDivide(expr, v);
+    if (div == null) return null;
 
     // Check for 1/(...) or c/(...)
-    Expression numerator = expr.left;
-    Expression denominator = expr.right;
+    Expression numerator = _unwrap(div.numerator);
+    Expression denominator = _unwrap(div.denominator);
 
     // Ensure numerator is constant w.r.t v
     if (_containsVariable(numerator, v)) return null;
@@ -293,12 +308,15 @@ class InverseTrigStrategy implements IntegrationStrategy {
       Expression? xSquared;
       Expression? aSquared;
 
-      if (_isXSquared(denominator.left, v)) {
-        xSquared = denominator.left;
-        aSquared = denominator.right;
-      } else if (_isXSquared(denominator.right, v)) {
-        xSquared = denominator.right;
-        aSquared = denominator.left;
+      final dLeft = _unwrap(denominator.left);
+      final dRight = _unwrap(denominator.right);
+
+      if (_isXSquared(dLeft, v)) {
+        xSquared = dLeft;
+        aSquared = dRight;
+      } else if (_isXSquared(dRight, v)) {
+        xSquared = dRight;
+        aSquared = dLeft;
       }
 
       if (xSquared != null &&
@@ -308,8 +326,11 @@ class InverseTrigStrategy implements IntegrationStrategy {
         // We need 'a'. If aSquared is Literal, we can sqrt it.
         // If it's an expression, we represent it as sqrt(a^2)
         Expression a = PredefinedFunctionExpression('sqrt', aSquared);
-        if (aSquared is Literal && (aSquared.value as num) > 0) {
-          a = Literal(math.sqrt((aSquared.value as num).toDouble()));
+        final unwrappedASquared = _unwrap(aSquared);
+        if (unwrappedASquared is Literal && (unwrappedASquared.value as num) > 0) {
+          a = Literal(math.sqrt((unwrappedASquared.value as num).toDouble()));
+        } else if (unwrappedASquared is Pow && _unwrap(unwrappedASquared.exponent) is Literal && (_unwrap(unwrappedASquared.exponent) as Literal).value == 2) {
+          a = unwrappedASquared.base;
         }
 
         // Result: (numerator/a) * atan(x/a)
@@ -323,20 +344,26 @@ class InverseTrigStrategy implements IntegrationStrategy {
     Expression? inner;
     if (denominator is PredefinedFunctionExpression &&
         denominator.functionName == 'sqrt') {
-      inner = denominator.operand;
+      inner = _unwrap(denominator.operand);
     } else if (denominator is Pow &&
-        denominator.exponent is Literal &&
-        (denominator.exponent as Literal).value == 0.5) {
-      inner = denominator.base;
+        _unwrap(denominator.exponent) is Literal &&
+        (_unwrap(denominator.exponent) as Literal).value == 0.5) {
+      inner = _unwrap(denominator.base);
     }
 
     if (inner is Subtract) {
+      final iLeft = _unwrap(inner.left);
+      final iRight = _unwrap(inner.right);
+
       // Check for a^2 - x^2
-      if (!_containsVariable(inner.left, v) && _isXSquared(inner.right, v)) {
-        Expression aSquared = inner.left;
+      if (!_containsVariable(iLeft, v) && _isXSquared(iRight, v)) {
+        Expression aSquared = iLeft;
         Expression a = PredefinedFunctionExpression('sqrt', aSquared);
-        if (aSquared is Literal && (aSquared.value as num) > 0) {
-          a = Literal(math.sqrt((aSquared.value as num).toDouble()));
+        final unwrappedASquared = _unwrap(aSquared);
+        if (unwrappedASquared is Literal && (unwrappedASquared.value as num) > 0) {
+          a = Literal(math.sqrt((unwrappedASquared.value as num).toDouble()));
+        } else if (unwrappedASquared is Pow && _unwrap(unwrappedASquared.exponent) is Literal && (_unwrap(unwrappedASquared.exponent) as Literal).value == 2) {
+          a = unwrappedASquared.base;
         }
 
         // Result: numerator * asin(x/a)
@@ -347,12 +374,60 @@ class InverseTrigStrategy implements IntegrationStrategy {
     return null;
   }
 
-  bool _isXSquared(Expression expr, Variable v) {
+  _VirtualDivide? _asDivide(Expression expr, Variable v) {
+    expr = _unwrap(expr);
+    if (expr is Divide) {
+      return _VirtualDivide(_unwrap(expr.left), _unwrap(expr.right));
+    }
     if (expr is Pow) {
-      if (expr.base is Variable &&
-          (expr.base as Variable).identifier.name == v.identifier.name &&
-          expr.exponent is Literal &&
-          (expr.exponent as Literal).value == 2) {
+      try {
+        final expVal = _unwrap(expr.exponent).evaluate();
+        if (expVal is num && expVal < 0) {
+          final denom =
+              expVal == -1 ? _unwrap(expr.base) : Pow(_unwrap(expr.base), Literal(-expVal));
+          return _VirtualDivide(Literal(1), denom);
+        }
+      } catch (_) {}
+    }
+    if (expr is Multiply) {
+      final eLeft = _unwrap(expr.left);
+      final eRight = _unwrap(expr.right);
+
+      if (!_containsVariable(eLeft, v) && eRight is Pow) {
+        final rPow = eRight;
+        try {
+          final expVal = _unwrap(rPow.exponent).evaluate();
+          if (expVal is num && expVal < 0) {
+            final denom =
+                expVal == -1 ? _unwrap(rPow.base) : Pow(_unwrap(rPow.base), Literal(-expVal));
+            return _VirtualDivide(eLeft, denom);
+          }
+        } catch (_) {}
+      }
+      if (!_containsVariable(eRight, v) && eLeft is Pow) {
+        final lPow = eLeft;
+        try {
+          final expVal = _unwrap(lPow.exponent).evaluate();
+          if (expVal is num && expVal < 0) {
+            final denom =
+                expVal == -1 ? _unwrap(lPow.base) : Pow(_unwrap(lPow.base), Literal(-expVal));
+            return _VirtualDivide(eRight, denom);
+          }
+        } catch (_) {}
+      }
+    }
+    return null;
+  }
+
+  bool _isXSquared(Expression expr, Variable v) {
+    expr = _unwrap(expr);
+    if (expr is Pow) {
+      final base = _unwrap(expr.base);
+      final exponent = _unwrap(expr.exponent);
+      if (base is Variable &&
+          base.identifier.name == v.identifier.name &&
+          exponent is Literal &&
+          exponent.value == 2) {
         return true;
       }
     }
@@ -370,6 +445,12 @@ class InverseTrigStrategy implements IntegrationStrategy {
   }
 }
 
+class _VirtualDivide {
+  final Expression numerator;
+  final Expression denominator;
+  _VirtualDivide(this.numerator, this.denominator);
+}
+
 /// Exponential integration
 class ExponentialStrategy implements IntegrationStrategy {
   @override
@@ -383,10 +464,21 @@ class ExponentialStrategy implements IntegrationStrategy {
         return Exp(v);
       }
     }
+    if (expr is Pow) {
+      final base = expr.base;
+      final exponent = expr.exponent;
+      if (exponent is Variable &&
+          exponent.identifier.name == v.identifier.name) {
+        if ((base is Variable && base.identifier.name == 'e') ||
+            (base is Literal && (base.value == 'e' || base.value == math.e))) {
+          return expr;
+        }
+      }
+    }
 
     // ∫a^x dx = a^x / ln(a)
     if (expr is Pow) {
-      if (expr.base is Literal && expr.exponent is Variable) {
+      if (!_containsVariable(expr.base, v) && expr.exponent is Variable) {
         if ((expr.exponent as Variable).identifier.name == v.identifier.name) {
           final a = expr.base;
           return Divide(expr, Ln(a));
@@ -395,6 +487,16 @@ class ExponentialStrategy implements IntegrationStrategy {
     }
 
     return null;
+  }
+
+  bool _containsVariable(Expression expr, Variable v) {
+    try {
+      return expr
+          .getVariableTerms()
+          .any((variable) => variable.identifier.name == v.identifier.name);
+    } catch (e) {
+      return false;
+    }
   }
 }
 
@@ -482,10 +584,10 @@ class SubstitutionStrategy implements IntegrationStrategy {
           // Simple check: are they proportional?
           // We can use _derivativesMatch logic roughly
           if (_derivativesMatch(numerator, denomDerivative, v)) {
-            // If they match structurally, check the constant factor
-            // We need to find k such that numerator = k * denomDerivative
-            // k = numerator / denomDerivative
-            // For now, let's assume they match exactly or we can extract constant
+            Expression ratio = Divide(numerator, denomDerivative).simplify();
+            if (!_containsVariable(ratio, v)) {
+              return Multiply(ratio, Ln(denominator));
+            }
             return Ln(denominator);
           }
 
@@ -520,7 +622,10 @@ class SubstitutionStrategy implements IntegrationStrategy {
       final function = factors[i];
 
       // Check if this is a trig/exp function we can integrate
-      if (function is Sin || function is Cos || function is Exp) {
+      if (function is Sin ||
+          function is Cos ||
+          function is Exp ||
+          function is Ln) {
         // Get the other factors (potential derivative)
         final otherFactors = <Expression>[];
         for (int j = 0; j < factors.length; j++) {
@@ -549,14 +654,23 @@ class SubstitutionStrategy implements IntegrationStrategy {
     return null;
   }
 
-  /// Flatten nested Multiply expressions into a list of factors
+  /// Flatten nested Multiply and Divide expressions into a list of factors
   List<Expression> _flattenMultiply(Expression expr) {
-    if (expr is! Multiply) return [expr];
-
-    final result = <Expression>[];
-    result.addAll(_flattenMultiply(expr.left));
-    result.addAll(_flattenMultiply(expr.right));
-    return result;
+    if (expr is Multiply) {
+      return [..._flattenMultiply(expr.left), ..._flattenMultiply(expr.right)];
+    }
+    if (expr is Divide) {
+      final denom = expr.right;
+      Expression invDenom;
+      if (denom is Pow) {
+        final negExponent = Multiply(Literal(-1), denom.exponent).simplify();
+        invDenom = Pow(denom.base, negExponent);
+      } else {
+        invDenom = Pow(denom, Literal(-1));
+      }
+      return [..._flattenMultiply(expr.left), ..._flattenMultiply(invDenom)];
+    }
+    return [expr];
   }
 
   Expression? _matchChainPattern(
@@ -600,6 +714,19 @@ class SubstitutionStrategy implements IntegrationStrategy {
         Expression k = Divide(derivative, innerDerivative).simplify();
         if (!_containsVariable(k, v)) {
           return Multiply(k, Exp(inner)).simplify();
+        }
+      }
+    }
+    // Pattern: ∫(derivative of inner) · ln(inner) dx = inner * ln(inner) - inner
+    if (function is Ln) {
+      final inner = function.operand;
+      final innerDerivative = inner.differentiate(v);
+
+      if (_derivativesMatch(derivative, innerDerivative, v)) {
+        Expression k = Divide(derivative, innerDerivative).simplify();
+        if (!_containsVariable(k, v)) {
+          return Multiply(k, Subtract(Multiply(inner, Ln(inner)), inner))
+              .simplify();
         }
       }
     }
@@ -659,23 +786,23 @@ class SubstitutionStrategy implements IntegrationStrategy {
 
   /// Extract non-constant part from a multiply expression
   Expression? _extractNonConstantPart(Expression expr, Variable v) {
-    if (expr is Multiply) {
-      // Check if left is constant
-      if (!_containsVariable(expr.left, v) && expr.left is Literal) {
-        return expr.right;
-      }
-      // Check if right is constant
-      if (!_containsVariable(expr.right, v) && expr.right is Literal) {
-        return expr.left;
-      }
+    if (expr is! Multiply) {
+      if (_containsVariable(expr, v)) return expr;
+      return null;
     }
 
-    // Expression doesn't have a separable constant factor
-    if (_containsVariable(expr, v)) {
-      return expr;
-    }
+    final factors = _flattenMultiply(expr);
+    final variableFactors =
+        factors.where((f) => _containsVariable(f, v)).toList();
 
-    return null;
+    if (variableFactors.isEmpty) return null;
+    if (variableFactors.length == 1) return variableFactors[0];
+
+    Expression result = variableFactors[0];
+    for (int i = 1; i < variableFactors.length; i++) {
+      result = Multiply(result, variableFactors[i]);
+    }
+    return result;
   }
 
   bool _containsVariable(Expression expr, Variable v) {
@@ -862,7 +989,15 @@ class IntegrationByPartsStrategy implements IntegrationStrategy {
   }
 
   bool _isExponential(Expression expr) {
-    return expr is Exp;
+    if (expr is Exp) return true;
+    if (expr is Pow) {
+      final base = expr.base;
+      if (base is Variable && base.identifier.name == 'e') return true;
+      if (base is Literal && (base.value == 'e' || base.value == math.e)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 
