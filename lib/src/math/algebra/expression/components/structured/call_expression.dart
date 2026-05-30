@@ -15,6 +15,14 @@ class CallExpression extends Expression {
     'solveEquations', 'diff', 'differentiate', 'max', 'min'
   };
 
+  /// Returns true if [name] is a known callable (either in the static set
+  /// or registered in [defaultContext] as a Function / VarArgsFunction).
+  static bool _isKnownFunction(String name) {
+    if (_knownFunctions.contains(name)) return true;
+    final v = defaultContext[name];
+    return v is Function || v is VarArgsFunction;
+  }
+
   Expression? _asImplicitMultiplication() {
     if (arguments.length == 1) {
       final c = callee.simplify();
@@ -24,7 +32,7 @@ class CallExpression extends Expression {
           return Multiply(c, arguments.first);
         }
       }
-      if (c is! Variable || !_knownFunctions.contains(c.identifier.name)) {
+      if (c is! Variable || !_isKnownFunction(c.identifier.name)) {
         return Multiply(c, arguments.first);
       }
     }

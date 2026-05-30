@@ -94,7 +94,7 @@ void main() {
       check('6/3*5', 10);
     });
     test('should recognize / = +', () {
-      check('2/3+2/3', 4 / 3);
+      check('2/3+2/3', Rational(4, 3));
     });
     test('should recognize ^ is right associative', () {
       check('2^3^2', 512);

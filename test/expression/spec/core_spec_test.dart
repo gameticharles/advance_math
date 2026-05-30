@@ -50,7 +50,7 @@ void main() {
       check('2*sin(x) + 4*sin(x)', '6*sin(x)');
       check('sin(x) + sin(x)', '2*sin(x)');
       check('3*sin(x) /6+sin(x)',
-          '3/2*sin(x)'); // 3/6 -> 0.5 -> 0.5+1 = 1.5. Or 1/2*sin(x)+sin(x) -> 3/2*sin(x)
+          '(3/2)*sin(x)'); // 3/6 -> 0.5 -> 0.5+1 = 1.5. Or 1/2*sin(x)+sin(x) -> 3/2*sin(x)
       check('sin(2*x)', 'sin(2*x)');
       check('sin(a*x)',
           'sin(a*x)'); // or sin(a*x) depending on parser precedence for implicit mult
