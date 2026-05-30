@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import '../expression/expression.dart';
 import '../../../number/complex/complex.dart';
 import '../../../number/decimal/rational.dart';
@@ -151,7 +150,8 @@ class SymbolicSum {
     final endVal = _tryNumericEval(endExpr);
 
     if (startVal == null || endVal == null) {
-      return CallExpression(Variable('sum'), [expr, variable, startExpr, endExpr]);
+      return CallExpression(
+          Variable('sum'), [expr, variable, startExpr, endExpr]);
     }
 
     final start = startVal.round();
@@ -326,9 +326,13 @@ class SymbolicLimit {
     // Step 4: Check for one-sided infinities
     final leftVal = _tryEval(expr, varName, c - 1e-8);
     final rightVal = _tryEval(expr, varName, c + 1e-8);
-    if (leftVal != null && leftVal.isInfinite && rightVal != null && rightVal.isInfinite) {
+    if (leftVal != null &&
+        leftVal.isInfinite &&
+        rightVal != null &&
+        rightVal.isInfinite) {
       // Both sides → infinity (same or different sign)
-      if (leftVal == double.negativeInfinity && rightVal == double.negativeInfinity) {
+      if (leftVal == double.negativeInfinity &&
+          rightVal == double.negativeInfinity) {
         return Literal(double.negativeInfinity, '-Infinity');
       }
       return Literal(double.negativeInfinity, '-Infinity');
@@ -558,7 +562,8 @@ class _LimitPoint extends _LimitPointResult {
   _LimitPoint._(this._name);
 
   @override
-  bool operator ==(Object other) => other is _LimitPoint && other._name == _name;
+  bool operator ==(Object other) =>
+      other is _LimitPoint && other._name == _name;
   @override
   int get hashCode => _name.hashCode;
 }
