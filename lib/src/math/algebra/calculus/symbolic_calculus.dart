@@ -303,7 +303,7 @@ class SymbolicCalculus {
   /// var result = SymbolicCalculus.definiteIntegral(expr, 'x', 0, 2);
   /// print(result); // 8/3 ≈ 2.667
   /// ```
-  static num definiteIntegral(
+  static dynamic definiteIntegral(
     Expression expr,
     String variable,
     num a,
@@ -322,17 +322,13 @@ class SymbolicCalculus {
   // Helper methods
 
   /// Evaluates an expression at a specific value for a variable.
-  static num _evaluateAt(Expression expr, String variable, num value) {
+  static dynamic _evaluateAt(Expression expr, String variable, num value) {
     // Use context map for evaluation instead of substitution
     // This is more robust and avoids issues with partial substitution
     final context = {variable: value};
     final result = expr.evaluate(context);
 
-    if (result is num) {
-      return result;
-    } else {
-      throw Exception('Expression evaluation did not return a number: $result');
-    }
+    return result;
   }
 
   /// Computes factorial of a non-negative integer.
@@ -413,7 +409,7 @@ extension SymbolicCalculusExtension on Expression {
   /// var expr = Expression.parse('x^3');
   /// var result = expr.definiteIntegral('x', 0, 2); // 4
   /// ```
-  num definiteIntegral(String variable, num a, num b) {
+  dynamic definiteIntegral(String variable, num a, num b) {
     return SymbolicCalculus.definiteIntegral(this, variable, a, b);
   }
 }

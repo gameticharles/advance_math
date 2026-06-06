@@ -12,7 +12,7 @@ void main() {
       var derivResults = results['derivative'];
       // Symbolic: 2x -> 6
       // Numerical: ~6
-      expect(derivResults['symbolic'], closeTo(6.0, tol));
+      expect(derivResults['symbolic'].toDouble(), closeTo(6.0, tol));
       expect(derivResults['numerical'], closeTo(6.0, tol));
       expect(derivResults['error'], lessThan(tol));
     });

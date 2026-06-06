@@ -96,15 +96,16 @@ void main() {
               .toString(),
           equals('5*x^6+5*x^5+27*x^4+27*x^3+28*x^2+28*x'));
       expect(expression.parse('lcm(-20+16*i,-10+8*i)').evaluate().toString(),
-          equals('-10+8*i'));
-      expect(expression.parse('lcm(2*x^2+2*x+1,x+1)').evaluate(),
-          equals('(1+2*x+2*x^2)*(1+x)'));
-      expect(expression.parse('lcm(x^2+2*x+1,x+1)').evaluate(),
-          equals('1+2*x+x^2'));
+          equals('-20+16*i'));
+      expect(expression.parse('lcm(2*x^2+2*x+1,x+1)').evaluate().toString(),
+          equals('(1+2*x^2+2*x)*(1+x)'));
+      expect(expression.parse('lcm(x^2+2*x+1,x+1)').evaluate().toString(),
+          equals('1+x^2+2*x'));
       expect(
           expression
               .parse('lcm(6*x^9+24*x^8+15*x^7+6*x^2+24*x+15, (2*x^2+8*x+5))')
-              .evaluate(),
+              .evaluate()
+              .toString(),
           equals('15+15*x^7+24*x+24*x^8+6*x^2+6*x^9'));
       expect(
           expression

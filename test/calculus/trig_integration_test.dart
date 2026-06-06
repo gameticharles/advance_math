@@ -41,7 +41,7 @@ void main() {
       final expr = Csc(x, n: 2);
       final integrated = expr.integrate();
       print('$expr -> $integrated');
-      expect(integrated.toString(), contains('-1.0*cot(x)'));
+      expect(integrated.toString(), contains('-cot(x)'));
     });
 
     test('Csc^2 integration with coeff: csc(2x)^2 -> -0.5*cot(2x)', () {

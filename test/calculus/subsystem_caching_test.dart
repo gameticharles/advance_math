@@ -72,7 +72,14 @@ void main() {
   group('Polynomial Durand-Kerner Roots Caching', () {
     test('Should cache roots of high-degree polynomial', () {
       // Create a polynomial DurandKerner instance
-      final dk = DurandKerner.num([1, -10, 35, -50, 24, 0]); // x^5 - 10x^4 + 35x^3 - 50x^2 + 24x = 0 (roots: 0, 1, 2, 3, 4)
+      final dk = DurandKerner.num([
+        1,
+        -10,
+        35,
+        -50,
+        24,
+        0
+      ]); // x^5 - 10x^4 + 35x^3 - 50x^2 + 24x = 0 (roots: 0, 1, 2, 3, 4)
 
       final stopwatch1 = Stopwatch()..start();
       final r1 = dk.roots();
@@ -86,7 +93,8 @@ void main() {
       expect(r2.length, equals(5));
       expect(identical(r1, r2), isTrue);
       // The second run should be extremely fast (essentially 0ms) due to caching
-      expect(stopwatch2.elapsedMicroseconds, lessThan(stopwatch1.elapsedMicroseconds));
+      expect(stopwatch2.elapsedMicroseconds,
+          lessThan(stopwatch1.elapsedMicroseconds));
     });
   });
 
@@ -110,7 +118,7 @@ void main() {
     test('isPrime and primeFactors caching and speedup', () {
       // Large prime number
       const largePrime = 7919; // 1000th prime
-      
+
       final stopwatch1 = Stopwatch()..start();
       final isP1 = isPrime(largePrime);
       stopwatch1.stop();
@@ -121,11 +129,12 @@ void main() {
 
       expect(isP1, isTrue);
       expect(isP2, isTrue);
-      expect(stopwatch2.elapsedMicroseconds, lessThan(stopwatch1.elapsedMicroseconds));
+      expect(stopwatch2.elapsedMicroseconds,
+          lessThan(stopwatch1.elapsedMicroseconds));
 
       // primeFactors
       const numberToFactor = 123456789;
-      
+
       final stopwatch3 = Stopwatch()..start();
       final factors1 = primeFactors(numberToFactor);
       stopwatch3.stop();
@@ -135,7 +144,8 @@ void main() {
       stopwatch4.stop();
 
       expect(factors1, equals(factors2));
-      expect(stopwatch4.elapsedMicroseconds, lessThan(stopwatch3.elapsedMicroseconds));
+      expect(stopwatch4.elapsedMicroseconds,
+          lessThan(stopwatch3.elapsedMicroseconds));
     });
   });
 }

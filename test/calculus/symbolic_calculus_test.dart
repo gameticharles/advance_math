@@ -78,7 +78,7 @@ void main() {
             maclaurin.substitute(Variable('x'), Literal(x)).evaluate();
         var exactValue = cos(x);
 
-        expect(seriesValue, closeTo(exactValue, relaxedTol));
+        expect(seriesValue.real.toDouble(), closeTo(exactValue, relaxedTol));
       });
     });
 
@@ -125,7 +125,7 @@ void main() {
         var result = SymbolicCalculus.definiteIntegral(expr, 'x', 0, 2);
 
         // ∫x² dx from 0 to 2 = [x³/3] = 8/3 ≈ 2.667
-        expect(result, closeTo(8 / 3, tol));
+        expect(result.toDouble(), closeTo(8 / 3, tol));
       });
 
       test('integral of sin(x) from 0 to π', () {

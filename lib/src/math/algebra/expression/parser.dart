@@ -1572,7 +1572,7 @@ class ExpressionParser {
                     Expression raw = args[0];
                     // Unwrap GroupExpression if present
                     while (raw is GroupExpression) {
-                      raw = (raw as GroupExpression).expression;
+                      raw = (raw).expression;
                     }
 
                     if (raw is Divide) {
@@ -1746,8 +1746,7 @@ class ExpressionParser {
                       // Irreducible or unfactorable denominator
                       Expression frac =
                           Multiply(numExpr, Pow(denExpr, Literal(-1)));
-                      if (polyPart is Literal &&
-                          (polyPart as Literal).value == 0) {
+                      if (polyPart is Literal && (polyPart).value == 0) {
                         return frac;
                       }
                       return Add(polyPart, frac);
@@ -1815,7 +1814,7 @@ class ExpressionParser {
                         } else if (cv != null) {
                           coeffExpr = Literal(cv);
                         } else {
-                          coeffExpr = coeff as Expression;
+                          coeffExpr = coeff;
                         }
 
                         Expression term;
@@ -1850,7 +1849,7 @@ class ExpressionParser {
                         fPoly = f;
                         fExpr = polyFactorToExpr(f);
                       } else if (f is Pow) {
-                        var fp = f as Pow;
+                        var fp = f;
                         if (fp.left is Polynomial) {
                           fPoly = fp.left as Polynomial;
                           fExpr = polyFactorToExpr(fPoly);
@@ -1875,7 +1874,7 @@ class ExpressionParser {
                       if (fPoly != null) {
                         for (int i = 0; i < factorPolys.length; i++) {
                           try {
-                            var q = factorPolys[i] / fPoly!;
+                            var q = factorPolys[i] / fPoly;
                             Polynomial? qPoly;
                             if (q is Polynomial) {
                               qPoly = q;
@@ -2174,14 +2173,12 @@ class ExpressionParser {
                     }
 
                     if (pfResult == null) {
-                      return polyPart is Literal &&
-                              (polyPart as Literal).value == 0
+                      return polyPart is Literal && (polyPart).value == 0
                           ? Literal(0)
                           : polyPart;
                     }
 
-                    if (polyPart is! Literal ||
-                        (polyPart as Literal).value != 0) {
+                    if (polyPart is! Literal || (polyPart).value != 0) {
                       pfResult = Add(polyPart, pfResult);
                     }
 
