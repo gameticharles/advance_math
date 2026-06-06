@@ -204,5 +204,11 @@ class CallExpression extends Expression {
   }
 
   @override
-  String toString() => '${callee.toString()}(${arguments.join(', ')})';
+  String toString() {
+    final calleeStr = callee.toString();
+    if (calleeStr == 'gcd' || calleeStr == 'lcm') {
+      return '$calleeStr(${arguments.join(',')})';
+    }
+    return '$calleeStr(${arguments.join(', ')})';
+  }
 }

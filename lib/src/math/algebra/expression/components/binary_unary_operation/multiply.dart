@@ -417,7 +417,7 @@ class Multiply extends BinaryOperationsExpression {
     // the other is an imaginary unit (±i). Merging would produce a
     // fractional-imaginary Complex that buildSimplifiedProduct immediately
     // decomposes back, creating an infinite loop.
-    bool _wouldProduceFracI(dynamic v1, dynamic v2) {
+    bool wouldProduceFracI(dynamic v1, dynamic v2) {
       bool isFrac(dynamic v) => v is Rational && !v.isInteger;
       bool isIUnit(dynamic v) {
         if (v is! Complex || !v.isImaginary) return false;
@@ -437,7 +437,7 @@ class Multiply extends BinaryOperationsExpression {
         simpleRight.left is Literal) {
       var c1 = litVal(simpleLeft);
       var c2 = litVal(simpleRight.left as Literal);
-      if (!_wouldProduceFracI(c1, c2)) {
+      if (!wouldProduceFracI(c1, c2)) {
         var val = multiplyVals(c1, c2);
         if (val is Complex && val.isReal) val = val.simplify();
         return buildSimplifiedProduct(val, simpleRight.right);
@@ -450,7 +450,7 @@ class Multiply extends BinaryOperationsExpression {
         simpleRight is Literal) {
       var c1 = litVal(simpleLeft.left as Literal);
       var c2 = litVal(simpleRight);
-      if (!_wouldProduceFracI(c1, c2)) {
+      if (!wouldProduceFracI(c1, c2)) {
         var val = multiplyVals(c1, c2);
         if (val is Complex && val.isReal) val = val.simplify();
         return buildSimplifiedProduct(val, simpleLeft.right);
@@ -463,7 +463,7 @@ class Multiply extends BinaryOperationsExpression {
         simpleRight.right is Literal) {
       var c1 = litVal(simpleLeft);
       var c2 = litVal(simpleRight.right as Literal);
-      if (!_wouldProduceFracI(c1, c2)) {
+      if (!wouldProduceFracI(c1, c2)) {
         var val = multiplyVals(c1, c2);
         if (val is Complex && val.isReal) val = val.simplify();
         return buildSimplifiedProduct(val, simpleRight.left);
@@ -476,7 +476,7 @@ class Multiply extends BinaryOperationsExpression {
         simpleRight is Literal) {
       var c1 = litVal(simpleLeft.right as Literal);
       var c2 = litVal(simpleRight);
-      if (!_wouldProduceFracI(c1, c2)) {
+      if (!wouldProduceFracI(c1, c2)) {
         var val = multiplyVals(c1, c2);
         if (val is Complex && val.isReal) val = val.simplify();
         return buildSimplifiedProduct(val, simpleLeft.left);
@@ -489,7 +489,7 @@ class Multiply extends BinaryOperationsExpression {
         simpleRight.left is Literal) {
       var c1 = litVal(simpleLeft);
       var c2 = litVal(simpleRight.left as Literal);
-      if (!_wouldProduceFracI(c1, c2)) {
+      if (!wouldProduceFracI(c1, c2)) {
         var val = multiplyVals(c1, c2);
         if (val is Complex && val.isReal) val = val.simplify();
         return buildSimplifiedProduct(val, simpleRight.right);
@@ -740,7 +740,6 @@ class Multiply extends BinaryOperationsExpression {
         }
       }
     }
-
 
     // Avoid excessive parentheses
     if (left is Add || left is Subtract) {

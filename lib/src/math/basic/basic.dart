@@ -1005,6 +1005,77 @@ List<int> primeFactors(int n) {
   return List<int>.from(result);
 }
 
+/// Returns the prime factors of the given integer [n].
+///
+/// The function computes the prime factorization of [n]
+/// and returns a list of prime numbers that multiply together
+/// to give the original number [n].
+///
+/// Example:
+/// ```dart
+/// List<int> factors = primeFactors(56);
+/// print(factors); // Outputs: [2, 2, 2, 7]
+/// ```
+///
+/// If [n] is less than 2, the returned list will be empty.
+///
+/// - Parameter n: The integer to factor.
+/// - Returns: A list of prime factors of [n].
+String pfactorBigInt(BigInt n) {
+  bool negative = n < BigInt.zero;
+  if (negative) n = -n;
+  if (n == BigInt.zero) return '0';
+  if (n == BigInt.one) return '1';
+
+  Map<BigInt, int> factors = {};
+  BigInt d = BigInt.two;
+  BigInt temp = n;
+
+  // Trial division up to sqrt
+  while (d * d <= temp) {
+    while (temp % d == BigInt.zero) {
+      factors[d] = (factors[d] ?? 0) + 1;
+      temp = temp ~/ d;
+    }
+    d += BigInt.one;
+  }
+  if (temp > BigInt.one) {
+    factors[temp] = (factors[temp] ?? 0) + 1;
+  }
+
+  if (factors.isEmpty) {
+    return negative ? '(-$n)' : '($n)';
+  }
+
+  // Build term strings first, then sort lexicographically
+  // This matches the expected output format where e.g. "11"
+  // sorts before "2" in string comparison.
+  List<String> terms = [];
+  if (negative) {
+    // Build all terms, attach sign to first prime (numerically)
+    var numSorted = factors.keys.toList()..sort((a, b) => a.compareTo(b));
+    BigInt p0 = numSorted.first;
+    int e0 = factors[p0]!;
+    terms.add(e0 == 1 ? '(-$p0)' : '(-$p0^$e0)');
+    for (int i = 1; i < numSorted.length; i++) {
+      BigInt p = numSorted[i];
+      int e = factors[p]!;
+      terms.add(e == 1 ? '($p)' : '($p^$e)');
+    }
+    // Sort all terms lexicographically
+    terms.sort((a, b) => a.compareTo(b));
+  } else {
+    for (var entry in factors.entries) {
+      final p = entry.key;
+      final e = entry.value;
+      terms.add(e == 1 ? '($p)' : '($p^$e)');
+    }
+    // Sort lexicographically (string sort)
+    terms.sort((a, b) => a.compareTo(b));
+  }
+  return terms.join('*');
+}
+
 /// Returns the factors of the given integer [n].
 ///
 /// The function computes and returns a list of positive integers

@@ -1,6 +1,5 @@
 import 'package:advance_math/advance_math.dart';
 import 'package:test/test.dart';
-import 'package:advance_math/src/math/algebra/calculus/symbolic_integration.dart';
 
 void main() {
   group('Symbolic Integration Tests', () {

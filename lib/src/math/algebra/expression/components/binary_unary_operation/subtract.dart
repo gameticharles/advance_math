@@ -68,6 +68,9 @@ class Subtract extends BinaryOperationsExpression {
       if (leftVal is Complex || rightVal is Complex) {
         return Literal(Complex(leftVal) - Complex(rightVal)).simplify();
       }
+      if (leftVal is Rational || rightVal is Rational) {
+        return Literal(Rational(leftVal) - Rational(rightVal));
+      }
       return Literal(leftVal - rightVal);
     }
 

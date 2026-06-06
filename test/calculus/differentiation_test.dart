@@ -1,6 +1,5 @@
 import 'package:advance_math/advance_math.dart';
 import 'package:test/test.dart';
-import 'package:advance_math/src/math/algebra/calculus/differentiation.dart';
 
 void main() {
   group('Numerical Differentiation Tests', () {

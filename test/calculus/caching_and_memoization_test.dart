@@ -1,8 +1,6 @@
 import 'dart:math' as math;
 import 'package:test/test.dart';
 import 'package:advance_math/advance_math.dart';
-import 'package:advance_math/src/math/algebra/calculus/differentiation.dart';
-import 'package:advance_math/src/math/algebra/calculus/integration.dart';
 
 void main() {
   group('LRUCache Tests', () {
@@ -23,7 +21,7 @@ void main() {
       cache.put('a', 1);
       cache.put('b', 2);
       cache.put('c', 3);
-      
+
       // Eviction happens here. 'a' is the oldest and should be evicted.
       cache.put('d', 4);
 
@@ -86,20 +84,24 @@ void main() {
     });
 
     test('nthDerivative performance/complexity validation', () {
-      num f(num x) => x * x * x * x * x; // x^5. 5th derivative should be 5! = 120.
-      
+      num f(num x) =>
+          x * x * x * x * x; // x^5. 5th derivative should be 5! = 120.
+
       final stopwatch = Stopwatch()..start();
       final result = NumericalDifferentiation.nthDerivative(f, 1, 5, h: 0.01);
       stopwatch.stop();
 
       expect(result, closeTo(120.0, 1e-1));
       expect(stopwatch.elapsedMilliseconds, lessThan(50),
-          reason: 'Calculations should take less than 50ms due to dynamic programming / caching.');
+          reason:
+              'Calculations should take less than 50ms due to dynamic programming / caching.');
     });
   });
 
   group('NumericalIntegration Caching Tests', () {
-    test('adaptiveSimpson correctly integrates and avoids redundant evaluations', () {
+    test(
+        'adaptiveSimpson correctly integrates and avoids redundant evaluations',
+        () {
       int evalCount = 0;
       num f(num x) {
         evalCount++;
@@ -107,11 +109,12 @@ void main() {
       }
 
       // Integral of x^2 from 0 to 2 is 8/3 ≈ 2.666667
-      final result = NumericalIntegration.adaptiveSimpson(f, 0, 2, tolerance: 1e-5);
-      
+      final result =
+          NumericalIntegration.adaptiveSimpson(f, 0, 2, tolerance: 1e-5);
+
       expect(result, closeTo(8 / 3, 1e-4));
       expect(evalCount, isPositive);
-      
+
       // Let's check that running with the same function wrapped manually does not evaluate more.
       // The key is that evaluations were bounded and deduplicated by the transient LRU cache.
       print('Evaluations with adaptiveSimpson caching: $evalCount');
@@ -120,7 +123,8 @@ void main() {
     test('adaptiveSimpson correctness and stability', () {
       num f(num x) => math.sin(x);
       // Integral of sin(x) from 0 to pi is 2.0
-      final result = NumericalIntegration.adaptiveSimpson(f, 0, math.pi, tolerance: 1e-6);
+      final result =
+          NumericalIntegration.adaptiveSimpson(f, 0, math.pi, tolerance: 1e-6);
       expect(result, closeTo(2.0, 1e-4));
     });
   });

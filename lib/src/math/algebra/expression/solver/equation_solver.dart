@@ -482,7 +482,7 @@ class ExpressionSolver {
     var mappedSolutions = solutions.map((s) {
       var val = s;
       if (s is Expression) {
-        bool _containsSymbolicPow(Expression expr) {
+        bool containsSymbolicPow(Expression expr) {
           if (expr is Pow) {
             // Pow with non-integer exponent is symbolic (e.g., x^0.5)
             if (expr.exponent is Literal) {
@@ -495,28 +495,28 @@ class ExpressionSolver {
               if (ev is num && ev != ev.toInt()) return true;
               if (ev is Rational && !ev.isInteger) return true;
             }
-            return _containsSymbolicPow(expr.base) ||
-                _containsSymbolicPow(expr.exponent);
+            return containsSymbolicPow(expr.base) ||
+                containsSymbolicPow(expr.exponent);
           }
           if (expr is BinaryExpression) {
-            return _containsSymbolicPow(expr.left) ||
-                _containsSymbolicPow(expr.right);
+            return containsSymbolicPow(expr.left) ||
+                containsSymbolicPow(expr.right);
           }
           if (expr is BinaryOperationsExpression) {
-            return _containsSymbolicPow(expr.left) ||
-                _containsSymbolicPow(expr.right);
+            return containsSymbolicPow(expr.left) ||
+                containsSymbolicPow(expr.right);
           }
           if (expr is GroupExpression) {
-            return _containsSymbolicPow(expr.expression);
+            return containsSymbolicPow(expr.expression);
           }
           if (expr is UnaryExpression) {
-            return _containsSymbolicPow(expr.operand);
+            return containsSymbolicPow(expr.operand);
           }
           return false;
         }
 
         bool isSymbolic(Expression expr) {
-          if (_containsSymbolicPow(expr)) return true;
+          if (containsSymbolicPow(expr)) return true;
           final str = expr.toString();
           return str.contains('sqrt') ||
               str.contains('log') ||

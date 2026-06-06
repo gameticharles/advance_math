@@ -1,6 +1,4 @@
 import 'package:advance_math/advance_math.dart';
-import 'package:advance_math/src/math/algebra/calculus/symbolic_calculus.dart';
-import 'package:advance_math/src/math/algebra/calculus/hybrid_calculus.dart';
 
 void main() {
   print('--- Symbolic Calculus Example ---\n');

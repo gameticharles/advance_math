@@ -494,35 +494,186 @@ class Polynomial extends Expression {
   }
 
   /// Calculates the Greatest Common Divisor of two polynomials.
+  /// Returns true if this polynomial is effectively zero (all coefficients are zero)
+  bool get _isZeroPoly =>
+      coefficients.isEmpty || coefficients.every((c) => _isZeroLiteral(c));
+
+  /// Extracts BigInt coefficients from a Polynomial if all coefficients are
+  /// integer-valued literals (int, double without fraction, Rational integer, or
+  /// Complex with zero imaginary part and integer real part).
+  /// Returns null if any coefficient is non-numeric or non-integer.
+  static List<BigInt>? _toBigIntCoeffs(Polynomial p) {
+    final result = <BigInt>[];
+    for (final c in p.coefficients) {
+      if (c is! Literal) return null;
+      final v = c.value;
+      BigInt? bi;
+      if (v is int) {
+        bi = BigInt.from(v);
+      } else if (v is double) {
+        if (v != v.truncateToDouble()) return null;
+        bi = BigInt.from(v.toInt());
+      } else if (v is Rational) {
+        if (!v.isInteger) return null;
+        bi = v.numerator;
+      } else if (v is Complex) {
+        final im = v.imaginary;
+        final imOk =
+            (im is num && im == 0) || (im is Rational && im == Rational.zero);
+        if (!imOk) return null;
+        final r = v.real;
+        if (r is int) {
+          bi = BigInt.from(r);
+        } else if (r is double) {
+          if (r != r.truncateToDouble()) return null;
+          bi = BigInt.from(r.toInt());
+        } else if (r is Rational) {
+          if (!r.isInteger) return null;
+          bi = r.numerator;
+        } else {
+          return null;
+        }
+      } else {
+        return null;
+      }
+      result.add(bi);
+    }
+    return result;
+  }
+
+  /// Builds a Polynomial from a list of BigInt coefficients (high degree first).
+  static Polynomial _fromBigInt(List<BigInt> coeffs, Variable variable) {
+    // Trim leading zeros
+    int start = 0;
+    while (start < coeffs.length - 1 && coeffs[start] == BigInt.zero) {
+      start++;
+    }
+    final trimmed = coeffs.sublist(start);
+    return Polynomial(
+      trimmed.map<Expression>((b) {
+        final i = b.isValidInt ? b.toInt() : b;
+        return Literal(i is int ? Complex(i) : Complex(b.toInt()));
+      }).toList(),
+      variable: variable,
+    );
+  }
+
+  /// Pseudo-remainder of [a] divided by [b] (all in BigInt arithmetic).
+  /// See: https://en.wikipedia.org/wiki/Pseudo-remainder_sequence
+  static List<BigInt>? _pseudoRemainder(List<BigInt> a, List<BigInt> b) {
+    if (b.isEmpty) return a;
+    // Trim leading zeros
+    while (a.length > 1 && a.first == BigInt.zero) {
+      a = a.sublist(1);
+    }
+    while (b.length > 1 && b.first == BigInt.zero) {
+      b = b.sublist(1);
+    }
+    if (b.every((c) => c == BigInt.zero)) return null; // b is zero poly
+    final int da = a.length - 1;
+    final int db = b.length - 1;
+    if (da < db) return a; // remainder is a itself
+    final BigInt lc = b.first;
+    final int delta = da - db + 1;
+    final BigInt factor = lc.pow(delta);
+    // Multiply a by factor
+    var r = a.map((c) => c * factor).toList();
+    // Standard long division
+    for (int i = 0; i <= da - db; i++) {
+      final BigInt coeff = r[i];
+      if (coeff == BigInt.zero) continue;
+      for (int j = 0; j <= db; j++) {
+        r[i + j] = r[i + j] - coeff * b[j] ~/ lc;
+      }
+    }
+    // Remainder is the last db elements
+    final rem = r.sublist(da - db + 1);
+    // Trim leading zeros
+    int start = 0;
+    while (start < rem.length - 1 && rem[start] == BigInt.zero) {
+      start++;
+    }
+    return rem.sublist(start);
+  }
+
+  /// Returns the GCD of a list of BigInts.
+  static BigInt _bigIntListGcd(List<BigInt> values) {
+    if (values.isEmpty) return BigInt.one;
+    BigInt g = values.first.abs();
+    for (int i = 1; i < values.length; i++) {
+      g = g.gcd(values[i].abs());
+      if (g == BigInt.one) break;
+    }
+    return g == BigInt.zero ? BigInt.one : g;
+  }
+
   Polynomial gcd(Polynomial other) {
+    // Fast path: try BigInt pseudo-remainder GCD
+    final aCoeffs = _toBigIntCoeffs(this);
+    final bCoeffs = _toBigIntCoeffs(other);
+
+    if (aCoeffs != null && bCoeffs != null) {
+      // Use BigInt pseudo-remainder Euclidean algorithm
+      var a = aCoeffs;
+      var b = bCoeffs;
+
+      // Handle zero cases
+      bool isZeroList(List<BigInt> c) => c.every((x) => x == BigInt.zero);
+      if (isZeroList(a)) {
+        return other._makePrimitive();
+      }
+      if (isZeroList(b)) {
+        return _makePrimitive();
+      }
+
+      while (!isZeroList(b)) {
+        final rem =
+            _pseudoRemainder(List<BigInt>.from(a), List<BigInt>.from(b));
+        if (rem == null) break;
+        a = b;
+        b = rem;
+      }
+
+      // a is the GCD (up to content) — make it primitive
+      final content = _bigIntListGcd(a);
+      if (content > BigInt.one) {
+        a = a.map((c) => c ~/ content).toList();
+      }
+      // Ensure leading coefficient is positive
+      if (a.isNotEmpty && a.first < BigInt.zero) {
+        a = a.map((c) => -c).toList();
+      }
+      return _fromBigInt(a, variable);
+    }
+
+    // Fallback: original Euclidean algorithm (for symbolic coefficients)
     Polynomial a = this;
     Polynomial b = other;
 
-    while (b.coefficients.length > 1 ||
-        (b.coefficients.isNotEmpty &&
-            b.coefficients[0] is Literal &&
-            (b.coefficients[0] as Literal).value != Complex.zero())) {
+    while (!b._isZeroPoly) {
       Polynomial temp = b;
       Expression remainder = a % b;
       if (remainder is! Polynomial) {
-        // Should not happen if both are polynomials
-        throw Exception('Remainder is not a polynomial');
+        break;
       }
       b = remainder;
       a = temp;
     }
 
-    // Normalize result (make leading coefficient 1)
-    if (a.coefficients.isNotEmpty &&
-        a.coefficients[0] is Literal &&
-        (a.coefficients[0] as Literal).value != Complex.zero()) {
-      var leading = a.coefficients[0];
-      var newCoeffs = a.coefficients
-          .map((c) => Divide(c, leading).simplifyBasic())
-          .toList();
-      return Polynomial(newCoeffs, variable: variable);
-    }
     return a;
+  }
+
+  /// Returns a primitive version of this polynomial (GCD of coefficients = 1).
+  Polynomial _makePrimitive() {
+    final coeffs = _toBigIntCoeffs(this);
+    if (coeffs == null) return this;
+    final content = _bigIntListGcd(coeffs);
+    if (content <= BigInt.one) return this;
+    final primitive = coeffs.map((c) => c ~/ content).toList();
+    if (primitive.isNotEmpty && primitive.first < BigInt.zero) {
+      return _fromBigInt(primitive.map((c) => -c).toList(), variable);
+    }
+    return _fromBigInt(primitive, variable);
   }
 
   /// Calculates the Least Common Multiple of two polynomials.
@@ -550,12 +701,20 @@ class Polynomial extends Expression {
     return product; // Fallback
   }
 
-  /// Helper function to clean up the zeroes
+  /// Returns true if an expression is a zero literal (int 0, double 0, Complex.zero, Rational.zero, etc.)
+  static bool _isZeroLiteral(Expression e) {
+    if (e is! Literal) return false;
+    final v = e.value;
+    if (v is Complex) return v == Complex.zero();
+    if (v is Rational) return v == Rational.zero;
+    if (v is num) return v == 0;
+    return false;
+  }
+
+  /// Helper function to clean up leading zeroes from a coefficient list
   List<Expression> _trimLeadingZeros(List<Expression> coeffs) {
     int i = 0;
-    while (i < coeffs.length &&
-        coeffs[i] is Literal &&
-        (coeffs[i] as Literal).value == Complex.zero()) {
+    while (i < coeffs.length && _isZeroLiteral(coeffs[i])) {
       i++;
     }
     return coeffs.sublist(i);

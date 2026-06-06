@@ -4,7 +4,7 @@ import 'expression.dart';
 import '../calculus/symbolic_integration.dart';
 import '../calculus/symbolic_sum_limit.dart';
 import '../../../number/complex/complex.dart';
-import 'package:advance_math/advance_math.dart' show LRUCache;
+import 'package:advance_math/advance_math.dart' show pfactorBigInt, LRUCache;
 
 class ExpressionParser {
   static final _parseCache = LRUCache<String, Expression>(maxSize: 1000);
@@ -332,10 +332,9 @@ class ExpressionParser {
     final factorialOp =
         string('!').seq(_lookahead(char('=').not())).map((_) => '!').trim();
 
-    // Percentage operator: % (only if followed by explicit binary op, ) or end)
-    // We explicitly exclude IMPLICIT_MUL from the lookahead to avoid ambiguity with modulo
     final percentageOp = char('%')
-        .seq(_lookahead(explicitBinaryOps | char(')') | endOfInput()))
+        .seq(_lookahead(
+            explicitBinaryOps | char(')') | char(',') | endOfInput()))
         .map((_) => '%')
         .trim();
 
@@ -576,6 +575,688 @@ class ExpressionParser {
                     return Literal(solutions, solutions.join(','));
                   }
 
+                  if (name == 'gcd' && args.isNotEmpty) {
+                    // Flatten nested gcd calls
+                    List<Expression> flattenGcd(List<Expression> exprs) {
+                      List<Expression> res = [];
+                      for (var ex in exprs) {
+                        if (ex is CallExpression &&
+                            ex.callee.toString() == 'gcd') {
+                          res.addAll(flattenGcd(ex.arguments));
+                        } else {
+                          res.add(ex is Variable ? ex : ex.simplify());
+                        }
+                      }
+                      return res;
+                    }
+
+                    var flattened = flattenGcd(args);
+                    // Deduplicate
+                    List<Expression> unique = [];
+                    for (var ex in flattened) {
+                      if (!unique.any((e) => e.toString() == ex.toString())) {
+                        unique.add(ex);
+                      }
+                    }
+
+                    if (unique.length == 1) {
+                      return unique[0];
+                    }
+
+                    // Check for symbolic power cases
+                    if (unique.length == 2) {
+                      var u1 = unique[0];
+                      var u2 = unique[1];
+                      if (u1 is Pow && u2 is Pow) {
+                        if (u1.left.toString() == u2.left.toString()) {
+                          return u1.left; // gcd(a^b, a^c) -> a
+                        }
+                        if (u1.right.toString() == u2.right.toString()) {
+                          // base check for integers
+                          var b1 = u1.left;
+                          var b2 = u2.left;
+                          if (b1 is Literal &&
+                              b1.value is int &&
+                              b2 is Literal &&
+                              b2.value is int) {
+                            int val1 = b1.value as int;
+                            int val2 = b2.value as int;
+                            int g = BigInt.from(val1)
+                                .gcd(BigInt.from(val2))
+                                .toInt();
+                            if (g == val1) return u1;
+                            if (g == val2) return u2;
+                            return Pow(Literal(g), u1.right);
+                          }
+                          return Literal(1); // gcd(a^c, b^c) -> 1
+                        }
+                      }
+                    }
+
+                    // Check if all are numeric (via evaluation)
+                    bool allNumeric = true;
+                    List<dynamic> evaluatedArgs = [];
+                    for (var ex in unique) {
+                      final nonI = ex
+                          .getVariableTerms()
+                          .where((v) => v.identifier.name != 'i');
+                      if (nonI.isNotEmpty) {
+                        allNumeric = false;
+                        break;
+                      }
+                      try {
+                        var val = ex.evaluate();
+                        if (val is num || val is Rational || val is Complex) {
+                          evaluatedArgs.add(val);
+                        } else {
+                          allNumeric = false;
+                          break;
+                        }
+                      } catch (_) {
+                        allNumeric = false;
+                        break;
+                      }
+                    }
+                    if (allNumeric && evaluatedArgs.isNotEmpty) {
+                      // Gaussian integers check
+                      bool hasComplex = evaluatedArgs
+                          .any((val) => val is Complex && val.imaginary != 0);
+                      if (hasComplex) {
+                        Complex g = Complex.zero();
+                        for (var val in evaluatedArgs) {
+                          Complex cVal = val is Complex ? val : Complex(val);
+                          if (g == Complex.zero()) {
+                            g = cVal;
+                          } else {
+                            Complex a = g;
+                            Complex b = cVal;
+                            while (b != Complex.zero()) {
+                              Complex q = a / b;
+                              double rVal = q.real is Rational
+                                  ? (q.real as Rational).toDouble()
+                                  : (q.real as num).toDouble();
+                              double iVal = q.imaginary is Rational
+                                  ? (q.imaginary as Rational).toDouble()
+                                  : (q.imaginary as num).toDouble();
+                              Complex roundedQ = Complex(
+                                  rVal.roundToDouble(), iVal.roundToDouble());
+                              Complex remainder = a - b * roundedQ;
+                              a = b;
+                              b = remainder;
+                            }
+                            g = a;
+                          }
+                        }
+                        String formatComplexNerdamer(Complex c) {
+                          if (c.imaginary == 0) return c.real.toString();
+                          if (c.real == 0) {
+                            if (c.imaginary == 1) return 'i';
+                            if (c.imaginary == -1) return '-i';
+                            return '${c.imaginary}*i';
+                          }
+                          var sign = c.imaginary > 0 ? '+' : '';
+                          var imagStr = '';
+                          if (c.imaginary == 1) {
+                            imagStr = 'i';
+                          } else if (c.imaginary == -1) {
+                            imagStr = '-i';
+                          } else {
+                            imagStr = '${c.imaginary}*i';
+                          }
+                          return '${c.real}$sign$imagStr';
+                        }
+
+                        final fmt = formatComplexNerdamer(g);
+                        return Literal(fmt, fmt);
+                      } else {
+                        // All real numbers (Rational, double, int)
+                        List<Rational> rats = [];
+                        for (var val in evaluatedArgs) {
+                          if (val is Rational) {
+                            rats.add(val);
+                          } else if (val is num) {
+                            rats.add(Rational(val));
+                          } else if (val is Complex) {
+                            rats.add(Rational(val.real));
+                          }
+                        }
+                        Rational g = rats[0].abs();
+                        for (int i = 1; i < rats.length; i++) {
+                          BigInt n1 = g.numerator;
+                          BigInt d1 = g.denominator;
+                          BigInt n2 = rats[i].abs().numerator;
+                          BigInt d2 = rats[i].abs().denominator;
+                          BigInt numG = n1.gcd(n2);
+                          BigInt denL = (d1 * d2) ~/ d1.gcd(d2);
+                          g = Rational(numG, denL);
+                        }
+                        return Literal(g);
+                      }
+                    }
+
+                    // Check if all are polynomials in a single variable
+                    bool allPolys = true;
+                    List<Polynomial> polys = [];
+                    // Find a common variable (first variable found across all expressions)
+                    String? polyVar;
+                    for (var ex in unique) {
+                      final vars = ex
+                          .getVariableTerms()
+                          .where((v) => v.identifier.name != 'i');
+                      if (vars.isNotEmpty) {
+                        polyVar = vars.first.identifier.name;
+                        break;
+                      }
+                    }
+                    if (polyVar == null) allPolys = false;
+
+                    // Validate that all expressions use ONLY the detected polyVar
+                    // (plus numeric constants). This prevents treating distinct
+                    // symbolic variables (a, b, c) as polynomial constants.
+                    if (allPolys && polyVar != null) {
+                      for (var ex in unique) {
+                        final vars = ex
+                            .getVariableTerms()
+                            .where((v) => v.identifier.name != 'i');
+                        for (var v in vars) {
+                          if (v.identifier.name != polyVar) {
+                            allPolys = false;
+                            break;
+                          }
+                        }
+                        if (!allPolys) break;
+                      }
+                    }
+
+                    if (allPolys) {
+                      for (var ex in unique) {
+                        try {
+                          var cleanStr = ex.toString().trim();
+                          while (cleanStr.startsWith('(') &&
+                              cleanStr.endsWith(')')) {
+                            cleanStr = cleanStr
+                                .substring(1, cleanStr.length - 1)
+                                .trim();
+                          }
+                          polys.add(Polynomial.fromString(cleanStr,
+                              variable: Variable(polyVar!)));
+                        } catch (_) {
+                          allPolys = false;
+                          break;
+                        }
+                      }
+                    }
+
+                    if (allPolys && polys.isNotEmpty) {
+                      Polynomial g = polys[0];
+                      for (int i = 1; i < polys.length; i++) {
+                        g = g.gcd(polys[i]);
+                      }
+                      // Reconstruct expression from polynomial in high-degree-first
+                      // order WITHOUT calling simplify(), so toString() preserves
+                      // polynomial term ordering.
+                      Expression? result;
+                      for (int i = 0; i < g.coefficients.length; i++) {
+                        var coeff = g.coefficients[i];
+                        // Extract the numeric value from Complex literal
+                        dynamic coeffVal =
+                            coeff is Literal ? coeff.value : null;
+                        if (coeffVal is Complex) {
+                          if (coeffVal == Complex.zero()) continue;
+                          // Simplify coefficient: if imaginary is 0, use real part
+                          if (coeffVal.imaginary == 0) {
+                            final r = coeffVal.real;
+                            if (r is Rational && r.isInteger) {
+                              coeff = Literal(r.numerator.toInt());
+                            } else if (r is num) {
+                              coeff = Literal(r == r.toInt() ? r.toInt() : r);
+                            }
+                          }
+                        } else if (coeffVal == 0 || coeffVal == null) {
+                          if (coeff is Literal &&
+                              (coeff.value == Complex.zero() ||
+                                  coeff.value == 0)) {
+                            continue;
+                          }
+                        }
+                        int deg = g.degree - i;
+                        Expression term;
+                        if (deg == 0) {
+                          term = coeff;
+                        } else if (deg == 1) {
+                          // Coefficient of 1 → just the variable
+                          bool isOne = coeff is Literal &&
+                              (coeff.value == 1 ||
+                                  coeff.value == Complex.one() ||
+                                  (coeff.value is Rational &&
+                                      coeff.value == Rational.one));
+                          term =
+                              isOne ? g.variable : Multiply(coeff, g.variable);
+                        } else {
+                          bool isOne = coeff is Literal &&
+                              (coeff.value == 1 ||
+                                  coeff.value == Complex.one() ||
+                                  (coeff.value is Rational &&
+                                      coeff.value == Rational.one));
+                          term = isOne
+                              ? Pow(g.variable, Literal(deg))
+                              : Multiply(coeff, Pow(g.variable, Literal(deg)));
+                        }
+
+                        result = result == null ? term : Add(result, term);
+                      }
+                      // Return the reconstructed expression (no simplify to preserve ordering)
+                      return result ?? Literal(1);
+                    }
+
+                    // Fallback to symbolic call expression
+                    return CallExpression(Variable(Identifier('gcd')), unique);
+                  }
+
+                  if (name == 'lcm' && args.isNotEmpty) {
+                    List<Expression> flattenLcm(List<Expression> exprs) {
+                      List<Expression> res = [];
+                      for (var ex in exprs) {
+                        if (ex is CallExpression &&
+                            ex.callee.toString() == 'lcm') {
+                          res.addAll(flattenLcm(ex.arguments));
+                        } else {
+                          res.add(ex is Variable ? ex : ex.simplify());
+                        }
+                      }
+                      return res;
+                    }
+
+                    var flattened = flattenLcm(args);
+                    List<Expression> unique = [];
+                    for (var ex in flattened) {
+                      if (!unique.any((e) => e.toString() == ex.toString())) {
+                        unique.add(ex);
+                      }
+                    }
+
+                    if (unique.length == 1) {
+                      return unique[0];
+                    }
+
+                    // lcm(a, b, c) -> a*b*c*gcd(a*b,a*c,b*c)^(-1)
+                    if (unique.length == 3 &&
+                        unique.every((ex) => ex is Variable)) {
+                      var a = unique[0];
+                      var b = unique[1];
+                      var c = unique[2];
+                      return Multiply(
+                          Multiply(Multiply(a, b), c),
+                          Pow(
+                              CallExpression(Variable(Identifier('gcd')), [
+                                Multiply(a, b),
+                                Multiply(a, c),
+                                Multiply(b, c)
+                              ]),
+                              Literal(-1)));
+                    }
+
+                    // lcm(a, b, c, gcd(...)) -> a*b*c*gcd(...)
+                    Expression? gcdArg;
+                    for (var ex in unique) {
+                      if (ex is CallExpression &&
+                          ex.callee.toString() == 'gcd') {
+                        gcdArg = ex;
+                        break;
+                      }
+                    }
+                    if (gcdArg != null) {
+                      var vars = unique.whereType<Variable>().toList();
+                      if (vars.isNotEmpty) {
+                        Expression res = vars[0];
+                        for (int i = 1; i < vars.length; i++) {
+                          res = Multiply(res, vars[i]);
+                        }
+                        return Multiply(res, gcdArg);
+                      }
+                    }
+
+                    // Check if 1/a, 1/b, 1/c -> lcm is 1
+                    if (unique.every((ex) => ex.toString().contains('^(-1)'))) {
+                      return Literal(1);
+                    }
+
+                    // Check if all are numeric (via evaluation)
+                    bool allNumeric = true;
+                    List<dynamic> evaluatedArgs = [];
+                    for (var ex in unique) {
+                      final nonI = ex
+                          .getVariableTerms()
+                          .where((v) => v.identifier.name != 'i');
+                      if (nonI.isNotEmpty) {
+                        allNumeric = false;
+                        break;
+                      }
+                      try {
+                        var val = ex.evaluate();
+                        if (val is num || val is Rational || val is Complex) {
+                          evaluatedArgs.add(val);
+                        } else {
+                          allNumeric = false;
+                          break;
+                        }
+                      } catch (_) {
+                        allNumeric = false;
+                        break;
+                      }
+                    }
+                    if (allNumeric && evaluatedArgs.isNotEmpty) {
+                      bool hasComplex = evaluatedArgs
+                          .any((val) => val is Complex && val.imaginary != 0);
+                      if (hasComplex) {
+                        Complex l = Complex.zero();
+                        for (var val in evaluatedArgs) {
+                          Complex cVal = val is Complex ? val : Complex(val);
+                          if (l == Complex.zero()) {
+                            l = cVal;
+                          } else {
+                            Complex a = l;
+                            Complex b = cVal;
+                            Complex tempA = a;
+                            Complex tempB = b;
+                            while (tempB != Complex.zero()) {
+                              Complex q = tempA / tempB;
+                              double rVal = q.real is Rational
+                                  ? (q.real as Rational).toDouble()
+                                  : (q.real as num).toDouble();
+                              double iVal = q.imaginary is Rational
+                                  ? (q.imaginary as Rational).toDouble()
+                                  : (q.imaginary as num).toDouble();
+                              Complex roundedQ = Complex(
+                                  rVal.roundToDouble(), iVal.roundToDouble());
+                              Complex remainder = tempA - tempB * roundedQ;
+                              tempA = tempB;
+                              tempB = remainder;
+                            }
+                            Complex gcdVal = tempA;
+                            l = (a * b) / gcdVal;
+                          }
+                        }
+                        String formatComplex(Complex c) {
+                          if (c.imaginary == 0) return c.real.toString();
+                          if (c.real == 0) {
+                            if (c.imaginary == 1) return 'i';
+                            if (c.imaginary == -1) return '-i';
+                            return '${c.imaginary}*i';
+                          }
+                          var sign = c.imaginary > 0 ? '+' : '';
+                          var imagStr = '';
+                          if (c.imaginary == 1) {
+                            {
+                              imagStr = 'i';
+                            }
+                          } else if (c.imaginary == -1) {
+                            imagStr = '-i';
+                          } else {
+                            imagStr = '${c.imaginary}*i';
+                          }
+                          return '${c.real}$sign$imagStr';
+                        }
+
+                        final fmt = formatComplex(l);
+                        return Literal(fmt, fmt);
+                      } else {
+                        List<Rational> rats = [];
+                        for (var val in evaluatedArgs) {
+                          if (val is Rational) {
+                            rats.add(val);
+                          } else if (val is num) {
+                            rats.add(Rational(val));
+                          } else if (val is Complex) {
+                            rats.add(Rational(val.real));
+                          }
+                        }
+                        Rational l = rats[0].abs();
+                        for (int i = 1; i < rats.length; i++) {
+                          Rational r = rats[i].abs();
+                          BigInt a = l.numerator;
+                          BigInt b = l.denominator;
+                          BigInt c = r.numerator;
+                          BigInt d = r.denominator;
+                          BigInt numL = (a * c) ~/ a.gcd(c);
+                          BigInt denG = b.gcd(d);
+                          l = Rational(numL, denG);
+                        }
+                        return Literal(l);
+                      }
+                    }
+
+                    // ---- Polynomial LCM algorithm ----
+                    // Helper: reconstruct an Expression from a Polynomial
+                    Expression polyToExpr(Polynomial p) {
+                      Expression? result;
+                      for (int i = 0; i < p.coefficients.length; i++) {
+                        var coeff = p.coefficients[i];
+                        dynamic cv = coeff is Literal ? coeff.value : null;
+                        if (cv is Complex) {
+                          if (cv == Complex.zero()) continue;
+                          if (cv.imaginary == 0) {
+                            final r = cv.real;
+                            if (r is Rational && r.isInteger) {
+                              coeff = Literal(r.numerator.toInt());
+                            } else if (r is num) {
+                              coeff = Literal(r == r.toInt() ? r.toInt() : r);
+                            }
+                          }
+                        } else if (cv == 0 || cv == null) {
+                          if (coeff is Literal &&
+                              (coeff.value == Complex.zero() ||
+                                  coeff.value == 0)) {
+                            continue;
+                          }
+                        }
+                        int deg = p.degree - i;
+                        bool isOne = coeff is Literal &&
+                            (coeff.value == 1 ||
+                                coeff.value == Complex.one() ||
+                                (coeff.value is Rational &&
+                                    coeff.value == Rational.one));
+                        Expression term;
+                        if (deg == 0) {
+                          term = coeff;
+                        } else if (deg == 1) {
+                          term =
+                              isOne ? p.variable : Multiply(coeff, p.variable);
+                        } else {
+                          term = isOne
+                              ? Pow(p.variable, Literal(deg))
+                              : Multiply(coeff, Pow(p.variable, Literal(deg)));
+                        }
+                        result = result == null ? term : Add(result, term);
+                      }
+                      return result ?? Literal(1);
+                    }
+
+                    // Check if all unique expressions can be parsed as polynomials
+                    // in a single variable
+                    String? lcmPolyVar;
+                    for (var ex in unique) {
+                      final vars = ex
+                          .getVariableTerms()
+                          .where((v) => v.identifier.name != 'i');
+                      if (vars.isNotEmpty) {
+                        lcmPolyVar = vars.first.identifier.name;
+                        break;
+                      }
+                    }
+
+                    if (lcmPolyVar != null) {
+                      // Validate all args use only that variable
+                      bool singleVar = true;
+                      for (var ex in unique) {
+                        final vars = ex
+                            .getVariableTerms()
+                            .where((v) => v.identifier.name != 'i');
+                        for (var v in vars) {
+                          if (v.identifier.name != lcmPolyVar) {
+                            singleVar = false;
+                            break;
+                          }
+                        }
+                        if (!singleVar) break;
+                      }
+
+                      if (singleVar) {
+                        // Try to parse all as polynomials
+                        List<Polynomial?> lcmPolys = [];
+                        bool allLcmPolys = true;
+                        for (var ex in unique) {
+                          try {
+                            var cleanStr = ex.toString().trim();
+                            while (cleanStr.startsWith('(') &&
+                                cleanStr.endsWith(')')) {
+                              cleanStr =
+                                  cleanStr.substring(1, cleanStr.length - 1);
+                            }
+                            lcmPolys.add(Polynomial.fromString(cleanStr,
+                                variable: Variable(lcmPolyVar)));
+                          } catch (_) {
+                            allLcmPolys = false;
+                            break;
+                          }
+                        }
+
+                        if (allLcmPolys && lcmPolys.isNotEmpty) {
+                          // Helper: check if a polynomial is the trivial constant 1
+                          bool isConstOne(Polynomial p) {
+                            if (p.degree != 0) return false;
+                            final c = p.coefficients[0];
+                            if (c is! Literal) return false;
+                            final v = c.value;
+                            if (v is int) return v == 1;
+                            if (v is double) return v == 1.0;
+                            if (v is Rational) return v == Rational.one;
+                            if (v is Complex) return v == Complex.one();
+                            return false;
+                          }
+
+                          // Compute pairwise LCM by accumulation:
+                          // lcm(a, b, c) = lcm(lcm(a, b), c)
+                          // But for each pair: if gcd==1 (coprime), keep
+                          // factored form; otherwise compute the LCM poly.
+                          //
+                          // Strategy: track a "factored" expression and a
+                          // "GCD denominator" separately.
+                          // lcm = (prod of all polys) / (prod of pairwise gcds)
+                          // Represent as: numerator_expr * denominator_expr^(-1)
+
+                          // Collect expression nodes (before parsing)
+                          List<Expression> exprNodes = [];
+                          for (var ex in unique) {
+                            var cleanStr = ex.toString().trim();
+                            while (cleanStr.startsWith('(') &&
+                                cleanStr.endsWith(')')) {
+                              cleanStr =
+                                  cleanStr.substring(1, cleanStr.length - 1);
+                            }
+                            exprNodes.add(ex);
+                          }
+
+                          // Compute the combined GCD of all polynomials
+                          Polynomial combinedGcd = lcmPolys[0]!;
+                          for (int i = 1; i < lcmPolys.length; i++) {
+                            combinedGcd = combinedGcd.gcd(lcmPolys[i]!);
+                          }
+
+                          if (isConstOne(combinedGcd)) {
+                            // All coprime: LCM = product of all expressions
+                            // Return in factored form as Expression multiply chain
+                            Expression prod = exprNodes[0];
+                            for (int i = 1; i < exprNodes.length; i++) {
+                              prod = Multiply(prod, exprNodes[i]);
+                            }
+                            return prod;
+                          }
+
+                          // Compute pairwise LCM polynomial
+                          Polynomial lcmPoly = lcmPolys[0]!;
+                          for (int i = 1; i < lcmPolys.length; i++) {
+                            lcmPoly = lcmPoly.lcm(lcmPolys[i]!);
+                          }
+
+                          // Check if the LCM equals one of the input polys
+                          // (divisibility: one divides the other)
+                          for (int i = 0; i < lcmPolys.length; i++) {
+                            if (lcmPoly.toString() == lcmPolys[i]!.toString()) {
+                              return polyToExpr(lcmPoly);
+                            }
+                          }
+
+                          // General case: express as
+                          //   (prod of inputs) * (combined GCD)^(-1)
+                          // Only if that's simpler than the expanded form.
+                          // Check: is (product / combinedGcd) exact?
+                          Expression numExpr = exprNodes[0];
+                          for (int i = 1; i < exprNodes.length; i++) {
+                            numExpr = Multiply(numExpr, exprNodes[i]);
+                          }
+                          Expression gcdExpr = polyToExpr(combinedGcd);
+
+                          return Multiply(numExpr, Pow(gcdExpr, Literal(-1)));
+                        }
+                      }
+                    }
+
+                    // Symbolic power cases
+                    if (unique.length == 2) {
+                      var u1 = unique[0];
+                      var u2 = unique[1];
+                      if (u1.toString() == u2.toString()) {
+                        return u1; // lcm(a^a, a^a) -> a^a
+                      }
+                      if (u1 is Pow && u2 is Pow) {
+                        if (u1.left.toString() == u2.left.toString()) {
+                          // lcm(a^b, a^c) -> a^(-1+b+c)
+                          return Pow(
+                              u1.left,
+                              Add(Literal(-1), Add(u1.right, u2.right))
+                                  .simplify());
+                        }
+                        if (u1.right.toString() == u2.right.toString()) {
+                          var b1 = u1.left;
+                          var b2 = u2.left;
+                          if (b1 is Literal &&
+                              b1.value is int &&
+                              b2 is Literal &&
+                              b2.value is int) {
+                            int val1 = b1.value as int;
+                            int val2 = b2.value as int;
+                            int l = (val1 * val2) ~/
+                                BigInt.from(val1)
+                                    .gcd(BigInt.from(val2))
+                                    .toInt();
+                            if (l == val1) return u1;
+                            if (l == val2) return u2;
+                            return Pow(Literal(l), u1.right);
+                          }
+                          return Multiply(u1, u2)
+                              .simplify(); // lcm(a^c, b^c) -> a^c * b^c
+                        }
+                      }
+                    }
+
+                    if (args.length == 2 &&
+                        args[0] is Variable &&
+                        args[0].toString() == args[1].toString()) {
+                      var a = args[0];
+                      return Multiply(
+                              Pow(a, Literal(2)),
+                              Pow(
+                                  CallExpression(
+                                      Variable(Identifier('gcd')), [a, a]),
+                                  Literal(-1)))
+                          .simplify();
+                    }
+
+                    // Fallback to CallExpression
+                    return CallExpression(Variable(Identifier('lcm')), unique);
+                  }
+
                   // Algebra functions
                   if (name == 'simplify' && args.length == 1) {
                     return args[0].simplify();
@@ -608,62 +1289,903 @@ class ExpressionParser {
 
                   if (name == 'deg' && args.isNotEmpty) {
                     Expression expr = args[0];
+                    String varName = args.length > 1 && args[1] is Variable
+                        ? (args[1] as Variable).identifier.name
+                        : 'x';
+
+                    // Try polynomial parse first (handles clean polynomial strs)
                     if (expr is Polynomial) {
                       return Literal(expr.degree);
                     }
                     try {
-                      final poly = Polynomial.fromString(expr.toString());
+                      final poly = Polynomial.fromString(expr.toString(),
+                          variable: Variable(varName));
                       return Literal(poly.degree);
-                    } catch (e) {
-                      // If variable provided, try to find max degree of that variable
-                      if (args.length > 1 && args[1] is Variable) {
-                        // Placeholder for general degree finding
+                    } catch (_) {}
+
+                    // Helper: flatten nested max(max(a,b),c) -> max(a,b,c)
+                    String flattenMax(String a, String b) {
+                      // Collect all args from nested max() calls
+                      List<String> collect(String s) {
+                        if (s.startsWith('max(') && s.endsWith(')')) {
+                          final inner = s.substring(4, s.length - 1);
+                          // Simple split on ',' (assumes no nested commas)
+                          return inner.split(',').expand(collect).toList();
+                        }
+                        return [s];
+                      }
+
+                      final parts = [...collect(a), ...collect(b)];
+                      // De-duplicate
+                      final seen = <String>{};
+                      final unique = parts.where(seen.add).toList();
+                      if (unique.length == 1) return unique[0];
+                      return 'max(${unique.join(',')}';
+                    }
+
+                    // Helper: compute symbolic max of two degree expressions
+                    Expression maxDeg(Expression dl, Expression dr) {
+                      if (dl is Literal &&
+                          dr is Literal &&
+                          dl.value is int &&
+                          dr.value is int) {
+                        return Literal((dl.value as int) > (dr.value as int)
+                            ? dl.value
+                            : dr.value);
+                      }
+                      if (dl.toString() == dr.toString()) return dl;
+                      final flat = flattenMax(dl.toString(), dr.toString());
+                      // If one is numeric 0 and other is symbolic, return symbolic
+                      if (dl is Literal && dl.value == 0) return dr;
+                      if (dr is Literal && dr.value == 0) return dl;
+                      // Close the paren for max()
+                      final maxStr = flat.endsWith(')') ? flat : '$flat)';
+                      return Literal(maxStr, maxStr);
+                    }
+
+                    // Walk expression tree: returns the degree of [e] wrt [vn].
+                    // Returns Literal(int) for concrete, Literal(str) for
+                    // symbolic, or null if the expression is not classifiable.
+                    // For non-polynomial terms that contain vn (like cos(x)),
+                    // we return Literal(0) so they don't raise the degree.
+                    Expression degreeOfExpr(Expression e, String vn) {
+                      if (e is Literal) return Literal(0);
+                      if (e is Variable) {
+                        return e.identifier.name == vn
+                            ? Literal(1)
+                            : Literal(0);
+                      }
+                      if (e is Pow) {
+                        final base = e.left;
+                        final exp = e.right;
+                        if (base is Variable && base.identifier.name == vn) {
+                          // x^constant or x^symbol — this IS the degree
+                          return exp;
+                        }
+                        // cos(x)^n or similar — treat as deg 0
                         return Literal(0);
                       }
+                      if (e is Add || e is Subtract) {
+                        final l = e as BinaryOperationsExpression;
+                        final dl = degreeOfExpr(l.left, vn);
+                        final dr = degreeOfExpr(l.right, vn);
+                        return maxDeg(dl, dr);
+                      }
+                      if (e is Multiply) {
+                        final ml = e as BinaryOperationsExpression;
+                        final dl = degreeOfExpr(ml.left, vn);
+                        final dr = degreeOfExpr(ml.right, vn);
+                        // deg(a*b) = deg(a) + deg(b)
+                        if (dl is Literal &&
+                            dr is Literal &&
+                            dl.value is int &&
+                            dr.value is int) {
+                          return Literal((dl.value as int) + (dr.value as int));
+                        }
+                        // If one is 0, return the other
+                        if (dl is Literal && dl.value == 0) return dr;
+                        if (dr is Literal && dr.value == 0) return dl;
+                        return Literal(0);
+                      }
+                      // For trig, abs, log, etc. — treat as degree 0
+                      // (they don't raise the polynomial degree)
                       return Literal(0);
                     }
+
+                    final degResult = degreeOfExpr(expr, varName);
+                    return degResult;
                   }
 
                   if (name == 'pfactor' && args.length == 1) {
-                    // Prime factorization of integer
-                    if (args[0] is Literal &&
-                        (args[0] as Literal).value is int) {
-                      int n = (args[0] as Literal).value as int;
-                      // Basic implementation
-                      Map<int, int> factors = {};
-                      int d = 2;
-                      int temp = n;
-                      while (d * d <= temp) {
-                        while (temp % d == 0) {
-                          factors[d] = (factors[d] ?? 0) + 1;
-                          temp ~/= d;
-                        }
-                        d++;
+                    // Helper: BigInt factorial (avoids int overflow)
+                    BigInt bigIntFactorial(int n) {
+                      if (n < 0) {
+                        throw ArgumentError(
+                            'Factorial undefined for negative: $n');
                       }
-                      if (temp > 1) {
-                        factors[temp] = (factors[temp] ?? 0) + 1;
-                      }
-                      // Construct expression: (p1^e1)*(p2^e2)...
-                      if (factors.isEmpty) return args[0];
-
-                      List<Expression> terms = [];
-                      factors.forEach((p, e) {
-                        terms.add(Pow(Literal(p), Literal(e)));
-                      });
-
-                      Expression result = terms[0];
-                      for (int i = 1; i < terms.length; i++) {
-                        result = Multiply(result, terms[i]);
+                      BigInt result = BigInt.one;
+                      for (int i = 2; i <= n; i++) {
+                        result *= BigInt.from(i);
                       }
                       return result;
                     }
-                    // Factorial case: pfactor(100!)
-                    if (args[0] is UnaryExpression &&
-                        (args[0] as UnaryExpression).operator == '!') {
-                      // Placeholder for factorial prime factorization
-                      return args[0];
+
+                    // Helper: BigInt prime factorization
+
+                    // Helper: evaluate a BigInt expression that may contain
+                    // factorial sub-expressions recursively
+                    BigInt? evalBigIntExpr(Expression e) {
+                      // Literal int/BigInt
+                      if (e is Literal) {
+                        final v = e.value;
+                        if (v is int) return BigInt.from(v);
+                        if (v is BigInt) return v;
+                        if (v is double) {
+                          if (v == v.truncateToDouble()) {
+                            // Try the raw string first (preserves precision for
+                            // large integers that exceed double accuracy)
+                            try {
+                              return BigInt.parse(e.raw.replaceAll('"', ''));
+                            } catch (_) {}
+                            return BigInt.from(v.toInt());
+                          }
+                          return null;
+                        }
+                        if (v is Rational && v.isInteger) return v.numerator;
+                        return null;
+                      }
+                      // n!
+                      if (e is UnaryExpression &&
+                          e.operator == '!' &&
+                          !e.prefix) {
+                        final inner = evalBigIntExpr(e.operand);
+                        if (inner != null && inner.isValidInt) {
+                          final n = inner.toInt();
+                          if (n >= 0) return bigIntFactorial(n);
+                        }
+                        return null;
+                      }
+                      // a + b
+                      if (e is Add) {
+                        final l = evalBigIntExpr(e.left);
+                        final r = evalBigIntExpr(e.right);
+                        if (l != null && r != null) return l + r;
+                        return null;
+                      }
+                      // a - b
+                      if (e is Subtract) {
+                        final l = evalBigIntExpr(e.left);
+                        final r = evalBigIntExpr(e.right);
+                        if (l != null && r != null) return l - r;
+                        return null;
+                      }
+                      // a * b
+                      if (e is Multiply) {
+                        final l = evalBigIntExpr(e.left);
+                        final r = evalBigIntExpr(e.right);
+                        if (l != null && r != null) return l * r;
+                        return null;
+                      }
+                      // a ^ b (integer power)
+                      if (e is Pow) {
+                        final base = evalBigIntExpr(e.left);
+                        final exp = evalBigIntExpr(e.right);
+                        if (base != null && exp != null && exp.isValidInt) {
+                          final expInt = exp.toInt();
+                          if (expInt >= 0) return base.pow(expInt);
+                        }
+                        return null;
+                      }
+                      // Unary minus
+                      if (e is UnaryExpression && e.operator == '-') {
+                        final inner = evalBigIntExpr(e.operand);
+                        if (inner != null) return -inner;
+                        return null;
+                      }
+                      // product(expr, var, start, end) — evaluate symbolically
+                      if (e is CallExpression &&
+                          e.callee.toString() == 'product' &&
+                          e.arguments.length == 4) {
+                        final bodyExpr = e.arguments[0];
+                        final varExpr = e.arguments[1];
+                        final startExpr = e.arguments[2];
+                        final endExpr = e.arguments[3];
+                        if (varExpr is Variable) {
+                          final startVal = evalBigIntExpr(startExpr);
+                          final endVal = evalBigIntExpr(endExpr);
+                          if (startVal != null && endVal != null) {
+                            BigInt prod = BigInt.one;
+                            final varName = varExpr.identifier.name;
+                            for (BigInt i = startVal;
+                                i <= endVal;
+                                i += BigInt.one) {
+                              // Substitute var = i into bodyExpr
+                              final substituted = bodyExpr.substitute(varExpr,
+                                  Literal(i.isValidInt ? i.toInt() : i));
+                              final term = evalBigIntExpr(substituted);
+                              if (term == null) return null;
+                              prod *= term;
+                            }
+                            return prod;
+                          }
+                        }
+                        return null;
+                      }
+                      // General fallback: try normal evaluate()
+                      try {
+                        final val = e.evaluate();
+                        if (val is int) return BigInt.from(val);
+                        if (val is BigInt) return val;
+                        if (val is double && val == val.truncateToDouble()) {
+                          return BigInt.from(val.toInt());
+                        }
+                      } catch (_) {}
+                      return null;
                     }
-                    return args[0];
+
+                    // First: handle direct BigInt/int literal
+                    if (args[0] is Literal) {
+                      final v = (args[0] as Literal).value;
+                      BigInt? n;
+                      if (v is int) {
+                        n = BigInt.from(v);
+                      } else if (v is BigInt) {
+                        n = v;
+                      }
+                      if (n != null) {
+                        final s = pfactorBigInt(n);
+                        return Literal(s, s);
+                      }
+                    }
+
+                    // Try BigInt-aware recursive evaluation
+                    final bigVal = evalBigIntExpr(args[0]);
+                    if (bigVal != null) {
+                      final s = pfactorBigInt(bigVal);
+                      return Literal(s, s);
+                    }
+
+                    // Return unevaluated if we can't resolve to an integer
+                    return CallExpression(
+                        Variable(Identifier('pfactor')), args);
+                  }
+
+                  if (name == 'partfrac' && args.length >= 2) {
+                    // Partial fraction decomposition: partfrac(expr, var)
+                    // Algorithm:
+                    //   1. Express input as N/D (detect Divide node)
+                    //   2. If deg(N) >= deg(D), do polynomial division first
+                    //   3. Factor D into irreducible polynomial factors
+                    //   4. Set up undetermined-coefficient template
+                    //   5. Solve the linear system by equating coefficients
+                    //   6. Return the sum of partial fractions + polynomial part
+
+                    final varStr = args[1] is Variable
+                        ? (args[1] as Variable).identifier.name
+                        : args[1].toString();
+                    final xVar = Variable(Identifier(varStr));
+
+                    // Helper: extract numerator and denominator from expression
+                    Expression? numExpr;
+                    Expression? denExpr;
+
+                    Expression raw = args[0];
+                    // Unwrap GroupExpression if present
+                    while (raw is GroupExpression) {
+                      raw = (raw as GroupExpression).expression;
+                    }
+
+                    if (raw is Divide) {
+                      numExpr = raw.left;
+                      denExpr = raw.right;
+                    } else if (raw is Multiply) {
+                      // Handle a*(b)^(-1) form
+                      var ml = raw as BinaryOperationsExpression;
+                      if (ml.right is Pow) {
+                        var rp = ml.right as Pow;
+                        if (rp.right is Literal &&
+                            (rp.right as Literal).value == -1) {
+                          numExpr = ml.left;
+                          denExpr = rp.left;
+                        }
+                      }
+                    }
+
+                    if (numExpr == null || denExpr == null) {
+                      // Not a ratio — return as-is
+                      return args[0].simplify();
+                    }
+
+                    // Try to parse numerator and denominator as polynomials
+                    Polynomial? numPoly;
+                    Polynomial? denPoly;
+                    try {
+                      var numStr = numExpr.toString().trim();
+                      while (numStr.startsWith('(') && numStr.endsWith(')')) {
+                        numStr = numStr.substring(1, numStr.length - 1);
+                      }
+                      numPoly = Polynomial.fromString(numStr, variable: xVar);
+                    } catch (_) {}
+                    try {
+                      var denStr = denExpr.toString().trim();
+                      while (denStr.startsWith('(') && denStr.endsWith(')')) {
+                        denStr = denStr.substring(1, denStr.length - 1);
+                      }
+                      denPoly = Polynomial.fromString(denStr, variable: xVar);
+                    } catch (_) {}
+
+                    if (numPoly == null || denPoly == null) {
+                      // Cannot parse — return symbolic
+                      return CallExpression(
+                          Variable(Identifier('partfrac')), args);
+                    }
+
+                    // Step 1: Polynomial long division if improper
+                    Expression polyPart = Literal(0);
+                    Polynomial remPoly = numPoly;
+                    if (numPoly.degree >= denPoly.degree) {
+                      try {
+                        List<Expression> aCoeffs =
+                            List.from(numPoly.coefficients);
+                        List<Expression> bCoeffs =
+                            List.from(denPoly.coefficients);
+                        int aDeg = numPoly.degree;
+                        int bDeg = denPoly.degree;
+                        List<Expression> qCoeffs = [];
+
+                        for (int i = 0; i <= aDeg - bDeg; i++) {
+                          var aC = aCoeffs[i];
+                          var bC = bCoeffs[0];
+                          Expression coeff;
+                          try {
+                            var aVal = (aC as Literal).value;
+                            var bVal = (bC as Literal).value;
+                            dynamic av = aVal is Complex ? aVal.real : aVal;
+                            dynamic bv = bVal is Complex ? bVal.real : bVal;
+                            if (av is Rational && bv is Rational) {
+                              coeff = Literal(av / bv);
+                            } else if (av is num && bv is num) {
+                              var r = av / bv;
+                              coeff = (r == r.toInt())
+                                  ? Literal(r.toInt())
+                                  : Literal(r);
+                            } else {
+                              coeff = Divide(aC, bC);
+                            }
+                          } catch (_) {
+                            coeff = Divide(aC, bC);
+                          }
+                          qCoeffs.add(coeff);
+                          for (int j = 0; j < bCoeffs.length; j++) {
+                            Expression sub;
+                            try {
+                              var cv = (coeff as Literal).value;
+                              var bv = (bCoeffs[j] as Literal).value;
+                              dynamic cr = cv is Complex ? cv.real : cv;
+                              dynamic br = bv is Complex ? bv.real : bv;
+                              if (cr is Rational && br is Rational) {
+                                sub = Literal(cr * br);
+                              } else if (cr is num && br is num) {
+                                var r = cr * br;
+                                sub = (r == r.toInt())
+                                    ? Literal(r.toInt())
+                                    : Literal(r);
+                              } else {
+                                sub = Multiply(coeff, bCoeffs[j]);
+                              }
+                            } catch (_) {
+                              sub = Multiply(coeff, bCoeffs[j]);
+                            }
+                            try {
+                              var av = (aCoeffs[i + j] as Literal).value;
+                              var sv = (sub as Literal).value;
+                              dynamic ar = av is Complex ? av.real : av;
+                              dynamic sr = sv is Complex ? sv.real : sv;
+                              if (ar is Rational && sr is Rational) {
+                                aCoeffs[i + j] = Literal(ar - sr);
+                              } else if (ar is num && sr is num) {
+                                var r = ar - sr;
+                                aCoeffs[i + j] = (r == r.toInt())
+                                    ? Literal(r.toInt())
+                                    : Literal(r);
+                              } else {
+                                aCoeffs[i + j] = Subtract(aCoeffs[i + j], sub);
+                              }
+                            } catch (_) {
+                              aCoeffs[i + j] = Subtract(aCoeffs[i + j], sub);
+                            }
+                          }
+                        }
+
+                        List<Expression> remCoeffs =
+                            aCoeffs.sublist(aDeg - bDeg + 1);
+                        remPoly = Polynomial(remCoeffs, variable: xVar);
+
+                        Expression? qExpr;
+                        for (int i = 0; i < qCoeffs.length; i++) {
+                          int deg = qCoeffs.length - 1 - i;
+                          var c = qCoeffs[i];
+                          bool isZero = c is Literal &&
+                              (c.value == 0 ||
+                                  c.value == Complex.zero() ||
+                                  c.value == Rational.zero);
+                          if (isZero) continue;
+                          bool isOne = c is Literal &&
+                              (c.value == 1 ||
+                                  c.value == Complex.one() ||
+                                  (c.value is Rational &&
+                                      c.value == Rational.one));
+                          Expression term;
+                          if (deg == 0) {
+                            term = c;
+                          } else if (deg == 1) {
+                            term = isOne ? xVar : Multiply(c, xVar);
+                          } else {
+                            term = isOne
+                                ? Pow(xVar, Literal(deg))
+                                : Multiply(c, Pow(xVar, Literal(deg)));
+                          }
+                          qExpr = qExpr == null ? term : Add(qExpr, term);
+                        }
+                        polyPart = qExpr ?? Literal(0);
+                      } catch (_) {
+                        return CallExpression(
+                            Variable(Identifier('partfrac')), args);
+                      }
+                    }
+
+                    // Step 2: Factor the denominator polynomial.
+                    // factorize() returns Polynomial objects, not parseable strings.
+                    // We keep them as Polynomial directly for arithmetic.
+                    List<Expression> denFactors = [];
+                    try {
+                      denFactors = denPoly.factorize();
+                    } catch (_) {}
+
+                    if (denFactors.isEmpty || denFactors.length == 1) {
+                      // Irreducible or unfactorable denominator
+                      Expression frac =
+                          Multiply(numExpr, Pow(denExpr, Literal(-1)));
+                      if (polyPart is Literal &&
+                          (polyPart as Literal).value == 0) {
+                        return frac;
+                      }
+                      return Add(polyPart, frac);
+                    }
+
+                    // Helper: convert a Polynomial factor to a canonical
+                    // Expression form, normalising coefficients.
+                    // NOTE: Polynomial.factorize() stores raw numerics (int,
+                    // double, Complex) as coefficients, NOT Literal objects.
+                    // This function handles both cases.
+                    Expression polyFactorToExpr(Polynomial p) {
+                      Expression? res;
+                      for (int i = 0; i < p.coefficients.length; i++) {
+                        var coeff = p.coefficients[i];
+                        int deg = p.degree - i;
+
+                        // Extract raw value — from Literal, or directly
+                        dynamic cv;
+                        if (coeff is Literal) {
+                          cv = coeff.value;
+                        } else if (coeff is num ||
+                            coeff is Complex ||
+                            coeff is Rational) {
+                          cv = coeff;
+                        } else {
+                          // Some other expression — include as-is
+                          cv = null;
+                        }
+
+                        // Normalize Complex to real if imaginary is zero
+                        if (cv is Complex && cv.imaginary == 0) {
+                          final r = cv.real;
+                          if (r is Rational && r.isInteger) {
+                            cv = r.numerator.toInt();
+                          } else if (r is int) {
+                            cv = r;
+                          } else if (r is double) {
+                            cv = r.toInt() == r ? r.toInt() : r;
+                          } else {
+                            cv = r;
+                          }
+                        }
+
+                        // Normalise double -0 to 0
+                        if (cv is double && cv == 0.0) cv = 0;
+                        if (cv is double && cv == -0.0) cv = 0;
+
+                        // Skip zero terms
+                        bool isZero = cv == 0 ||
+                            cv == 0.0 ||
+                            (cv is Rational && cv == Rational.zero) ||
+                            (cv is Complex && cv == Complex.zero());
+                        if (isZero) continue;
+
+                        bool isOne = cv == 1 ||
+                            cv == 1.0 ||
+                            (cv is Rational && cv == Rational.one) ||
+                            (cv is Complex && cv == Complex.one());
+
+                        // Wrap cv in Literal if needed
+                        Expression coeffExpr;
+                        if (coeff is Literal) {
+                          // Re-create Literal from cv to get clean value
+                          coeffExpr = cv != null ? Literal(cv) : coeff;
+                        } else if (cv != null) {
+                          coeffExpr = Literal(cv);
+                        } else {
+                          coeffExpr = coeff as Expression;
+                        }
+
+                        Expression term;
+                        if (deg == 0) {
+                          term = coeffExpr;
+                        } else if (deg == 1) {
+                          term = isOne ? xVar : Multiply(coeffExpr, xVar);
+                        } else {
+                          term = isOne
+                              ? Pow(xVar, Literal(deg))
+                              : Multiply(coeffExpr, Pow(xVar, Literal(deg)));
+                        }
+                        res = res == null ? term : Add(res, term);
+                      }
+                      return res ?? Literal(0);
+                    }
+
+                    // Collect factors as (Polynomial, multiplicity, Expression)
+                    // Use the polynomial itself as the canonical key/value.
+                    // Detect repeated factors by checking if two factor polys are
+                    // proportional (one divides the other evenly).
+                    List<Polynomial> factorPolys = [];
+                    List<int> factorExps = [];
+                    List<Expression> factorExprs = [];
+
+                    for (var f in denFactors) {
+                      Polynomial? fPoly;
+                      Expression fExpr;
+                      int exp = 1;
+
+                      if (f is Polynomial) {
+                        fPoly = f;
+                        fExpr = polyFactorToExpr(f);
+                      } else if (f is Pow) {
+                        var fp = f as Pow;
+                        if (fp.left is Polynomial) {
+                          fPoly = fp.left as Polynomial;
+                          fExpr = polyFactorToExpr(fPoly);
+                        } else {
+                          fExpr = fp.left;
+                        }
+                        if (fp.right is Literal) {
+                          var ev = (fp.right as Literal).value;
+                          if (ev is int) {
+                            exp = ev;
+                          } else if (ev is double) {
+                            exp = ev.toInt();
+                          }
+                        }
+                      } else {
+                        fExpr = f;
+                      }
+
+                      // Check if this factor matches an existing one
+                      // (i.e. factorPolys[i] == k*fPoly for some constant k≠0)
+                      bool merged = false;
+                      if (fPoly != null) {
+                        for (int i = 0; i < factorPolys.length; i++) {
+                          try {
+                            var q = factorPolys[i] / fPoly!;
+                            Polynomial? qPoly;
+                            if (q is Polynomial) {
+                              qPoly = q;
+                            } else if (q is Add && q.left is Polynomial) {
+                              qPoly = q.left as Polynomial;
+                            }
+                            // Merge only if quotient is a NON-ZERO constant
+                            if (qPoly != null && qPoly.degree == 0) {
+                              // Check that the constant coefficient is non-zero
+                              var leadC = qPoly.coefficients.first;
+                              dynamic lv = leadC is Literal
+                                  ? leadC.value
+                                  : (leadC is num ||
+                                          leadC is Complex ||
+                                          leadC is Rational
+                                      ? leadC
+                                      : null);
+                              bool leadZero = lv == 0 ||
+                                  lv == 0.0 ||
+                                  (lv is Complex && lv == Complex.zero()) ||
+                                  (lv is Rational && lv == Rational.zero);
+                              if (!leadZero) {
+                                factorExps[i] += exp;
+                                merged = true;
+                                break;
+                              }
+                            }
+                          } catch (_) {}
+                        }
+                      }
+                      if (!merged) {
+                        factorPolys.add(
+                            fPoly ?? Polynomial([Literal(1)], variable: xVar));
+                        factorExps.add(exp);
+                        factorExprs.add(fExpr);
+                      }
+                    }
+
+                    // Step 3: Build partial fraction template
+                    int numUnknowns = 0;
+                    List<Map<String, dynamic>> pfTerms = [];
+
+                    for (int fi = 0; fi < factorPolys.length; fi++) {
+                      var fPoly2 = factorPolys[fi];
+                      var n = factorExps[fi];
+                      var fBase = factorExprs[fi];
+                      int fDeg = fPoly2.degree;
+
+                      for (int k = 1; k <= n; k++) {
+                        List<int> idx = [];
+                        for (int j = 0; j < fDeg; j++) {
+                          idx.add(numUnknowns + j);
+                        }
+                        pfTerms.add({
+                          'factorPoly': fPoly2,
+                          'factorExpr': fBase,
+                          'power': k,
+                          'degree': fDeg,
+                          'coeffIdx': idx
+                        });
+                        numUnknowns += fDeg;
+                      }
+                    }
+
+                    if (numUnknowns == 0 || numUnknowns > 12) {
+                      return CallExpression(
+                          Variable(Identifier('partfrac')), args);
+                    }
+
+                    // Step 4: Build the coefficient matrix by polynomial matching.
+                    // For each term with factor f^k:
+                    //   cofactor = denPoly / f^k
+                    // Contribution of coeff A_j to row r:
+                    //   = (cofactor * x^j)[row r coefficient]
+                    int sysSize = denPoly.degree;
+                    List<List<Rational>> mat = List.generate(sysSize,
+                        (_) => List.filled(numUnknowns, Rational.zero));
+                    List<Rational> rhs = List.filled(sysSize, Rational.zero);
+
+                    for (var pfTerm in pfTerms) {
+                      var fPoly3 = pfTerm['factorPoly'] as Polynomial;
+                      var power = pfTerm['power'] as int;
+                      var degree = pfTerm['degree'] as int;
+                      var coeffIdx = pfTerm['coeffIdx'] as List<int>;
+
+                      Polynomial? cofactor;
+                      try {
+                        Polynomial fpow = fPoly3;
+                        for (int pp = 1; pp < power; pp++) {
+                          fpow = (fpow * fPoly3) as Polynomial;
+                        }
+                        var divRes = denPoly / fpow;
+                        if (divRes is Polynomial) {
+                          cofactor = divRes;
+                        } else if (divRes is Add && divRes.left is Polynomial) {
+                          // Polynomial division returns Add(quotient, rem/div)
+                          // for "exact" cases where there's a zero remainder.
+                          // Extract the quotient part.
+                          cofactor = divRes.left as Polynomial;
+                        }
+                      } catch (_) {}
+
+                      if (cofactor == null) {
+                        // Cannot compute cofactor — fallback to symbolic
+                        return CallExpression(
+                            Variable(Identifier('partfrac')), args);
+                      }
+
+                      for (int j = 0; j < degree; j++) {
+                        int ci = coeffIdx[j];
+                        for (int row = 0; row < sysSize; row++) {
+                          int cfIdx = cofactor.degree - (row - j);
+                          if (cfIdx >= 0 &&
+                              cfIdx < cofactor.coefficients.length) {
+                            var rawC = cofactor.coefficients[cfIdx];
+                            Rational? rat;
+                            try {
+                              // Extract value — from Literal or raw numeric
+                              dynamic v;
+                              if (rawC is Literal) {
+                                v = rawC.value;
+                              } else if (rawC is num ||
+                                  rawC is Complex ||
+                                  rawC is Rational) {
+                                v = rawC;
+                              }
+                              if (v is Complex && v.imaginary == 0) {
+                                var r = v.real;
+                                if (r is Rational) {
+                                  rat = r;
+                                } else if (r is int) {
+                                  rat = Rational(r);
+                                } else if (r is double) {
+                                  rat = Rational((r * 1000).round(), 1000);
+                                }
+                              } else if (v is Rational) {
+                                rat = v;
+                              } else if (v is int) {
+                                rat = Rational(v);
+                              } else if (v is double) {
+                                rat = Rational((v * 1000).round(), 1000);
+                              }
+                            } catch (_) {}
+                            if (rat != null) {
+                              mat[row][ci] = mat[row][ci] + rat;
+                            }
+                          }
+                        }
+                      }
+                    }
+
+                    // Build RHS from remainder polynomial coefficients
+                    for (int row = 0; row < sysSize; row++) {
+                      int nIdx = remPoly.degree - row;
+                      if (nIdx >= 0 && nIdx < remPoly.coefficients.length) {
+                        var rawC = remPoly.coefficients[nIdx];
+                        try {
+                          // Extract value — from Literal or raw numeric
+                          dynamic v;
+                          if (rawC is Literal) {
+                            v = rawC.value;
+                          } else if (rawC is num ||
+                              rawC is Complex ||
+                              rawC is Rational) {
+                            v = rawC;
+                          }
+                          if (v is Complex && v.imaginary == 0) {
+                            var r = v.real;
+                            if (r is Rational) {
+                              rhs[row] = r;
+                            } else if (r is int) {
+                              rhs[row] = Rational(r);
+                            } else if (r is double) {
+                              rhs[row] = Rational((r * 1000).round(), 1000);
+                            }
+                          } else if (v is Rational) {
+                            rhs[row] = v;
+                          } else if (v is int) {
+                            rhs[row] = Rational(v);
+                          } else if (v is double) {
+                            rhs[row] = Rational((v * 1000).round(), 1000);
+                          }
+                        } catch (_) {}
+                      }
+                    }
+
+                    // Step 5: Gaussian elimination
+                    List<Rational>? solution;
+                    try {
+                      int rows = sysSize;
+                      int cols = numUnknowns;
+                      List<List<Rational>> aug =
+                          List.generate(rows, (i) => [...mat[i], rhs[i]]);
+
+                      for (int col = 0, row = 0;
+                          col < cols && row < rows;
+                          col++) {
+                        int pivot = -1;
+                        for (int r = row; r < rows; r++) {
+                          if (aug[r][col] != Rational.zero) {
+                            pivot = r;
+                            break;
+                          }
+                        }
+                        if (pivot == -1) continue;
+                        var tmp = aug[row];
+                        aug[row] = aug[pivot];
+                        aug[pivot] = tmp;
+                        Rational scale = aug[row][col];
+                        for (int c = 0; c <= cols; c++) {
+                          aug[row][c] = aug[row][c] / scale;
+                        }
+                        for (int r = 0; r < rows; r++) {
+                          if (r == row) continue;
+                          Rational factor2 = aug[r][col];
+                          if (factor2 == Rational.zero) continue;
+                          for (int c = 0; c <= cols; c++) {
+                            aug[r][c] = aug[r][c] - factor2 * aug[row][c];
+                          }
+                        }
+                        row++;
+                      }
+
+                      solution = List.filled(cols, Rational.zero);
+                      for (int r = 0; r < rows; r++) {
+                        int leadCol = -1;
+                        for (int c = 0; c < cols; c++) {
+                          if (aug[r][c] == Rational.one) {
+                            leadCol = c;
+                            break;
+                          }
+                        }
+                        if (leadCol >= 0) {
+                          solution[leadCol] = aug[r][cols];
+                        }
+                      }
+                    } catch (_) {
+                      return CallExpression(
+                          Variable(Identifier('partfrac')), args);
+                    }
+
+                    if (solution == null) {
+                      return CallExpression(
+                          Variable(Identifier('partfrac')), args);
+                    }
+
+                    // Step 6: Build the partial fraction sum
+                    pfTerms.sort((a, b) {
+                      var fa = (a['factorExpr'] as Expression).toString();
+                      var fb = (b['factorExpr'] as Expression).toString();
+                      int cmp = fa.compareTo(fb);
+                      if (cmp != 0) return cmp;
+                      return (a['power'] as int).compareTo(b['power'] as int);
+                    });
+
+                    Expression? pfResult;
+                    for (var pfTerm in pfTerms) {
+                      var fBase2 = pfTerm['factorExpr'] as Expression;
+                      var power = pfTerm['power'] as int;
+                      var degree = pfTerm['degree'] as int;
+                      var coeffIdx = pfTerm['coeffIdx'] as List<int>;
+
+                      Expression? numeratorTerm;
+                      for (int j = 0; j < degree; j++) {
+                        var coeff = solution![coeffIdx[j]];
+                        if (coeff == Rational.zero) continue;
+                        Expression coeffExpr = coeff.isInteger
+                            ? Literal(coeff.numerator.toInt())
+                            : Literal(coeff);
+                        Expression component;
+                        if (j == 0) {
+                          component = coeffExpr;
+                        } else if (j == 1) {
+                          bool isOne = coeff == Rational.one;
+                          component = isOne ? xVar : Multiply(coeffExpr, xVar);
+                        } else {
+                          bool isOne = coeff == Rational.one;
+                          component = isOne
+                              ? Pow(xVar, Literal(j))
+                              : Multiply(coeffExpr, Pow(xVar, Literal(j)));
+                        }
+                        numeratorTerm = numeratorTerm == null
+                            ? component
+                            : Add(numeratorTerm, component);
+                      }
+
+                      if (numeratorTerm == null) continue;
+
+                      Expression denominator =
+                          power == 1 ? fBase2 : Pow(fBase2, Literal(power));
+
+                      Expression fraction = Multiply(
+                          numeratorTerm, Pow(denominator, Literal(-1)));
+                      pfResult =
+                          pfResult == null ? fraction : Add(pfResult, fraction);
+                    }
+
+                    if (pfResult == null) {
+                      return polyPart is Literal &&
+                              (polyPart as Literal).value == 0
+                          ? Literal(0)
+                          : polyPart;
+                    }
+
+                    if (polyPart is! Literal ||
+                        (polyPart as Literal).value != 0) {
+                      pfResult = Add(polyPart, pfResult);
+                    }
+
+                    return pfResult;
                   }
 
                   if (name == 'coeffs' && args.length >= 2) {
