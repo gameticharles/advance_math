@@ -1,3 +1,10 @@
+# 5.7.1
+
+## Documentation Expansion & Metadata Optimization
+
+- **[DOCUMENTATION]** Extensively expanded `README.md` with comprehensive explanations, code examples, and usage cases for the symbolic calculus package (differentiation, integration, limits, summations), Laplace & Inverse Laplace transforms, and system equation solvers.
+- **[IMPROVEMENT]** Updated pubspec topics to `expressions-cas` to highlight the library's advanced Computer Algebra System capabilities.
+
 # 5.7.0
 
 ## Laplace Transforms, Symbolic Calculus & CAS Enhancements

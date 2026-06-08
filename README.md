@@ -48,6 +48,9 @@ Advance math is a comprehensive Dart library that enriches mathematical programm
 - Supports vectors, complex numbers and complex vectors with most of the basic functionalities and operations.
 - Supports math expressions with context and functions.
 - Enhanced expression creation with multiple approaches: explicit Literal objects, toExpression() extension method, and ex() helper function.
+- Symbolic Calculus & Integral Transforms: Support for partial derivatives, indefinite and definite integration, Taylor and Maclaurin series expansions, limits, and summations symbolically.
+- Laplace & Inverse Laplace Transforms: Compute symbolic Laplace transforms and their inverse transforms.
+- Equation Solving & Systems of Equations: Solve single linear, quadratic, and cubic equations, as well as multi-equation systems symbolically and numerically.
 
 
 ## Usage
@@ -3370,6 +3373,70 @@ final expr3 = ex(3) * (x ^ ex(2)) - ex(4) / x;
 print('Expression 3: $expr3');
 ```
 
+### Comprehensive CAS & Symbolic Expression Examples
+
+This section showcases a rich set of capabilities available in the CAS parser and expression evaluator, spanning complex numbers, polynomials, statistics, and algebraic transformations:
+
+#### 1. Complex Numbers in Expressions
+Evaluate complex number arithmetic, power functions, roots, and trigonometric/hyperbolic operations:
+```dart
+var parser = ExpressionParser();
+
+// Complex Arithmetic
+print(parser.parse('complex(1, 2) / complex(3, 4)')); // 0.44 + 0.08i
+print(parser.parse('complex(3, 4) + 5'));             // 8 + 4i
+
+// Power and Roots
+print(parser.parse('complex(1, 2) ^ complex(3, 4)')); // 0.129...+0.033...i
+print(parser.parse('sqrt(complex(-4, 0))'));          // 0 + 2i
+print(parser.parse('nthRoot(complex(-8, 0), 3)'));    // 1 + 1.732i (one of the roots)
+
+// Hyperbolic & Trigonometric Functions
+print(parser.parse('sinh(complex(1, 1))'));           // 0.635...+1.188...i
+print(parser.parse('cos(complex(0, 1))'));            // 1.543...+0i
+
+// Parsing String Complex Numbers
+print(parser.parse('complex("1 + 2i")'));             // 1 + 2i
+print(parser.parse('complex("-√3 + 2πi")'));          // -1.732...+6.283...i
+```
+
+#### 2. Advanced Polynomial & Algebraic Operations
+Verify degree, extract coefficients, factorize polynomials, decompose into partial fractions, or complete the square:
+```dart
+// Factorization
+print(parser.parse('factor(x^2 + 2*x + 1)'));         // (1+x)^2
+print(parser.parse('factor(x^16 - 1)'));              // (-1+x)*(1+x)*(1+x^2)*(1+x^4)*(1+x^8)
+print(parser.parse('factor(64*x^3 + 125)'));          // (-20*x+16*x^2+25)*(4*x+5)
+
+// Prime Factorization
+print(parser.parse('pfactor(100)'));                  // (2^2)*(5^2)
+print(parser.parse('pfactor(100!)'));                 // prime factorization of 100 factorial
+
+// Polynomial Degree & Coefficient Extraction
+print(parser.parse('deg(x^2 + 2*x + x^5)'));          // 5
+print(parser.parse('coeffs(x^2 + 2*x + 1, x)'));      // [1, 2, 1]
+print(parser.parse('coeffs(a*b*x^2 + c*x + d, x)'));  // [d, c, a*b]
+
+// Partial Fraction Decomposition
+print(parser.parse('partfrac((3*x + 2)/(x^2 + x), x)')); // (1+x)^(-1)+2*x^(-1)
+
+// Complete the Square
+print(parser.parse('sqcomp(9*x^2 - 18*x + 17)'));     // (-3+3*x)^2+8
+```
+
+#### 3. Combination, Permutation & Statistics
+Evaluate combinations, permutations, and statistical properties (like mode) dynamically inside expression trees:
+```dart
+// Permutations & Combinations
+print(parser.parse('5P3'));                           // 5 permute 3 = 60
+print(parser.parse('5C3'));                           // 5 choose 3 = 10
+print(parser.parse('5P3 + 5C3'));                     // 70
+
+// Expression Mode (Identifies the most frequent algebraic terms)
+print(parser.parse('mode(x, r+1, 21, tan(x), r+1)')); // 1+r
+print(parser.parse('mode(x, r+1, 21, tan(x), r+1, x)')); // [1+r, x]
+```
+
 ### Enhanced Expression Creation
 
 The library provides three intuitive approaches for creating expressions with numeric literals, solving common type inference issues:
@@ -3413,16 +3480,81 @@ final polynomial = ex(3) * (x ^ ex(2)) +
 print('P(2,3) = ${polynomial.evaluate({'x': 2, 'y': 3})}');
 ```
 
-#### Calculus Operations
+#### Calculus & Integral Transforms
+
+The library provides extensive support for differentiation, integration, Taylor series, limits, summations, and integral transforms:
 
 ```dart
-// Differentiation
-final func = (x ^ ex(3)) + 2.toExpression() * (x ^ ex(2)) - ex(5) * x + ex(7);
-print('f\'(x) = ${func.differentiate()}');
+final x = Variable('x');
+final t = Variable('t');
+final s = Variable('s');
 
-// Integration
+// 1. Differentiation
+final func = (x ^ ex(3)) + ex(2) * (x ^ ex(2)) - ex(5) * x;
+print('f\'(x) = ${func.differentiate()}'); // 3*x^2 + 4*x - 5
+print('∂/∂x (x*y) = ${Expression.parse("diff(x*y, x)")}'); // y
+
+// 2. Indefinite & Definite Integration
 final integrand = 6.toExpression() * (x ^ ex(2)) + 4.toExpression() * x - ex(3);
-print('∫f(x)dx = ${integrand.integrate()}');
+print('∫f(x)dx = ${integrand.integrate()}'); // 2*x^3 + 2*x^2 - 3*x
+// Definite integration computes numerical/symbolic approximations
+var defResult = SymbolicCalculus.definiteIntegral(Cos(x), 'x', 0, pi);
+print('∫[0,π] cos(x) dx = $defResult'); // 0.0
+
+// 3. Limits and Summations
+// lim_{x -> 1} (2 - 2x^2) / (x - 1)
+var limitResult = SymbolicCalculus.limit(Expression.parse('(2 - 2*x^2)/(x - 1)'), 'x', 1);
+print('Limit: $limitResult'); // -4
+
+// Σ_{x=0}^{10} (x^2 + x)
+print('Sum: ${Expression.parse("sum(x^2+x, x, 0, 10)").simplify()}'); // 440
+
+// 4. Laplace & Inverse Laplace Transforms
+// L{ 5 } = 5/s
+print('L{5} = ${LaplaceTransform.compute(Literal(5), t, s)}'); // 5/s
+// L{ cos(a*t) } = s / (s^2 + a^2)
+print('L{cos(a*t)} = ${Expression.parse("laplace(cos(a*t), t, s)").simplify()}'); // s*(s^2+a^2)^(-1)
+
+// L^-1{ 5 / (s^2 + 4)^2 } = (5/4) * t * sin(2*t)
+print('L^-1{5*s/(s^2+4)^2} = ${InverseLaplaceTransform.compute(Expression.parse("5*s/(s^2+4)^2"), s, t)}'); // (5/4)*sin(2*t)*t
+```
+
+#### Taylor & Maclaurin Series
+
+Generate Taylor or Maclaurin series expansions of expressions around a center:
+
+```dart
+final x = Variable('x');
+
+// Taylor series of x^2 around x=1, up to order 2:
+final taylor = SymbolicCalculus.taylorSeries(x ^ ex(2), 'x', 1, 2);
+print('Taylor of x^2: $taylor'); // 1 + 2*(x - 1) + (x - 1)^2
+
+// Maclaurin series of cos(x) up to order 4:
+final maclaurin = SymbolicCalculus.maclaurinSeries(Cos(x), 'x', 4);
+print('Maclaurin of cos(x): $maclaurin'); // 1 - x^2/2 + x^4/24
+```
+
+#### Equation Solver & Systems of Equations
+
+Solve single equations (linear, quadratic, cubic) or systems of equations symbolically or numerically:
+
+```dart
+final x = Variable('x');
+final y = Variable('y');
+
+// 1. Solving a single equation (e.g. x^2 - 9 = 0)
+final eq1 = Subtract(Pow(x, ex(2)), ex(9));
+final solutions = ExpressionSolver.solve(eq1, x);
+print('Solutions: $solutions'); // [3, -3]
+
+// 2. Solving systems of linear equations (e.g. x + y = 5, x - y = 1)
+final equations = [
+  Expression.parse('x + y - 5'),
+  Expression.parse('x - y - 1'),
+];
+final sysSolutions = ExpressionSolver.solveEquations(equations, [x, y]);
+print('System Solutions: $sysSolutions'); // [3.0, 2.0]
 ```
 
 All three methods produce equivalent results and can be mixed within the same expression. Choose the approach that best fits your coding style:
@@ -3455,6 +3587,106 @@ extension E on num {
 ```
 
 These extension methods allow for more intuitive and readable code when working with expressions.
+
+</details>
+
+<details>
+<summary>SYMBOLIC CALCULUS & COMPUTER ALGEBRA SYSTEM (CAS)</summary>
+
+## Symbolic Calculus & CAS
+
+The `advance_math` library features a complete symbolic calculus package (`lib/src/math/algebra/calculus`) built on top of the Expression parser. This allows developers to construct, simplify, differentiate, integrate, and transform mathematical expressions programmatically.
+
+### 1. Symbolic Differentiation
+
+Compute derivatives and partial derivatives of expressions with respect to specific variables:
+
+```dart
+import 'package:advance_math/advance_math.dart';
+
+var x = Variable('x');
+
+// Differentiate x^2 + 2x
+var expr = (x ^ ex(2)) + ex(2) * x;
+var deriv = expr.differentiate();
+print('Derivative: $deriv'); // 2*x + 2
+
+// Partial derivatives: ∂/∂x (x^3)
+var poly = Expression.parse('x^3');
+var partial = SymbolicCalculus.partialDerivative(poly, 'x');
+print('Partial: $partial'); // 3*x^2 (Evaluated at x=2 yields 12.0)
+```
+
+### 2. Symbolic Integration (Indefinite & Definite)
+
+Perform indefinite and definite integration over algebraic and trigonometric functions:
+
+```dart
+// Indefinite Integration: ∫ x^2 dx = x^3/3
+var expr = x ^ ex(2);
+var indefinite = SymbolicCalculus.indefiniteIntegral(expr, 'x');
+print('Indefinite: $indefinite'); // x^3/3
+
+// Definite Integration: ∫_0^2 x^2 dx = 8/3 ≈ 2.667
+var definite = SymbolicCalculus.definiteIntegral(expr, 'x', 0, 2);
+print('Definite: $definite'); // 2.666667
+```
+
+### 3. Taylor & Maclaurin Series Expansions
+
+Expand complex expressions into Taylor or Maclaurin series approximations up to arbitrary orders:
+
+```dart
+// Taylor series of sin(x) around x=0 up to order 5
+var sinExpr = Sin(Variable('x'));
+var taylor = SymbolicCalculus.taylorSeries(sinExpr, 'x', 0, 5);
+print('Taylor (sin): $taylor'); // x - x^3/6 + x^5/120
+
+// Maclaurin series of exp(x) up to order 4
+var expExpr = Exp(Variable('x'));
+var maclaurin = SymbolicCalculus.maclaurinSeries(expExpr, 'x', 4);
+print('Maclaurin (exp): $maclaurin'); // 1 + x + x^2/2 + x^3/6 + x^4/24
+```
+
+### 4. Limits and Summations
+
+Evaluate limits (including indeterminate forms using L'Hopital's rule) and summations:
+
+```dart
+// lim_{x -> 0} sin(x)/x = 1.0
+var limExpr = Sin(Variable('x')) / Variable('x');
+var limit = SymbolicCalculus.limit(limExpr, 'x', 0);
+print('Limit: $limit'); // 1.0
+
+// Σ_{x=0}^{10} (x^2 + x) = 440
+var sumExpr = Expression.parse('sum(x^2 + x, x, 0, 10)');
+print('Sum: ${sumExpr.simplify()}'); // 440
+```
+
+### 5. Laplace & Inverse Laplace Transforms
+
+Perform symbolic Laplace transforms and their inversions:
+
+```dart
+// Laplace Transform: L{ cos(a*t) } = s / (s^2 + a^2)
+var laplace = Expression.parse('laplace(cos(a*t), t, s)').simplify();
+print('Laplace: $laplace'); // s*(s^2+a^2)^(-1)
+
+// Inverse Laplace Transform: L^-1{ 5*s / (s^2 + 4)^2 } = (5/4) * t * sin(2*t)
+var ilt = Expression.parse('ilt(5*s/(s^2+4)^2, s, t)').simplify();
+print('Inverse Laplace: $ilt'); // (5/4)*sin(2*t)*t
+```
+
+### 6. Caching and LRU Memoization
+
+To prevent redundant computations during heavy calculus operations (like numerical derivatives or adaptive integration), the library uses an LRU (Least Recently Used) cache:
+
+```dart
+// Numerical differentiation with high-order caching
+// computes 7th derivative of e^x efficiently
+var numDeriv = NumericalDifferentiation.nthDerivative((x) => exp(x), 0, 7);
+print('7th derivative of e^x at x=0: $numDeriv'); // 1.0
+```
 
 </details>
 
