@@ -19,7 +19,8 @@ class Modulo extends BinaryOperationsExpression {
     } else if (leftEval is num && rightEval is num) {
       result = Complex(leftEval % rightEval);
     } else if (arg == null &&
-        (_containsVariable(left) || _containsVariable(right))) {
+        (left.getVariableTerms().isNotEmpty ||
+            right.getVariableTerms().isNotEmpty)) {
       result = simplify();
     } else if (leftEval is Expression && rightEval is Expression) {
       result = Modulo(leftEval, rightEval).simplify();
@@ -29,21 +30,23 @@ class Modulo extends BinaryOperationsExpression {
     return _normalizeResult(result);
   }
 
-// Helper method to check if an expression contains a Variable
-  bool _containsVariable(Expression expr) {
-    if (expr is Variable) {
-      return true;
-    } else if (expr is BinaryOperationsExpression) {
-      return _containsVariable(expr.left) || _containsVariable(expr.right);
-    }
-    return false;
-  }
-
   @override
   Expression differentiate([Variable? v]) {
-    // Derivative of modulo is generally not well-defined in continuous calculus context
-    // or is 0 piecewise. For now, we return 0 or throw.
-    // Let's return 0 assuming step function behavior where defined.
+    if (v == null) return Literal(0);
+
+    final leftHasVar = left.getVariableTerms().contains(v);
+    final rightHasVar = right.getVariableTerms().contains(v);
+
+    // If no variables, derivative is 0
+    if (!leftHasVar && !rightHasVar) return Literal(0);
+
+    // FIX 3: d/dx (f(x) % c) = f'(x) (almost everywhere, ignoring discontinuities)
+    if (leftHasVar && !rightHasVar) {
+      return left.differentiate(v);
+    }
+
+    // d/dx (c % f(x)) is technically -c*f'(x)/f(x)^2 between jumps,
+    // but usually treated as 0 or undefined in basic CAS.
     return Literal(0);
   }
 
@@ -57,9 +60,38 @@ class Modulo extends BinaryOperationsExpression {
     Expression simplifiedLeft = left.simplify();
     Expression simplifiedRight = right.simplify();
 
-    // If both operands are literals, evaluate and return a new Literal.
+    // FIX 2: Catch Modulo by Zero during simplification
+    if (simplifiedRight is Literal) {
+      final rVal = simplifiedRight.evaluate();
+      if (rVal is num && rVal == 0) {
+        throw Exception('Modulo by zero is undefined.');
+      }
+    }
+
+    // FIX 4a: 0 % x = 0
+    if (simplifiedLeft is Literal) {
+      final lVal = simplifiedLeft.evaluate();
+      if (lVal is num && lVal == 0) return Literal(0);
+    }
+
+    // FIX 4b: x % x = 0
+    if (simplifiedLeft == simplifiedRight) {
+      return Literal(0);
+    }
+
+    // Literal % Literal evaluation
     if (simplifiedLeft is Literal && simplifiedRight is Literal) {
-      return Literal(simplifiedLeft.evaluate() % simplifiedRight.evaluate());
+      final lVal = simplifiedLeft.evaluate();
+      final rVal = simplifiedRight.evaluate();
+
+      if (lVal is num && rVal is num) {
+        return Literal(lVal % rVal);
+      }
+
+      //If your Rational class supports the % operator, uncomment this:
+      if (lVal is Rational && rVal is Rational) {
+        return Literal(lVal % rVal);
+      }
     }
 
     return Modulo(simplifiedLeft, simplifiedRight);

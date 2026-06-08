@@ -41,36 +41,29 @@ class Multiply extends BinaryOperationsExpression {
     return _normalizeResult(result);
   }
 
-// Helper method to check if an expression contains a Variable
-  // bool _containsVariable(Expression expr) {
-  //   if (expr is Variable) {
-  //     return true;
-  //   } else if (expr is BinaryOperationsExpression) {
-  //     return _containsVariable(expr.left) || _containsVariable(expr.right);
-  //   }
-  //   return false;
-  // }
-
   @override
   Expression differentiate([Variable? v]) {
+    if (v != null &&
+        !left.getVariableTerms().contains(v) &&
+        !right.getVariableTerms().contains(v)) {
+      return Literal(0);
+    }
     // Applying the product rule: (u * v)' = u' * v + u * v'
     // where u and v are functions of x.
     var uPrime = left.differentiate(v);
     var vPrime = right.differentiate(v);
-
-    return Add(Multiply(uPrime, right), Multiply(left, vPrime));
+    return Add(Multiply(uPrime, right), Multiply(left, vPrime)).simplify();
   }
 
   @override
   Expression integrate() {
     // If left is a Literal, integrate right and multiply with left.
-    if (left is Literal) {
-      return Multiply(left, right.integrate());
+    // 1. Constant Multiple Rule
+    if (left.getVariableTerms().isEmpty) {
+      return Multiply(left, right.integrate()).simplify();
     }
-
-    // If right is a Literal, integrate left and multiply with right.
-    else if (right is Literal) {
-      return Multiply(right, left.integrate());
+    if (right.getVariableTerms().isEmpty) {
+      return Multiply(right, left.integrate()).simplify();
     }
 
     // For more complex cases, we'll apply integration by parts:

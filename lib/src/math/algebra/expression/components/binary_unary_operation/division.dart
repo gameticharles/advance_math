@@ -21,7 +21,7 @@ class Divide extends BinaryOperationsExpression {
     if (rightEval is Matrix) {
       return (leftEval / rightEval);
     }
-    
+
     if ((leftEval is num || leftEval is Complex || leftEval is Rational) &&
         (rightEval is num || rightEval is Complex || rightEval is Rational)) {
       final rC = rightEval is Complex ? rightEval : Complex(rightEval);
@@ -43,18 +43,13 @@ class Divide extends BinaryOperationsExpression {
     return _normalizeResult(result);
   }
 
-// // Helper method to check if an expression contains a Variable
-//   bool _containsVariable(Expression expr) {
-//     if (expr is Variable) {
-//       return true;
-//     } else if (expr is BinaryOperationsExpression) {
-//       return _containsVariable(expr.left) || _containsVariable(expr.right);
-//     }
-//     return false;
-//   }
-
   @override
   Expression differentiate([Variable? v]) {
+    // Optimization: Constant Multiple Rule
+    if (right.getVariableTerms().isEmpty) {
+      return Divide(left.differentiate(v), right).simplify();
+    }
+
     // Applying the quotient rule: (u / v)' = (u' * v - u * v') / v^2
     // where u and v are functions of x.
     var uPrime = left.differentiate(v);
@@ -67,105 +62,259 @@ class Divide extends BinaryOperationsExpression {
 
   @override
   Expression integrate() {
-    // If numerator (left) is a Literal or Variable, perform a simple integration of the denominator.
-    if (left is Literal || left is Variable) {
-      return Divide(left, right.integrate());
+    // 1. Denominator is a constant: ∫ f(x)/c dx = (1/c) * ∫ f(x) dx
+    if (right.getVariableTerms().isEmpty) {
+      return Multiply(Divide(Literal(1), right), left.integrate()).simplify();
     }
 
-    // If denominator (right) is a Literal or Variable, perform a simple integration of the numerator.
-    else if (right is Literal || right is Variable) {
-      return Divide(left.integrate(), right);
+    // 2. Numerator is a constant, denominator is a single variable: ∫ c/x dx = c * ln|x|
+    if (left.getVariableTerms().isEmpty && right is Variable) {
+      return Multiply(left, Ln(Abs(right))).simplify();
     }
 
-    // If the numerator is a derivative of the denominator, then the integral is a log of the denominator.
-    if (left.differentiate().simplify() == right) {
-      return Multiply(Literal(log(right.evaluate())), right);
+    // 3. Logarithmic integration: ∫ f'(x)/f(x) dx = ln|f(x)|
+    final u = right.simplify();
+    final du = u.differentiate().simplify();
+    if (left.simplify() == du) {
+      return Ln(Abs(u));
     }
 
-    // If the numerator and denominator are both polynomials
-    if (left is Polynomial && right is Polynomial) {
-      var numerator = left as Polynomial;
-      var denominator = right as Polynomial;
+    // 4. Rational function integration via Polynomial Long Division & Partial Fractions
+    try {
+      final result =
+          _integrateRationalFunction(left.simplify(), right.simplify());
+      if (result != null) return result.simplify();
+    } catch (_) {
+      // Fall through to unimplemented error if rational integration fails
+    }
 
-      // If degree of numerator >= degree of denominator
-      if (numerator.degree >= denominator.degree) {
-        // Perform polynomial long division
-        var result = numerator / denominator as Add;
+    throw UnimplementedError(
+        'Advanced rational integration (complex roots or irreducible quadratics) is not yet supported.');
+  }
 
-        // Integrate the quotient and remainder separately
-        var quotientIntegral = Multiply(result.left, denominator).integrate();
-        var remainderIntegral = Divide(result.right, denominator).integrate();
+  /// Attempts to integrate a rational function N(x)/D(x) using the existing Polynomial class.
+  Expression? _integrateRationalFunction(
+      Expression numExpr, Expression denExpr) {
+    final vars = denExpr.getVariableTerms();
+    if (vars.length != 1) return null; // Multivariate not supported
+    final v = vars.first;
 
-        return Add(quotientIntegral, remainderIntegral);
+    // Convert Expression trees to Polynomial objects
+    final numPoly = _toPolynomial(numExpr, v);
+    final denPoly = _toPolynomial(denExpr, v);
+
+    if (numPoly == null || denPoly == null || _isZeroPoly(denPoly)) return null;
+
+    Expression integral = Literal(0);
+    Polynomial remPoly = numPoly;
+
+    // STEP A: Polynomial Long Division (if improper fraction)
+    if (numPoly.degree >= denPoly.degree) {
+      // Leverage Polynomial's operator / which returns Add(Quotient, RationalFunction)
+      Expression divResult = numPoly / denPoly;
+      Polynomial? quotPoly;
+
+      if (divResult is Add && divResult.left is Polynomial) {
+        quotPoly = divResult.left as Polynomial;
+      } else if (divResult is Polynomial) {
+        quotPoly = divResult;
+      }
+
+      if (quotPoly != null) {
+        // Integrate the polynomial quotient using Polynomial's built-in integrate()
+        integral = Add(integral, quotPoly.integrate()).simplify();
+      }
+
+      // Get the remainder using Polynomial's operator %
+      remPoly = (numPoly % denPoly) as Polynomial;
+    }
+
+    if (_isZeroPoly(remPoly)) return integral;
+
+    // STEP B: Partial Fraction Decomposition (for proper fraction remPoly / denPoly)
+    List<dynamic> roots = denPoly.roots();
+    if (roots.isEmpty) return null;
+
+    // Group roots to find multiplicities (only support real roots for standard real calculus)
+    Map<num, int> rootMult = {};
+    for (var r in roots) {
+      num? realVal;
+      if (r is num) {
+        realVal = r;
+      } else if (r is Complex && r.imaginary == 0) {
+        realVal = r.real;
       } else {
-        // Apply partial fraction decomposition
-        var decomposed = _partialFractionDecomposition(numerator, denominator);
+        // Abort on complex or symbolic roots
+        return null;
+      }
 
-        // Integrate each term separately
-        return decomposed
-            .map(
-                (fraction) => Divide(fraction.left, fraction.right).integrate())
-            .reduce((a, b) => Add(a, b));
+      // Round slightly to group identical floating point roots
+      num rounded = double.parse(realVal!.toStringAsFixed(8));
+      rootMult[rounded] = (rootMult[rounded] ?? 0) + 1;
+    }
+
+    // Process each distinct root using the derivative formula for coefficients
+    for (var entry in rootMult.entries) {
+      num r = entry.key;
+      int m = entry.value; // Multiplicity
+
+      // Divide denominator by (x - r)^m using synthetic division
+      Polynomial denReduced = denPoly;
+      for (int i = 0; i < m; i++) {
+        denReduced = _syntheticDiv(denReduced, r);
+      }
+
+      // F(x) = Remainder / Reduced_Denominator
+      Expression fExpr = Divide(remPoly, denReduced).simplify();
+
+      // Calculate coefficients: A_k = F^(k)(r) / k!
+      for (int k = 0; k < m; k++) {
+        int j = m - k; // The power in the denominator (x - r)^j
+
+        Expression fK = fExpr;
+        for (int d = 0; d < k; d++) {
+          fK = fK.differentiate(v).simplify();
+        }
+
+        // Evaluate the k-th derivative at x = r
+        dynamic evalVal = fK.evaluate({v.identifier.name: r});
+        num val = 0;
+        if (evalVal is num) {
+          val = evalVal;
+        } else if (evalVal is Complex) {
+          val = evalVal.toDouble();
+        } else if (evalVal is Rational) {
+          val = evalVal.toDouble();
+        } else {
+          return null;
+        }
+
+        num coeff = val / factorial(k);
+        if (coeff.abs() < 1e-10) continue; // Skip effectively zero coefficients
+
+        if (j == 1) {
+          // Integral of A / (x - r) is A * ln|x - r|
+          integral = Add(integral,
+                  Multiply(Literal(coeff), Ln(Abs(Subtract(v, Literal(r))))))
+              .simplify();
+        } else {
+          // Integral of A / (x - r)^j is A * (x - r)^(-j + 1) / (-j + 1)
+          num power = -j + 1;
+          num newCoeff = coeff / power;
+          integral = Add(
+                  integral,
+                  Multiply(Literal(newCoeff),
+                      Pow(Subtract(v, Literal(r)), Literal(power))))
+              .simplify();
+        }
       }
     }
-    return this;
+
+    return integral;
   }
 
-  List<Divide> _partialFractionDecomposition(
-      Polynomial numerator, Polynomial denominator) {
-    // First, factorize the denominator into its linear factors
-    // This is a complex step and requires a polynomial factorization algorithm
-    // For simplicity, let's assume a method `factorize()` that gives us linear factors
-    List<Polynomial> factors = denominator.factorize();
+  // ==========================================
+  // HELPER METHODS FOR RATIONAL INTEGRATION
+  // ==========================================
 
-    // For each factor, we'll have a corresponding fraction with an unknown coefficient in the numerator
-    // e.g., for (x^2 + 3x + 2) we might have: A/(x + 1) + B/(x + 2)
-    // We'll then form equations to solve for A, B, etc.
+  /// Recursively converts an Expression tree into a Polynomial object.
+  Polynomial? _toPolynomial(Expression expr, Variable v) {
+    if (expr is Literal) {
+      return Polynomial.fromList([expr], variable: v);
+    }
+    if (expr is Variable) {
+      if (expr == v || expr.identifier.name == v.identifier.name) {
+        return Polynomial.fromList([Literal(1), Literal(0)],
+            variable: v); // Represents 'x'
+      }
+      return null; // Different variable
+    }
+    if (expr is Add) {
+      final left = _toPolynomial(expr.left, v);
+      final right = _toPolynomial(expr.right, v);
+      if (left == null || right == null) return null;
+      return (left + right) as Polynomial;
+    }
+    if (expr is Subtract) {
+      final left = _toPolynomial(expr.left, v);
+      final right = _toPolynomial(expr.right, v);
+      if (left == null || right == null) return null;
+      return (left - right) as Polynomial;
+    }
+    if (expr is Multiply) {
+      final left = _toPolynomial(expr.left, v);
+      final right = _toPolynomial(expr.right, v);
+      if (left == null || right == null) return null;
+      return (left * right) as Polynomial;
+    }
+    if (expr is Negate) {
+      final inner = _toPolynomial(expr.operand, v);
+      if (inner == null) return null;
+      return (Polynomial.fromList([Literal(0)], variable: v) - inner)
+          as Polynomial;
+    }
+    if (expr is Pow) {
+      final base = _toPolynomial(expr.left, v);
+      if (base == null) return null;
+      if (expr.right is Literal) {
+        final expVal = (expr.right as Literal).evaluate();
+        num? expNum;
+        if (expVal is num) {
+          expNum = expVal;
+        } else if (expVal is Complex && expVal.imaginary == 0) {
+          expNum = expVal.real;
+        } else if (expVal is Rational) {
+          expNum = expVal.toDouble();
+        }
 
-    // For simplicity, let's assume we have a method `solveCoefficients()`
-    // that gives us the coefficients for each factor
-    List<Literal> coefficients = _solveCoefficients(numerator, factors);
-
-    // Now form the decomposed fractions
-    List<Divide> decomposed = [];
-    for (int i = 0; i < factors.length; i++) {
-      decomposed.add(Divide(coefficients[i], factors[i]));
+        if (expNum != null && expNum >= 0 && expNum % 1 == 0) {
+          Polynomial res = Polynomial.fromList([Literal(1)], variable: v);
+          for (int i = 0; i < expNum.toInt(); i++) {
+            res = (res * base) as Polynomial;
+          }
+          return res;
+        }
+      }
+      return null;
     }
 
-    return decomposed;
+    // Fallback: Try parsing from string representation
+    try {
+      return Polynomial.fromString(expr.toString(), variable: v);
+    } catch (_) {
+      return null;
+    }
   }
 
-  List<Literal> _solveCoefficients(
-      Polynomial numerator, List<Polynomial> factors) {
-    int n = factors.length;
-    List<Literal> coefficients = List.filled(n, Literal(0));
-
-    // Form the expression for the sum of the simpler fractions
-    Expression sum = Literal(0);
-    for (int i = 0; i < n; i++) {
-      // Using a new variable as the coefficient for each factor
-      Variable coefficient = Variable('A${i + 1}');
-      sum = Add(sum, Divide(coefficient, factors[i]));
+  /// Performs synthetic division to divide a Polynomial by (x - r).
+  Polynomial _syntheticDiv(Polynomial poly, num r) {
+    List<Expression> coeffs = poly.coefficients;
+    if (coeffs.length <= 1) {
+      return Polynomial.fromList([Literal(0)], variable: poly.variable);
     }
 
-    // Clear the denominators
-    var commonDenominator = factors.reduce((a, b) => (a * b) as Polynomial);
-    var multipliedNumerator = (numerator * commonDenominator) as Polynomial;
-    var multipliedSum = Multiply(sum, commonDenominator);
-
-    // Equate the coefficients of the powers of x on both sides
-    for (int i = 0; i < n; i++) {
-      coefficients[i] = Literal(Subtract(
-          multipliedNumerator.coefficient(i) as Expression,
-          (multipliedSum as Polynomial).coefficient(i) as Expression));
+    List<Expression> out = [];
+    Expression carry = Literal(0);
+    for (int i = 0; i < coeffs.length - 1; i++) {
+      Expression current = Add(coeffs[i], carry).simplify();
+      out.add(current);
+      carry = Multiply(current, Literal(r)).simplify();
     }
+    return Polynomial.fromList(out, variable: poly.variable);
+  }
 
-    // At this point, we'd typically solve the system of equations for the coefficients
-    // This requires methods for systems of linear equations, which can be complex
-    // For now, we'll return the coefficients as they are, but in practice,
-    // you'd need to solve this system to get the actual coefficients
-
-    return coefficients;
+  /// Checks if a Polynomsial is effectively zero.
+  bool _isZeroPoly(Polynomial p) {
+    if (p.coefficients.isEmpty) return true;
+    return p.coefficients.every((c) {
+      if (c is Literal) {
+        final v = c.value;
+        if (v is Complex) return v == Complex.zero();
+        if (v is Rational) return v == Rational.zero;
+        if (v is num) return v == 0;
+      }
+      return false;
+    });
   }
 
   @override
@@ -228,7 +377,10 @@ class Divide extends BinaryOperationsExpression {
       var r = extractNum(denominator);
 
       if ((l is num || l is Rational) && (r is num || r is Rational)) {
-        if (isIntegerVal(l) && isIntegerVal(r) && fitsInInt(l) && fitsInInt(r)) {
+        if (isIntegerVal(l) &&
+            isIntegerVal(r) &&
+            fitsInInt(l) &&
+            fitsInInt(r)) {
           final intL = toIntVal(l);
           final intR = toIntVal(r);
           if (intR == 0) throw Exception('Division by zero');
@@ -328,7 +480,9 @@ class Divide extends BinaryOperationsExpression {
     }
 
     // Cancellation: (c * A) / d -> (c/d) * A
-    if (numerator is Multiply && numerator.left is Literal && denominator is Literal) {
+    if (numerator is Multiply &&
+        numerator.left is Literal &&
+        denominator is Literal) {
       final cVal = extractNum(numerator.left as Literal);
       final dVal = extractNum(denominator);
       if ((cVal is num || cVal is Rational || cVal is Complex) &&

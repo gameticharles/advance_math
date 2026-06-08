@@ -16,6 +16,21 @@ List<num> _getArgsParams(List<dynamic> args) {
   final flattened = _flattenArgs(args);
 
   return flattened.map<num>((e) {
+    // NEW: Safely attempt to evaluate Expressions to numbers
+    if (e is Expression) {
+      try {
+        var eval = e.evaluate();
+        if (eval is num) return eval;
+        if (eval is Complex) {
+          final r = eval.real;
+          return r is Rational ? r.toDouble() : r as num;
+        }
+        if (eval is Rational) return eval.toDouble();
+      } catch (_) {}
+      throw ArgumentError(
+          'Cannot compute numerical statistics for unbound symbolic expression: ${e.toString()}');
+    }
+
     if (e is Complex) {
       final r = e.real;
       return r is Rational ? r.toDouble() : r as num;
@@ -25,25 +40,31 @@ List<num> _getArgsParams(List<dynamic> args) {
       try {
         return num.parse(e);
       } catch (_) {
-        // Handle symbol string by letting it fail later or return 0
-        return 0;
+        throw ArgumentError('Cannot parse string as number: $e');
       }
     }
     return e as num;
   }).toList();
 }
 
-Polynomial _toPoly(dynamic p) {
-  if (p is Polynomial) {
-    // Re-dispatch through fromList to ensure we have the most specific subclass (Quadratic, etc.)
-    return Polynomial.fromList(p.coefficients, variable: p.variable);
-  }
-  return Polynomial.fromString(p.toString());
-}
-
 List<num> _toNumList(dynamic dat) {
   if (dat is List) {
     return dat.map<num>((e) {
+      // NEW: Safely attempt to evaluate Expressions to numbers
+      if (e is Expression) {
+        try {
+          var eval = e.evaluate();
+          if (eval is num) return eval;
+          if (eval is Complex) {
+            final r = eval.real;
+            return r is Rational ? r.toDouble() : r as num;
+          }
+          if (eval is Rational) return eval.toDouble();
+        } catch (_) {}
+        throw ArgumentError(
+            'Cannot compute numerical statistics for unbound symbolic expression: ${e.toString()}');
+      }
+
       if (e is Complex) {
         final r = e.real;
         return r is Rational ? r.toDouble() : r as num;
@@ -53,6 +74,14 @@ List<num> _toNumList(dynamic dat) {
     }).toList();
   }
   return [];
+}
+
+Polynomial _toPoly(dynamic p) {
+  if (p is Polynomial) {
+    // Re-dispatch through fromList to ensure we have the most specific subclass (Quadratic, etc.)
+    return Polynomial.fromList(p.coefficients, variable: p.variable);
+  }
+  return Polynomial.fromString(p.toString());
 }
 
 // Internal implementations to avoid VarArgsFunction dispatch overhead
@@ -113,7 +142,7 @@ num _correlation(List<num> x, List<num> y) {
   return numerator / math.sqrt(denominator1 * denominator2);
 }
 
-/// Returns the sum of a list of numbers (num or Complex).
+/// Returns the sum of a list of numbers (num or Complex) or symbolic expressions.
 ///
 /// Accepts variable arguments or a single list.
 ///
@@ -123,7 +152,10 @@ num _correlation(List<num> x, List<num> y) {
 /// print(sum([1, 2, 3])); // 6
 /// print(sum(Complex(1, 1), Complex(2, 2))); // 3.0 + 3.0i
 /// ```
-dynamic sum = VarArgsFunction((args, kwargs) => _sum(_flattenArgs(args)));
+dynamic sum = VarArgsFunction((dynamic args, dynamic kwargs) {
+  var flattened = _flattenArgs(args as List<dynamic>);
+  return _sum(flattened);
+});
 
 /// Returns the mean (average) of a list of numbers.
 ///
@@ -132,8 +164,30 @@ dynamic sum = VarArgsFunction((args, kwargs) => _sum(_flattenArgs(args)));
 /// print(mean([1, 2, 3, 4, 5])); // prints: 3.0
 /// print(mean(1, 2, 3, 4, 5));   // prints: Complex:<3 + 0i>
 /// ```
-dynamic mean =
-    VarArgsFunction((args, kwargs) => Complex(_mean(_getArgsParams(args)), 0));
+dynamic mean = VarArgsFunction((dynamic args, dynamic kwargs) {
+  var flattened = _flattenArgs(args as List<dynamic>);
+  if (flattened.isEmpty) return 0;
+
+  // Check if any item is an Expression (symbolic math support)
+  bool hasExpression = flattened.any((e) => e is Expression);
+  if (hasExpression) {
+    dynamic result = flattened.first is Expression
+        ? flattened.first
+        : Literal(flattened.first);
+    for (int i = 1; i < flattened.length; i++) {
+      var item = flattened[i];
+      Expression left = result is Expression ? result : Literal(result);
+      Expression right = item is Expression ? item : Literal(item);
+      result = Add(left, right).simplify();
+    }
+    return Divide(result is Expression ? result : Literal(result),
+            Literal(flattened.length))
+        .simplify();
+  }
+
+  // Numeric fallback
+  return Complex(_mean(_getArgsParams(args)), 0);
+});
 
 /// Alias for mean.
 dynamic average = mean;
@@ -162,7 +216,7 @@ dynamic median = VarArgsFunction((args, kwargs) {
   }
 });
 
-/// Returns the mode (most common element(s)) of a list of numbers.
+/// Returns the mode (most common element(s)) of a list of numbers or expressions.
 ///
 /// Returns a list of the most frequent elements.
 ///
@@ -170,21 +224,56 @@ dynamic median = VarArgsFunction((args, kwargs) {
 /// ```dart
 /// print(mode(1, 2, 2, 3)); // [2]
 /// print(mode([1, 1, 2, 2])); // [1, 2]
+/// print(mode(a,a,b,c,a,b,d)); // a
+/// print(mode(x, r+1, 21, tan(x), r+1)); // 1+r
+/// print(mode(x, r+1, 21, tan(x), r+1, x)); // [1+r, x]
 /// ```
-dynamic mode = VarArgsFunction((args, kwargs) {
-  List<num> list = _getArgsParams(args);
-  if (list.isEmpty) return [];
+dynamic mode = VarArgsFunction((dynamic args, dynamic kwargs) {
+  // CRITICAL FIX: Flatten the arguments so `mode([1,2,2,3])` works correctly
+  var flattened = _flattenArgs(args as List<dynamic>);
+  if (flattened.isEmpty) return [];
 
-  Map<num, int> freqMap = {};
-  for (num item in list) {
-    freqMap[item] = (freqMap[item] ?? 0) + 1;
+  Map<String, int> freqMap = {};
+  Map<String, dynamic> itemMap = {};
+
+  for (var item in flattened) {
+    String key;
+    dynamic processedItem = item;
+
+    if (item is Expression) {
+      // Simplify and expand to ensure algebraic equivalence (e.g., r+1 == 1+r)
+      var simplified = item.simplify();
+      var expanded = simplified.expand().simplify();
+      key = expanded.toString();
+      processedItem = simplified;
+    } else {
+      key = item.toString();
+      processedItem = item;
+    }
+
+    freqMap[key] = (freqMap[key] ?? 0) + 1;
+    itemMap[key] = processedItem;
   }
 
+  if (freqMap.isEmpty) return [];
   var maxFreq = freqMap.values.reduce(math.max);
-  return freqMap.entries
+
+  // Extract the most frequent items
+  var modes = freqMap.entries
       .where((entry) => entry.value == maxFreq)
-      .map((entry) => Complex(entry.key))
+      .map((entry) => itemMap[entry.key]!)
       .toList();
+
+  // Sort the modes alphabetically/numerically to ensure deterministic output
+  modes.sort((a, b) => a.toString().compareTo(b.toString()));
+
+  // If there is only one clear mode, return the item itself.
+  // If there is a tie, return the list of modes.
+  if (modes.length == 1) {
+    return modes[0];
+  }
+
+  return modes;
 });
 
 /// Returns the variance of a list of numbers.
@@ -480,20 +569,8 @@ dynamic nPr = (dynamic n, dynamic r) => permutations(n, r).length;
 /// print(gcf(12, 18, 24)); // 6
 /// ```
 dynamic gcf = VarArgsFunction((args, kwargs) {
-  List<num> numbers = _getArgsParams(args);
-  if (numbers.isEmpty) {
-    throw ArgumentError('List of numbers cannot be empty.');
-  }
-
-  num ggcf(num a, num b) {
-    return b == 0 ? a : ggcf(b, a % b);
-  }
-
-  num result = numbers[0];
-  for (int i = 1; i < numbers.length; i++) {
-    result = ggcf(result, numbers[i]);
-  }
-  return Complex(result);
+  // Delegate entirely to gcd, which already handles polynomials and numeric lists
+  return (gcd as VarArgsFunction).callback(args, kwargs);
 });
 
 /// Returns the greatest common divisor (GCD) of a list of numbers.

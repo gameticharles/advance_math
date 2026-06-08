@@ -36,6 +36,9 @@ void main(List<String> args) {
   print(avg([1, 2, 3, 4, 5]));
   print(avg(1, 2, 3, 4, 5));
 
+  print(mode(1, 2, 2, 3)); // [2]
+  print(mode([1, 1, 2, 2])); // [1, 2]
+
   print('--- Vector Support ---');
   final v1 = Expression.parse('vector(1, 2, 3)').evaluate(context);
   print('v1: $v1');
@@ -524,6 +527,8 @@ void advancedMathFunctions() {
     'ldexp(0.5, 4)',
     'getDigits(1234)',
     'egcd(12, 18)',
+    'min(1, 4, 3)',
+    'max(1, 4, 3)',
   ];
   evaluateExpressions(expressions, "Advanced Math Functions", context);
 }

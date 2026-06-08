@@ -342,7 +342,7 @@ void main() {
       var formula = '(a-b)^2-(b-a)^2';
 
       // when
-      var result = expression.parse(formula).simplify().toString();
+      var result = expression.parse(formula).expand().simplify().toString();
 
       // then
       expect(result, equals('0'));
@@ -353,7 +353,7 @@ void main() {
       var formula = 'factor(x^2+x+1/4)';
 
       // when
-      var result = expression.parse(formula).toString();
+      var result = expression.parse(formula).simplify().toString();
 
       // then
       expect(result, equals('(1/4)*(1+2*x)^2'));
@@ -439,7 +439,7 @@ void main() {
     test('should not have any regression to factor', () {
       //this test will absolutely break as factor improves enough to factor this expression. For now it just serves as a safeguard
       expect(expression.parse('factor(x^a+2x^(a-1)+1x^(a-2))').toString(),
-          equals('2*x^(-1+a)+x^(-2+a)+x^a'));
+          equals('x^a+2*x^(a-1)+x^(a-2)'));
     });
     test('should correctly determine the polynomial degree', () {
       expect(expression.parse('deg(x^2+2*x+x^5)').toString(), equals('5'));

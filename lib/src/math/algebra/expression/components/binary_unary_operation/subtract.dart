@@ -21,25 +21,15 @@ class Subtract extends BinaryOperationsExpression {
     if (rightEval is Matrix) {
       return (leftEval - rightEval);
     }
-    
+
     if ((leftEval is num || leftEval is Complex || leftEval is Rational) &&
         (rightEval is num || rightEval is Complex || rightEval is Rational)) {
       return _normalizeResult(Complex(leftEval) - Complex(rightEval));
     }
-    
+
     dynamic result = Subtract(Literal(leftEval), Literal(rightEval)).simplify();
     return _normalizeResult(result);
   }
-
-// // Helper method to check if an expression contains a Variable
-//   bool _containsVariable(Expression expr) {
-//     if (expr is Variable) {
-//       return true;
-//     } else if (expr is BinaryOperationsExpression) {
-//       return _containsVariable(expr.left) || _containsVariable(expr.right);
-//     }
-//     return false;
-//   }
 
   @override
   Expression differentiate([Variable? v]) {

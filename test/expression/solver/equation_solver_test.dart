@@ -52,9 +52,8 @@ void main() {
         // Convert to zero form manually: (x + 3) - 0
         final zeroForm = Subtract(equation, Literal(0));
 
-        // This should fail with UnimplementedError for now
-        // as we haven't implemented full addition handling
-        expect(() => ExpressionSolver.solve(zeroForm, x), isA<List<dynamic>>());
+        // Verify we can solve addition by isolating the variable
+        expect(ExpressionSolver.solve(zeroForm, x), equals([-3]));
       });
     });
 
@@ -94,14 +93,14 @@ void main() {
         // 5 = 0 (no solution)
         final equation = Literal(5);
 
-        expect(() => ExpressionSolver.solve(equation, x), equals([]));
+        expect(ExpressionSolver.solve(equation, x), equals([]));
       });
 
       test('trivial equation 0 = 0', () {
         final equation = Literal(0);
 
         // Should recognize this has infinite solutions or handle specially
-        expect(() => ExpressionSolver.solve(equation, x), isA<List<dynamic>>());
+        expect(ExpressionSolver.solve(equation, x), isA<List<dynamic>>());
       });
     });
 

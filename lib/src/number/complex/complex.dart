@@ -640,21 +640,41 @@ class Complex implements Comparable<dynamic> {
     throw ArgumentError('Invalid type for division: ${other.runtimeType}');
   }
 
-  /// Integer division operator
+  /// Safely rounds a dynamic numeric value (num or Rational) to the nearest integer.
+  static dynamic _roundToNearest(dynamic val) {
+    if (val is Rational) return val.toDouble().round();
+    if (val is num) return val.round();
+    return val;
+  }
+
+  /// Safely truncates a dynamic numeric value (num or Rational) towards zero.
+  static dynamic _truncateToZero(dynamic val) {
+    if (val is Rational) return val.toDouble().truncate();
+    if (val is num) return val.truncate();
+    return val;
+  }
+
+  /// Integer division operator (Gaussian Integer Division).
   ///
-  /// Performs integer division between complex numbers.
-  /// Returns the quotient of the division with the fractional part truncated.
+  /// Performs integer division between complex numbers by dividing them
+  /// and rounding the real and imaginary parts to the *nearest* integers.
+  ///
+  /// Note: Rounding to the nearest integer (rather than truncating towards zero)
+  /// is mathematically required for complex numbers to form a Euclidean domain.
+  /// This ensures the remainder's magnitude is always strictly less than the
+  /// divisor's magnitude.
   ///
   /// Example:
   /// ```dart
-  /// Complex(5, 3) ~/ Complex(2, 1)  // Returns the integer part of the division
+  /// Complex(5, 3) ~/ Complex(2, 1)
+  /// // Exact division is 2.6 + 0.4i.
+  /// // Rounds to the nearest integer: 3 + 0i
   /// ```
   Complex operator ~/(dynamic divisor) {
     // Special cases handling
     if (isNaN) return Complex.nan();
 
     if (divisor is Complex) {
-      // Special cases for NaN and infinity
       if (divisor.isNaN) return Complex.nan();
 
       // 0/0, inf/inf give NaN
@@ -664,33 +684,65 @@ class Complex implements Comparable<dynamic> {
       // Handle division by infinity
       if (divisor.isInfinite) return Complex.zero();
 
-      // Use the optimized division algorithm from the existing implementation
       // (a + bi) / (c + di) = (ac + bd) / (c^2 + d^2) + i * (bc - ad) / (c^2 + d^2)
       final c = divisor.real;
       final d = divisor.imaginary;
       final c2d2 = _add(_mul(c, c), _mul(d, d));
 
-      return Complex(
-          _div(_add(_mul(real, c), _mul(imaginary, d)), c2d2).truncate(),
-          _div(_sub(_mul(imaginary, c), _mul(real, d)), c2d2).truncate());
+      final realPart = _div(_add(_mul(real, c), _mul(imaginary, d)), c2d2);
+      final imagPart = _div(_sub(_mul(imaginary, c), _mul(real, d)), c2d2);
+
+      // Round to nearest integer for proper Gaussian integer division
+      return Complex(_roundToNearest(realPart), _roundToNearest(imagPart));
     } else if (divisor is num || divisor is Rational) {
-      // Special cases
       if (divisor.isNaN) return Complex.nan();
-
-      // Handle division by zero
       if (divisor == 0) return isZero ? Complex.nan() : Complex.infinity();
-
-      // Handle division by infinity
       if (divisor is num && divisor.isInfinite) return Complex.zero();
 
-      // Normal integer division
-      return Complex(
-          _div(real, divisor).truncate(), _div(imaginary, divisor).truncate());
+      // Round to nearest integer
+      return Complex(_roundToNearest(_div(real, divisor)),
+          _roundToNearest(_div(imaginary, divisor)));
     }
 
     throw ArgumentError(
         'Invalid type for integer division: ${divisor.runtimeType}');
   }
+
+  // /// Integer division operator (Truncation towards zero).
+  // ///
+  // /// Performs division and truncates the real and imaginary parts towards zero.
+  // /// Note: Unlike rounding to the nearest integer, truncation does not guarantee
+  // /// that the remainder's magnitude is smaller than the divisor's magnitude.
+  // Complex operator ~/(dynamic divisor) {
+  //   if (isNaN) return Complex.nan();
+
+  //   if (divisor is Complex) {
+  //     if (divisor.isNaN) return Complex.nan();
+  //     if (divisor.isZero) return isZero ? Complex.nan() : Complex.infinity();
+  //     if (isInfinite && divisor.isInfinite) return Complex.nan();
+  //     if (divisor.isInfinite) return Complex.zero();
+
+  //     final c = divisor.real;
+  //     final d = divisor.imaginary;
+  //     final c2d2 = _add(_mul(c, c), _mul(d, d));
+
+  //     final realPart = _div(_add(_mul(real, c), _mul(imaginary, d)), c2d2);
+  //     final imagPart = _div(_sub(_mul(imaginary, c), _mul(real, d)), c2d2);
+
+  //     // Truncate towards zero
+  //     return Complex(_truncateToZero(realPart), _truncateToZero(imagPart));
+  //   } else if (divisor is num || divisor is Rational) {
+  //     if (divisor.isNaN) return Complex.nan();
+  //     if (divisor == 0) return isZero ? Complex.nan() : Complex.infinity();
+  //     if (divisor is num && divisor.isInfinite) return Complex.zero();
+
+  //     return Complex(_truncateToZero(_div(real, divisor)),
+  //         _truncateToZero(_div(imaginary, divisor)));
+  //   }
+
+  //   throw ArgumentError(
+  //       'Invalid type for integer division: ${divisor.runtimeType}');
+  // }
 
   /// The modulo operator.
   Complex operator %(dynamic divisor) {
@@ -803,9 +855,18 @@ class Complex implements Comparable<dynamic> {
     if (isNaN) return 7;
     if (isInfinite) return 11;
 
+    // Normalize helper
+    dynamic normalize(dynamic v) {
+      if (v is Rational && v.denominator == BigInt.one) {
+        return v.numerator.toInt();
+      }
+      if (v is num && v == -0.0) return 0.0;
+      return v;
+    }
+
     // Normalize -0.0 to 0.0 for consistent hashing
-    final r = (real == -0.0) ? 0.0 : real;
-    final i = (imaginary == -0.0) ? 0.0 : imaginary;
+    final r = normalize(real);
+    final i = normalize(imaginary);
 
     // Handle pure real numbers
     if (i == 0) return 23 * r.hashCode;
@@ -916,8 +977,12 @@ class Complex implements Comparable<dynamic> {
   /// Complex modulus represents the magnitude of this complex number in the complex plane.
   /// Synonymous with abs().
   Complex get complexModulus {
-    final double r = real is Rational ? (real as Rational).toDouble() : (real as num).toDouble();
-    final double i = imaginary is Rational ? (imaginary as Rational).toDouble() : (imaginary as num).toDouble();
+    final double r = real is Rational
+        ? (real as Rational).toDouble()
+        : (real as num).toDouble();
+    final double i = imaginary is Rational
+        ? (imaginary as Rational).toDouble()
+        : (imaginary as num).toDouble();
     final value = dmath.sqrt(r * r + i * i);
     return Complex(value);
   }
@@ -930,8 +995,12 @@ class Complex implements Comparable<dynamic> {
 
   /// In radians.
   Complex get complexArgument {
-    final double r = real is Rational ? (real as Rational).toDouble() : (real as num).toDouble();
-    final double i = imaginary is Rational ? (imaginary as Rational).toDouble() : (imaginary as num).toDouble();
+    final double r = real is Rational
+        ? (real as Rational).toDouble()
+        : (real as num).toDouble();
+    final double i = imaginary is Rational
+        ? (imaginary as Rational).toDouble()
+        : (imaginary as num).toDouble();
     return Complex(dmath.atan2(i, r));
   }
 
@@ -948,8 +1017,12 @@ class Complex implements Comparable<dynamic> {
   num get magnitude {
     if (real.isNaN || imaginary.isNaN) return double.nan;
     if (real.isInfinite || imaginary.isInfinite) return double.infinity;
-    final double a = real is Rational ? (real as Rational).toDouble().abs() : (real as num).toDouble().abs();
-    final double b = imaginary is Rational ? (imaginary as Rational).toDouble().abs() : (imaginary as num).toDouble().abs();
+    final double a = real is Rational
+        ? (real as Rational).toDouble().abs()
+        : (real as num).toDouble().abs();
+    final double b = imaginary is Rational
+        ? (imaginary as Rational).toDouble().abs()
+        : (imaginary as num).toDouble().abs();
     if (b == 0) return a;
     if (a == 0) return b;
     if (a > b) {
@@ -1163,12 +1236,18 @@ class Complex implements Comparable<dynamic> {
     // Handle zero case
     if (isZero) return Complex.zero();
 
-    final double realVal = real is Rational ? (real as Rational).toDouble() : (real as num).toDouble();
+    final double realVal = real is Rational
+        ? (real as Rational).toDouble()
+        : (real as num).toDouble();
     final double absReal = realVal.abs();
-    final double absVal = abs().real is Rational ? (abs().real as Rational).toDouble() : (abs().real as num).toDouble();
+    final double absVal = abs().real is Rational
+        ? (abs().real as Rational).toDouble()
+        : (abs().real as num).toDouble();
 
     final t = dmath.sqrt((absVal + absReal) / 2.0);
-    final double imaginaryVal = imaginary is Rational ? (imaginary as Rational).toDouble() : (imaginary as num).toDouble();
+    final double imaginaryVal = imaginary is Rational
+        ? (imaginary as Rational).toDouble()
+        : (imaginary as num).toDouble();
 
     if (realVal >= 0.0) {
       return Complex(t, imaginaryVal / (2.0 * t));
@@ -1203,8 +1282,12 @@ class Complex implements Comparable<dynamic> {
   /// ```
   Complex exp() {
     if (isNaN) return Complex.nan();
-    final double rVal = real is Rational ? (real as Rational).toDouble() : (real as num).toDouble();
-    final double iVal = imaginary is Rational ? (imaginary as Rational).toDouble() : (imaginary as num).toDouble();
+    final double rVal = real is Rational
+        ? (real as Rational).toDouble()
+        : (real as num).toDouble();
+    final double iVal = imaginary is Rational
+        ? (imaginary as Rational).toDouble()
+        : (imaginary as num).toDouble();
     final r = dmath.exp(rVal);
     return Complex.polar(r, iVal);
   }
@@ -1243,8 +1326,12 @@ class Complex implements Comparable<dynamic> {
     if (real.isNaN || imaginary.isNaN) return Complex.nan();
     if (real.isInfinite || imaginary.isInfinite) return Complex.infinity();
 
-    final double a = real is Rational ? (real as Rational).toDouble().abs() : (real as num).toDouble().abs();
-    final double b = imaginary is Rational ? (imaginary as Rational).toDouble().abs() : (imaginary as num).toDouble().abs();
+    final double a = real is Rational
+        ? (real as Rational).toDouble().abs()
+        : (real as num).toDouble().abs();
+    final double b = imaginary is Rational
+        ? (imaginary as Rational).toDouble().abs()
+        : (imaginary as num).toDouble().abs();
     if (a == 0) return Complex(b);
     if (b == 0) return Complex(a);
 

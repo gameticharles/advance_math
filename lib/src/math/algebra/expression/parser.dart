@@ -1,8 +1,7 @@
 import 'package:petitparser/petitparser.dart';
 import '../../../number/decimal/rational.dart';
 import 'expression.dart';
-import '../calculus/symbolic_integration.dart';
-import '../calculus/symbolic_sum_limit.dart';
+import '../calculus/calculus.dart';
 import '../../../number/complex/complex.dart';
 import 'package:advance_math/advance_math.dart' show pfactorBigInt, LRUCache;
 
@@ -2319,6 +2318,20 @@ class ExpressionParser {
                       }
                     } catch (e) {
                       return args[0];
+                    }
+                  }
+
+                  if (name == 'laplace' && args.length == 3) {
+                    if (args[1] is Variable && args[2] is Variable) {
+                      return LaplaceTransform.compute(
+                          args[0], args[1] as Variable, args[2] as Variable);
+                    }
+                  }
+
+                  if (name == 'ilt' && args.length == 3) {
+                    if (args[1] is Variable && args[2] is Variable) {
+                      return InverseLaplaceTransform.compute(
+                          args[0], args[1] as Variable, args[2] as Variable);
                     }
                   }
                 }

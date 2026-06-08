@@ -1,5 +1,23 @@
 part of "math.dart";
 
+// /// Safely evaluates an Expression to a number, or returns the number directly.
+// /// Throws a clear ArgumentError if the expression contains unbound variables.
+// num _evalToNum(dynamic x) {
+//   if (x is Expression) {
+//     try {
+//       var eval = x.evaluate();
+//       if (eval is num) return eval;
+//       if (eval is Complex) return eval.toDouble();
+//       if (eval is Rational) return eval.toDouble();
+//     } catch (_) {}
+//     throw ArgumentError(
+//         'Cannot evaluate symbolic expression to a number: ${x.toString()}');
+//   }
+//   return x as num;
+// }
+
+// int _evalToInt(dynamic x) => _evalToNum(x).toInt();
+
 /// Returns the sum of all numbers up to `n`.
 ///
 /// Example:
@@ -52,15 +70,11 @@ num sumUpTo(num start, num end, {num step = 1}) {
 /// print(abs(-5));  // Output: 5
 /// ```
 dynamic abs(dynamic x) {
-  if (x is num) {
-    return Complex(x.abs());
-  } else if (x is Complex) {
-    return x.abs();
-  } else if (x is Matrix) {
-    return MatrixFunctions(x).abs();
-  } else {
-    throw ArgumentError('Input should be either num or Complex');
-  }
+  if (x is Expression) return Abs(x);
+  if (x is num) return Complex(x.abs());
+  if (x is Complex) return x.abs();
+  if (x is Matrix) return MatrixFunctions(x).abs();
+  throw ArgumentError('Input should be num, Complex, Matrix, or Expression');
 }
 
 /// Returns the square root of a number.
@@ -70,13 +84,10 @@ dynamic abs(dynamic x) {
 /// print(sqrt(9));  // Output: 3.0
 /// ```
 dynamic sqrt(dynamic x) {
-  if (x is num || x is Complex) {
-    return Complex(x).sqrt();
-  } else if (x is Matrix) {
-    return MatrixFunctions(x).sqrt();
-  } else {
-    throw ArgumentError('Input should be either num or Complex');
-  }
+  if (x is Expression) return Pow(x, Literal(Rational(1, 2)));
+  if (x is num || x is Complex) return Complex(x).sqrt();
+  if (x is Matrix) return MatrixFunctions(x).sqrt();
+  throw ArgumentError('Input should be num, Complex, Matrix, or Expression');
 }
 
 /// Returns the cube root of a number.
@@ -86,6 +97,7 @@ dynamic sqrt(dynamic x) {
 /// print(cbrt(8));  // Output: 2.0
 /// ```
 dynamic cbrt(dynamic x) {
+  if (x is Expression) return Pow(x, Literal(Rational(1, 3)));
   return nthRoot(x, 3);
 }
 
@@ -97,13 +109,14 @@ dynamic cbrt(dynamic x) {
 /// print(nthRoot(8, 3));  // Output: 2.0
 /// ```
 dynamic nthRoot(dynamic x, dynamic nth) {
-  if (x is num || x is Complex) {
-    return Complex(x).nthRoot(nth.toInt());
-  } else if (x is Matrix) {
-    return MatrixFunctions(x).nthRoot(nth.toInt());
-  } else {
-    throw ArgumentError('Input should be either num or Complex');
+  if (x is Expression || nth is Expression) {
+    final base = x is Expression ? x : Literal(x);
+    final exp = nth is Expression ? nth : Literal(nth);
+    return Pow(base, Divide(Literal(1), exp));
   }
+  if (x is num || x is Complex) return Complex(x).nthRoot(nth.toInt());
+  if (x is Matrix) return MatrixFunctions(x).nthRoot(nth.toInt());
+  throw ArgumentError('Input should be num, Complex, Matrix, or Expression');
 }
 
 /// Returns the natural exponentiation of a number.
@@ -113,15 +126,11 @@ dynamic nthRoot(dynamic x, dynamic nth) {
 /// print(exp(1));  // Output: 2.718281828459045
 /// ```
 dynamic exp(dynamic x) {
-  if (x is num) {
-    return Complex(math.exp(x));
-  } else if (x is Complex) {
-    return x.exp();
-  } else if (x is Matrix) {
-    return MatrixFunctions(x).exp();
-  } else {
-    throw ArgumentError('Input should be either num or Complex');
-  }
+  if (x is Expression) return Exp(x);
+  if (x is num) return Complex(math.exp(x));
+  if (x is Complex) return x.exp();
+  if (x is Matrix) return MatrixFunctions(x).exp();
+  throw ArgumentError('Input should be num, Complex, Matrix, or Expression');
 }
 
 /// Raises a number to the power of another number.
@@ -137,13 +146,14 @@ dynamic exp(dynamic x) {
 /// print(pow(2, xxx));  // Output: 0.36691394948660344 + 1.9660554808224875i
 /// ```
 dynamic pow(dynamic x, dynamic exponent) {
-  if (x is num || x is Complex) {
-    return Complex(x).pow(exponent);
-  } else if (x is Matrix) {
-    return MatrixFunctions(x).pow(exponent);
-  } else {
-    throw ArgumentError('Input should be either num or Complex');
+  if (x is Expression || exponent is Expression) {
+    final base = x is Expression ? x : Literal(x);
+    final exp = exponent is Expression ? exponent : Literal(exponent);
+    return Pow(base, exp);
   }
+  if (x is num || x is Complex) return Complex(x).pow(exponent);
+  if (x is Matrix) return MatrixFunctions(x).pow(exponent);
+  throw ArgumentError('Input should be num, Complex, Matrix, or Expression');
 }
 
 /// Heaviside step function.
@@ -198,6 +208,7 @@ Complex rect(double x) {
 /// print(sinc(1));    // Output: 0.8414709848078965 (approximate value of sin(1)/1)
 /// ```
 dynamic sinc(dynamic x) {
+  if (x is Expression) return Divide(Sin(x), x);
   if (x == 0 || x == Complex.zero()) return Complex.one();
   return sin(x) / x;
 }
@@ -235,17 +246,19 @@ dynamic sinc(dynamic x) {
 /// print(mod(10, 3));  // Output: 1
 /// ```
 dynamic mod(dynamic a, dynamic b) {
-  if (a is int && b is int) {
-    return a % b;
-  } else if (a is num && b is num) {
-    return a - (a / b).floor() * b;
-  } else if (a is Complex || b is Complex) {
+  if (a is Expression || b is Expression) {
+    final left = a is Expression ? a : Literal(a);
+    final right = b is Expression ? b : Literal(b);
+    return Modulo(left, right);
+  }
+  if (a is int && b is int) return a % b;
+  if (a is num && b is num) return a - (a / b).floor() * b;
+  if (a is Complex || b is Complex) {
     var ac = a is Complex ? a : Complex(a as num, 0);
     var bc = b is Complex ? b : Complex(b as num, 0);
     return ac - bc * (ac / bc).floor();
-  } else {
-    throw ArgumentError('Input should be either num or Complex');
   }
+  throw ArgumentError('Input should be num, Complex, or Expression');
 }
 
 /// Returns the modular inverse of 'a' mod 'm' if it exists.
@@ -441,9 +454,15 @@ Complex round(dynamic x, [int decimalPlaces = 0]) {
 dynamic max = VarArgsFunction((args, kwargs) {
   var list = _flattenArgs(args);
   if (list.isEmpty) return Complex(0);
-  var nums = list.map((e) {
-    return e;
-  }).toList();
+
+  // If any argument is an un-evaluated Expression, return a symbolic CallExpression
+  if (list.any((e) => e is Expression)) {
+    List<Expression> exprList =
+        list.map((e) => e is Expression ? e : Literal(e)).toList();
+    return CallExpression(Variable(Identifier('max')), exprList);
+  }
+
+  var nums = list.map((e) => e).toList();
   return nums.reduce((curr, next) {
     if (curr is num && next is num) return Complex(math.max(curr, next));
     // Fallback equality logic if needed or comparable
@@ -463,9 +482,14 @@ dynamic max = VarArgsFunction((args, kwargs) {
 dynamic min = VarArgsFunction((args, kwargs) {
   var list = _flattenArgs(args);
   if (list.isEmpty) return Complex(0);
-  var nums = list.map((e) {
-    return e;
-  }).toList();
+
+  if (list.any((e) => e is Expression)) {
+    List<Expression> exprList =
+        list.map((e) => e is Expression ? e : Literal(e)).toList();
+    return CallExpression(Variable(Identifier('min')), exprList);
+  }
+
+  var nums = list.map((e) => e).toList();
   return nums.reduce((curr, next) {
     if (curr is num && next is num) return Complex(math.min(curr, next));
     return (curr as dynamic) < (next as dynamic) ? curr : next;
