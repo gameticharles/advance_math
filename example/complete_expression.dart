@@ -137,11 +137,11 @@ void algebraExamples() {
   demoEval('lcm(1/2, 1/3, 1/4)', description: 'LCM of fractions');
 
   printSection('Factorization');
-  demo('factor(x^2+2*x+1)', description: 'Factor perfect square');
-  demo('factor(x^2-y^2)', description: 'Difference of squares');
-  demo('factor(x^16-1)', description: 'Difference of powers');
-  demo('factor(100)', description: 'Prime factorization of integer');
-  demo('factor(64*x^3+125)', description: 'Sum of cubes');
+  demoEval('factor(x^2+2*x+1)', description: 'Factor perfect square');
+  demoEval('factor(x^2-y^2)', description: 'Difference of squares');
+  demoEval('factor(x^16-1)', description: 'Difference of powers');
+  demoEval('factor(100)', description: 'Prime factorization of integer');
+  demoEval('factor(64*x^3+125)', description: 'Sum of cubes');
 
   printSection('Prime Factorization');
   demoEval('pfactor(100)', description: 'Prime factors of 100');
@@ -186,39 +186,39 @@ void calculusExamples() {
   printHeader('3. CALCULUS OPERATIONS');
 
   printSection('Differentiation - Basic');
-  demo('diff(x^2, x)', description: 'd/dx(x²)');
-  demo('diff(2*x^2+4, x)', description: 'd/dx(2x² + 4)');
-  demo('diff(x^(1/2)*x, x)', description: 'd/dx(x^(1/2) · x)');
-  demo('diff(e^x, x)', description: 'd/dx(eˣ)');
+  demoEval('diff(x^2, x)', description: 'd/dx(x²)');
+  demoEval('diff(2*x^2+4, x)', description: 'd/dx(2x² + 4)');
+  demoEval('diff(x^(1/2)*x, x)', description: 'd/dx(x^(1/2) · x)');
+  demoEval('diff(e^x, x)', description: 'd/dx(eˣ)');
 
   printSection('Differentiation - Trigonometric');
-  demo('diff(cos(x), x)', description: 'd/dx(cos x)');
-  demo('diff(sin(x), x)', description: 'd/dx(sin x)');
-  demo('diff(tan(x), x)', description: 'd/dx(tan x)');
-  demo('diff(4*tan(x)*sec(x), x)');
+  demoEval('diff(cos(x), x)', description: 'd/dx(cos x)');
+  demoEval('diff(sin(x), x)', description: 'd/dx(sin x)');
+  demoEval('diff(tan(x), x)', description: 'd/dx(tan x)');
+  demoEval('diff(4*tan(x)*sec(x), x)');
 
   printSection('Differentiation - Product & Chain Rule');
-  demo('diff(x*cos(x), x)', description: 'Product rule');
-  demo('diff(cos(2*x), x)', description: 'Chain rule');
-  demo('diff(sin(x^2)^cos(x), x)', description: 'Complex composition');
+  demoEval('diff(x*cos(x), x)', description: 'Product rule');
+  demoEval('diff(cos(2*x), x)', description: 'Chain rule');
+  demoEval('diff(sin(x^2)^cos(x), x)', description: 'Complex composition');
 
   printSection('Integration - Power Rule');
-  demo('integrate(x^2, x)', description: '∫ x² dx');
-  demo('integrate(2*x^2+x, x)', description: '∫ (2x² + x) dx');
+  demoEval('integrate(x^2, x)', description: '∫ x² dx');
+  demoEval('integrate(2*x^2+x, x)', description: '∫ (2x² + x) dx');
   // Note: sqrt not yet fully supported in integration
   print('  ∫ √x dx => (Future: symbolic sqrt integration)');
 
   printSection('Integration - Trigonometric');
-  demo('integrate(sin(x), x)', description: '∫ sin x dx');
-  demo('integrate(cos(x), x)', description: '∫ cos x dx');
-  demo('integrate(sec(x)^2, x)', description: '∫ sec² x dx');
+  demoEval('integrate(sin(x), x)', description: '∫ sin x dx');
+  demoEval('integrate(cos(x), x)', description: '∫ cos x dx');
+  demoEval('integrate(sec(x)^2, x)', description: '∫ sec² x dx');
   // Note: product of trig not yet supported
   print('  ∫ cos x sin x dx => (Future: trig product integration)');
 
   printSection('Integration - Exponential & Logarithmic');
-  print('  ∫ eˣ dx => (Future: exponential integration)');
-  print('  ∫ ln x dx => (Future: integration by parts)');
-  demo('integrate(a/x, x)', description: '∫ a/x dx');
+  demoEval('  ∫ eˣ dx => (Future: exponential integration)');
+  demoEval('  ∫ ln x dx => (Future: integration by parts)');
+  demoEval('integrate(a/x, x)', description: '∫ a/x dx');
 
   printSection('Integration - By Parts (Future Feature)');
   print('  ∫ x eˣ dx => (Not yet implemented)');
@@ -226,18 +226,18 @@ void calculusExamples() {
   print('  ∫ x² sin x dx => (Not yet implemented)');
 
   printSection('Integration - Substitution');
-  demo('integrate(1/(a^2+x^2), x)', description: '∫ 1/(a² + x²) dx');
+  demoEval('integrate(1/(a^2+x^2), x)', description: '∫ 1/(a² + x²) dx');
   print('  ∫ x/(x+a)² dx => (Not yet implemented)');
 
   printSection('Limits (Unevaluated)');
-  demo('limit((2-2*x^2)/(x-1), x, 1)',
+  demoEval('limit((2-2*x^2)/(x-1), x, 1)',
       description: 'lim(x→1) (returns expression)');
-  demo('limit(tan(3*x)/tan(x), x, pi/2)');
+  demoEval('limit(tan(3*x)/tan(x), x, pi/2)');
 
   printSection('Summation (Unevaluated)');
-  demo('sum(x+y, x, 0, 3)',
+  demoEval('sum(x+y, x, 0, 3)',
       description: 'Σ(x+y) from x=0 to 3 (returns expression)');
-  demo('sum(x^2+x, x, 0, 10)', description: 'Σ(x²+x) from x=0 to 10');
+  demoEval('sum(x^2+x, x, 0, 10)', description: 'Σ(x²+x) from x=0 to 10');
 }
 
 // ============================================================================
@@ -302,14 +302,16 @@ void advancedExamples() {
   demoEval('solve(x^2+1=0, x)', description: 'x² + 1 = 0 (complex roots)');
 
   printSection('Partial Fractions (Future Features)');
-  print('  partfrac((3*x+2)/(x²+x), x) => (Not yet implemented)');
-  print('  Partial fraction decomposition => (Future feature)');
+  demoEval('partfrac((3*x+2)/(x²+x), x)',
+      description: 'partfrac((3*x+2)/(x²+x), x) => (Not yet implemented)');
+  print('Partial fraction decomposition => (Future feature)');
 
   printSection('Special Functions & Constants');
   demoEval('pi', description: 'π constant');
   demoEval('e', description: 'e constant');
-  // Note: factorial is in defaultContext but needs to be called with context parameter
-  print('  factorial(5) => 120 (requires context parameter in evaluate)');
+  demoEval('factorial(5)',
+      description:
+          'factorial(5) => 120 (requires context parameter in evaluate)');
   demoEval('5C3', description: '5 choose 3 - combination operator');
   demoEval('5P3', description: '5 permute 3 - permutation operator');
 

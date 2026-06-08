@@ -1,3 +1,19 @@
+# 5.7.0
+
+## Laplace Transforms, Symbolic Calculus & CAS Enhancements
+
+- **[FEATURE]** Implemented symbolic Laplace Transform and Inverse Laplace Transform computation (`LaplaceTransform` and `InverseLaplaceTransform`) with comprehensive mapping of standard functions.
+- **[FEATURE]** Added symbolic support for limits, summations, and definite integration (`SymbolicLimit`, `SymbolicSum`, and `DefiniteIntegral`).
+- **[IMPROVEMENT]** Extended basic math functions (`abs`, `sqrt`, `cbrt`, `nthRoot`, `pow`, `exp`, `mod`, `min`, `max`) to accept `Expression` parameters, yielding correct symbolic counterpart nodes.
+- **[FEATURE]** Improved absolute value `Abs.simplify()` logic to dynamically evaluate and strip/negate absolute signs for expressions with guaranteed non-negative/non-positive values (e.g. `abs(5*x^2)`).
+- **[IMPROVEMENT]** Rewrote and enhanced `ExpressionSolver` for systems of linear, quadratic, and cubic equations, adding robust variable isolation solving algorithms.
+- **[IMPROVEMENT]** Updated `mode()`, `mean()`, and `average()` in statistics to natively handle lists, varargs, and complex symbolic expressions.
+- **[IMPROVEMENT]** Implemented Gaussian Integer Division (`operator ~/` for `Complex`) using nearest-integer rounding to ensure mathematical correctness in Euclidean domain calculations.
+- **[IMPROVEMENT]** Normalized real and imaginary parts of `Complex` numbers when denominator is `1` for consistent hash code evaluation.
+- **[FEATURE]** Expanded solid geometry with `Capsule`, `ConeFrustum`, `Hemisphere`, and `HollowCylinder`, and plane geometry with `AnnulusSector` and `Kite`.
+- **[FEATURE]** Added `cumsum()` helper function for iterables to calculate cumulative sums.
+- **[IMPROVEMENT]** Optimized numerical optimization, non-linear systems solver, and matrix factorization/decomposition performance.
+
 # 5.6.1
 
 ## Computer Algebra System (CAS) & Simplifier Overhaul
