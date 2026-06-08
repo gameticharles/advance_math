@@ -53,6 +53,11 @@ class Cubic extends Polynomial {
 
   @override
   List<Expression> roots() {
+    final rationalRoots = solveRationalAndDeflate();
+    if (rationalRoots != null) {
+      return rationalRoots.map((e) => e as Expression).toList();
+    }
+
     bool isZero(Expression expr) {
       if (expr is Literal) {
         var val = expr.value;

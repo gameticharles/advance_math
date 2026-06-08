@@ -2115,6 +2115,7 @@ class ExpressionParser {
                           Variable(Identifier('partfrac')), args);
                     }
 
+                    // ignore: unnecessary_null_comparison
                     if (solution == null) {
                       return CallExpression(
                           Variable(Identifier('partfrac')), args);

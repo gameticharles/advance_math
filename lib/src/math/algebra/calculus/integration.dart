@@ -53,11 +53,11 @@ dynamic _divide(dynamic a, dynamic b) {
   return a / b;
 }
 
-dynamic _negate(dynamic a) {
-  if (a is Complex) return -a;
-  if (a is Rational) return -a;
-  return -a;
-}
+// dynamic _negate(dynamic a) {
+//   if (a is Complex) return -a;
+//   if (a is Rational) return -a;
+//   return -a;
+// }
 
 dynamic _abs(dynamic a) {
   if (a is Complex) return a.abs();
@@ -74,7 +74,6 @@ double _toDouble(dynamic val) {
   }
   return (val as num).toDouble();
 }
-
 
 /// A class providing various numerical integration methods for calculating
 /// definite integrals of functions.
@@ -115,7 +114,8 @@ class NumericalIntegration {
   /// var result = NumericalIntegration.trapezoidal(f, 0, math.pi, n: 1000);
   /// print(result); // ~2.0
   /// ```
-  static dynamic trapezoidal(dynamic Function(num) f, num a, num b, {int n = 100}) {
+  static dynamic trapezoidal(dynamic Function(num) f, num a, num b,
+      {int n = 100}) {
     if (n <= 0) {
       throw ArgumentError('Number of subintervals must be positive');
     }
@@ -155,7 +155,8 @@ class NumericalIntegration {
   /// var result = NumericalIntegration.simpsons(f, 0, 2, n: 100);
   /// print(result); // ~4.0
   /// ```
-  static dynamic simpsons(dynamic Function(num) f, num a, num b, {int n = 100}) {
+  static dynamic simpsons(dynamic Function(num) f, num a, num b,
+      {int n = 100}) {
     if (n <= 0) {
       throw ArgumentError('Number of subintervals must be positive');
     }
@@ -210,7 +211,8 @@ class NumericalIntegration {
       return val;
     }
 
-    return _simplifyResult(_adaptiveSimpsonRecursive(cachedF, a, b, tolerance, maxDepth, 0));
+    return _simplifyResult(
+        _adaptiveSimpsonRecursive(cachedF, a, b, tolerance, maxDepth, 0));
   }
 
   /// Helper function for adaptive Simpson's rule recursion
@@ -680,7 +682,8 @@ class NumericalIntegration {
   /// var result = NumericalIntegration.integrateWithError(f, 0, math.pi);
   /// print('Value: ${result['value']}, Error: ${result['error']}');
   /// ```
-  static Map<String, dynamic> integrateWithError(dynamic Function(num) f, num a, num b,
+  static Map<String, dynamic> integrateWithError(
+      dynamic Function(num) f, num a, num b,
       {double tolerance = 1e-6}) {
     // Use two different methods and compare
     final simpson = adaptiveSimpson(f, a, b, tolerance: tolerance);
