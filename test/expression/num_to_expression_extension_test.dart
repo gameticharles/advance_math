@@ -150,7 +150,10 @@ void main() {
         final expr = (ex(2) + x) * (ex(3) - y) / ex(4);
         expect(expr, isA<Divide>());
         final result = expr.evaluate({'x': 1, 'y': 1});
-        expect(result, equals(1.5)); // (2 + 1) * (3 - 1) / 4 = 6 / 4 = 1.5
+        expect(
+            result,
+            anyOf(Rational(3, 2), equals(1.5),
+                closeTo(1.5, 0.001))); // (2 + 1) * (3 - 1) / 4 = 6 / 4 = 1.5
       });
     });
 
@@ -447,7 +450,7 @@ void main() {
       test('should handle fractional results', () {
         final expr = ex(7) / x;
         final result = expr.evaluate({'x': 2});
-        expect(result, equals(3.5));
+        expect(result, anyOf(Rational(7, 2), equals(3.5), closeTo(3.5, 0.001)));
       });
     });
 

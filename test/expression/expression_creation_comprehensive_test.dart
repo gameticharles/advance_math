@@ -158,7 +158,7 @@ void main() {
         final result = expr.evaluate(testValues);
         expect(
             result,
-            anyOf(equals(1.5),
+            anyOf(Rational(3, 2), equals(1.5),
                 closeTo(1.5, 1e-9))); // (2+1) * (3-1) / 4 = 6/4 = 1.5
       });
 
@@ -185,7 +185,9 @@ void main() {
         final testValues = {'x': 2, 'y': 3};
         final result = expr.evaluate(testValues);
         expect(
-            result, equals(Complex(2.6))); // (5*2 + 3) / (2*3 - 1) = 13/5 = 2.6
+            result,
+            anyOf(Rational(13, 5),
+                equals(Complex(2.6)))); // (5*2 + 3) / (2*3 - 1) = 13/5 = 2.6
       });
 
       test('should handle trigonometric expressions with mixed approaches', () {
@@ -539,8 +541,12 @@ void main() {
 
         final testValues = {'x': 1, 'y': 1, 'z': 1};
         final result = expr.evaluate(testValues);
-        expect(result,
-            equals(Complex(1.2))); // ((2+1) * (3-1)) / (4 + (1*1)) = 6/5 = 1.2
+        expect(
+            result,
+            anyOf(
+                Rational(6, 5),
+                equals(Complex(
+                    1.2)))); // ((2+1) * (3-1)) / (4 + (1*1)) = 6/5 = 1.2
       });
 
       test('should handle expressions with many variables', () {

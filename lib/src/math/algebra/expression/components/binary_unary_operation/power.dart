@@ -85,16 +85,27 @@ class Pow extends BinaryOperationsExpression {
 
   @override
   Expression integrate() {
-    // Integration rules for exponents depend on the specific forms of the base and exponent.
-    // For simplicity, we'll handle the case where the base is a variable (e.g., x) and the exponent is a constant.
-    // ∫x^n dx = (x^(n+1))/(n+1)
     if (left is Variable && right is Literal) {
-      var n = right.evaluate() + 1;
-      return Divide(Pow(left, Literal(n)), Literal(n));
+      var n = right.evaluate();
+
+      // Handle the 1/x case
+      if (n == -1 || n == -1.0) {
+        return Ln(Abs(
+            left)); // Use Ln(left) if your CAS operates strictly in Complex numbers
+      }
+
+      var nPlus1 = n + 1;
+      return Divide(Pow(left, Literal(nPlus1)), Literal(nPlus1));
     }
-    // For other cases, it can be complex.
-    // Placeholder for the more general case:
-    return this; // Placeholder for actual implementation.
+
+    // Handle integral of a^x (where a is constant, x is variable)
+    if (left is Literal && right is Variable) {
+      var a = left.evaluate();
+      if (a == 1 || a == 1.0) return right; // integral of 1^x is x
+      return Divide(this, Ln(left)); // integral of a^x is a^x / ln(a)
+    }
+
+    return this;
   }
 
   @override
@@ -257,9 +268,27 @@ class Pow extends BinaryOperationsExpression {
 
     // (x^a)^b = x^(a*b)
     if (simplifiedBase is Pow) {
-      var newExponent =
-          Multiply(simplifiedBase.exponent, simplifiedExponent).simplifyBasic();
-      return Pow(simplifiedBase.base, newExponent).simplifyBasic();
+      var innerExp = simplifiedBase.exponent;
+      var outerExp = simplifiedExponent;
+
+      // Safe to multiply exponents if outer exponent is an integer
+      bool outerIsInt = false;
+      if (outerExp is Literal) {
+        var val = litVal(outerExp);
+        if (val is int ||
+            (val is num && val == val.toInt()) ||
+            (val is Rational && val.isInteger)) {
+          outerIsInt = true;
+        }
+      }
+
+      if (outerIsInt) {
+        var newExponent = Multiply(innerExp, outerExp).simplifyBasic();
+        return Pow(simplifiedBase.base, newExponent).simplifyBasic();
+      }
+
+      // Optional: Handle (x^2)^(1/2) -> |x|
+      // (Requires checking if innerExp is an even integer and outerExp is 1/2)
     }
 
     // 1^x = 1 for any x
@@ -368,12 +397,15 @@ class Pow extends BinaryOperationsExpression {
       baseStr = '($baseStr)';
     }
     var expStr = exponent.toString();
-    bool expNeedsParentheses = (exponent is BinaryOperationsExpression && exponent is! Pow) ||
-        exponent is BinaryExpression ||
-        expStr.startsWith('-') ||
-        expStr.startsWith('+') ||
-        (exponent is Literal && (exponent as Literal).value is Rational && !((exponent as Literal).value as Rational).isInteger) ||
-        expStr.contains('/');
+    bool expNeedsParentheses =
+        (exponent is BinaryOperationsExpression && exponent is! Pow) ||
+            exponent is BinaryExpression ||
+            expStr.startsWith('-') ||
+            expStr.startsWith('+') ||
+            (exponent is Literal &&
+                (exponent as Literal).value is Rational &&
+                !((exponent as Literal).value as Rational).isInteger) ||
+            expStr.contains('/');
     if (expNeedsParentheses) {
       expStr = '($expStr)';
     }
@@ -401,7 +433,8 @@ Map<int, Expression>? _collectPolynomialCoeffs(Expression expr, Variable v) {
   }
 
   _TermCoeff? parsePolynomialTerm(Expression t) {
-    if (t is UnaryExpression && t.operator == '-') {
+    //if (t is UnaryExpression && t.operator == '-')
+    if (t is Negate) {
       var inner = parsePolynomialTerm(t.operand);
       if (inner == null) return null;
       return _TermCoeff(

@@ -232,7 +232,7 @@ void main() {
 
         // Test that integral can be evaluated
         final result = integral.evaluate({'x': 2});
-        expect(result, isA<num>());
+        expect(result, anyOf(isA<Rational>(), isA<num>()));
       });
     });
 

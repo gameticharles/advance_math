@@ -160,9 +160,8 @@ void main() {
 
         // Test evaluation (avoiding x + y = 0)
         final result = rational.evaluate({'x': 3, 'y': 1});
-        expect(result, isA<num>());
+        expect(result, anyOf(Rational(5, 2), closeTo(2.5, 0.001)));
         // (9 + 1) / (3 + 1) = 10 / 4 = 2.5
-        expect(result, closeTo(2.5, 0.001));
       });
 
       test('should handle trigonometric multivariate expressions', () {
