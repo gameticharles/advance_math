@@ -91,7 +91,7 @@ class SymbolicCalculus {
         final context = {variable: point};
         final derivValue = currentDerivative.evaluate(context);
 
-        if (derivValue is num && derivValue.abs() > 1e-10) {
+        if ((derivValue.toDouble()).abs() > 1e-10) {
           // Skip terms that are essentially zero
 
           // Compute (x - a)^n

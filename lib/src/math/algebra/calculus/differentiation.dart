@@ -1,5 +1,20 @@
 import '../../basic/math.dart';
 import 'package:advance_math/advance_math.dart' show LRUCache;
+import '../../../number/complex/complex.dart';
+import '../../../number/decimal/rational.dart';
+
+dynamic _simplifyResult(dynamic val) {
+  if (val is Complex) {
+    return val.simplify();
+  }
+  if (val is Rational) {
+    if (val.denominator == BigInt.one) {
+      return val.numerator.toInt();
+    }
+    return val.toDouble();
+  }
+  return val;
+}
 
 /// A class providing various numerical differentiation methods for approximating
 /// derivatives of functions.
@@ -37,8 +52,8 @@ class NumericalDifferentiation {
   /// var result = NumericalDifferentiation.derivative(f, 2.0);
   /// print(result); // ~12.0 (exact: 3*x^2 = 12)
   /// ```
-  static num derivative(num Function(num) f, num x, {double h = 1e-5}) {
-    return (f(x + h) - f(x - h)) / (2 * h);
+  static dynamic derivative(dynamic Function(num) f, num x, {double h = 1e-5}) {
+    return _simplifyResult((f(x + h) - f(x - h)) / (2 * h));
   }
 
   /// Computes the first derivative using forward difference method.
@@ -61,8 +76,9 @@ class NumericalDifferentiation {
   /// var result = NumericalDifferentiation.forwardDifference(f, 0);
   /// print(result); // ~1.0 (exact: cos(0) = 1)
   /// ```
-  static num forwardDifference(num Function(num) f, num x, {double h = 1e-5}) {
-    return (f(x + h) - f(x)) / h;
+  static dynamic forwardDifference(dynamic Function(num) f, num x,
+      {double h = 1e-5}) {
+    return _simplifyResult((f(x + h) - f(x)) / h);
   }
 
   /// Computes the first derivative using backward difference method.
@@ -85,8 +101,9 @@ class NumericalDifferentiation {
   /// var result = NumericalDifferentiation.backwardDifference(f, 1);
   /// print(result); // ~2.718 (exact: e^1 = e)
   /// ```
-  static num backwardDifference(num Function(num) f, num x, {double h = 1e-5}) {
-    return (f(x) - f(x - h)) / h;
+  static dynamic backwardDifference(dynamic Function(num) f, num x,
+      {double h = 1e-5}) {
+    return _simplifyResult((f(x) - f(x - h)) / h);
   }
 
   /// Computes the second derivative using central difference method.
@@ -109,8 +126,9 @@ class NumericalDifferentiation {
   /// var result = NumericalDifferentiation.secondDerivative(f, 2);
   /// print(result); // ~12.0 (exact: 6x = 12)
   /// ```
-  static num secondDerivative(num Function(num) f, num x, {double h = 1e-5}) {
-    return (f(x + h) - 2 * f(x) + f(x - h)) / (h * h);
+  static dynamic secondDerivative(dynamic Function(num) f, num x,
+      {double h = 1e-5}) {
+    return _simplifyResult((f(x + h) - f(x) * 2 + f(x - h)) / (h * h));
   }
 
   /// Computes the nth derivative using recursive application of central differences.
@@ -134,20 +152,20 @@ class NumericalDifferentiation {
   /// var result = NumericalDifferentiation.nthDerivative(f, 1, 4);
   /// print(result); // ~24.0 (exact: 4! = 24)
   /// ```
-  static num nthDerivative(num Function(num) f, num x, int n,
+  static dynamic nthDerivative(dynamic Function(num) f, num x, int n,
       {double h = 1e-5}) {
     if (n <= 0) {
       throw ArgumentError('Order of derivative must be positive');
     }
 
-    final cache = LRUCache<String, num>(maxSize: 1000);
+    final cache = LRUCache<String, dynamic>(maxSize: 1000);
 
-    num getVal(num point, int order) {
+    dynamic getVal(num point, int order) {
       final key = '$point:$order';
       final cached = cache.get(key);
       if (cached != null) return cached;
 
-      num result;
+      dynamic result;
       if (order == 1) {
         result = derivative(f, point, h: h);
       } else if (order == 2) {
@@ -161,7 +179,7 @@ class NumericalDifferentiation {
       return result;
     }
 
-    return getVal(x, n);
+    return _simplifyResult(getVal(x, n));
   }
 
   /// Computes the gradient of a multivariate function.
@@ -187,10 +205,10 @@ class NumericalDifferentiation {
   /// var grad = NumericalDifferentiation.gradient(f, [1, 2]);
   /// print(grad); // [2, 4]
   /// ```
-  static List<num> gradient(num Function(List<num>) f, List<num> x,
+  static List<dynamic> gradient(dynamic Function(List<num>) f, List<num> x,
       {double h = 1e-5}) {
     final n = x.length;
-    final grad = List<num>.filled(n, 0);
+    final grad = List<dynamic>.filled(n, 0);
 
     for (int i = 0; i < n; i++) {
       // Create points x + h*ei and x - h*ei
@@ -201,7 +219,7 @@ class NumericalDifferentiation {
       xMinusH[i] -= h;
 
       // Central difference for partial derivative
-      grad[i] = (f(xPlusH) - f(xMinusH)) / (2 * h);
+      grad[i] = _simplifyResult((f(xPlusH) - f(xMinusH)) / (2 * h));
     }
 
     return grad;
@@ -229,13 +247,13 @@ class NumericalDifferentiation {
   /// var J = NumericalDifferentiation.jacobian(functions, [2, 3]);
   /// // J = [[4, 1], [3, 2]]
   /// ```
-  static List<List<num>> jacobian(
-      List<num Function(List<num>)> functions, List<num> x,
+  static List<List<dynamic>> jacobian(
+      List<dynamic Function(List<num>)> functions, List<num> x,
       {double h = 1e-5}) {
     final m = functions.length; // Number of functions
     final n = x.length; // Number of variables
 
-    final J = List.generate(m, (_) => List<num>.filled(n, 0));
+    final J = List.generate(m, (_) => List<dynamic>.filled(n, 0));
 
     for (int i = 0; i < m; i++) {
       // Compute gradient of the i-th function
@@ -271,10 +289,10 @@ class NumericalDifferentiation {
   /// var H = NumericalDifferentiation.hessian(f, [1, 1]);
   /// // H = [[2, 1], [1, 2]]
   /// ```
-  static List<List<num>> hessian(num Function(List<num>) f, List<num> x,
+  static List<List<dynamic>> hessian(dynamic Function(List<num>) f, List<num> x,
       {double h = 1e-4}) {
     final n = x.length;
-    final H = List.generate(n, (_) => List<num>.filled(n, 0));
+    final H = List.generate(n, (_) => List<dynamic>.filled(n, 0));
 
     for (int i = 0; i < n; i++) {
       for (int j = 0; j < n; j++) {
@@ -285,7 +303,8 @@ class NumericalDifferentiation {
           xPlusH[i] += h;
           xMinusH[i] -= h;
 
-          H[i][j] = (f(xPlusH) - 2 * f(x) + f(xMinusH)) / (h * h);
+          H[i][j] =
+              _simplifyResult((f(xPlusH) - f(x) * 2 + f(xMinusH)) / (h * h));
         } else {
           // Off-diagonal elements: ∂²f/∂xᵢ∂xⱼ
           // Using central differences in both directions
@@ -301,7 +320,8 @@ class NumericalDifferentiation {
           xMinusBoth[i] -= h;
           xMinusBoth[j] -= h;
 
-          H[i][j] = (f(xPlusBoth) - f(xPlusI) - f(xPlusJ) + f(x)) / (h * h);
+          H[i][j] = _simplifyResult(
+              (f(xPlusBoth) - f(xPlusI) - f(xPlusJ) + f(x)) / (h * h));
         }
       }
     }
@@ -309,7 +329,7 @@ class NumericalDifferentiation {
     // Symmetrize the Hessian (it should be symmetric for continuous functions)
     for (int i = 0; i < n; i++) {
       for (int j = i + 1; j < n; j++) {
-        final avg = (H[i][j] + H[j][i]) / 2;
+        final avg = _simplifyResult((H[i][j] + H[j][i]) / 2);
         H[i][j] = avg;
         H[j][i] = avg;
       }
@@ -345,15 +365,17 @@ class NumericalDifferentiation {
   /// );
   /// print(dd); // ~2.0
   /// ```
-  static num directionalDerivative(
-      num Function(List<num>) f, List<num> point, List<num> direction,
+  static dynamic directionalDerivative(
+      dynamic Function(List<num>) f, List<num> point, List<num> direction,
       {double h = 1e-5}) {
     if (point.length != direction.length) {
       throw ArgumentError('Point and direction must have the same dimension');
     }
 
     // Normalize the direction vector
-    final magnitude = sqrt(direction.fold<num>(0, (sum, d) => sum + d * d));
+    final magnitude =
+        _simplifyResult(sqrt(direction.fold<num>(0, (sum, d) => sum + d * d)))
+            as num;
 
     if (magnitude == 0) {
       throw ArgumentError('Direction vector cannot be zero');
@@ -365,12 +387,17 @@ class NumericalDifferentiation {
     final grad = gradient(f, point, h: h);
 
     // Dot product: ∇f · v
-    num dotProduct = 0;
+    dynamic dotProduct = 0;
     for (int i = 0; i < grad.length; i++) {
-      dotProduct += grad[i] * normalizedDirection[i];
+      final term = grad[i] * normalizedDirection[i];
+      if (term is Complex) {
+        dotProduct = term + dotProduct;
+      } else {
+        dotProduct = dotProduct + term;
+      }
     }
 
-    return dotProduct;
+    return _simplifyResult(dotProduct);
   }
 
   /// Computes derivatives with multiple step sizes and estimates error.
@@ -391,7 +418,8 @@ class NumericalDifferentiation {
   /// var result = NumericalDifferentiation.derivativeWithError(f, math.pi/4);
   /// print('Value: ${result['value']}, Error: ${result['error']}');
   /// ```
-  static Map<String, num> derivativeWithError(num Function(num) f, num x,
+  static Map<String, dynamic> derivativeWithError(
+      dynamic Function(num) f, num x,
       {double h = 1e-3}) {
     // Compute derivatives with different step sizes
     final d1 = derivative(f, x, h: h);
@@ -399,10 +427,11 @@ class NumericalDifferentiation {
 
     // Richardson extrapolation
     // error ~ O(h²), so error(h/2) ≈ error(h)/4
-    final value = (4 * d2 - d1) / 3;
-    final error = ((d2 - d1) / 3).abs();
+    final value = (d2 * 4 - d1) / 3;
+    final diff = d2 - d1;
+    final error = ((diff is Complex ? diff.abs() : (diff as num).abs()) as dynamic) / 3.0;
 
-    return {'value': value, 'error': error};
+    return {'value': _simplifyResult(value), 'error': _simplifyResult(error)};
   }
 
   /// Computes the Laplacian (divergence of gradient) of a scalar function.
@@ -430,10 +459,10 @@ class NumericalDifferentiation {
   /// var laplacian = NumericalDifferentiation.laplacian(f, [1, 1]);
   /// print(laplacian); // ~4.0 (exact: 2 + 2 = 4)
   /// ```
-  static num laplacian(num Function(List<num>) f, List<num> x,
+  static dynamic laplacian(dynamic Function(List<num>) f, List<num> x,
       {double h = 1e-4}) {
     final n = x.length;
-    num lapl = 0;
+    dynamic lapl = 0;
 
     for (int i = 0; i < n; i++) {
       final xPlusH = List<num>.from(x);
@@ -442,10 +471,15 @@ class NumericalDifferentiation {
       xMinusH[i] -= h;
 
       // Second partial derivative with respect to xi
-      lapl += (f(xPlusH) - 2 * f(x) + f(xMinusH)) / (h * h);
+      final term = (f(xPlusH) - f(x) * 2 + f(xMinusH)) / (h * h);
+      if (term is Complex) {
+        lapl = term + lapl;
+      } else {
+        lapl = lapl + term;
+      }
     }
 
-    return lapl;
+    return _simplifyResult(lapl);
   }
 
   /// Computes the divergence of a vector field.
@@ -471,7 +505,8 @@ class NumericalDifferentiation {
   /// var div = NumericalDifferentiation.divergence(F, [1, 1]);
   /// print(div); // ~2.0 (exact: 1 + 1 = 2)
   /// ```
-  static num divergence(List<num Function(List<num>)> vectorField, List<num> x,
+  static dynamic divergence(
+      List<dynamic Function(List<num>)> vectorField, List<num> x,
       {double h = 1e-5}) {
     final n = vectorField.length;
     if (x.length != n) {
@@ -479,7 +514,7 @@ class NumericalDifferentiation {
           'Vector field dimension must match coordinate dimension');
     }
 
-    num div = 0;
+    dynamic div = 0;
 
     for (int i = 0; i < n; i++) {
       final xPlusH = List<num>.from(x);
@@ -488,10 +523,15 @@ class NumericalDifferentiation {
       xMinusH[i] -= h;
 
       // ∂Fᵢ/∂xᵢ
-      div += (vectorField[i](xPlusH) - vectorField[i](xMinusH)) / (2 * h);
+      final term = (vectorField[i](xPlusH) - vectorField[i](xMinusH)) / (2 * h);
+      if (term is Complex) {
+        div = term + div;
+      } else {
+        div = div + term;
+      }
     }
 
-    return div;
+    return _simplifyResult(div);
   }
 
   /// Computes the curl of a 3D vector field.
@@ -521,7 +561,8 @@ class NumericalDifferentiation {
   /// var curl = NumericalDifferentiation.curl(F, [1, 0, 0]);
   /// print(curl); // [0, 0, -2]
   /// ```
-  static List<num> curl(List<num Function(List<num>)> vectorField, List<num> x,
+  static List<dynamic> curl(
+      List<dynamic Function(List<num>)> vectorField, List<num> x,
       {double h = 1e-5}) {
     if (vectorField.length != 3 || x.length != 3) {
       throw ArgumentError('Curl is only defined for 3D vector fields');
@@ -532,22 +573,25 @@ class NumericalDifferentiation {
     final f3 = vectorField[2];
 
     // Compute partial derivatives
-    num partialDerivative(num Function(List<num>) f, int varIndex) {
+    dynamic partialDerivative(dynamic Function(List<num>) f, int varIndex) {
       final xPlus = List<num>.from(x);
       final xMinus = List<num>.from(x);
       xPlus[varIndex] += h;
       xMinus[varIndex] -= h;
-      return (f(xPlus) - f(xMinus)) / (2 * h);
+      return _simplifyResult((f(xPlus) - f(xMinus)) / (2 * h));
     }
 
     // curl_x = ∂F₃/∂y - ∂F₂/∂z
-    final curlX = partialDerivative(f3, 1) - partialDerivative(f2, 2);
+    final curlX =
+        _simplifyResult(partialDerivative(f3, 1) - partialDerivative(f2, 2));
 
     // curl_y = ∂F₁/∂z - ∂F₃/∂x
-    final curlY = partialDerivative(f1, 2) - partialDerivative(f3, 0);
+    final curlY =
+        _simplifyResult(partialDerivative(f1, 2) - partialDerivative(f3, 0));
 
     // curl_z = ∂F₂/∂x - ∂F₁/∂y
-    final curlZ = partialDerivative(f2, 0) - partialDerivative(f1, 1);
+    final curlZ =
+        _simplifyResult(partialDerivative(f2, 0) - partialDerivative(f1, 1));
 
     return [curlX, curlY, curlZ];
   }

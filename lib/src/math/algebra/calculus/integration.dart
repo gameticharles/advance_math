@@ -1,5 +1,80 @@
+import 'dart:math' as dmath;
 import '../../basic/math.dart';
 import 'package:advance_math/advance_math.dart' show LRUCache;
+import '../../../number/complex/complex.dart';
+import '../../../number/decimal/rational.dart';
+
+dynamic _simplifyResult(dynamic val) {
+  if (val is Complex) {
+    return val.simplify();
+  }
+  if (val is Rational) {
+    if (val.denominator == BigInt.one) {
+      return val.numerator.toInt();
+    }
+    return val.toDouble();
+  }
+  return val;
+}
+
+dynamic _add(dynamic a, dynamic b) {
+  if (a is Complex) return a + b;
+  if (b is Complex) return b + a;
+  if (a is Rational) return a + b;
+  if (b is Rational) return b + a;
+  return a + b;
+}
+
+dynamic _subtract(dynamic a, dynamic b) {
+  if (a is Complex) return a - b;
+  if (b is Complex) return -(b - a);
+  if (a is Rational) return a - b;
+  if (b is Rational) return -(b - a);
+  return a - b;
+}
+
+dynamic _multiply(dynamic a, dynamic b) {
+  if (a is Complex) return a * b;
+  if (b is Complex) return b * a;
+  if (a is Rational) return a * b;
+  if (b is Rational) return b * a;
+  return a * b;
+}
+
+dynamic _divide(dynamic a, dynamic b) {
+  if (a is Complex) return a / b;
+  if (b is Complex) {
+    return Complex(a) / b;
+  }
+  if (a is Rational) return a / b;
+  if (b is Rational) {
+    return a * b.inverse;
+  }
+  return a / b;
+}
+
+dynamic _negate(dynamic a) {
+  if (a is Complex) return -a;
+  if (a is Rational) return -a;
+  return -a;
+}
+
+dynamic _abs(dynamic a) {
+  if (a is Complex) return a.abs();
+  if (a is Rational) return a.abs();
+  return a.abs();
+}
+
+double _toDouble(dynamic val) {
+  if (val is Complex) {
+    return _toDouble(val.real);
+  }
+  if (val is Rational) {
+    return val.toDouble();
+  }
+  return (val as num).toDouble();
+}
+
 
 /// A class providing various numerical integration methods for calculating
 /// definite integrals of functions.
@@ -40,20 +115,20 @@ class NumericalIntegration {
   /// var result = NumericalIntegration.trapezoidal(f, 0, math.pi, n: 1000);
   /// print(result); // ~2.0
   /// ```
-  static num trapezoidal(num Function(num) f, num a, num b, {int n = 100}) {
+  static dynamic trapezoidal(dynamic Function(num) f, num a, num b, {int n = 100}) {
     if (n <= 0) {
       throw ArgumentError('Number of subintervals must be positive');
     }
     if (a == b) return 0;
 
     final h = (b - a) / n;
-    num sum = (f(a) + f(b)) / 2;
+    dynamic sum = _divide(_add(f(a), f(b)), 2);
 
     for (int i = 1; i < n; i++) {
-      sum += f(a + i * h);
+      sum = _add(sum, f(a + i * h));
     }
 
-    return h * sum;
+    return _simplifyResult(_multiply(sum, h));
   }
 
   /// Computes the definite integral using Simpson's rule.
@@ -80,7 +155,7 @@ class NumericalIntegration {
   /// var result = NumericalIntegration.simpsons(f, 0, 2, n: 100);
   /// print(result); // ~4.0
   /// ```
-  static num simpsons(num Function(num) f, num a, num b, {int n = 100}) {
+  static dynamic simpsons(dynamic Function(num) f, num a, num b, {int n = 100}) {
     if (n <= 0) {
       throw ArgumentError('Number of subintervals must be positive');
     }
@@ -91,14 +166,15 @@ class NumericalIntegration {
     if (a == b) return 0;
 
     final h = (b - a) / n;
-    num sum = f(a) + f(b);
+    dynamic sum = _add(f(a), f(b));
 
     for (int i = 1; i < n; i++) {
       final x = a + i * h;
-      sum += (i % 2 == 0 ? 2 : 4) * f(x);
+      final term = _multiply(f(x), (i % 2 == 0 ? 2 : 4));
+      sum = _add(sum, term);
     }
 
-    return (h / 3) * sum;
+    return _simplifyResult(_multiply(sum, h / 3));
   }
 
   /// Computes the definite integral using adaptive Simpson's rule.
@@ -121,12 +197,12 @@ class NumericalIntegration {
   /// var result = NumericalIntegration.adaptiveSimpson(f, 0, 1, tolerance: 1e-8);
   /// print(result); // π/4 ≈ 0.785398
   /// ```
-  static num adaptiveSimpson(num Function(num) f, num a, num b,
+  static dynamic adaptiveSimpson(dynamic Function(num) f, num a, num b,
       {double tolerance = 1e-6, int maxDepth = 50}) {
     if (a == b) return 0;
 
-    final cache = LRUCache<num, num>(maxSize: 1000);
-    num cachedF(num x) {
+    final cache = LRUCache<num, dynamic>(maxSize: 1000);
+    dynamic cachedF(num x) {
       final cached = cache.get(x);
       if (cached != null) return cached;
       final val = f(x);
@@ -134,12 +210,12 @@ class NumericalIntegration {
       return val;
     }
 
-    return _adaptiveSimpsonRecursive(cachedF, a, b, tolerance, maxDepth, 0);
+    return _simplifyResult(_adaptiveSimpsonRecursive(cachedF, a, b, tolerance, maxDepth, 0));
   }
 
   /// Helper function for adaptive Simpson's rule recursion
-  static num _adaptiveSimpsonRecursive(
-    num Function(num) f,
+  static dynamic _adaptiveSimpsonRecursive(
+    dynamic Function(num) f,
     num a,
     num b,
     double tolerance,
@@ -154,7 +230,7 @@ class NumericalIntegration {
     final fc = f(c);
 
     // Simpson's rule for whole interval
-    final s = (h / 6) * (fa + 4 * fc + fb);
+    final s = _multiply(_add(_add(fa, _multiply(fc, 4)), fb), h / 6);
 
     if (depth >= maxDepth) {
       return s;
@@ -166,21 +242,23 @@ class NumericalIntegration {
     final fd = f(d);
     final fe = f(e);
 
-    final sleft = (h / 12) * (fa + 4 * fd + fc);
-    final sright = (h / 12) * (fc + 4 * fe + fb);
-    final s2 = sleft + sright;
+    final sleft = _multiply(_add(_add(fa, _multiply(fd, 4)), fc), h / 12);
+    final sright = _multiply(_add(_add(fc, _multiply(fe, 4)), fb), h / 12);
+    final s2 = _add(sleft, sright);
 
     // Error estimate
-    final error = (s2 - s).abs() / 15;
+    final diff = _subtract(s2, s);
+    final error = _divide(_abs(diff), 15);
 
-    if (error < tolerance) {
-      return s2 + error; // Richardson extrapolation
+    if (_toDouble(error) < tolerance) {
+      return _add(s2, error); // Richardson extrapolation
     }
 
     // Recursively refine
-    return _adaptiveSimpsonRecursive(
-            f, a, c, tolerance / 2, maxDepth, depth + 1) +
-        _adaptiveSimpsonRecursive(f, c, b, tolerance / 2, maxDepth, depth + 1);
+    return _add(
+      _adaptiveSimpsonRecursive(f, a, c, tolerance / 2, maxDepth, depth + 1),
+      _adaptiveSimpsonRecursive(f, c, b, tolerance / 2, maxDepth, depth + 1),
+    );
   }
 
   /// Computes the definite integral using Romberg integration.
@@ -204,43 +282,45 @@ class NumericalIntegration {
   /// var result = NumericalIntegration.romberg(f, 0, 1, tolerance: 1e-10);
   /// print(result);
   /// ```
-  static num romberg(num Function(num) f, num a, num b,
+  static dynamic romberg(dynamic Function(num) f, num a, num b,
       {double tolerance = 1e-6, int maxDepth = 10}) {
     if (a == b) return 0;
 
     // Initialize Romberg table
-    List<List<num>> r =
+    List<List<dynamic>> r =
         List.generate(maxDepth, (_) => List.filled(maxDepth, 0));
 
     final h = b - a;
-    r[0][0] = (h / 2) * (f(a) + f(b));
+    r[0][0] = _multiply(_add(f(a), f(b)), h / 2);
 
     for (int i = 1; i < maxDepth; i++) {
       // Trapezoidal approximation with 2^i intervals
-      num sum = 0;
-      final stepSize = h / pow(2, i);
-      final numPoints = pow(2, i - 1).toInt();
+      dynamic sum = 0;
+      final stepSize = h / dmath.pow(2, i);
+      final numPoints = dmath.pow(2, i - 1).toInt();
 
       for (int k = 0; k < numPoints; k++) {
-        sum += f(a + (2 * k + 1) * stepSize);
+        sum = _add(sum, f(a + (2 * k + 1) * stepSize));
       }
 
-      r[i][0] = r[i - 1][0] / 2 + stepSize * sum;
+      r[i][0] = _add(_divide(r[i - 1][0], 2), _multiply(sum, stepSize));
 
       // Richardson extrapolation
       for (int j = 1; j <= i; j++) {
-        final coefficient = pow(4, j);
-        r[i][j] =
-            (coefficient * r[i][j - 1] - r[i - 1][j - 1]) / (coefficient - 1);
+        final coefficient = dmath.pow(4, j);
+        r[i][j] = _divide(
+            _subtract(_multiply(r[i][j - 1], coefficient), r[i - 1][j - 1]),
+            coefficient - 1);
       }
 
       // Check convergence
-      if (i > 0 && (r[i][i] - r[i - 1][i - 1]).abs() < tolerance) {
-        return r[i][i];
+      if (i > 0 &&
+          _toDouble(_abs(_subtract(r[i][i], r[i - 1][i - 1]))) < tolerance) {
+        return _simplifyResult(r[i][i]);
       }
     }
 
-    return r[maxDepth - 1][maxDepth - 1];
+    return _simplifyResult(r[maxDepth - 1][maxDepth - 1]);
   }
 
   /// Computes the definite integral using Gaussian quadrature.
@@ -263,7 +343,7 @@ class NumericalIntegration {
   /// var result = NumericalIntegration.gaussianQuadrature(f, 0, 1, order: 5);
   /// print(result); // 0.25
   /// ```
-  static num gaussianQuadrature(num Function(num) f, num a, num b,
+  static dynamic gaussianQuadrature(dynamic Function(num) f, num a, num b,
       {int order = 5}) {
     if (order < 2 || order > 10) {
       throw ArgumentError('Order must be between 2 and 10');
@@ -279,13 +359,13 @@ class NumericalIntegration {
     final c1 = (b - a) / 2;
     final c2 = (b + a) / 2;
 
-    num sum = 0;
+    dynamic sum = 0;
     for (int i = 0; i < order; i++) {
       final x = c1 * nodes[i] + c2;
-      sum += weights[i] * f(x);
+      sum = _add(sum, _multiply(f(x), weights[i]));
     }
 
-    return c1 * sum;
+    return _simplifyResult(_multiply(sum, c1));
   }
 
   /// Returns Gauss-Legendre nodes and weights for the interval [-1, 1]
@@ -470,15 +550,15 @@ class NumericalIntegration {
   /// );
   /// print(result); // 0.25
   /// ```
-  static num doubleIntegral(num Function(num, num) f, num ax, num bx,
-      num Function(num) ay, num Function(num) by,
+  static dynamic doubleIntegral(dynamic Function(num, num) f, num ax, num bx,
+      dynamic Function(num) ay, dynamic Function(num) by,
       {int nx = 50, int ny = 50}) {
-    num outerIntegrand(num x) {
-      num innerIntegrand(num y) => f(x, y);
+    dynamic outerIntegrand(num x) {
+      dynamic innerIntegrand(num y) => f(x, y);
       return trapezoidal(innerIntegrand, ay(x), by(x), n: ny);
     }
 
-    return trapezoidal(outerIntegrand, ax, bx, n: nx);
+    return _simplifyResult(trapezoidal(outerIntegrand, ax, bx, n: nx));
   }
 
   /// Computes a triple integral over a rectangular region.
@@ -509,27 +589,27 @@ class NumericalIntegration {
   /// );
   /// print(result); // 0.125
   /// ```
-  static num tripleIntegral(
-      num Function(num, num, num) f,
+  static dynamic tripleIntegral(
+      dynamic Function(num, num, num) f,
       num ax,
       num bx,
-      num Function(num) ay,
-      num Function(num) by,
-      num Function(num, num) az,
-      num Function(num, num) bz,
+      dynamic Function(num) ay,
+      dynamic Function(num) by,
+      dynamic Function(num, num) az,
+      dynamic Function(num, num) bz,
       {int nx = 20,
       int ny = 20,
       int nz = 20}) {
-    num outerIntegrand(num x) {
-      num middleIntegrand(num y) {
-        num innerIntegrand(num z) => f(x, y, z);
+    dynamic outerIntegrand(num x) {
+      dynamic middleIntegrand(num y) {
+        dynamic innerIntegrand(num z) => f(x, y, z);
         return trapezoidal(innerIntegrand, az(x, y), bz(x, y), n: nz);
       }
 
       return trapezoidal(middleIntegrand, ay(x), by(x), n: ny);
     }
 
-    return trapezoidal(outerIntegrand, ax, bx, n: nx);
+    return _simplifyResult(trapezoidal(outerIntegrand, ax, bx, n: nx));
   }
 
   /// Computes a multi-dimensional integral using Monte Carlo integration.
@@ -559,8 +639,8 @@ class NumericalIntegration {
   /// );
   /// print(result); // ~0.6667
   /// ```
-  static num monteCarloIntegral(
-      num Function(List<num>) f, List<num> lower, List<num> upper,
+  static dynamic monteCarloIntegral(
+      dynamic Function(List<num>) f, List<num> lower, List<num> upper,
       {int samples = 10000, int? seed}) {
     if (lower.length != upper.length) {
       throw ArgumentError(
@@ -577,14 +657,14 @@ class NumericalIntegration {
     }
 
     // Monte Carlo sampling
-    num sum = 0;
+    dynamic sum = 0;
     for (int i = 0; i < samples; i++) {
       final point = List<num>.generate(dimension,
           (j) => lower[j] + random.nextDouble() * (upper[j] - lower[j]));
-      sum += f(point);
+      sum = _add(sum, f(point));
     }
 
-    return volume * sum / samples;
+    return _simplifyResult(_divide(_multiply(sum, volume), samples));
   }
 
   /// Computes a definite integral with error estimation.
@@ -600,15 +680,18 @@ class NumericalIntegration {
   /// var result = NumericalIntegration.integrateWithError(f, 0, math.pi);
   /// print('Value: ${result['value']}, Error: ${result['error']}');
   /// ```
-  static Map<String, num> integrateWithError(num Function(num) f, num a, num b,
+  static Map<String, dynamic> integrateWithError(dynamic Function(num) f, num a, num b,
       {double tolerance = 1e-6}) {
     // Use two different methods and compare
     final simpson = adaptiveSimpson(f, a, b, tolerance: tolerance);
-    final romberg = NumericalIntegration.romberg(f, a, b, tolerance: tolerance);
+    final romb = romberg(f, a, b, tolerance: tolerance);
 
     final value = simpson;
-    final error = (simpson - romberg).abs();
+    final error = _abs(_subtract(simpson, romb));
 
-    return {'value': value, 'error': error};
+    return {
+      'value': _simplifyResult(value),
+      'error': _simplifyResult(error),
+    };
   }
 }

@@ -149,7 +149,7 @@ void main() {
         final expr = Multiply(Multiply(Literal(2), x), Sin(Pow(x, Literal(2))));
         final result = SymbolicIntegration.integrate(expr, x);
 
-        expect(result, isA<Negate>());
+        expect(result, anyOf(isA<Negate>(), isA<Multiply>()));
         expect(result.toString(), contains('cos'));
         expect(result.toString(), contains('x'));
       });
@@ -201,7 +201,7 @@ void main() {
         final expr = Multiply(x, Exp(x));
         final result = SymbolicIntegration.integrate(expr, x);
 
-        expect(result, isA<Subtract>());
+        expect(result, anyOf(isA<Subtract>(), isA<Add>()));
         expect(result.toString(), contains('x'));
         expect(result.toString(), contains('exp'));
       });

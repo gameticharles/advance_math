@@ -30,7 +30,8 @@ Expression polyFactorToExpr(Polynomial p, Variable xVar) {
     print('    isZero=$isZero');
     if (isZero) continue;
 
-    bool isOne = cv == 1 || cv == 1.0 ||
+    bool isOne = cv == 1 ||
+        cv == 1.0 ||
         (cv is Rational && cv == Rational.one) ||
         (cv is Complex && cv == Complex.one());
     print('    isOne=$isOne');
@@ -57,14 +58,14 @@ void main() {
   var factors = denPoly.factorize();
 
   print('Factor 0: ${factors[0]}');
-  print('Coefficients 0: ${(factors[0] as Polynomial).coefficients}');
+  print('Coefficients 0: ${(factors[0]).coefficients}');
   print('Calling polyFactorToExpr on factor 0:');
-  var e0 = polyFactorToExpr(factors[0] as Polynomial, xVar);
+  var e0 = polyFactorToExpr(factors[0], xVar);
   print('Result 0: $e0');
 
   print('\nFactor 1: ${factors[1]}');
-  print('Coefficients 1: ${(factors[1] as Polynomial).coefficients}');
+  print('Coefficients 1: ${(factors[1]).coefficients}');
   print('Calling polyFactorToExpr on factor 1:');
-  var e1 = polyFactorToExpr(factors[1] as Polynomial, xVar);
+  var e1 = polyFactorToExpr(factors[1], xVar);
   print('Result 1: $e1');
 }

@@ -1495,7 +1495,7 @@ class ExpressionParser {
                           final endVal = evalBigIntExpr(endExpr);
                           if (startVal != null && endVal != null) {
                             BigInt prod = BigInt.one;
-                            final varName = varExpr.identifier.name;
+                            //final varName = varExpr.identifier.name;
                             for (BigInt i = startVal;
                                 i <= endVal;
                                 i += BigInt.one) {
@@ -2139,7 +2139,7 @@ class ExpressionParser {
 
                       Expression? numeratorTerm;
                       for (int j = 0; j < degree; j++) {
-                        var coeff = solution![coeffIdx[j]];
+                        var coeff = solution[coeffIdx[j]];
                         if (coeff == Rational.zero) continue;
                         Expression coeffExpr = coeff.isInteger
                             ? Literal(coeff.numerator.toInt())

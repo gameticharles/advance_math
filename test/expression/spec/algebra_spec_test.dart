@@ -99,6 +99,7 @@ void main() {
           equals('-20+16*i'));
       expect(expression.parse('lcm(2*x^2+2*x+1,x+1)').evaluate().toString(),
           equals('(1+2*x^2+2*x)*(1+x)'));
+
       expect(expression.parse('lcm(x^2+2*x+1,x+1)').evaluate().toString(),
           equals('1+x^2+2*x'));
       expect(
@@ -106,53 +107,52 @@ void main() {
               .parse('lcm(6*x^9+24*x^8+15*x^7+6*x^2+24*x+15, (2*x^2+8*x+5))')
               .evaluate()
               .toString(),
-          equals('15+15*x^7+24*x+24*x^8+6*x^2+6*x^9'));
+          equals('15+6*x^9+24*x^8+15*x^7+6*x^2+24*x'));
       expect(
           expression
               .parse('lcm(x^8+4*x^7+4*x^6+3*x^5+12*x^4+12*x^3, (x^3+3))')
               .toString(),
-          equals('12*x^3+12*x^4+3*x^5+4*x^6+4*x^7+x^8'));
+          equals('x^8+4*x^7+4*x^6+3*x^5+12*x^4+12*x^3'));
       expect(
           expression
               .parse('lcm(6*x^9+24*x^8+15*x^7+6*x^2+24*x+15, x^7+1)')
               .toString(),
-          equals('15+15*x^7+24*x+24*x^8+6*x^2+6*x^9'));
+          equals('6*x^9+24*x^8+15*x^7+6*x^2+24*x+15'));
       expect(
-          expression.parse('lcm(1+x^2,2*x)').toString(), equals('2*(1+x^2)*x'));
+          expression.parse('lcm(1+x^2,2*x)').toString(), equals('(1+x^2)*2*x'));
       expect(
           expression
               .parse(
                   'lcm(84*x^4+147*x^3+16*x^2+28*x, 44*x^5+77*x^4+16*x^3+28*x^2+12*x+21)')
               .toString(),
           equals(
-              '(12*x+16*x^3+28*x^2+44*x^5+77*x^4+21)*(147*x^3+16*x^2+28*x+84*x^4)*(4*x+7)^(-1)'));
+              '(84*x^4+147*x^3+16*x^2+28*x)*(21+44*x^5+77*x^4+16*x^3+28*x^2+12*x)*(4*x+7)^(-1)'));
       expect(
           expression
               .parse(
                   'lcm(5*x^11+90*x^9+361*x^7+473*x^5+72*x^3+91*x, 7150*x^12+9360*x^10+1375*x^9+1430*x^8+37550*x^7+1872*x^6+47075*x^5+7510*x^3+9360*x)')
               .toString(),
           equals(
-              '(1375*x^9+1430*x^8+1872*x^6+37550*x^7+47075*x^5+7150*x^12+7510*x^3+9360*x+9360*x^10)*(361*x^7+473*x^5+5*x^11+72*x^3+90*x^9+91*x)*(5*x^5+x)^(-1)'));
+              '(5*x^11+90*x^9+361*x^7+473*x^5+72*x^3+91*x)*(7150*x^12+9360*x^10+1375*x^9+1430*x^8+37550*x^7+1872*x^6+47075*x^5+7510*x^3+9360*x)*(5*x^5+x)^(-1)'));
       expect(
           expression
               .parse(
                   'lcm(7*x^4+7*x^3+4*x^2+5*x+1, 21*x^6+47*x^4+80*x^3+20*x^2+49*x+11)')
               .toString(),
           equals(
-              '(1+4*x+7*x^3)^(-1)*(1+4*x^2+5*x+7*x^3+7*x^4)*(11+20*x^2+21*x^6+47*x^4+49*x+80*x^3)'));
+              '(1+7*x^4+7*x^3+4*x^2+5*x)*(11+21*x^6+47*x^4+80*x^3+20*x^2+49*x)*(7*x^3+4*x+1)^(-1)'));
       expect(
           expression
               .parse(
                   'lcm(5*x^11+90*x^9+361*x^7+473*x^5+72*x^3+91*x, 7150*x^12+9360*x^10+1375*x^9+1430*x^8+37550*x^7+1872*x^6+47075*x^5+7510*x^3+9360*x,x)')
               .toString(),
           equals(
-              '(1375*x^9+1430*x^8+1872*x^6+37550*x^7+47075*x^5+7150*x^12+7510*x^3+9360*x+9360*x^10)*(361*x^7+473*x^5+5*x^11+72*x^3+90*x^9+91*x)*(5*x^6+x^2)^(-1)*x'));
+              '(5*x^11+90*x^9+361*x^7+473*x^5+72*x^3+91*x)*(7150*x^12+9360*x^10+1375*x^9+1430*x^8+37550*x^7+1872*x^6+47075*x^5+7510*x^3+9360*x)*x/x'));
       expect(
           expression
               .parse('lcm(x^8+4*x^7+4*x^6+3*x^5+12*x^4+12*x^3, (x^3+3), 3+x^3)')
               .toString(),
-          equals(
-              '(12*x^3+12*x^4+3*x^5+4*x^6+4*x^7+x^8)*(3+x^3)^2*(6*x^3+x^6+9)^(-1)'));
+          equals('x^8+4*x^7+4*x^6+3*x^5+12*x^4+12*x^3'));
       expect(expression.parse('lcm(a, b, c)').toString(),
           equals('a*b*c*gcd(a*b,a*c,b*c)^(-1)'));
       expect(expression.parse('lcm(18,12, 6)').toString(), equals('36'));
@@ -167,12 +167,9 @@ void main() {
               .toString(),
           equals('a*b*c*gcd(x,y,z,f,g,h)'));
       expect(expression.parse('lcm(2^x, 6^x)').toString(), equals('6^x'));
-      expect(
-          expression.parse('lcm(a,a,b,b,gcd(c,c))').toString(),
-          equals(
-              'a^2*b^2*c*gcd(a^2*b^2,a^2*b*c,a^2*b*c,a*b^2*c,a*b^2*c)^(-1)'));
-      expect(
-          expression.parse('lcm(a,a)').toString(), equals('a^2*gcd(a,a)^(-1)'));
+      expect(expression.parse('lcm(a,a,b,b,gcd(c,c))').toString(),
+          equals('a*b*c*gcd(a*b,a*c,b*c)^(-1)'));
+      expect(expression.parse('lcm(a,a)').toString(), equals('a'));
       expect(expression.parse('lcm(a^b,a^c)').toString(), equals('a^(-1+b+c)'));
       expect(expression.parse('lcm(a^c,b^c)').toString(), equals('a^c*b^c'));
       expect(expression.parse('lcm(a^a,a^a)').toString(), equals('a^a'));

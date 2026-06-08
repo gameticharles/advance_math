@@ -40,7 +40,8 @@ void main() {
             taylor.substitute(Variable('x'), Literal(x)).evaluate();
         var exactValue = sin(x);
 
-        expect(taylorValue, closeTo(exactValue, relaxedTol));
+        expect(
+            taylorValue.toDouble(), closeTo(exactValue.toDouble(), relaxedTol));
       });
 
       test('Taylor series using extension method', () {
@@ -65,7 +66,8 @@ void main() {
             maclaurin.substitute(Variable('x'), Literal(x)).evaluate();
         var exactValue = exp(x);
 
-        expect(seriesValue, closeTo(exactValue, relaxedTol));
+        expect(
+            seriesValue.toDouble(), closeTo(exactValue.toDouble(), relaxedTol));
       });
 
       test('using extension method maclaurin', () {
@@ -78,7 +80,7 @@ void main() {
             maclaurin.substitute(Variable('x'), Literal(x)).evaluate();
         var exactValue = cos(x);
 
-        expect(seriesValue.real.toDouble(), closeTo(exactValue, relaxedTol));
+        expect(seriesValue.toDouble(), closeTo(exactValue, relaxedTol));
       });
     });
 

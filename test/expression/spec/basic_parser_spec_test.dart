@@ -32,6 +32,8 @@ void main() {
           reason: 'Eval of $given (real part)');
       expect(result.imaginary, closeTo(0, 1e-10),
           reason: 'Eval of $given (imaginary part)');
+    } else if (result is Rational) {
+      expect(result, exp, reason: 'Eval of $given');
     } else if (result is String || result is List) {
       // Handle String or List results (e.g. vectors)
       expect(result.toString().replaceAll(' ', ''),

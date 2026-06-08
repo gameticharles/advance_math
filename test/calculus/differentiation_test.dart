@@ -9,25 +9,25 @@ void main() {
 
     group('Central Difference', () {
       test('differentiates x^2 at x=3', () {
-        num f(num x) => x * x;
+        dynamic f(num x) => x * x;
         final result = NumericalDifferentiation.derivative(f, 3);
         expect(result, closeTo(6.0, tol)); // d/dx(x²) = 2x = 6
       });
 
       test('differentiates sin(x) at x=0', () {
-        num f(num x) => sin(x);
+        dynamic f(num x) => sin(x);
         final result = NumericalDifferentiation.derivative(f, 0);
         expect(result, closeTo(1.0, tol)); // d/dx(sin) = cos, cos(0) = 1
       });
 
       test('differentiates e^x at x=1', () {
-        num f(num x) => exp(x);
+        dynamic f(num x) => exp(x);
         final result = NumericalDifferentiation.derivative(f, 1);
         expect(result, closeTo(e, tol)); // d/dx(e^x) = e^x
       });
 
       test('differentiates x^3 at various points', () {
-        num f(num x) => x * x * x;
+        dynamic f(num x) => x * x * x;
 
         expect(NumericalDifferentiation.derivative(f, 0), closeTo(0.0, tol));
         expect(NumericalDifferentiation.derivative(f, 1), closeTo(3.0, tol));
@@ -38,13 +38,13 @@ void main() {
 
     group('Forward Difference', () {
       test('approximates derivative of x^2', () {
-        num f(num x) => x * x;
+        dynamic f(num x) => x * x;
         final result = NumericalDifferentiation.forwardDifference(f, 2);
         expect(result, closeTo(4.0, tol));
       });
 
       test('works at boundaries', () {
-        num f(num x) => x * x * x;
+        dynamic f(num x) => x * x * x;
         final result = NumericalDifferentiation.forwardDifference(f, 0);
         expect(result, closeTo(0.0, tol));
       });
@@ -52,13 +52,13 @@ void main() {
 
     group('Backward Difference', () {
       test('approximates derivative of x^2', () {
-        num f(num x) => x * x;
+        dynamic f(num x) => x * x;
         final result = NumericalDifferentiation.backwardDifference(f, 2);
         expect(result, closeTo(4.0, tol));
       });
 
       test('works at boundaries', () {
-        num f(num x) => exp(x);
+        dynamic f(num x) => exp(x);
         final result = NumericalDifferentiation.backwardDifference(f, 0);
         expect(result, closeTo(1.0, tol));
       });
@@ -66,19 +66,19 @@ void main() {
 
     group('Second Derivative', () {
       test('computes second derivative of x^3', () {
-        num f(num x) => x * x * x;
+        dynamic f(num x) => x * x * x;
         final result = NumericalDifferentiation.secondDerivative(f, 2);
         expect(result, closeTo(12.0, tol)); // d²/dx²(x³) = 6x = 12
       });
 
       test('computes second derivative of sin(x)', () {
-        num f(num x) => sin(x);
+        dynamic f(num x) => sin(x);
         final result = NumericalDifferentiation.secondDerivative(f, pi / 2);
         expect(result, closeTo(-1.0, tol)); // d²/dx²(sin) = -sin
       });
 
       test('computes second derivative of e^x', () {
-        num f(num x) => exp(x);
+        dynamic f(num x) => exp(x);
         final result = NumericalDifferentiation.secondDerivative(f, 1);
         expect(result, closeTo(e, tol)); // d²/dx²(e^x) = e^x
       });
@@ -86,14 +86,14 @@ void main() {
 
     group('nth Derivative', () {
       test('computes 3rd derivative of x^4', () {
-        num f(num x) => x * x * x * x;
+        dynamic f(num x) => x * x * x * x;
         final result = NumericalDifferentiation.nthDerivative(f, 1, 3);
         expect(result,
             closeTo(24.0, 1.0)); // Relaxed tolerance for recursive derivatives
       });
 
       test('throws error for non-positive n', () {
-        num f(num x) => x;
+        dynamic f(num x) => x;
         expect(() => NumericalDifferentiation.nthDerivative(f, 1, 0),
             throwsArgumentError);
         expect(() => NumericalDifferentiation.nthDerivative(f, 1, -1),
@@ -101,14 +101,14 @@ void main() {
       });
 
       test('n=1 equals first derivative', () {
-        num f(num x) => x * x;
+        dynamic f(num x) => x * x;
         final nthDeriv = NumericalDifferentiation.nthDerivative(f, 3, 1);
         final firstDeriv = NumericalDifferentiation.derivative(f, 3);
         expect(nthDeriv, closeTo(firstDeriv, 1e-8));
       });
 
       test('n=2 equals second derivative', () {
-        num f(num x) => x * x * x;
+        dynamic f(num x) => x * x * x;
         final nthDeriv = NumericalDifferentiation.nthDerivative(f, 2, 2);
         final secondDeriv = NumericalDifferentiation.secondDerivative(f, 2);
         expect(nthDeriv, closeTo(secondDeriv, 1e-6));
@@ -117,7 +117,7 @@ void main() {
 
     group('Gradient', () {
       test('computes gradient of x² + y²', () {
-        num f(List<num> coords) {
+        dynamic f(List<num> coords) {
           final x = coords[0];
           final y = coords[1];
           return x * x + y * y;
@@ -129,7 +129,7 @@ void main() {
       });
 
       test('computes gradient of x*y*z', () {
-        num f(List<num> coords) {
+        dynamic f(List<num> coords) {
           final x = coords[0];
           final y = coords[1];
           final z = coords[2];
@@ -143,7 +143,7 @@ void main() {
       });
 
       test('gradient at minimum is zero', () {
-        num f(List<num> coords) {
+        dynamic f(List<num> coords) {
           final x = coords[0];
           final y = coords[1];
           return x * x + y * y;
@@ -189,7 +189,7 @@ void main() {
 
     group('Hessian', () {
       test('computes Hessian of x² + y²', () {
-        num f(List<num> coords) {
+        dynamic f(List<num> coords) {
           final x = coords[0];
           final y = coords[1];
           return x * x + y * y;
@@ -204,7 +204,7 @@ void main() {
       });
 
       test('computes Hessian of x² + xy + y²', () {
-        num f(List<num> coords) {
+        dynamic f(List<num> coords) {
           final x = coords[0];
           final y = coords[1];
           return x * x + x * y + y * y;
@@ -219,7 +219,7 @@ void main() {
       });
 
       test('Hessian is symmetric', () {
-        num f(List<num> coords) {
+        dynamic f(List<num> coords) {
           final x = coords[0];
           final y = coords[1];
           return x * x * y + y * y * y;
@@ -233,7 +233,7 @@ void main() {
 
     group('Directional Derivative', () {
       test('computes in x-direction', () {
-        num f(List<num> coords) {
+        dynamic f(List<num> coords) {
           final x = coords[0];
           final y = coords[1];
           return x * x + y * y;
@@ -245,7 +245,7 @@ void main() {
       });
 
       test('computes in arbitrary direction', () {
-        num f(List<num> coords) {
+        dynamic f(List<num> coords) {
           final x = coords[0];
           final y = coords[1];
           return x * x + y * y;
@@ -256,11 +256,11 @@ void main() {
             NumericalDifferentiation.directionalDerivative(f, [1, 1], [1, 1]);
         // Gradient is (2, 2), direction normalized is (1/√2, 1/√2)
         // dd = (2, 2) · (1/√2, 1/√2) = 4/√2 = 2√2
-        expect(dd, closeTo(2 * sqrt(2), tol));
+        expect(dd, closeTo(2 * sqrt(2).toDouble(), tol));
       });
 
       test('throws error for zero direction', () {
-        num f(List<num> coords) => coords[0];
+        dynamic f(List<num> coords) => coords[0];
         expect(
             () => NumericalDifferentiation.directionalDerivative(
                 f, [1, 1], [0, 0]),
@@ -268,7 +268,7 @@ void main() {
       });
 
       test('throws error for mismatched dimensions', () {
-        num f(List<num> coords) => coords[0];
+        dynamic f(List<num> coords) => coords[0];
         expect(
             () => NumericalDifferentiation.directionalDerivative(
                 f, [1, 1], [1, 0, 0]),
@@ -278,7 +278,7 @@ void main() {
 
     group('Derivative with Error Estimation', () {
       test('provides error estimate for smooth functions', () {
-        num f(num x) => sin(x);
+        dynamic f(num x) => sin(x);
         final result = NumericalDifferentiation.derivativeWithError(f, 0);
 
         expect(result['value'], closeTo(1.0, tol));
@@ -286,7 +286,7 @@ void main() {
       });
 
       test('returns both value and error', () {
-        num f(num x) => x * x;
+        dynamic f(num x) => x * x;
         final result = NumericalDifferentiation.derivativeWithError(f, 3);
 
         expect(result.containsKey('value'), isTrue);
@@ -298,7 +298,7 @@ void main() {
 
     group('Laplacian', () {
       test('computes Laplacian of x² + y²', () {
-        num f(List<num> coords) {
+        dynamic f(List<num> coords) {
           final x = coords[0];
           final y = coords[1];
           return x * x + y * y;
@@ -309,7 +309,7 @@ void main() {
       });
 
       test('computes Laplacian of x² + y² + z²', () {
-        num f(List<num> coords) {
+        dynamic f(List<num> coords) {
           final x = coords[0];
           final y = coords[1];
           final z = coords[2];
@@ -322,7 +322,7 @@ void main() {
 
       test('Laplacian of harmonic function is zero', () {
         // ln(r) is harmonic in 2D (except at origin)
-        num f(List<num> coords) {
+        dynamic f(List<num> coords) {
           final x = coords[0];
           final y = coords[1];
           final r = sqrt(x * x + y * y);
@@ -410,7 +410,7 @@ void main() {
 
     group('Accuracy Comparisons', () {
       test('central difference more accurate than forward/backward', () {
-        num f(num x) => sin(x);
+        dynamic f(num x) => sin(x);
         final exact = cos(pi / 4);
 
         final central = NumericalDifferentiation.derivative(f, pi / 4);
@@ -428,19 +428,19 @@ void main() {
 
     group('Edge Cases', () {
       test('handles very small step sizes', () {
-        num f(num x) => x * x;
+        dynamic f(num x) => x * x;
         final result = NumericalDifferentiation.derivative(f, 1, h: 1e-10);
         expect(result, closeTo(2.0, tol));
       });
 
       test('handles negative x values', () {
-        num f(num x) => x * x * x;
+        dynamic f(num x) => x * x * x;
         final result = NumericalDifferentiation.derivative(f, -2);
         expect(result, closeTo(12.0, tol));
       });
 
       test('handles zero', () {
-        num f(num x) => x * x * x;
+        dynamic f(num x) => x * x * x;
         final result = NumericalDifferentiation.derivative(f, 0);
         expect(result, closeTo(0.0, tol));
       });

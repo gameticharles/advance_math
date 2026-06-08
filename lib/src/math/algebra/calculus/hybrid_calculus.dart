@@ -2,6 +2,15 @@ import '../expression/expression.dart';
 import 'differentiation.dart';
 import 'integration.dart';
 import 'symbolic_calculus.dart';
+import '../../../number/complex/complex.dart';
+import '../../../number/decimal/rational.dart';
+
+num _toNum(dynamic val) {
+  if (val is Complex || val is Rational) {
+    return val.toDouble();
+  }
+  return val as num;
+}
 
 /// A hybrid calculus class that bridges symbolic and numerical methods.
 ///
@@ -22,12 +31,12 @@ class HybridCalculus {
   /// Returns: The numerical value of the derivative.
   static num evaluateDerivative(Expression expr, String variable, num at) {
     // Define the function to differentiate
-    num f(num x) {
+    dynamic f(num x) {
       return expr.evaluate({variable: x});
     }
 
     // Use numerical differentiation
-    return NumericalDifferentiation.derivative(f, at);
+    return _toNum(NumericalDifferentiation.derivative(f, at));
   }
 
   /// Evaluates the integral of a symbolic expression numerically.
@@ -44,12 +53,12 @@ class HybridCalculus {
   /// Returns: The numerical value of the integral.
   static num evaluateIntegral(Expression expr, String variable, num a, num b) {
     // Define the function to integrate
-    num f(num x) {
+    dynamic f(num x) {
       return expr.evaluate({variable: x});
     }
 
     // Use numerical integration (Simpson's rule is generally robust)
-    return NumericalIntegration.simpsons(f, a, b);
+    return _toNum(NumericalIntegration.simpsons(f, a, b));
   }
 
   /// Compares symbolic and numerical results for validation.
@@ -78,29 +87,32 @@ class HybridCalculus {
     // Symbolic
     Expression symbolicDerivExpr =
         SymbolicCalculus.partialDerivative(expr, variable);
-    num symbolicDerivVal = symbolicDerivExpr.evaluate({variable: at});
+    dynamic symbolicDerivVal = symbolicDerivExpr.evaluate({variable: at});
 
     // Numerical
     num numericalDerivVal = evaluateDerivative(expr, variable, at);
 
     // 2. Integral Comparison
     // Symbolic (Definite)
-    num symbolicIntegralVal =
+    dynamic symbolicIntegralVal =
         SymbolicCalculus.definiteIntegral(expr, variable, a, b);
 
     // Numerical
     num numericalIntegralVal = evaluateIntegral(expr, variable, a, b);
 
+    final sDeriv = _toNum(symbolicDerivVal);
+    final sIntegral = _toNum(symbolicIntegralVal);
+
     return {
       'derivative': {
-        'symbolic': symbolicDerivVal,
+        'symbolic': sDeriv,
         'numerical': numericalDerivVal,
-        'error': (symbolicDerivVal - numericalDerivVal).abs(),
+        'error': (sDeriv - numericalDerivVal).abs(),
       },
       'integral': {
-        'symbolic': symbolicIntegralVal,
+        'symbolic': sIntegral,
         'numerical': numericalIntegralVal,
-        'error': (symbolicIntegralVal - numericalIntegralVal).abs(),
+        'error': (sIntegral - numericalIntegralVal).abs(),
       },
     };
   }

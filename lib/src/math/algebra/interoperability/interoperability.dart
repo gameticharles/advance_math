@@ -1,6 +1,6 @@
 library interoperability;
 
-/* TODO:
+/* TO DO:
 Interoperability:
    - Enable integration with other linear algebra libraries or frameworks (e.g., TensorFlow, NumPy)
  */
