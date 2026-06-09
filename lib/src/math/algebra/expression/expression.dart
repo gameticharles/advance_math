@@ -29,16 +29,41 @@ part 'components/simple/conditional.dart';
 
 part 'components/functions/function.dart';
 part 'components/functions/predefined.dart';
+// Trig functions - Standard
 part 'components/functions/trigonometric.dart';
 part 'components/functions/trig/sin.dart';
 part 'components/functions/trig/cos.dart';
 part 'components/functions/trig/tan.dart';
+
+part 'components/functions/trig/sinh.dart';
+part 'components/functions/trig/cosh.dart';
+part 'components/functions/trig/tanh.dart';
+
 part 'components/functions/trig/sec.dart';
 part 'components/functions/trig/csc.dart';
 part 'components/functions/trig/cot.dart';
+
+part 'components/functions/trig/sech.dart';
+part 'components/functions/trig/csch.dart';
+part 'components/functions/trig/coth.dart';
+
+// Trig functions - Inverse
 part 'components/functions/trig/asin.dart';
 part 'components/functions/trig/acos.dart';
 part 'components/functions/trig/atan.dart';
+
+part 'components/functions/trig/asinh.dart';
+part 'components/functions/trig/acosh.dart';
+part 'components/functions/trig/atanh.dart';
+
+part 'components/functions/trig/asec.dart';
+part 'components/functions/trig/acsc.dart';
+part 'components/functions/trig/acot.dart';
+
+part 'components/functions/trig/asech.dart';
+part 'components/functions/trig/acsch.dart';
+part 'components/functions/trig/acoth.dart';
+
 part 'components/functions/trig/trig_expression.dart';
 part 'components/functions/rational.dart';
 part 'components/functions/abs.dart';

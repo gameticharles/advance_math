@@ -416,45 +416,36 @@ class ExpressionParser {
                   if (name == 'asin' && args.length == 1) return Asin(args[0]);
                   if (name == 'acos' && args.length == 1) return Acos(args[0]);
                   if (name == 'atan' && args.length == 1) return Atan(args[0]);
+                  if (name == 'asec' && args.length == 1) return Asec(args[0]);
+                  if (name == 'acsc' && args.length == 1) return Acsc(args[0]);
+                  if (name == 'acot' && args.length == 1) return Acot(args[0]);
 
                   // Hyperbolic trigonometric functions
-                  if (name == 'sinh' && args.length == 1) {
-                    return Trigonometric('sinh', args[0]);
-                  }
-                  if (name == 'cosh' && args.length == 1) {
-                    return Trigonometric('cosh', args[0]);
-                  }
-                  if (name == 'tanh' && args.length == 1) {
-                    return Trigonometric('tanh', args[0]);
-                  }
-                  if (name == 'sech' && args.length == 1) {
-                    return Trigonometric('sech', args[0]);
-                  }
-                  if (name == 'csch' && args.length == 1) {
-                    return Trigonometric('csch', args[0]);
-                  }
-                  if (name == 'coth' && args.length == 1) {
-                    return Trigonometric('coth', args[0]);
-                  }
+                  if (name == 'sinh' && args.length == 1) return Sinh(args[0]);
+                  if (name == 'cosh' && args.length == 1) return Cosh(args[0]);
+                  if (name == 'tanh' && args.length == 1) return Tanh(args[0]);
+                  if (name == 'csch' && args.length == 1) return Csch(args[0]);
+                  if (name == 'sech' && args.length == 1) return Sech(args[0]);
+                  if (name == 'coth' && args.length == 1) return Coth(args[0]);
 
                   // Inverse Hyperbolic trigonometric functions
                   if (name == 'asinh' && args.length == 1) {
-                    return Trigonometric('asinh', args[0]);
+                    return Asinh(args[0]);
                   }
                   if (name == 'acosh' && args.length == 1) {
-                    return Trigonometric('acosh', args[0]);
+                    return Acosh(args[0]);
                   }
                   if (name == 'atanh' && args.length == 1) {
-                    return Trigonometric('atanh', args[0]);
-                  }
-                  if (name == 'asech' && args.length == 1) {
-                    return Trigonometric('asech', args[0]);
+                    return Atanh(args[0]);
                   }
                   if (name == 'acsch' && args.length == 1) {
-                    return Trigonometric('acsch', args[0]);
+                    return Acsch(args[0]);
+                  }
+                  if (name == 'asech' && args.length == 1) {
+                    return Asech(args[0]);
                   }
                   if (name == 'acoth' && args.length == 1) {
-                    return Trigonometric('acoth', args[0]);
+                    return Acoth(args[0]);
                   }
 
                   // Exponential / Logarithmic
@@ -2489,6 +2480,9 @@ class ExpressionParser {
     'asin',
     'acos',
     'atan',
+    'asec',
+    'acsc',
+    'acot',
     'sinh',
     'cosh',
     'tanh',

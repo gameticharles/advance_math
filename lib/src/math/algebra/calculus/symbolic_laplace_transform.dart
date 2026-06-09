@@ -39,6 +39,7 @@ class LaplaceTransform {
         return Multiply(expr.right, _transform(expr.left, t, s)).simplify();
       }
     }
+
     if (expr is Sin ||
         expr is Cos ||
         (expr is Trigonometric &&
@@ -56,19 +57,22 @@ class LaplaceTransform {
         }
         return Multiply(Literal(fact), Pow(s, Literal(-(n + 1)))).simplify();
       }
+      // FIX 1: Use Rational to prevent decimal evaluation of pi and exponents
       if (n is Rational &&
           n.numerator == BigInt.one &&
           n.denominator == BigInt.two) {
-        return Divide(
-                Multiply(
-                    Pow(Variable('pi'), Literal(0.5)), Pow(s, Literal(-1.5))),
-                Literal(2))
+        return Multiply(
+                Literal(Rational(1, 2)),
+                Multiply(Pow(s, Literal(Rational(-3, 2))),
+                    Pow(Variable('pi'), Literal(Rational(1, 2)))))
             .simplify();
       }
     }
     if (expr == t) return Pow(s, Literal(-2)).simplify();
+
     var expA = _extractExpCoeff(expr, t);
     if (expA != null) return Pow(Subtract(s, expA), Literal(-1)).simplify();
+
     var sinA = _extractTrigCoeff(expr, t, 'sin');
     if (sinA != null) {
       return Divide(sinA, Add(Pow(s, Literal(2)), Pow(sinA, Literal(2))))
@@ -89,6 +93,7 @@ class LaplaceTransform {
       return Divide(s, Subtract(Pow(s, Literal(2)), Pow(coshA, Literal(2))))
           .simplify();
     }
+
     if (expr is Multiply) {
       if (expr.left == t) {
         return Negate(_transform(expr.right, t, s).differentiate(s)).simplify();
@@ -165,6 +170,55 @@ class LaplaceTransform {
     return expr;
   }
 
+  // FIX 2: Robust coefficient extraction that flattens nested Multiplications
+  static Expression? _extractCoeffOfT(Expression expr, Variable t) {
+    if (expr == t) return Literal(1);
+    if (expr is Negate && expr.operand == t) return Literal(-1);
+    if (expr is Multiply) {
+      List<Expression> factors = [];
+      void flatten(Expression e) {
+        if (e is Multiply) {
+          flatten(e.left);
+          flatten(e.right);
+        } else {
+          factors.add(e);
+        }
+      }
+
+      flatten(expr);
+
+      Expression? tFactor;
+      List<Expression> otherFactors = [];
+      for (var f in factors) {
+        if (f == t) {
+          if (tFactor != null) return null; // t^2 or higher
+          tFactor = f;
+        } else if (f is Negate && f.operand == t) {
+          if (tFactor != null) return null;
+          tFactor = f;
+          otherFactors.add(Literal(-1));
+        } else {
+          otherFactors.add(f);
+        }
+      }
+
+      if (tFactor != null) {
+        if (otherFactors.isEmpty) {
+          return tFactor is Negate ? Literal(-1) : Literal(1);
+        }
+        Expression coeff = otherFactors[0];
+        for (int i = 1; i < otherFactors.length; i++) {
+          coeff = Multiply(coeff, otherFactors[i]).simplify();
+        }
+        if (tFactor is Negate) {
+          coeff = Multiply(Literal(-1), coeff).simplify();
+        }
+        return coeff;
+      }
+    }
+    return null;
+  }
+
   static Expression? _extractTrigCoeff(
       Expression expr, Variable t, String func) {
     bool isFunc(Expression e, String name) {
@@ -178,11 +232,7 @@ class LaplaceTransform {
 
     if (isFunc(expr, func)) {
       var op = (expr as dynamic).operand;
-      if (op is Multiply) {
-        if (op.left == t) return op.right;
-        if (op.right == t) return op.left;
-      }
-      if (op == t) return Literal(1);
+      return _extractCoeffOfT(op, t);
     }
     return null;
   }
@@ -199,11 +249,7 @@ class LaplaceTransform {
 
     if (isExp(expr)) {
       var op = (expr is Pow) ? expr.exponent : (expr as dynamic).operand;
-      if (op is Multiply) {
-        if (op.left == t) return op.right;
-        if (op.right == t) return op.left;
-      }
-      if (op == t) return Literal(1);
+      return _extractCoeffOfT(op, t);
     }
     return null;
   }
@@ -281,11 +327,14 @@ class InverseLaplaceTransform {
         }
         return Divide(Pow(t, Literal(power)), Literal(fact)).simplify();
       }
+      // FIX 1: Use Rational for exact formatting
       if (n is Rational &&
           n.numerator == BigInt.from(-3) &&
           n.denominator == BigInt.two) {
-        return Multiply(Literal(2),
-                Divide(Pow(t, Literal(0.5)), Pow(Variable('pi'), Literal(0.5))))
+        return Multiply(
+                Literal(2),
+                Divide(Pow(t, Literal(Rational(1, 2))),
+                    Pow(Variable('pi'), Literal(Rational(1, 2)))))
             .simplify();
       }
     }
@@ -306,7 +355,6 @@ class InverseLaplaceTransform {
             : denCoeffs.keys.reduce((a, b) => a > b ? a : b);
 
         if (deg == 1) {
-          // Linear denominator: B*s + C
           var B = denCoeffs[1] ?? Literal(0);
           var C = denCoeffs[0] ?? Literal(0);
           var numCoeffs = _collectCoeffs(nume, s) ?? {};
@@ -321,7 +369,6 @@ class InverseLaplaceTransform {
         }
 
         if (deg == 2) {
-          // Quadratic denominator: A*s^2 + B*s + C
           var A = denCoeffs[2] ?? Literal(0);
           var B = denCoeffs[1] ?? Literal(0);
           var C = denCoeffs[0] ?? Literal(0);
@@ -369,6 +416,92 @@ class InverseLaplaceTransform {
             }
           }
         }
+
+        if (deg >= 3) {
+          try {
+            // Reconstruct polynomial coefficients (high to low degree)
+            List<dynamic> polyCoeffs = [];
+            for (int i = deg; i >= 0; i--) {
+              var coeff = denCoeffs[i] ?? Literal(0);
+              var val = coeff is Literal ? coeff.value : coeff;
+              if (val is Complex) val = val.real;
+              if (val is Rational) val = val.toDouble();
+              polyCoeffs.add(val);
+            }
+
+            var denPoly = Polynomial.fromList(polyCoeffs, variable: s);
+            var roots = denPoly.roots();
+
+            if (roots != null && roots.isNotEmpty) {
+              bool allReal = roots.every((r) {
+                if (r is num) return true;
+                if (r is Complex) return r.imaginary == 0;
+                return false;
+              });
+
+              if (allReal) {
+                var uniqueRoots = <double>[];
+                var mults = <int>[];
+                for (var r in roots) {
+                  double rVal =
+                      r is Complex ? r.real.toDouble() : (r as num).toDouble();
+                  rVal = double.parse(rVal
+                      .toStringAsFixed(8)); // Round to avoid float duplicates
+                  int idx = uniqueRoots.indexOf(rVal);
+                  if (idx == -1) {
+                    uniqueRoots.add(rVal);
+                    mults.add(1);
+                  } else {
+                    mults[idx]++;
+                  }
+                }
+
+                // Simple Heaviside cover-up for distinct real roots
+                if (mults.every((m) => m == 1)) {
+                  Expression result = Literal(0);
+                  for (var p in uniqueRoots) {
+                    // D'(p) = product of (p - q) for all other roots q
+                    double denomDerivAtP = 1.0;
+                    for (var q in uniqueRoots) {
+                      if ((q - p).abs() > 1e-9) denomDerivAtP *= (p - q);
+                    }
+
+                    // Evaluate numerator at s = p
+                    dynamic numAtP;
+                    try {
+                      var evalRes = nume.evaluate({s.identifier.name: p});
+                      numAtP = evalRes is Complex ? evalRes.real : evalRes;
+                      if (numAtP is Rational) numAtP = numAtP.toDouble();
+                    } catch (_) {}
+
+                    if (numAtP is num) {
+                      double residue = numAtP / denomDerivAtP;
+                      if (residue.abs() > 1e-12) {
+                        Expression eTerm = p.abs() < 1e-9
+                            ? Literal(1)
+                            : Exp(Multiply(Literal(p), t));
+
+                        // Format residue cleanly
+                        Expression residueLit;
+                        if (residue == residue.roundToDouble()) {
+                          residueLit = Literal(residue.toInt());
+                        } else {
+                          residueLit = Literal(residue);
+                        }
+
+                        result =
+                            Add(result, Multiply(residueLit, eTerm)).simplify();
+                      }
+                    }
+                  }
+                  return result;
+                }
+              }
+            }
+          } catch (_) {
+            // Fall through to UnimplementedError if polynomial root finding fails
+          }
+        }
       }
       if (den is Pow && den.exponent is Literal) {
         var n = (den.exponent as Literal).value;
@@ -382,44 +515,60 @@ class InverseLaplaceTransform {
                   : baseCoeffs.keys.reduce((a, b) => a > b ? a : b);
               if (deg == 2) {
                 var A = baseCoeffs[2] ?? Literal(0);
+                var bBase = baseCoeffs[1] ?? Literal(0); // FIX 3: Extract B
                 var C = baseCoeffs[0] ?? Literal(0);
 
-                var numCoeffs = _collectCoeffs(nume, s) ?? {};
-                var Q = numCoeffs[2] ?? Literal(0);
-                var R = numCoeffs[1] ?? Literal(0);
-                var S = numCoeffs[0] ?? Literal(0);
+                // FIX 3: Ensure B is effectively zero before applying (A*s^2 + C)^2 formula
+                bool bIsZero = false;
+                if (bBase is Literal) {
+                  var val = bBase.value;
+                  if (val == 0 ||
+                      val == 0.0 ||
+                      val == Complex.zero() ||
+                      val == Rational.zero) {
+                    bIsZero = true;
+                  }
+                }
 
-                var a2 = Multiply(A, A).simplify();
-                var q = Divide(Q, a2).simplify();
-                var r = Divide(R, a2).simplify();
-                var ss = Divide(S, a2).simplify();
+                if (bIsZero) {
+                  var numCoeffs = _collectCoeffs(nume, s) ?? {};
+                  var Q = numCoeffs[2] ?? Literal(0);
+                  var R = numCoeffs[1] ?? Literal(0);
+                  var S = numCoeffs[0] ?? Literal(0);
 
-                var wSquared = Divide(C, A).simplify();
-                var w = Pow(wSquared, Literal(0.5)).simplify();
+                  var a2 = Multiply(A, A).simplify();
+                  var q = Divide(Q, a2).simplify();
+                  var r = Divide(R, a2).simplify();
+                  var ss = Divide(S, a2).simplify();
 
-                var term1 = Divide(q, Multiply(Literal(2), w)).simplify();
-                var term2 = Divide(ss, Multiply(Literal(2), Pow(w, Literal(3))))
-                    .simplify();
-                var coeffSin = Add(term1, term2).simplify();
+                  var wSquared = Divide(C, A).simplify();
+                  var w = Pow(wSquared, Literal(0.5)).simplify();
 
-                var coeffSinT = Divide(r, Multiply(Literal(2), w)).simplify();
+                  var term1 = Divide(q, Multiply(Literal(2), w)).simplify();
+                  var term2 =
+                      Divide(ss, Multiply(Literal(2), Pow(w, Literal(3))))
+                          .simplify();
+                  var coeffSin = Add(term1, term2).simplify();
 
-                var term3 = Divide(q, Literal(2)).simplify();
-                var term4 =
-                    Divide(ss, Multiply(Literal(2), wSquared)).simplify();
-                var coeffCosT = Subtract(term3, term4).simplify();
+                  var coeffSinT = Divide(r, Multiply(Literal(2), w)).simplify();
 
-                Expression t1 = coeffSin is Literal && coeffSin.value == 0
-                    ? Literal(0)
-                    : Multiply(coeffSin, Sin(Multiply(w, t)));
-                Expression t2 = coeffSinT is Literal && coeffSinT.value == 0
-                    ? Literal(0)
-                    : Multiply(Multiply(coeffSinT, Sin(Multiply(w, t))), t);
-                Expression t3 = coeffCosT is Literal && coeffCosT.value == 0
-                    ? Literal(0)
-                    : Multiply(Multiply(coeffCosT, Cos(Multiply(w, t))), t);
+                  var term3 = Divide(q, Literal(2)).simplify();
+                  var term4 =
+                      Divide(ss, Multiply(Literal(2), wSquared)).simplify();
+                  var coeffCosT = Subtract(term3, term4).simplify();
 
-                return Add(Add(t1, t2), t3).simplify();
+                  Expression t1 = coeffSin is Literal && coeffSin.value == 0
+                      ? Literal(0)
+                      : Multiply(coeffSin, Sin(Multiply(w, t)));
+                  Expression t2 = coeffSinT is Literal && coeffSinT.value == 0
+                      ? Literal(0)
+                      : Multiply(Multiply(coeffSinT, Sin(Multiply(w, t))), t);
+                  Expression t3 = coeffCosT is Literal && coeffCosT.value == 0
+                      ? Literal(0)
+                      : Multiply(Multiply(coeffCosT, Cos(Multiply(w, t))), t);
+
+                  return Add(Add(t1, t2), t3).simplify();
+                }
               }
             }
           }
@@ -455,11 +604,19 @@ class InverseLaplaceTransform {
         return Multiply(nume, Exp(Multiply(a, t))).simplify();
       }
     }
-    return CallExpression(Variable(Identifier('ilt')), [expr, s, t]);
+    throw UnimplementedError('Inverse Laplace not implemented for: $expr');
+    //return CallExpression(Variable(Identifier('ilt')), [expr, s, t]);
   }
 
   static Map<int, Expression>? _collectCoeffs(Expression expr, Variable s) {
     final varName = s.identifier.name;
+
+    // CRITICAL FIX 1: Expand and simplify to flatten the polynomial.
+    // This converts (s+1)*(s+2) into s^2 + 3s + 2, and (s^2+4)^2 into s^4 + 8s^2 + 16.
+    try {
+      expr = expr.expand().simplify();
+    } catch (_) {}
+
     List<Expression> collectSumTerms(Expression e) {
       if (e is Add) {
         return [...collectSumTerms(e.left), ...collectSumTerms(e.right)];
@@ -467,7 +624,7 @@ class InverseLaplaceTransform {
       if (e is Subtract) {
         return [
           ...collectSumTerms(e.left),
-          ...collectSumTerms(Multiply(Literal(-1), e.right))
+          ...collectSumTerms(Multiply(Literal(-1), e.right).simplify())
         ];
       }
       if (e is GroupExpression) {
@@ -486,28 +643,41 @@ class InverseLaplaceTransform {
       if (t is GroupExpression) {
         return parseTerm(t.expression);
       }
+
+      // Check if it's a constant (no 's' variable)
       if (!t
           .getVariableTerms()
           .any((varTerm) => varTerm.identifier.name == varName)) {
         return _LaplaceTermCoeff(t, 0);
       }
+
       if (t is Variable && t.identifier.name == varName) {
         return _LaplaceTermCoeff(Literal(1), 1);
       }
+
       if (t is Pow) {
         if (t.base is Variable &&
             (t.base as Variable).identifier.name == varName) {
           if (t.exponent is Literal) {
             var val = (t.exponent as Literal).value;
             double expDouble = -1.0;
-            if (val is num) expDouble = val.toDouble();
-            if (val is Rational) expDouble = val.toDouble();
+            if (val is num) {
+              expDouble = val.toDouble();
+            } else if (val is Rational) {
+              expDouble = val.toDouble();
+            }
+            // CRITICAL FIX 2: Handle Complex literals (e.g., Complex(2, 0))
+            else if (val is Complex) {
+              expDouble = val.real.toDouble();
+            }
+
             if (expDouble >= 0 && expDouble == expDouble.toInt()) {
               return _LaplaceTermCoeff(Literal(1), expDouble.toInt());
             }
           }
         }
       }
+
       if (t is Multiply) {
         var leftHasVar = t.left
             .getVariableTerms()
@@ -515,6 +685,7 @@ class InverseLaplaceTransform {
         var rightHasVar = t.right
             .getVariableTerms()
             .any((varTerm) => varTerm.identifier.name == varName);
+
         if (leftHasVar && !rightHasVar) {
           var varTerm = parseTerm(t.left);
           if (varTerm == null) return null;
@@ -526,7 +697,8 @@ class InverseLaplaceTransform {
           if (varTerm == null) return null;
           return _LaplaceTermCoeff(
               Multiply(t.left, varTerm.coefficient).simplify(), varTerm.degree);
-        } else {
+        } else if (leftHasVar && rightHasVar) {
+          // Handle cases like s * s^2 -> s^3 (though expand() usually prevents this)
           var leftTerm = parseTerm(t.left);
           var rightTerm = parseTerm(t.right);
           if (leftTerm == null || rightTerm == null) return null;
@@ -536,6 +708,7 @@ class InverseLaplaceTransform {
           );
         }
       }
+
       if (t is Divide) {
         var denHasVar = t.right
             .getVariableTerms()
@@ -555,7 +728,7 @@ class InverseLaplaceTransform {
       Map<int, Expression> degreeCoeffs = {};
       for (var term in sumTerms) {
         var parsedTerm = parseTerm(term);
-        if (parsedTerm == null) return null;
+        if (parsedTerm == null) return null; // If any term fails, abort cleanly
         var deg = parsedTerm.degree;
         var coeff = parsedTerm.coefficient;
         if (degreeCoeffs.containsKey(deg)) {
