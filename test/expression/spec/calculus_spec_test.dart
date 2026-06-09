@@ -158,9 +158,9 @@ void main() {
     test('integrate(2*x^2+x, x)',
         () => check('integrate(2*x^2+x, x)', '(2/3)*x^3+(1/2)*x^2'));
     test('integrate(log(x), x)',
-        () => check('integrate(log(x), x)', 'ln(x)*x-x'));
+        () => check('integrate(log(x), x)', 'x*ln(x)-x'));
     test('integrate(sqrt(x), x)',
-        () => check('integrate(sqrt(x), x)', '(2/3)*x^(3/2)'));
+        () => check('integrate(sqrt(x), x)', 'x^(3/2)/(3/2)')); //(2/3)*x^(3/2)
     test(
         'integrate(asin(a*x), x)',
         () =>
@@ -190,11 +190,8 @@ void main() {
         skip: 'Advanced symbolic integration strategy not implemented yet');
     test('integrate(1/(a^2+x^2), x)',
         () => check('integrate(1/(a^2+x^2), x)', 'atan(x/a)/a'));
-    test(
-        'integrate(11/(a+5*r*x)^2,x)',
-        () => check(
-            'integrate(11/(a+5*r*x)^2,x)', '(-11/5)*(5*r*x+a)^(-1)*r^(-1)'),
-        skip: 'Advanced symbolic integration strategy not implemented yet');
+    test('integrate(11/(a+5*r*x)^2,x)',
+        () => check('integrate(11/(a+5*r*x)^2,x)', '(-11/5)*(a+5*r*x)^(-1)/r'));
     test('integrate(cos(x)*sin(x), x)',
         () => check('integrate(cos(x)*sin(x), x)', '(-1/2)*cos(x)^2'));
     test(
@@ -214,7 +211,7 @@ void main() {
     test(
         'integrate(1/(x^2+3*a^2), x)',
         () => check('integrate(1/(x^2+3*a^2), x)',
-            'sqrt(3*a^2)^(-1)*atan(x/sqrt(3*a^2))'));
+            '3^(-1/2)*atan(x/(sqrt(3)*a))/a')); // sqrt(3*a^2)^(-1)*atan(x/sqrt(3*a^2))
     test(
         'integrate(8*x^3/(6*x^2+3*a^2), x)',
         () => check('integrate(8*x^3/(6*x^2+3*a^2), x)',
@@ -225,8 +222,11 @@ void main() {
         () => check('integrate(10*q/(4*x^2+24*x+20), x)',
             '10*((-1/16)*log(5+x)+(1/16)*log(1+x))*q'),
         skip: 'Advanced symbolic integration strategy not implemented yet');
-    test('integrate(x/(x+a)^2, x)',
-        () => check('integrate(x/(x+a)^2, x)', '(a+x)^(-1)*a+log(a+x)'),
+    test(
+        'integrate(x/(x+a)^2, x)',
+        () => check('integrate(x/(x+a)^2, x)',
+            'ln(x+a)+a*(x+a)^(-1)') // (a+x)^(-1)*a+log(a+x)
+        ,
         skip: 'Advanced symbolic integration strategy not implemented yet');
     test('integrate(sqrt(x-a), x)',
         () => check('integrate(sqrt(x-a), x)', '(x-a)^(3/2)/(3/2)'));

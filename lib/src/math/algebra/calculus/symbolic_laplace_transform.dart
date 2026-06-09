@@ -432,7 +432,7 @@ class InverseLaplaceTransform {
             var denPoly = Polynomial.fromList(polyCoeffs, variable: s);
             var roots = denPoly.roots();
 
-            if (roots != null && roots.isNotEmpty) {
+            if (roots.isNotEmpty) {
               bool allReal = roots.every((r) {
                 if (r is num) return true;
                 if (r is Complex) return r.imaginary == 0;

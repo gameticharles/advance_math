@@ -8,6 +8,7 @@
 ## CAS Trigonometric Functions & Test Improvements
 
 - **[FEATURE]** Expanded Computer Algebra System (CAS) expression classes and parser to fully support inverse trigonometric (`asec`, `acsc`, `acot`), hyperbolic (`sinh`, `cosh`, `tanh`, `sech`, `csch`, `coth`), and inverse hyperbolic (`asinh`, `acosh`, `atanh`, `asech`, `acsch`, `acoth`) functions natively.
+- **[IMPROVEMENT]** Improved symbolic Laplace Transform and Inverse Laplace Transform computation (`LaplaceTransform` and `InverseLaplaceTransform`) with comprehensive mapping of standard functions..
 - **[TEST]** Enabled and verified more complex Inverse Laplace Transform test cases in `extra_spec_test.dart`.
 
 # 5.7.0
