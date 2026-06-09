@@ -5,6 +5,11 @@
 - **[DOCUMENTATION]** Extensively expanded `README.md` with comprehensive explanations, code examples, and usage cases for the symbolic calculus package (differentiation, integration, limits, summations), Laplace & Inverse Laplace transforms, and system equation solvers.
 - **[IMPROVEMENT]** Updated pubspec topics to `expressions-cas` to highlight the library's advanced Computer Algebra System capabilities.
 
+## CAS Trigonometric Functions & Test Improvements
+
+- **[FEATURE]** Expanded Computer Algebra System (CAS) expression classes and parser to fully support inverse trigonometric (`asec`, `acsc`, `acot`), hyperbolic (`sinh`, `cosh`, `tanh`, `sech`, `csch`, `coth`), and inverse hyperbolic (`asinh`, `acosh`, `atanh`, `asech`, `acsch`, `acoth`) functions natively.
+- **[TEST]** Enabled and verified more complex Inverse Laplace Transform test cases in `extra_spec_test.dart`.
+
 # 5.7.0
 
 ## Laplace Transforms, Symbolic Calculus & CAS Enhancements
