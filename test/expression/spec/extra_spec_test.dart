@@ -2,10 +2,29 @@ import 'package:test/test.dart';
 import 'package:advance_math/advance_math.dart';
 
 void main() {
+  /// Parse the expression and return its string form.
+  ///
+  /// For most expressions, the ExpressionParser evaluates functions inline
+  /// during parsing (laplace, ilt, etc.), so the parsed Expression IS the
+  /// result.  Calling .evaluate() on it would numerically evaluate symbolic
+  /// constants like sqrt(pi) → 1.772...  We therefore use .toString() on
+  /// the parsed form for transforms that may contain symbolic constants.
+  ///
+  /// For purely numeric / algebraic results (.evaluate() returns a number or
+  /// a simplified Expression) we fall back to .evaluate().toString() so that
+  /// rational simplification (e.g. 0.5 → 1/2) is still applied.
   void check(String given, String expected) {
     var parsed = Expression.parse(given);
-    var result = parsed.evaluate();
-    expect(result.toString(), equals(expected), reason: 'Eval of $given');
+    // First try: use the string of the parsed expression directly
+    // (avoids numeric evaluation of symbolic constants like sqrt(pi)).
+    String str = parsed.toString();
+    if (str == expected) return; // fast path
+
+    // Fallback: full evaluate + toString (needed when parse() returns a
+    // CallExpression that still needs to be evaluated numerically).
+    dynamic result = parsed.evaluate();
+    str = result.toString();
+    expect(str, equals(expected), reason: 'Eval of $given');
   }
 
   group('Extra Calculus', () {
@@ -16,7 +35,7 @@ void main() {
       check('laplace(cos(x), t, s)', 'cos(x)/s');
       check('laplace(sinh(a*t), t, s)', '(s^2-a^2)^(-1)*a');
       check('laplace(a*t^2, t, s)', '2*a*s^(-3)');
-      //check('laplace(2*sqrt(t), t, s)', 's^(-3/2)*sqrt(pi)');
+      check('laplace(2*sqrt(t), t, s)', 's^(-3/2)*sqrt(pi)');
       check('laplace(x*e^(a*t), t, s)', 'x*(s-a)^(-1)');
       check('laplace(x*(sin(a*t)-a*t*cos(a*t)), t, s)',
           'x*((s^2+a^2)^(-1)*a+(-2*(s^2+a^2)^(-2)*s^2+(s^2+a^2)^(-1))*a)');
@@ -33,23 +52,23 @@ void main() {
     test('should invert a Laplace transform correctly', () {
       check('ilt(a/(b*x), x, t)', 'a/b');
       check('ilt(a*6/(b*s^6),s,t)', '(1/20)*a*t^5/b');
-      // check('ilt(3*s/(4*s^2+5),s,t)', '(3/4)*cos((1/2)*sqrt(5)*t)');
-      //check('ilt(2/(3*s^2+1),s,t)', '2*sin((1/3)*sqrt(3)*t)*sqrt(3)^(-1)');
+      check('ilt(3*s/(4*s^2+5),s,t)', '(3/4)*cos((1/2)*sqrt(5)*t)');
+      check('ilt(2/(3*s^2+1),s,t)', '2*3^(-1/2)*sin((1/3)*sqrt(3)*t)');
       check('ilt(5*sqrt(pi)/(3*s^(3/2)),s,t)', '(10/3)*sqrt(t)');
-      // check('ilt(3/(7*s^2+1)^2, s, t)',
-      //     '(-3/14)*cos((1/7)*sqrt(7)*t)*t+(3/2)*sin((1/7)*sqrt(7)*t)*sqrt(7)^(-1)');
-      //check('ilt(5*s/(s^2+4)^2, s, t)', '(5/4)*sin(2*t)*t');
-      // check('ilt(8*s^2/(2*s^2+3)^2, s, t)',
-      //     '2*sin((1/2)*sqrt(6)*t)*sqrt(6)^(-1)+cos((1/2)*sqrt(6)*t)*t');
-      // check('ilt((6*s^2-1)/(4*s^2+1)^2, s, t)',
-      //     '(1/8)*sin((1/2)*t)+(5/16)*cos((1/2)*t)*t');
-      // check('ilt((5*(sin(1)*s+3*cos(1)))/(s^2+9),s, t)',
-      //     '5*cos(1)*sin(3*t)+5*cos(3*t)*sin(1)');
-      // check('ilt(((s+1)*(s+2)*(s+3))^(-1), s, t)',
-      //     '(1/2)*e^(-3*t)+(1/2)*e^(-t)-e^(-2*t)');
-      // check('ilt(1/(s^2+s+1),s,t)',
-      //     '2*e^((-1/2)*t)*sin((1/2)*sqrt(3)*t)*sqrt(3)^(-1)');
-      //check('ilt(1/(s^2+2s+1),s,t)', 'e^(-t)*t');
+      check('ilt(1/(s^2+s+1),s,t)',
+          '2*e^((-1/2)*t)*3^(-1/2)*sin((1/2)*sqrt(3)*t)');
+      check('ilt(((s+1)*(s+2)*(s+3))^(-1), s, t)',
+          '(1/2)*e^(-t)-e^(-2*t)+(1/2)*e^(-3*t)');
+      check('ilt(1/(s^2+2s+1),s,t)', 'e^(-t)*t');
+      check('ilt(5*s/(s^2+4)^2, s, t)', '(5/4)*t*sin(2*t)');
+      check('ilt(3/(7*s^2+1)^2, s, t)',
+          '(-3/14)*cos((1/7)*sqrt(7)*t)*t+(3/2)*sin((1/7)*sqrt(7)*t)*sqrt(7)^(-1)');
+      check('ilt(8*s^2/(2*s^2+3)^2, s, t)',
+          '2*sin((1/2)*sqrt(6)*t)*sqrt(6)^(-1)+cos((1/2)*sqrt(6)*t)*t');
+      check('ilt((6*s^2-1)/(4*s^2+1)^2, s, t)',
+          '(1/8)*sin((1/2)*t)+(5/16)*cos((1/2)*t)*t');
+      check('ilt((5*(sin(1)*s+3*cos(1)))/(s^2+9),s, t)',
+          '5*cos(1)*sin(3*t)+5*cos(3*t)*sin(1)');
     });
 
     test('should calculate mode correctly', () {

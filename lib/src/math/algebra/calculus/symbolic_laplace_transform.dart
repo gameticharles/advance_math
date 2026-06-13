@@ -59,6 +59,7 @@ class LaplaceTransform {
 
     if (expr is Multiply) {
       if (!hasT(expr.left)) {
+        // .simplify() preserves symbolic sqrt(pi) — it does NOT evaluate it numerically.
         return Multiply(expr.left, _transform(expr.right, t, s)).simplify();
       }
       if (!hasT(expr.right)) {
@@ -90,15 +91,17 @@ class LaplaceTransform {
         }
         return Multiply(Literal(fact), Pow(s, Literal(-(n + 1)))).simplify();
       }
-      // L{sqrt(t)} = L{t^(1/2)} = sqrt(π)/(2*s^(3/2))
-      // Keep sqrt(pi) symbolic — do NOT simplify numerically
+      // L{sqrt(t)} = L{t^(1/2)} = Γ(3/2)/s^(3/2) = sqrt(π)/(2s^(3/2))
+      // Keep sqrt(pi) symbolic — do NOT call .evaluate(); .simplify() is safe.
       if (n is Rational &&
           n.numerator == BigInt.one &&
           n.denominator == BigInt.two) {
-        // Return WITHOUT simplify() to keep sqrt(pi) symbolic
+        // Γ(3/2) = sqrt(pi)/2, so L{t^(1/2)} = (1/2)*sqrt(pi)*s^(-3/2)
         var sqrtPi = Pow(Variable('pi'), Literal(Rational(1, 2)));
         var sPow = Pow(s, Literal(Rational(-3, 2)));
-        return Multiply(sPow, sqrtPi);
+        // Use simplify() to fold any leading factor; it preserves sqrt(pi).
+        return Multiply(Literal(Rational(1, 2)), Multiply(sPow, sqrtPi))
+            .simplify();
       }
     }
 
@@ -329,6 +332,7 @@ class InverseLaplaceTransform {
     // First try direct inversion (handles simple additive / linear forms)
     try {
       var r = _invertDirect(expr, s, t);
+      // .simplify() is safe here — it preserves symbolic sqrt(n) forms.
       return LaplaceTransform._safeSimplify(r);
     } catch (_) {}
 
@@ -456,13 +460,151 @@ class InverseLaplaceTransform {
     if (deg == 1) {
       var B = denCoeffs[1] ?? Literal(0);
       var C = denCoeffs[0] ?? Literal(0);
-      var numCoeffs = _collectCoeffs(numer, s) ?? {};
+      var numCoeffs = _collectCoeffs(numer, s);
+      if (numCoeffs == null) {
+        throw UnimplementedError('numer is not a polynomial: $numer');
+      }
       var P = numCoeffs[1] ?? Literal(0);
       var Q = numCoeffs[0] ?? Literal(0);
       if (_isZeroExpr(P)) {
         var factor = Divide(Q, B).simplify();
         var a = Negate(Divide(C, B)).simplify();
-        return Multiply(factor, Exp(Multiply(a, t))).simplify();
+        return Multiply(factor, Pow(Variable('e'), Multiply(a, t))).simplify();
+      }
+    }
+
+    if (deg == 2) {
+      var A = denCoeffs[2] ?? Literal(0);
+      var B = denCoeffs[1] ?? Literal(0);
+      var C = denCoeffs[0] ?? Literal(0);
+      var numCoeffs = _collectCoeffs(numer, s);
+      if (numCoeffs == null) {
+        throw UnimplementedError('numer is not a polynomial: $numer');
+      }
+      var P = numCoeffs[1] ?? Literal(0);
+      var Q = numCoeffs[0] ?? Literal(0);
+
+      var aVal = _evalToDouble(A);
+      var bVal = _evalToDouble(B);
+      var cVal = _evalToDouble(C);
+
+      if (aVal != null && bVal != null && cVal != null) {
+        double discVal = bVal * bVal - 4 * aVal * cVal;
+        if (discVal < 0) {
+          // Complex conjugate roots — completing the square
+          //double alphaVal = -bVal / (2 * aVal);
+          double omegaVal =
+              dmath.sqrt(4 * aVal * cVal - bVal * bVal) / (2 * aVal);
+
+          Expression alpha =
+              Divide(Negate(B), Multiply(Literal(2), A)).simplify();
+          Expression wExpr = _omegaToSymbolic(omegaVal);
+
+          Expression eAlpha = _isZeroExpr(alpha)
+              ? Literal(1)
+              : Pow(Variable('e'), Multiply(alpha, t)).simplify();
+
+          Expression coeffCos = Divide(P, A).simplify();
+          Expression shift =
+              Divide(Negate(B), Multiply(Literal(2), A)).simplify();
+          Expression coeffSin =
+              Divide(Add(Multiply(P, shift), Q), Multiply(A, wExpr)).simplify();
+
+          Expression cosTerm = _isZeroExpr(coeffCos)
+              ? Literal(0)
+              : Multiply(coeffCos, Cos(Multiply(wExpr, t))).simplify();
+          Expression sinTerm = _isZeroExpr(coeffSin)
+              ? Literal(0)
+              : Multiply(coeffSin, Sin(Multiply(wExpr, t))).simplify();
+
+          return Multiply(eAlpha, Add(cosTerm, sinTerm).simplify()).simplify();
+        } else if (discVal == 0) {
+          // Repeated real root
+          Expression alpha =
+              Divide(Negate(B), Multiply(Literal(2), A)).simplify();
+          Expression eAlpha = _isZeroExpr(alpha)
+              ? Literal(1)
+              : Pow(Variable('e'), Multiply(alpha, t)).simplify();
+
+          Expression coeff1 = Divide(P, A).simplify();
+          Expression shift =
+              Divide(Negate(B), Multiply(Literal(2), A)).simplify();
+          Expression coeff2 = Divide(Add(Multiply(P, shift), Q), A).simplify();
+
+          Expression term1 = _isZeroExpr(coeff1) ? Literal(0) : coeff1;
+          Expression term2 =
+              _isZeroExpr(coeff2) ? Literal(0) : Multiply(coeff2, t).simplify();
+          return Multiply(eAlpha, Add(term1, term2).simplify()).simplify();
+        }
+      }
+    }
+
+    if (deg == 4) {
+      var a4 = denCoeffs[4] ?? Literal(0);
+      var a3 = denCoeffs[3] ?? Literal(0);
+      var a2 = denCoeffs[2] ?? Literal(0);
+      var a1 = denCoeffs[1] ?? Literal(0);
+      var a0 = denCoeffs[0] ?? Literal(0);
+
+      if (_isZeroExpr(a3) && _isZeroExpr(a1)) {
+        var a4Val = _evalToDouble(a4);
+        var a2Val = _evalToDouble(a2);
+        var a0Val = _evalToDouble(a0);
+
+        if (a4Val != null &&
+            a2Val != null &&
+            a0Val != null &&
+            a4Val > 0 &&
+            a0Val > 0) {
+          double diff = (a2Val * a2Val - 4 * a4Val * a0Val).abs();
+          if (diff < 1e-6) {
+            // Reconstruct A and C from (As^2 + C)^2
+            double aVal = dmath.sqrt(a4Val);
+            double cVal = dmath.sqrt(a0Val);
+            Expression A = _omegaToSymbolic(aVal);
+            //Expression C = _omegaToSymbolic(C_val);
+
+            var numCoeffs = _collectCoeffs(numer, s);
+            if (numCoeffs == null) {
+              throw UnimplementedError('numer is not a polynomial: $numer');
+            }
+            var P = numCoeffs[2] ?? Literal(0);
+            var Q = numCoeffs[1] ?? Literal(0);
+            var R = numCoeffs[0] ?? Literal(0);
+
+            double omegaVal = dmath.sqrt(cVal / aVal);
+            Expression wExpr = _omegaToSymbolic(omegaVal);
+
+            Expression term1 = _isZeroExpr(P)
+                ? Literal(0)
+                : Divide(
+                    Multiply(
+                        P,
+                        Add(
+                            Sin(Multiply(wExpr, t)),
+                            Multiply(
+                                Multiply(wExpr, t), Cos(Multiply(wExpr, t))))),
+                    Multiply(Literal(2), wExpr));
+            Expression term2 = _isZeroExpr(Q)
+                ? Literal(0)
+                : Divide(Multiply(Q, Multiply(t, Sin(Multiply(wExpr, t)))),
+                    Multiply(Literal(2), wExpr));
+            Expression term3 = _isZeroExpr(R)
+                ? Literal(0)
+                : Divide(
+                    Multiply(
+                        R,
+                        Subtract(
+                            Sin(Multiply(wExpr, t)),
+                            Multiply(
+                                Multiply(wExpr, t), Cos(Multiply(wExpr, t))))),
+                    Multiply(Literal(2), Pow(wExpr, Literal(3))));
+
+            return Divide(Add(term1, Add(term2, term3).simplify()).simplify(),
+                    Multiply(A, A))
+                .simplify();
+          }
+        }
       }
     }
 
@@ -515,17 +657,11 @@ class InverseLaplaceTransform {
     N = N.map((c) => _cdiv(c, leadD)).toList();
 
     // 3+4. Find roots and determine multiplicities.
-    //
-    // Polynomial.roots() returns Literal(Complex), Literal(int), Divide, etc.
-    // We evaluate each root numerically to get a Complex double.
-    // Multiplicity is determined by checking how many derivatives vanish at the root.
     List<double> realDcoeffs = D.map((c) => c.real).cast<double>().toList();
     var denPolyObj = Polynomial.fromList(realDcoeffs, variable: s);
     var rawRoots = denPolyObj.roots();
 
     // Convert any root to a Complex<double,double> by numerical evaluation.
-    // Polynomial.roots() returns Literal(Complex(Rational, Rational)) —
-    // we must extract double values explicitly.
     Complex toComplex(dynamic r) {
       if (r is Literal) return toComplex(r.value);
       if (r is Complex) {
@@ -565,23 +701,20 @@ class InverseLaplaceTransform {
       if (!found) poles.add(_Pole(r, 1));
     }
 
-    // For repeated-pole cases (like (s^2+1)^2) the quartic/cubic solver may
-    // return symbolic roots that evaluate to the same value. Re-verify
-    // multiplicity by checking how many derivatives of D vanish at the root.
-    // Build derivative polynomials of D in complex arithmetic.
-    List<List<Complex>> Dderivs = [D];
+    // Re-verify multiplicity by checking how many derivatives of D vanish at the root.
+    List<List<Complex>> dDerivs = [D];
     for (int di = 0; di < 4; di++) {
-      var prev = Dderivs.last;
+      var prev = dDerivs.last;
       if (prev.length <= 1) break;
       var deriv = List.generate(prev.length - 1,
           (i) => _cmul(prev[i], Complex((prev.length - 1 - i).toDouble(), 0)));
-      Dderivs.add(deriv);
+      dDerivs.add(deriv);
     }
     for (var pole in poles) {
       if (pole.mult > 1) continue; // already identified as repeated
       Complex p = pole.value;
       int m = 0;
-      for (var dPoly in Dderivs) {
+      for (var dPoly in dDerivs) {
         Complex val = _polyEval(dPoly, p);
         if (val.real.abs() < 1e-4 && val.imaginary.abs() < 1e-4) {
           m++;
@@ -639,17 +772,20 @@ class InverseLaplaceTransform {
         // ---- Real pole ----
         double pReal = p.real;
         for (int j = 1; j <= m; j++) {
-          Complex A = residues[j - 1]; // residue for order j (1-indexed)
+          // Heaviside formula: A_j = G^(m-j)(p) / (m-j)!
+          // residues[k] ≈ G^(k)(p), so A_j = residues[m-j] / (m-j)!
+          Complex A = residues[m - j];
           double aR = A.real;
           if (aR.abs() < 1e-10) continue;
 
           int power = j - 1;
-          double coeff = aR / _factorial(power);
+          // L⁻¹{A_j/(s-p)^j} = A_j * t^(j-1)/(j-1)! * e^(pt)
+          double coeff = aR / _factorial(m - j) / _factorial(power);
           Expression coeffExpr = _toRationalExpr(coeff);
           Expression tPow = power == 0 ? Literal(1) : Pow(t, Literal(power));
           Expression eFact = pReal.abs() < 1e-9
               ? Literal(1)
-              : Exp(Multiply(_toRationalExpr(pReal), t));
+              : Pow(Variable('e'), Multiply(_toRationalExpr(pReal), t));
 
           result = Add(
                   result,
@@ -667,14 +803,17 @@ class InverseLaplaceTransform {
         Expression wExpr = _omegaToSymbolic(omega);
         Expression eAlpha = alpha.abs() < 1e-9
             ? Literal(1)
-            : Exp(Multiply(_toRationalExpr(alpha), t));
+            : Pow(Variable('e'), Multiply(_toRationalExpr(alpha), t));
 
         for (int j = 1; j <= m; j++) {
-          Complex A = residues[j - 1];
+          // Heaviside formula: A_j = residues[m-j] / (m-j)!
+          Complex A = residues[m - j];
           int power = j - 1;
-          // Combined: A·t^(j-1)/(j-1)!·e^(pt) + Ā·... = e^(αt)·t^(j-1)/(j-1)!·[2Re(A)cos - 2Im(A)sin]
-          double coeffCos = 2 * A.real / _factorial(power);
-          double coeffSin = -2 * A.imaginary / _factorial(power);
+          // Combined contribution from conjugate pair:
+          //   e^(αt)·t^(j-1)/(j-1)! · [2Re(A_j)cos(ωt) − 2Im(A_j)sin(ωt)]
+          double factMJ = _factorial(m - j).toDouble();
+          double coeffCos = 2 * A.real / factMJ / _factorial(power);
+          double coeffSin = -2 * A.imaginary / factMJ / _factorial(power);
 
           Expression tPow = power == 0 ? Literal(1) : Pow(t, Literal(power));
           Expression scale = Multiply(eAlpha, tPow).simplify();
@@ -724,7 +863,10 @@ class InverseLaplaceTransform {
     if (expr is Pow && expr.exponent is Literal) {
       double? nd = _asDouble((expr.exponent as Literal).value);
       if (nd != null && nd < 0) {
-        return (Literal(1), Pow(expr.base, Literal(-nd)));
+        // When nd == -1 the denominator IS the base (not Pow(base, 1.0))
+        Expression denom =
+            nd == -1.0 ? expr.base : Pow(expr.base, Literal((-nd).toInt()));
+        return (Literal(1), denom);
       }
     }
 
@@ -880,30 +1022,6 @@ class InverseLaplaceTransform {
     }
   }
 
-  /// Evaluate expr at s = pReal (real double), return double or null.
-  static double? _evalAtDouble(Expression expr, Variable s, double pReal) {
-    try {
-      var v = expr.evaluate({s.identifier.name: pReal});
-      return _asDouble(v is Complex ? v.real : v);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  /// Evaluate expr at s = p (Complex), return Complex or null.
-  static Complex? _evalAtComplex(Expression expr, Variable s, Complex p) {
-    try {
-      var v = expr.evaluate({s.identifier.name: p});
-      if (v is Complex) return v;
-      if (v is double) return Complex(v, 0);
-      if (v is int) return Complex(v.toDouble(), 0);
-      if (v is Rational) return Complex(v.toDouble(), 0);
-      return null;
-    } catch (_) {
-      return null;
-    }
-  }
-
   /// Convert a double to a Rational expression if it's close to a simple fraction.
   /// Always returns a symbolic expression, never a float literal.
   static Expression _toRationalExpr(double v) {
@@ -988,9 +1106,10 @@ class InverseLaplaceTransform {
     var rat = Rational(outside, q);
     if (rat.isInteger) {
       int n = rat.numerator.toInt();
-      return n == 1 ? sqrtExpr : Multiply(Literal(n), sqrtExpr).simplify();
+      // Do NOT call .simplify() — it would evaluate sqrt(n) numerically
+      return n == 1 ? sqrtExpr : Multiply(Literal(n), sqrtExpr);
     }
-    return Multiply(Literal(rat), sqrtExpr).simplify();
+    return Multiply(Literal(rat), sqrtExpr); // No .simplify()!
   }
 
   static bool _complexClose(Complex a, Complex b) =>

@@ -182,6 +182,38 @@ class Pow extends BinaryOperationsExpression {
       if (isRealNum(b) && isRealNum(e)) {
         final ratB = Rational(b);
         final ratE = Rational(e);
+        if (ratE.denominator == BigInt.two) {
+          if (ratE.isNegative) {
+            final posE = -ratE;
+            final simplifiedPos = Pow(simplifiedBase, Literal(posE)).simplify();
+            if (simplifiedPos is Literal) {
+              return Divide(Literal(1), simplifiedPos).simplify();
+            }
+            return Pow(simplifiedBase, simplifiedExponent);
+          } else {
+            final N = ratB.numerator;
+            final D = ratB.denominator;
+            double sqrtN = dmath.sqrt(N.toDouble());
+            double sqrtD = dmath.sqrt(D.toDouble());
+            if (sqrtN == sqrtN.roundToDouble() && sqrtD == sqrtD.roundToDouble()) {
+              // Perfect square, let it fall through to evaluate
+            } else {
+              if (ratE == Rational(1, 2)) {
+                // Let the existing 1/2 block handle it below
+              } else {
+                final whole = ratE.toInt();
+                final rem = ratE - Rational(whole);
+                if (whole > 0) {
+                  return Multiply(
+                    Pow(simplifiedBase, Literal(whole)),
+                    Pow(simplifiedBase, Literal(rem))
+                  ).simplify();
+                }
+                return Pow(simplifiedBase, simplifiedExponent);
+              }
+            }
+          }
+        }
 
         if (ratE == Rational(1, 2)) {
           if (ratB.isNegative) {
@@ -198,7 +230,14 @@ class Pow extends BinaryOperationsExpression {
               BigInt remaining = N;
               double d = N.toDouble();
               if (!d.isInfinite && !d.isNaN) {
-                int limit = dmath.sqrt(d).floor();
+                double root = dmath.sqrt(d);
+                if (root == root.roundToDouble()) {
+                  return Literal(Rational(root.round()));
+                }
+                int limit = root.floor();
+                if (limit > 10000) {
+                  limit = 10000;
+                }
                 for (int i = 2; i <= limit; i++) {
                   BigInt i2 = BigInt.from(i * i);
                   while (remaining % i2 == BigInt.zero) {
