@@ -20,6 +20,7 @@ part of 'math.dart';
 /// print(sin(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic sin(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     return math.sin(x);
   } else if (x is Complex) {
@@ -52,6 +53,7 @@ dynamic sin(dynamic x) {
 /// print(cos(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic cos(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     return math.cos(x);
   } else if (x is Complex) {
@@ -84,6 +86,7 @@ dynamic cos(dynamic x) {
 /// print(tan(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic tan(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     return math.tan(x);
   } else if (x is Complex) {
@@ -112,6 +115,7 @@ dynamic tan(dynamic x) {
 /// print(sec(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic sec(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     return 1 / cos(x);
   } else if (x is Complex) {
@@ -140,6 +144,7 @@ dynamic sec(dynamic x) {
 /// print(csc(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic csc(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     return 1 / sin(x);
   } else if (x is Complex) {
@@ -168,6 +173,7 @@ dynamic csc(dynamic x) {
 /// print(cot(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic cot(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     return 1 / tan(x);
   } else if (x is Complex) {
@@ -196,6 +202,7 @@ dynamic cot(dynamic x) {
 /// print(asin(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic asin(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     if (x >= -1 && x <= 1) {
       return math.asin(x);
@@ -234,6 +241,7 @@ dynamic asin(dynamic x) {
 /// print(acos(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic acos(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     if (x >= -1 && x <= 1) {
       return math.acos(x);
@@ -272,6 +280,7 @@ dynamic acos(dynamic x) {
 /// print(atan(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic atan(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     return math.atan(x);
   } else if (x is Complex) {
@@ -340,6 +349,7 @@ dynamic atan2(dynamic a, dynamic b) {
 /// print(asec(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic asec(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num || x is Complex) {
     if (x.abs() < 1) {
       throw ArgumentError(
@@ -370,6 +380,7 @@ dynamic asec(dynamic x) {
 /// print(acsc(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic acsc(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num || x is Complex) {
     if (x.abs() < 1) {
       throw ArgumentError(
@@ -400,6 +411,7 @@ dynamic acsc(dynamic x) {
 /// print(acot(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic acot(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num || x is Complex) {
     //pi / 2 - math.atan(x)
     return Complex(x).acot();
@@ -427,6 +439,7 @@ dynamic acot(dynamic x) {
 /// print(sinh(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic sinh(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     return (exp(x) - exp(-x)) / 2;
   } else if (x is Complex) {
@@ -455,6 +468,7 @@ dynamic sinh(dynamic x) {
 /// print(cosh(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic cosh(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     return (exp(x) + exp(-x)) / 2;
   } else if (x is Complex) {
@@ -483,6 +497,7 @@ dynamic cosh(dynamic x) {
 /// print(tanh(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic tanh(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num || x is Complex) {
     return sinh(x) / cosh(x);
   } else if (x is Matrix) {
@@ -509,6 +524,7 @@ dynamic tanh(dynamic x) {
 /// print(sech(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic sech(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num || x is Complex) {
     return Complex(1, 0) / cosh(x);
   } else if (x is Matrix) {
@@ -535,6 +551,7 @@ dynamic sech(dynamic x) {
 /// print(csch(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic csch(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num || x is Complex) {
     return Complex(1, 0) / sinh(x);
   } else if (x is Matrix) {
@@ -561,6 +578,7 @@ dynamic csch(dynamic x) {
 /// print(coth(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic coth(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num || x is Complex) {
     return Complex(1, 0) / tanh(x);
   } else if (x is Matrix) {
@@ -587,6 +605,7 @@ dynamic coth(dynamic x) {
 /// print(asinh(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic asinh(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     dynamic res = log(Complex(x) + sqrt(x * x + 1));
     return res is Complex ? res.simplify() : res;
@@ -618,6 +637,7 @@ dynamic asinh(dynamic x) {
 /// print(acosh(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic acosh(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     if (x < 1) {
       throw ArgumentError('Invalid input for acosh: input must be >= 1');
@@ -652,6 +672,7 @@ dynamic acosh(dynamic x) {
 /// print(atanh(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic atanh(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     if (x <= -1 || x >= 1) {
       throw ArgumentError('Invalid input for atanh: input must be in (-1, 1)');
@@ -683,6 +704,7 @@ dynamic atanh(dynamic x) {
 /// print(asech(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic asech(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     if (x <= 0 || x > 1) {
       throw ArgumentError('Invalid input for asech: input must be in (0, 1]');
@@ -714,6 +736,7 @@ dynamic asech(dynamic x) {
 /// print(acsch(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic acsch(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     return math.log(1 / x + math.sqrt(1 / (x * x) + 1));
   } else if (x is Complex) {
@@ -742,6 +765,7 @@ dynamic acsch(dynamic x) {
 /// print(acoth(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic acoth(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     if (x.abs() <= 1) {
       throw ArgumentError(
@@ -776,6 +800,7 @@ dynamic acoth(dynamic x) {
 /// print(vers(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic vers(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num || x is Complex) {
     return x is num ? 1 - math.cos(x) : Complex.one() - cos(x);
   } else if (x is Matrix) {
@@ -803,6 +828,7 @@ dynamic vers(dynamic x) {
 /// print(covers(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic covers(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num || x is Complex) {
     return x is num ? 1 - math.sin(x) : Complex.one() - sin(x);
   } else if (x is Matrix) {
@@ -831,6 +857,7 @@ dynamic covers(dynamic x) {
 /// print(havers(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic havers(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num || x is Complex) {
     return x is num
         ? 0.5 * (1 - cos(x))
@@ -859,6 +886,7 @@ dynamic havers(dynamic x) {
 /// print(exsec(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic exsec(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num || x is Complex) {
     return x is num ? 1 / cos(x) - 1 : Complex.one() / cos(x) - Complex.one();
   } else if (x is Matrix) {
@@ -885,6 +913,7 @@ dynamic exsec(dynamic x) {
 /// print(excsc(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic excsc(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num || x is Complex) {
     return x is num ? 1 / sin(x) - 1 : Complex.one() / sin(x) - Complex.one();
   } else if (x is Matrix) {
@@ -911,6 +940,7 @@ dynamic excsc(dynamic x) {
 /// print(sawtooth(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic sawtooth(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     return (x - x.floor()).toDouble();
   } else if (x is Complex) {
@@ -939,6 +969,7 @@ dynamic sawtooth(dynamic x) {
 /// print(squareWave(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic squareWave(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     return (x % 2 < 1) ? -1 : 1;
   } else if (x is Complex) {
@@ -967,6 +998,7 @@ dynamic squareWave(dynamic x) {
 /// print(triangleWave(Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic triangleWave(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     x %= 1;
     if (x < 0.25) {

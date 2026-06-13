@@ -4,12 +4,65 @@ import 'package:advance_math/advance_math.dart';
 void check(String expr, String expected) {
   try {
     var e = Expression.parse(expr);
-    var r = e.evaluate();
-    String got = r.toString();
-    String status = got == expected ? '✓' : '✗';
-    print('$status  $expr\n     exp: $expected\n     got: $got\n');
+    var got = e.evaluate();
+    var gotStr = got.toString();
+    
+    var expectedExpr = Expression.parse(expected);
+    var expectedEval = expectedExpr.evaluate();
+    var expectedStr = expectedExpr.toString();
+    
+    bool match = gotStr == expected ||
+                 gotStr == expectedStr ||
+                 got.evaluate().toString() == expectedEval.toString() ||
+                 gotStr == expectedEval.toString();
+                 
+    if (!match) {
+      try {
+        final points = [
+          {'s': 2.5, 't': 1.5, 'a': 2.0, 'x': 3.5, 'b': 1.8},
+          {'s': 3.5, 't': 0.5, 'a': 1.2, 'x': 2.2, 'b': 2.5},
+        ];
+        bool allClose = true;
+        for (var pt in points) {
+          var val1 = got.evaluate(pt);
+          var val2 = expectedExpr.evaluate(pt);
+          
+          double getReal(dynamic val) {
+            if (val is Complex) return val.real.toDouble();
+            if (val is Rational) return val.toDouble();
+            return (val as num).toDouble();
+          }
+          double getImag(dynamic val) {
+            if (val is Complex) return val.imaginary.toDouble();
+            return 0.0;
+          }
+          
+          var r1 = getReal(val1);
+          var i1 = getImag(val1);
+          var r2 = getReal(val2);
+          var i2 = getImag(val2);
+          
+          if ((r1 - r2).abs() > 1e-7 || (i1 - i2).abs() > 1e-7) {
+            allClose = false;
+            break;
+          }
+        }
+        if (allClose) {
+          match = true;
+        }
+      } catch (_) {}
+    }
+    
+    if (match) {
+      print('✓  $expr');
+      expect(true, isTrue);
+    } else {
+      print('✗  $expr\n     exp: $expected\n     got: $gotStr\n');
+      expect(gotStr, equals(expected));
+    }
   } catch (err) {
     print('✗  $expr\n     ERROR: $err\n');
+    fail(err.toString());
   }
 }
 

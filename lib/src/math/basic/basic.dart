@@ -71,6 +71,7 @@ num sumUpTo(num start, num end, {num step = 1}) {
 /// ```
 dynamic abs(dynamic x) {
   if (x is Expression) return Abs(x);
+  if (x is Rational) x = x.toDouble();
   if (x is num) return Complex(x.abs());
   if (x is Complex) return x.abs();
   if (x is Matrix) return MatrixFunctions(x).abs();
@@ -85,6 +86,7 @@ dynamic abs(dynamic x) {
 /// ```
 dynamic sqrt(dynamic x) {
   if (x is Expression) return Pow(x, Literal(Rational(1, 2)));
+  if (x is Rational) x = x.toDouble();
   if (x is num || x is Complex) return Complex(x).sqrt();
   if (x is Matrix) return MatrixFunctions(x).sqrt();
   throw ArgumentError('Input should be num, Complex, Matrix, or Expression');
@@ -98,6 +100,7 @@ dynamic sqrt(dynamic x) {
 /// ```
 dynamic cbrt(dynamic x) {
   if (x is Expression) return Pow(x, Literal(Rational(1, 3)));
+  if (x is Rational) x = x.toDouble();
   return nthRoot(x, 3);
 }
 
@@ -114,6 +117,8 @@ dynamic nthRoot(dynamic x, dynamic nth) {
     final exp = nth is Expression ? nth : Literal(nth);
     return Pow(base, Divide(Literal(1), exp));
   }
+  if (x is Rational) x = x.toDouble();
+  if (nth is Rational) nth = nth.toDouble();
   if (x is num || x is Complex) return Complex(x).nthRoot(nth.toInt());
   if (x is Matrix) return MatrixFunctions(x).nthRoot(nth.toInt());
   throw ArgumentError('Input should be num, Complex, Matrix, or Expression');
@@ -127,6 +132,7 @@ dynamic nthRoot(dynamic x, dynamic nth) {
 /// ```
 dynamic exp(dynamic x) {
   if (x is Expression) return Exp(x);
+  if (x is Rational) x = x.toDouble();
   if (x is num) return Complex(math.exp(x));
   if (x is Complex) return x.exp();
   if (x is Matrix) return MatrixFunctions(x).exp();
@@ -151,6 +157,8 @@ dynamic pow(dynamic x, dynamic exponent) {
     final exp = exponent is Expression ? exponent : Literal(exponent);
     return Pow(base, exp);
   }
+  if (x is Rational) x = x.toDouble();
+  if (exponent is Rational) exponent = exponent.toDouble();
   if (x is num || x is Complex) return Complex(x).pow(exponent);
   if (x is Matrix) return MatrixFunctions(x).pow(exponent);
   throw ArgumentError('Input should be num, Complex, Matrix, or Expression');
@@ -392,6 +400,7 @@ BigInt bigIntNChooseRModPrime(int N, int R, int P) {
 /// print(floor(2.3));  // Output: 2
 /// ```
 Complex floor(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num || x is Complex) {
     return Complex(x).floor();
   } else {
@@ -406,6 +415,7 @@ Complex floor(dynamic x) {
 /// print(ceil(2.3));  // Output: 3
 /// ```
 Complex ceil(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num || x is Complex) {
     return Complex(x).ceil();
   } else {
@@ -429,6 +439,7 @@ Complex ceil(dynamic x) {
 /// [x] is the number to be rounded.
 /// [decimalPlaces] specifies the number of decimal places to round to.
 Complex round(dynamic x, [int decimalPlaces = 0]) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     if (decimalPlaces == 0) {
       return Complex(x.round());
@@ -528,6 +539,7 @@ num hypot(dynamic x, dynamic y) {
 /// print(sign(Complex(0, -5))); // Output: -1
 /// ```
 dynamic sign(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num) {
     return Complex(x < 0 ? -1 : (x > 0 ? 1 : 0));
   } else if (x is Complex) {
@@ -547,6 +559,9 @@ dynamic sign(dynamic x) {
 /// print(clamp(Complex(10, 7), 1, 5)); // Output: Complex(5, 5)
 /// ```
 Complex clamp(dynamic x, dynamic min, dynamic max) {
+  if (x is Rational) x = x.toDouble();
+  if (min is Rational) min = min.toDouble();
+  if (max is Rational) max = max.toDouble();
   if (x is num || x is Complex) {
     return Complex(x).clamp(min, max);
   } else {

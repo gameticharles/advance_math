@@ -17,6 +17,7 @@ part of 'math.dart';
 /// print(log10(Matrix([[1, 2], [3, 4]])));  // Output: [[0.6931471805599453, 1.039720770839918], [1.559581156259877, 1.7404683910198387]]
 /// ```
 dynamic log10(dynamic x) {
+  if (x is Rational) x = x.toDouble();
   if (x is num || x is Decimal) {
     num nx = x is! num ? (x as Decimal).toDouble() : x;
     return math.log(nx) / math.ln10;
@@ -52,6 +53,8 @@ dynamic log10(dynamic x) {
 /// print(log(Matrix([[1, 2], [3, 4]])));  // Output: [[0.6931471805599453, 1.039720770839918], [1.559581156259877, 1.7404683910198387]]
 /// ```
 dynamic log(dynamic x, [dynamic b]) {
+  if (x is Rational) x = x.toDouble();
+  if (b is Rational) b = b.toDouble();
   if (x is num || x is Decimal) {
     num nx = x is! num ? (x as Decimal).toDouble() : x;
     if (nx <= 0 || (b != null && b <= 0)) {
@@ -102,6 +105,8 @@ dynamic log(dynamic x, [dynamic b]) {
 /// print(logBase(2, Matrix([[1, 2], [3, 4]])));  // Output: [[0.6931471805599453, 1.039720770839918], [1.559581156259877, 1.7404683910198387]]
 /// ```
 dynamic logBase(dynamic base, dynamic x) {
+  if (base is Rational) base = base.toDouble();
+  if (x is Rational) x = x.toDouble();
   if ((base is num || base is Decimal) && x is num) {
     num nBase = base is! num ? (base as Decimal).toDouble() : base;
     return math.log(x) / math.log(nBase);
