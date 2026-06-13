@@ -77,8 +77,8 @@ void main() {
 
       test('Unified gcd handles polynomials', () {
         try {
-          final result =
-              Expression.parse('poly_gcd(x^2 + 2x + 1, x + 1)').evaluate(context);
+          final result = Expression.parse('poly_gcd(x^2 + 2x + 1, x + 1)')
+              .evaluate(context);
           print('DEBUG: poly_gcd result: $result (${result.runtimeType})');
           expect(result, isA<Polynomial>());
           expect(result.toString(), contains('x + 1'));
@@ -94,7 +94,8 @@ void main() {
               Expression.parse('poly_lcm(x + 1, x - 1)').evaluate(context);
           print('DEBUG: poly_lcm result: $result (${result.runtimeType})');
           expect(result, isA<Polynomial>());
-          expect(result.toString().replaceAll(' ', ''), anyOf(contains('x²-1'), contains('x^2-1')));
+          expect(result.toString().replaceAll(' ', ''),
+              anyOf(contains('x²-1'), contains('x^2-1')));
         } catch (e, s) {
           print('DEBUG: poly_lcm ERROR: $e\n$s');
           rethrow;
