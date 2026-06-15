@@ -178,7 +178,7 @@ class SymbolicSum {
     }
 
     // Build symbolic sum by substituting each integer value
-    Expression total = Literal(0);
+    Expression total = Literal.nonComplex(0);
 
     for (int k = start; k <= end; k++) {
       final substituted = expr.substitute(variable, Literal(k));

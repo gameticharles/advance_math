@@ -32,13 +32,13 @@ class Modulo extends BinaryOperationsExpression {
 
   @override
   Expression differentiate([Variable? v]) {
-    if (v == null) return Literal(0);
+    if (v == null) return Literal.nonComplex(0);
 
     final leftHasVar = left.getVariableTerms().contains(v);
     final rightHasVar = right.getVariableTerms().contains(v);
 
     // If no variables, derivative is 0
-    if (!leftHasVar && !rightHasVar) return Literal(0);
+    if (!leftHasVar && !rightHasVar) return Literal.nonComplex(0);
 
     // FIX 3: d/dx (f(x) % c) = f'(x) (almost everywhere, ignoring discontinuities)
     if (leftHasVar && !rightHasVar) {
@@ -47,7 +47,7 @@ class Modulo extends BinaryOperationsExpression {
 
     // d/dx (c % f(x)) is technically -c*f'(x)/f(x)^2 between jumps,
     // but usually treated as 0 or undefined in basic CAS.
-    return Literal(0);
+    return Literal.nonComplex(0);
   }
 
   @override
@@ -71,12 +71,12 @@ class Modulo extends BinaryOperationsExpression {
     // FIX 4a: 0 % x = 0
     if (simplifiedLeft is Literal) {
       final lVal = simplifiedLeft.evaluate();
-      if (lVal is num && lVal == 0) return Literal(0);
+      if (lVal is num && lVal == 0) return Literal.nonComplex(0);
     }
 
     // FIX 4b: x % x = 0
     if (simplifiedLeft == simplifiedRight) {
-      return Literal(0);
+      return Literal.nonComplex(0);
     }
 
     // Literal % Literal evaluation

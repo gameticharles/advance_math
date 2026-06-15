@@ -618,7 +618,7 @@ class ExpressionParser {
                             if (g == val2) return u2;
                             return Pow(Literal(g), u1.right);
                           }
-                          return Literal(1); // gcd(a^c, b^c) -> 1
+                          return Literal.nonComplex(1); // gcd(a^c, b^c) -> 1
                         }
                       }
                     }
@@ -836,7 +836,7 @@ class ExpressionParser {
                         result = result == null ? term : Add(result, term);
                       }
                       // Return the reconstructed expression (no simplify to preserve ordering)
-                      return result ?? Literal(1);
+                      return result ?? Literal.nonComplex(1);
                     }
 
                     // Fallback to symbolic call expression
@@ -908,7 +908,7 @@ class ExpressionParser {
 
                     // Check if 1/a, 1/b, 1/c -> lcm is 1
                     if (unique.every((ex) => ex.toString().contains('^(-1)'))) {
-                      return Literal(1);
+                      return Literal.nonComplex(1);
                     }
 
                     // Check if all are numeric (via evaluation)
@@ -1059,7 +1059,7 @@ class ExpressionParser {
                         }
                         result = result == null ? term : Add(result, term);
                       }
-                      return result ?? Literal(1);
+                      return result ?? Literal.nonComplex(1);
                     }
 
                     // Check if all unique expressions can be parsed as polynomials
@@ -1235,7 +1235,7 @@ class ExpressionParser {
                         args[0].toString() == args[1].toString()) {
                       var a = args[0];
                       return Multiply(
-                              Pow(a, Literal(2)),
+                              Pow(a, Literal.nonComplex(2)),
                               Pow(
                                   CallExpression(
                                       Variable(Identifier('gcd')), [a, a]),
@@ -1255,7 +1255,7 @@ class ExpressionParser {
                   if (name == 'factor' && args.length == 1) {
                     if (args[0] is Polynomial) {
                       final factors = (args[0] as Polynomial).factorize();
-                      if (factors.isEmpty) return Literal(1);
+                      if (factors.isEmpty) return Literal.nonComplex(1);
                       Expression result = factors[0];
                       for (int i = 1; i < factors.length; i++) {
                         result = Multiply(result, factors[i]);
@@ -1266,7 +1266,7 @@ class ExpressionParser {
                     try {
                       final poly = Polynomial.fromString(args[0].toString());
                       final factors = poly.factorize();
-                      if (factors.isEmpty) return Literal(1);
+                      if (factors.isEmpty) return Literal.nonComplex(1);
                       Expression result = factors[0];
                       for (int i = 1; i < factors.length; i++) {
                         result = Multiply(result, factors[i]);
@@ -1337,13 +1337,13 @@ class ExpressionParser {
                     // Returns Literal(int) for concrete, Literal(str) for
                     // symbolic, or null if the expression is not classifiable.
                     // For non-polynomial terms that contain vn (like cos(x)),
-                    // we return Literal(0) so they don't raise the degree.
+                    // we return Literal.nonComplex(0) so they don't raise the degree.
                     Expression degreeOfExpr(Expression e, String vn) {
-                      if (e is Literal) return Literal(0);
+                      if (e is Literal) return Literal.nonComplex(0);
                       if (e is Variable) {
                         return e.identifier.name == vn
-                            ? Literal(1)
-                            : Literal(0);
+                            ? Literal.nonComplex(1)
+                            : Literal.nonComplex(0);
                       }
                       if (e is Pow) {
                         final base = e.left;
@@ -1353,7 +1353,7 @@ class ExpressionParser {
                           return exp;
                         }
                         // cos(x)^n or similar — treat as deg 0
-                        return Literal(0);
+                        return Literal.nonComplex(0);
                       }
                       if (e is Add || e is Subtract) {
                         final l = e as BinaryOperationsExpression;
@@ -1375,11 +1375,11 @@ class ExpressionParser {
                         // If one is 0, return the other
                         if (dl is Literal && dl.value == 0) return dr;
                         if (dr is Literal && dr.value == 0) return dl;
-                        return Literal(0);
+                        return Literal.nonComplex(0);
                       }
                       // For trig, abs, log, etc. — treat as degree 0
                       // (they don't raise the polynomial degree)
-                      return Literal(0);
+                      return Literal.nonComplex(0);
                     }
 
                     final degResult = degreeOfExpr(expr, varName);
@@ -1611,7 +1611,7 @@ class ExpressionParser {
                     }
 
                     // Step 1: Polynomial long division if improper
-                    Expression polyPart = Literal(0);
+                    Expression polyPart = Literal.nonComplex(0);
                     Polynomial remPoly = numPoly;
                     if (numPoly.degree >= denPoly.degree) {
                       try {
@@ -1717,7 +1717,7 @@ class ExpressionParser {
                           }
                           qExpr = qExpr == null ? term : Add(qExpr, term);
                         }
-                        polyPart = qExpr ?? Literal(0);
+                        polyPart = qExpr ?? Literal.nonComplex(0);
                       } catch (_) {
                         return CallExpression(
                             Variable(Identifier('partfrac')), args);
@@ -1819,7 +1819,7 @@ class ExpressionParser {
                         }
                         res = res == null ? term : Add(res, term);
                       }
-                      return res ?? Literal(0);
+                      return res ?? Literal.nonComplex(0);
                     }
 
                     // Collect factors as (Polynomial, multiplicity, Expression)
@@ -1897,7 +1897,7 @@ class ExpressionParser {
                       }
                       if (!merged) {
                         factorPolys.add(
-                            fPoly ?? Polynomial([Literal(1)], variable: xVar));
+                            fPoly ?? Polynomial([Literal.nonComplex(1)], variable: xVar));
                         factorExps.add(exp);
                         factorExprs.add(fExpr);
                       }
@@ -2165,7 +2165,7 @@ class ExpressionParser {
 
                     if (pfResult == null) {
                       return polyPart is Literal && (polyPart).value == 0
-                          ? Literal(0)
+                          ? Literal.nonComplex(0)
                           : polyPart;
                     }
 
@@ -2303,9 +2303,9 @@ class ExpressionParser {
 
                         // Construct: a * (var + b/(2a))^2 + (c - b^2/(4a))
                         Expression term1 = a *
-                            Pow(Variable(varName) + b / (Literal(2) * a),
-                                Literal(2));
-                        Expression term2 = c - (b * b) / (Literal(4) * a);
+                            Pow(Variable(varName) + b / (Literal.nonComplex(2) * a),
+                                Literal.nonComplex(2));
+                        Expression term2 = c - (b * b) / (Literal.nonComplex(4) * a);
                         return (term1 + term2).simplify();
                       }
                     } catch (e) {
@@ -2569,7 +2569,7 @@ class ExpressionParser {
       return Log(args[0], args[1]);
     }
     if (name == 'sqrt' && args.length == 1) {
-      return Pow(args[0], Literal(0.5));
+      return Pow(args[0], Literal.nonComplex(0.5));
     }
 
     // Default to generic call

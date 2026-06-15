@@ -81,7 +81,7 @@ class SymbolicCalculus {
     }
 
     // Build the Taylor series term by term
-    Expression result = Literal(0);
+    Expression result = Literal.nonComplex(0);
     Expression currentDerivative = expr;
 
     for (int n = 0; n <= order; n++) {

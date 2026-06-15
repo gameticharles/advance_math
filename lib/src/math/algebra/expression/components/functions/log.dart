@@ -32,10 +32,10 @@ class Log extends Expression {
   Log(this.base, this.operand);
 
   /// Creates a base-10 logarithm (common logarithm).
-  Log.base10(this.operand) : base = Literal(10);
+  Log.base10(this.operand) : base = Literal.nonComplex(10);
 
   /// Creates a base-2 logarithm (binary logarithm).
-  Log.base2(this.operand) : base = Literal(2);
+  Log.base2(this.operand) : base = Literal.nonComplex(2);
 
   /// Creates a natural logarithm (base e).
   Log.natural(this.operand) : base = Literal(math.e);
@@ -113,12 +113,12 @@ class Log extends Expression {
 
     // log_a(1) = 0 for any valid base a
     if (simplifiedOperand is Literal && simplifiedOperand.value == 1) {
-      return Literal(0);
+      return Literal.nonComplex(0);
     }
 
     // log_a(a) = 1 for any valid base a
     if (simplifiedBase == simplifiedOperand) {
-      return Literal(1);
+      return Literal.nonComplex(1);
     }
 
     // log_a(a^x) = x for any valid base a

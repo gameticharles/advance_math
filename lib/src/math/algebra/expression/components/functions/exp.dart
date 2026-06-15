@@ -79,7 +79,7 @@ class Exp extends Expression {
     if (simplifiedOperand is Literal) {
       final value = simplifiedOperand.value;
       if (value == 0) {
-        return Literal(1); // e^0 = 1
+        return Literal.nonComplex(1); // e^0 = 1
       }
       if (value == 1) {
         return Literal(math.e); // e^1 = e

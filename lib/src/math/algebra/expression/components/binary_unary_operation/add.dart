@@ -2,8 +2,8 @@
 
 part of '../../expression.dart';
 
-class Add extends BinaryOperationsExpression {
-  Add(super.left, super.right);
+final class Add extends BinaryOperationsExpression {
+  const Add(super.left, super.right);
 
   @override
   dynamic evaluate([dynamic arg]) {
@@ -81,13 +81,13 @@ class Add extends BinaryOperationsExpression {
     if (simplifiedLeft is Multiply && simplifiedRight is Variable) {
       if (simplifiedLeft.left.evaluate() == -1 &&
           simplifiedLeft.right == simplifiedRight) {
-        return Literal(0);
+        return Literal.nonComplex(0);
       }
     }
     if (simplifiedRight is Multiply && simplifiedLeft is Variable) {
       if (simplifiedRight.left.evaluate() == -1 &&
           simplifiedRight.right == simplifiedLeft) {
-        return Literal(0);
+        return Literal.nonComplex(0);
       }
     }
     // Direct negation without multiplication
@@ -102,7 +102,7 @@ class Add extends BinaryOperationsExpression {
       var leftValue = simplifiedLeft.evaluate();
       var rightValue = simplifiedRight.evaluate();
       if (leftValue != null && rightValue != null && leftValue == -rightValue) {
-        return Literal(0);
+        return Literal.nonComplex(0);
       }
     } catch (e) {
       // Ignore evaluation errors
@@ -273,22 +273,22 @@ class Add extends BinaryOperationsExpression {
             // It might be simplified to 4*A*B or 4*B*A or 4*...
             // Let's construct 4*A*B and simplify it to compare
             var target4AB =
-                Multiply(Literal(4), Multiply(A, B)).simplifyBasic();
+                Multiply(Literal.nonComplex(4), Multiply(A, B)).simplifyBasic();
             var target4BA =
-                Multiply(Literal(4), Multiply(B, A)).simplifyBasic();
+                Multiply(Literal.nonComplex(4), Multiply(B, A)).simplifyBasic();
 
             if (term2.toString() == target4AB.toString() ||
                 term2.toString() == target4BA.toString()) {
               // Found it! Replace term1 and term2 with (A+B)^2
               simplifiedTerms.removeAt(dmath.max(i, j));
               simplifiedTerms.removeAt(dmath.min(i, j));
-              simplifiedTerms.add(Pow(Add(A, B), Literal(2)).simplifyBasic());
+              simplifiedTerms.add(Pow(Add(A, B), Literal.nonComplex(2)).simplifyBasic());
               // Restart or break? Restart to be safe
               return Add(
                       simplifiedTerms[0],
                       simplifiedTerms.length > 1
                           ? simplifiedTerms[1]
-                          : Literal(0))
+                          : Literal.nonComplex(0))
                   .simplifyBasic(); // Recursive call to handle list reconstruction
             }
           }
@@ -298,7 +298,7 @@ class Add extends BinaryOperationsExpression {
 
     // If there's no term left after simplification, return 0.
     if (simplifiedTerms.isEmpty) {
-      return Literal(0);
+      return Literal.nonComplex(0);
     }
 
     // If there's only one term left after simplification, return it directly
@@ -334,7 +334,7 @@ class Add extends BinaryOperationsExpression {
     var rightStr = right.toString();
 
     // If right starts with -, don't add +
-    if (rightStr.startsWith('-')) {
+    if (rightStr[0] == '-') {
       return "$leftStr$rightStr";
     }
     return "$leftStr+$rightStr";

@@ -75,7 +75,7 @@ class Subtract extends BinaryOperationsExpression {
 
     // Negation
     if (simplifiedLeft.toString() == simplifiedRight.toString()) {
-      return Literal(0);
+      return Literal.nonComplex(0);
     }
 
     // Flattening nested subtractions and additions
@@ -190,7 +190,7 @@ class Subtract extends BinaryOperationsExpression {
 
     // If there's no term left after simplification, return 0.
     if (simplifiedTerms.isEmpty) {
-      return Literal(0);
+      return Literal.nonComplex(0);
     }
 
     // If there's only one term left after simplification, return it directly

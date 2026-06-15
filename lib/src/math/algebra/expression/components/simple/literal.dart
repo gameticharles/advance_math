@@ -2,12 +2,15 @@ part of '../../expression.dart';
 
 class Literal extends Expression {
   final dynamic value;
-  final String raw;
+  // final String raw;
+
+  String get raw => value.toString();
 
   // Constructor to initialize the literal's value
+  const Literal.nonComplex(this.value);
   Literal(dynamic val, [String? raw])
-      : value = (val is Complex) ? val.simplify() : val,
-        raw = raw ?? (val is String ? '"$val"' : (val is Complex ? '${val.simplify()}' : '$val'));
+      : value = (val is Complex) ? val.simplify() : val;
+        // raw = raw ?? (val is String ? '"$val"' : (val is Complex ? '${val.simplify()}' : '$val'));
 
   @override
   dynamic evaluate([dynamic arg]) {

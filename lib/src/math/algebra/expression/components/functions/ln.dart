@@ -46,9 +46,9 @@ class Ln extends Expression {
     if (simplifiedOperand is Literal) {
       var val = simplifiedOperand.value;
       if (val is num) {
-        if (val == 1) return Literal(0);
+        if (val == 1) return Literal.nonComplex(0);
         // ln(e) = 1
-        if ((val - dmath.e).abs() < 1e-15) return Literal(1);
+        if ((val - dmath.e).abs() < 1e-15) return Literal.nonComplex(1);
         // Evaluate positive numeric literals
         if (val > 0) return Literal(math.log(val));
       }

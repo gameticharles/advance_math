@@ -17,7 +17,7 @@ class Abs extends Expression {
 
     // If it's a constant, the derivative is 0
     if (u is Literal) {
-      return Literal(0);
+      return Literal.nonComplex(0);
     }
 
     // d/dx |u| = (u / |u|) * du/dx
