@@ -166,7 +166,7 @@ class PowerRuleStrategy implements IntegrationStrategy {
     }
 
     if (expr is Variable && expr.identifier.name == v.identifier.name) {
-      return Multiply(Literal(Rational(1, 2)), Pow(v, Literal(2)));
+      return Multiply(Literal(Rational(1, 2)), Pow(v, Literal.nonComplex(2)));
     }
 
     if (expr is Pow) {
@@ -192,7 +192,7 @@ class PowerRuleStrategy implements IntegrationStrategy {
           }
 
           // FIX: Handle symbolic exponents algebraically (e.g., x^n -> x^(n+1)/(n+1))
-          final newExponent = Add(expExpr, Literal(1)).simplify();
+          final newExponent = Add(expExpr, Literal.nonComplex(1)).simplify();
           return Divide(Pow(v, newExponent), newExponent);
         }
       }
@@ -325,12 +325,12 @@ class BasicTrigStrategy implements IntegrationStrategy {
         return Negate(Cot(v));
       }
       if (expr.base is Sin && isV((expr.base as Sin).operand)) {
-        return Subtract(Divide(v, Literal(2)),
-            Divide(Sin(Multiply(Literal(2), v)), Literal(4)));
+        return Subtract(Divide(v, Literal.nonComplex(2)),
+            Divide(Sin(Multiply(Literal.nonComplex(2), v)), Literal.nonComplex(4)));
       }
       if (expr.base is Cos && isV((expr.base as Cos).operand)) {
-        return Add(Divide(v, Literal(2)),
-            Divide(Sin(Multiply(Literal(2), v)), Literal(4)));
+        return Add(Divide(v, Literal.nonComplex(2)),
+            Divide(Sin(Multiply(Literal.nonComplex(2), v)), Literal.nonComplex(4)));
       }
     }
 
@@ -340,7 +340,7 @@ class BasicTrigStrategy implements IntegrationStrategy {
     if (expr is Coth && isV(expr.operand)) return Ln(Abs(Sinh(v)));
     if (expr is Sech && isV(expr.operand)) return Atan(Sinh(v));
     if (expr is Csch && isV(expr.operand)) {
-      return Ln(Abs(Tanh(Multiply(Literal(0.5), v))));
+      return Ln(Abs(Tanh(Multiply(Literal.nonComplex(0.5), v))));
     }
 
     if (expr is Pow &&
@@ -369,7 +369,7 @@ class InverseTrigStrategy implements IntegrationStrategy {
   @override
   Expression? tryIntegrate(Expression expr, Variable v, Expression original) {
     expr = _unwrap(expr);
-    Expression num = Literal(1);
+    Expression num = Literal.nonComplex(1);
     Expression den = expr;
 
     if (expr is Divide) {
@@ -400,10 +400,10 @@ class InverseTrigStrategy implements IntegrationStrategy {
         }
       }
       num = numFactors.isEmpty
-          ? Literal(1)
+          ? Literal.nonComplex(1)
           : numFactors.reduce((a, b) => Multiply(a, b).simplify());
       den = denFactors.isEmpty
-          ? Literal(1)
+          ? Literal.nonComplex(1)
           : denFactors.reduce((a, b) => Multiply(a, b).simplify());
     } else {
       return null;
@@ -599,7 +599,7 @@ class SubstitutionStrategy implements IntegrationStrategy {
       final du = inner.differentiate(v).simplify();
       final remaining = [...factors]..removeAt(i);
       Expression actualDu = remaining.isEmpty
-          ? Literal(1)
+          ? Literal.nonComplex(1)
           : remaining.reduce((a, b) => Multiply(a, b).simplify());
       final k = _getConstantFactor(actualDu, du, v);
       if (k != null) {
@@ -678,7 +678,7 @@ class IntegrationByPartsStrategy implements IntegrationStrategy {
   Expression? tryIntegrate(Expression expr, Variable v, Expression original) {
     // FIX: Restore solo function handling for IBP (implied * 1)
     if (_isLogarithmic(expr) || _isInverseTrig(expr)) {
-      return _applyIBP(expr, Literal(1), v, original);
+      return _applyIBP(expr, Literal.nonComplex(1), v, original);
     }
 
     if (expr is! Multiply) return null;
@@ -725,7 +725,7 @@ class IntegrationByPartsStrategy implements IntegrationStrategy {
       final k = _getConstantFactor(vDu, original, v);
       if (k != null) {
         final uv = Multiply(u, integralDv).simplify();
-        final onePlusK = Add(Literal(1), k).simplify();
+        final onePlusK = Add(Literal.nonComplex(1), k).simplify();
         return Divide(uv, onePlusK).simplify();
       }
       final integralVDu = SymbolicIntegration.integrate(vDu, v);
@@ -829,7 +829,7 @@ class TrigPowerStrategy implements IntegrationStrategy {
 
     if (otherFactors.any((f) => _containsVariable(f, v))) return null;
     Expression constantMultiplier = otherFactors.isEmpty
-        ? Literal(1)
+        ? Literal.nonComplex(1)
         : otherFactors.reduce((a, b) => Multiply(a, b).simplify());
 
     if (sinPow > 0 &&
@@ -851,8 +851,8 @@ class TrigPowerStrategy implements IntegrationStrategy {
       if (sinPow == 2) {
         return Multiply(
                 constantMultiplier,
-                Subtract(Divide(v, Literal(2)),
-                    Divide(Sin(Multiply(Literal(2), v)), Literal(4))))
+                Subtract(Divide(v, Literal.nonComplex(2)),
+                    Divide(Sin(Multiply(Literal.nonComplex(2), v)), Literal.nonComplex(4))))
             .simplify();
       }
     }
@@ -860,8 +860,8 @@ class TrigPowerStrategy implements IntegrationStrategy {
       if (cosPow == 2) {
         return Multiply(
                 constantMultiplier,
-                Add(Divide(v, Literal(2)),
-                    Divide(Sin(Multiply(Literal(2), v)), Literal(4))))
+                Add(Divide(v, Literal.nonComplex(2)),
+                    Divide(Sin(Multiply(Literal.nonComplex(2), v)), Literal.nonComplex(4))))
             .simplify();
       }
     }
@@ -871,7 +871,7 @@ class TrigPowerStrategy implements IntegrationStrategy {
   Expression? _integrateSinOddCosEven(
       int m, int n, Expression arg, Expression constant, Variable v) {
     int k = (m - 1) ~/ 2;
-    Expression integral = Literal(0);
+    Expression integral = Literal.nonComplex(0);
     for (int i = 0; i <= k; i++) {
       int coeff = _binomial(k, i) * (i % 2 == 0 ? 1 : -1);
       int powerOfU = n + 2 * i;
@@ -885,7 +885,7 @@ class TrigPowerStrategy implements IntegrationStrategy {
   Expression? _integrateCosOddSinEven(
       int m, int n, Expression arg, Expression constant, Variable v) {
     int kCos = (n - 1) ~/ 2;
-    Expression integral = Literal(0);
+    Expression integral = Literal.nonComplex(0);
     for (int i = 0; i <= kCos; i++) {
       int coeff = _binomial(kCos, i) * (i % 2 == 0 ? 1 : -1);
       int powerOfU = m + 2 * i;
@@ -933,7 +933,7 @@ class InverseHyperbolicStrategy implements IntegrationStrategy {
   @override
   Expression? tryIntegrate(Expression expr, Variable v, Expression original) {
     expr = _unwrap(expr);
-    Expression num = Literal(1);
+    Expression num = Literal.nonComplex(1);
     Expression den = expr;
 
     if (expr is Divide) {
@@ -964,10 +964,10 @@ class InverseHyperbolicStrategy implements IntegrationStrategy {
         }
       }
       num = numFactors.isEmpty
-          ? Literal(1)
+          ? Literal.nonComplex(1)
           : numFactors.reduce((a, b) => Multiply(a, b).simplify());
       den = denFactors.isEmpty
-          ? Literal(1)
+          ? Literal.nonComplex(1)
           : denFactors.reduce((a, b) => Multiply(a, b).simplify());
     } else {
       return null;
@@ -1055,12 +1055,12 @@ class CompletingTheSquareStrategy implements IntegrationStrategy {
     final B = coeffs['B']!;
     final C = coeffs['C']!;
 
-    final twoA = Multiply(Literal(2), A).simplify();
+    final twoA = Multiply(Literal.nonComplex(2), A).simplify();
     final bOver2A = Divide(B, twoA).simplify();
     final u = Add(v, bOver2A).simplify();
 
     final cOverA = Divide(C, A).simplify();
-    final bOver2ASq = Pow(bOver2A, Literal(2)).simplify();
+    final bOver2ASq = Pow(bOver2A, Literal.nonComplex(2)).simplify();
     final k = Subtract(cOverA, bOver2ASq).simplify();
 
     final newNum = Divide(num, A).simplify();
@@ -1078,7 +1078,7 @@ class CompletingTheSquareStrategy implements IntegrationStrategy {
         final a = sqrtK != null
             ? Literal(sqrtK)
             : Pow(Negate(k), Literal(Rational(1, 2))).simplify();
-        final twoAVal = Multiply(Literal(2), a).simplify();
+        final twoAVal = Multiply(Literal.nonComplex(2), a).simplify();
         final logArg = Divide(Subtract(u, a), Add(u, a)).simplify();
         return Multiply(Divide(newNum, twoAVal), Ln(Abs(logArg))).simplify();
       } else {
@@ -1158,7 +1158,7 @@ class LinearSubstitutionStrategy implements IntegrationStrategy {
           polyFactors.add(f);
         } else {
           linearBase = f;
-          powerExpr = Literal(1);
+          powerExpr = Literal.nonComplex(1);
         }
       } else {
         polyFactors.add(f);
@@ -1168,7 +1168,7 @@ class LinearSubstitutionStrategy implements IntegrationStrategy {
     if (linearBase == null || powerExpr == null) return null;
 
     Expression polyExpr = polyFactors.isEmpty
-        ? Literal(1)
+        ? Literal.nonComplex(1)
         : polyFactors.reduce((a, b) => Multiply(a, b).simplify());
 
     // 2. Extract 'a' and 'b' from the linear base (a*x + b)
@@ -1227,7 +1227,7 @@ class LinearSubstitutionStrategy implements IntegrationStrategy {
   Expression? _extractLinearCoeff(Expression expr, Variable v) {
     expr = expr.simplify();
     if (expr is Variable && expr.identifier.name == v.identifier.name) {
-      return Literal(1);
+      return Literal.nonComplex(1);
     }
     if (expr is Multiply) {
       if (!_containsVariable(expr.left, v)) {
@@ -1254,7 +1254,7 @@ class LinearSubstitutionStrategy implements IntegrationStrategy {
   Expression? _extractLinearConst(Expression expr, Variable v) {
     expr = expr.simplify();
     if (expr is Variable && expr.identifier.name == v.identifier.name) {
-      return Literal(0);
+      return Literal.nonComplex(0);
     }
     if (expr is Multiply) {
       if (!_containsVariable(expr.left, v)) {

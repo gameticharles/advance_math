@@ -17,7 +17,7 @@ class PerfectNumber {
   // Immutable state
   late final int? nth;
   // List of known Mersenne prime exponents (for faster lookup)
-  static final List<int> _knownMersenneExponents = [
+  static const List<int> _knownMersenneExponents = [
     2,
     3,
     5,
@@ -84,7 +84,7 @@ class PerfectNumber {
   List<int>? _consecutiveTwoPowers;
 
   // Timing metrics
-  final _timingStats = <String, Duration>{
+  final _timingStats = const <String, Duration>{
     'perfectNumber': Duration.zero,
     'properties': Duration.zero,
   };

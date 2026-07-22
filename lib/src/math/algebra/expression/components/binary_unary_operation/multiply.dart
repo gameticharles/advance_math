@@ -1,7 +1,7 @@
 part of '../../expression.dart';
 
-class Multiply extends BinaryOperationsExpression {
-  Multiply(super.left, super.right);
+final class Multiply extends BinaryOperationsExpression {
+  const Multiply(super.left, super.right);
 
   @override
   dynamic evaluate([dynamic arg]) {
@@ -46,7 +46,7 @@ class Multiply extends BinaryOperationsExpression {
     if (v != null &&
         !left.getVariableTerms().contains(v) &&
         !right.getVariableTerms().contains(v)) {
-      return Literal(0);
+      return Literal.nonComplex(0);
     }
     // Applying the product rule: (u * v)' = u' * v + u * v'
     // where u and v are functions of x.
@@ -314,7 +314,7 @@ class Multiply extends BinaryOperationsExpression {
     // Handle cases like x * 0 = 0, x * 1 = x
     if (simpleLeft is Literal && isZeroVal(litVal(simpleLeft)) ||
         simpleRight is Literal && isZeroVal(litVal(simpleRight))) {
-      return Literal(0);
+      return Literal.nonComplex(0);
     }
 
     if (simpleLeft is Literal && isOneVal(litVal(simpleLeft))) {
@@ -354,7 +354,7 @@ class Multiply extends BinaryOperationsExpression {
 
     // Multiplication involving same base x * x = x^2
     if (simpleLeft.toString() == simpleRight.toString()) {
-      return Pow(simpleLeft, Literal(2)).simplifyBasic();
+      return Pow(simpleLeft, Literal.nonComplex(2)).simplifyBasic();
     }
 
     // Multiplication involving exponential functions
@@ -372,7 +372,7 @@ class Multiply extends BinaryOperationsExpression {
     if (simpleLeft is! Literal &&
         simpleRight is Pow &&
         simpleRight.base.toString() == simpleLeft.toString()) {
-      return Pow(simpleLeft, Add(simpleRight.exponent, Literal(1)).simplify())
+      return Pow(simpleLeft, Add(simpleRight.exponent, Literal.nonComplex(1)).simplify())
           .simplifyBasic();
     }
 
@@ -380,7 +380,7 @@ class Multiply extends BinaryOperationsExpression {
     if (simpleRight is! Literal &&
         simpleLeft is Pow &&
         simpleLeft.base.toString() == simpleRight.toString()) {
-      return Pow(simpleRight, Add(simpleLeft.exponent, Literal(1)).simplify())
+      return Pow(simpleRight, Add(simpleLeft.exponent, Literal.nonComplex(1)).simplify())
           .simplifyBasic();
     }
 
@@ -501,20 +501,20 @@ class Multiply extends BinaryOperationsExpression {
           newCoefficient = newCoefficient.simplify();
         }
         var newBase = (simpleLeft).right;
-        return Multiply(Literal(newCoefficient), Pow(newBase, Literal(2)));
+        return Multiply(Literal(newCoefficient), Pow(newBase, Literal.nonComplex(2)));
       }
     }
 
     // Combine like terms: (A * B) * B = A * B^2
     if (simpleLeft is Multiply &&
         simpleLeft.right.toString() == simpleRight.toString()) {
-      return Multiply(simpleLeft.left, Pow(simpleRight, Literal(2)))
+      return Multiply(simpleLeft.left, Pow(simpleRight, Literal.nonComplex(2)))
           .simplifyBasic();
     }
     // Combine like terms: (A * B) * A = B * A^2
     if (simpleLeft is Multiply &&
         simpleLeft.left.toString() == simpleRight.toString()) {
-      return Multiply(simpleLeft.right, Pow(simpleRight, Literal(2)))
+      return Multiply(simpleLeft.right, Pow(simpleRight, Literal.nonComplex(2)))
           .simplifyBasic();
     }
 
@@ -550,9 +550,9 @@ class Multiply extends BinaryOperationsExpression {
     if (simpleLeft is Add && simpleRight.toString() == simpleLeft.toString()) {
       var a = (simpleLeft).left;
       var b = (simpleLeft).right;
-      var aSquared = Pow(a, Literal(2));
-      var bSquared = Pow(b, Literal(2));
-      var twoAB = Multiply(Multiply(Literal(2), a), b);
+      var aSquared = Pow(a, Literal.nonComplex(2));
+      var bSquared = Pow(b, Literal.nonComplex(2));
+      var twoAB = Multiply(Multiply(Literal.nonComplex(2), a), b);
       return Add(Add(aSquared, twoAB), bSquared);
     }
 
@@ -563,8 +563,8 @@ class Multiply extends BinaryOperationsExpression {
         simpleLeft.right.toString() == simpleRight.right.toString()) {
       var a = simpleLeft.left;
       var b = simpleLeft.right;
-      var aSquared = Pow(a, Literal(2));
-      var bSquared = Pow(b, Literal(2));
+      var aSquared = Pow(a, Literal.nonComplex(2));
+      var bSquared = Pow(b, Literal.nonComplex(2));
       return Subtract(aSquared, bSquared);
     }
 
@@ -614,7 +614,7 @@ class Multiply extends BinaryOperationsExpression {
       var leftTerms = getTerms(expandedLeft);
       var rightTerms = getTerms(expandedRight);
 
-      Expression result = Literal(0);
+      Expression result = Literal.nonComplex(0);
       bool first = true;
 
       for (var l in leftTerms) {
@@ -634,7 +634,7 @@ class Multiply extends BinaryOperationsExpression {
     if (isAddOrSub(expandedLeft) && !isAddOrSub(expandedRight)) {
       // (a+b)c = ac + bc
       var leftTerms = getTerms(expandedLeft);
-      Expression result = Literal(0);
+      Expression result = Literal.nonComplex(0);
       bool first = true;
       for (var l in leftTerms) {
         var term = Multiply(l, expandedRight);
@@ -651,7 +651,7 @@ class Multiply extends BinaryOperationsExpression {
     if (!isAddOrSub(expandedLeft) && isAddOrSub(expandedRight)) {
       // a(b+c) = ab + ac
       var rightTerms = getTerms(expandedRight);
-      Expression result = Literal(0);
+      Expression result = Literal.nonComplex(0);
       bool first = true;
       for (var r in rightTerms) {
         var term = Multiply(expandedLeft, r);

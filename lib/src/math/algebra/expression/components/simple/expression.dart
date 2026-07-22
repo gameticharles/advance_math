@@ -12,6 +12,7 @@ part of '../../expression.dart';
 /// required methods.
 abstract class Expression {
   static final ExpressionParser _parser = ExpressionParser();
+  const Expression();
 
   static Expression? tryParse(String formattedString) {
     final result = _parser.expression.trim().end().parse(formattedString);

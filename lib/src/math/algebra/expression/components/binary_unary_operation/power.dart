@@ -131,18 +131,18 @@ class Pow extends BinaryOperationsExpression {
           try {
             final coeffMap = _collectPolynomialCoeffs(simplifiedBase, v);
             if (coeffMap != null && coeffMap.keys.every((d) => d <= 2)) {
-              final A = coeffMap[2] ?? Literal(0);
-              final B = coeffMap[1] ?? Literal(0);
-              final C = coeffMap[0] ?? Literal(0);
+              final A = coeffMap[2] ?? Literal.nonComplex(0);
+              final B = coeffMap[1] ?? Literal.nonComplex(0);
+              final C = coeffMap[0] ?? Literal.nonComplex(0);
 
               // Check if discriminant B^2 - 4*A*C simplifies to 0
               final disc =
-                  Subtract(Multiply(B, B), Multiply(Literal(4), Multiply(A, C)))
+                  Subtract(Multiply(B, B), Multiply(Literal.nonComplex(4), Multiply(A, C)))
                       .simplify();
               if (disc is Literal && litVal(disc) == 0) {
-                final sqrtA = Pow(A, Literal(0.5)).simplify();
+                final sqrtA = Pow(A, Literal.nonComplex(0.5)).simplify();
                 final term =
-                    Add(v, Divide(B, Multiply(Literal(2), A))).simplify();
+                    Add(v, Divide(B, Multiply(Literal.nonComplex(2), A))).simplify();
                 if (sqrtA is Literal &&
                     (sqrtA.value == 1 || sqrtA.value == 1.0)) {
                   return term;
@@ -157,7 +157,7 @@ class Pow extends BinaryOperationsExpression {
 
     if (simplifiedExponent is Literal) {
       var exponentValue = litVal(simplifiedExponent);
-      if (exponentValue == 0) return Literal(1);
+      if (exponentValue == 0) return Literal.nonComplex(1);
       if (exponentValue == 1) return simplifiedBase;
     }
 
@@ -165,7 +165,7 @@ class Pow extends BinaryOperationsExpression {
       final bv = litVal(simplifiedBase);
       if (bv == 0) {
         if (simplifiedExponent is Literal && litVal(simplifiedExponent) > 0) {
-          return Literal(0);
+          return Literal.nonComplex(0);
         }
         throw Exception('0 raised to a non-positive power is undefined.');
       }
@@ -187,7 +187,7 @@ class Pow extends BinaryOperationsExpression {
             final posE = -ratE;
             final simplifiedPos = Pow(simplifiedBase, Literal(posE)).simplify();
             if (simplifiedPos is Literal) {
-              return Divide(Literal(1), simplifiedPos).simplify();
+              return Divide(Literal.nonComplex(1), simplifiedPos).simplify();
             }
             return Pow(simplifiedBase, simplifiedExponent);
           } else {
@@ -333,7 +333,7 @@ class Pow extends BinaryOperationsExpression {
     // 1^x = 1 for any x
     if (simplifiedBase is Literal) {
       final bv = litVal(simplifiedBase);
-      if (bv == 1) return Literal(1);
+      if (bv == 1) return Literal.nonComplex(1);
     }
 
     // (a * b)^n = a^n * b^n for literal integer n or 0.5/Rational(1,2)
@@ -342,7 +342,7 @@ class Pow extends BinaryOperationsExpression {
       if (ev is int ||
           (ev is num && ev == ev.toInt()) ||
           ev == 0.5 ||
-          ev == Rational(1, 2)) {
+          ev == Rational.ints(1, 2)) {
         return Multiply(
           Pow(simplifiedBase.left, simplifiedExponent),
           Pow(simplifiedBase.right, simplifiedExponent),
@@ -380,7 +380,7 @@ class Pow extends BinaryOperationsExpression {
       }
       if (val != null) {
         if (val == 0) {
-          return Literal(1);
+          return const Literal.nonComplex(1);
         }
         if (val == 1) {
           return base.expand();
@@ -411,7 +411,7 @@ class Pow extends BinaryOperationsExpression {
     if (exponent is Literal) {
       final ev = (exponent as Literal).value;
       final val = (ev is Complex) ? ev.simplify() : ev;
-      if (val == 0.5 || val == Rational(1, 2)) {
+      if (val == 0.5 || val == Rational.ints(1, 2)) {
         return "sqrt($base)";
       }
     }
@@ -488,7 +488,7 @@ Map<int, Expression>? _collectPolynomialCoeffs(Expression expr, Variable v) {
       return _TermCoeff(t, 0);
     }
     if (t is Variable && t.identifier.name == varName) {
-      return _TermCoeff(Literal(1), 1);
+      return _TermCoeff(Literal.nonComplex(1), 1);
     }
     if (t is Pow) {
       if (t.base is Variable &&
@@ -499,7 +499,7 @@ Map<int, Expression>? _collectPolynomialCoeffs(Expression expr, Variable v) {
           if (val is num) expDouble = val.toDouble();
           if (val is Rational) expDouble = val.toDouble();
           if (expDouble >= 0 && expDouble == expDouble.toInt()) {
-            return _TermCoeff(Literal(1), expDouble.toInt());
+            return _TermCoeff(Literal.nonComplex(1), expDouble.toInt());
           }
         }
       }

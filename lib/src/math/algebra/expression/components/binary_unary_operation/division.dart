@@ -64,7 +64,7 @@ class Divide extends BinaryOperationsExpression {
   Expression integrate() {
     // 1. Denominator is a constant: ∫ f(x)/c dx = (1/c) * ∫ f(x) dx
     if (right.getVariableTerms().isEmpty) {
-      return Multiply(Divide(Literal(1), right), left.integrate()).simplify();
+      return Multiply(Divide(Literal.nonComplex(1), right), left.integrate()).simplify();
     }
 
     // 2. Numerator is a constant, denominator is a single variable: ∫ c/x dx = c * ln|x|
@@ -105,7 +105,7 @@ class Divide extends BinaryOperationsExpression {
 
     if (numPoly == null || denPoly == null || _isZeroPoly(denPoly)) return null;
 
-    Expression integral = Literal(0);
+    Expression integral = Literal.nonComplex(0);
     Polynomial remPoly = numPoly;
 
     // STEP A: Polynomial Long Division (if improper fraction)
@@ -224,7 +224,7 @@ class Divide extends BinaryOperationsExpression {
     }
     if (expr is Variable) {
       if (expr == v || expr.identifier.name == v.identifier.name) {
-        return Polynomial.fromList([Literal(1), Literal(0)],
+        return Polynomial.fromList([Literal.nonComplex(1), Literal.nonComplex(0)],
             variable: v); // Represents 'x'
       }
       return null; // Different variable
@@ -250,7 +250,7 @@ class Divide extends BinaryOperationsExpression {
     if (expr is Negate) {
       final inner = _toPolynomial(expr.operand, v);
       if (inner == null) return null;
-      return (Polynomial.fromList([Literal(0)], variable: v) - inner)
+      return (Polynomial.fromList([Literal.nonComplex(0)], variable: v) - inner)
           as Polynomial;
     }
     if (expr is Pow) {
@@ -268,7 +268,7 @@ class Divide extends BinaryOperationsExpression {
         }
 
         if (expNum != null && expNum >= 0 && expNum % 1 == 0) {
-          Polynomial res = Polynomial.fromList([Literal(1)], variable: v);
+          Polynomial res = Polynomial.fromList([Literal.nonComplex(1)], variable: v);
           for (int i = 0; i < expNum.toInt(); i++) {
             res = (res * base) as Polynomial;
           }
@@ -290,11 +290,11 @@ class Divide extends BinaryOperationsExpression {
   Polynomial _syntheticDiv(Polynomial poly, num r) {
     List<Expression> coeffs = poly.coefficients;
     if (coeffs.length <= 1) {
-      return Polynomial.fromList([Literal(0)], variable: poly.variable);
+      return Polynomial.fromList([Literal.nonComplex(0)], variable: poly.variable);
     }
 
     List<Expression> out = [];
-    Expression carry = Literal(0);
+    Expression carry = Literal.nonComplex(0);
     for (int i = 0; i < coeffs.length - 1; i++) {
       Expression current = Add(coeffs[i], carry).simplify();
       out.add(current);
@@ -420,18 +420,18 @@ class Divide extends BinaryOperationsExpression {
       // 0 / x -> 0 (but only if numerator is 0)
       if (numerator is Literal) {
         final nv = extractNum(numerator);
-        if (nv == 0) return Literal(0);
+        if (nv == 0) return Literal.nonComplex(0);
       }
     }
 
     // 0 / x -> 0
     if (numerator is Literal) {
       final nv = extractNum(numerator);
-      if (nv == 0) return Literal(0);
+      if (nv == 0) return Literal.nonComplex(0);
     }
 
     // x / x -> 1
-    if (numerator.toString() == denominator.toString()) return Literal(1);
+    if (numerator.toString() == denominator.toString()) return Literal.nonComplex(1);
 
     // Convert division by literal to multiplication by reciprocal
     // x / c -> x * (1/c)
@@ -439,7 +439,7 @@ class Divide extends BinaryOperationsExpression {
       final dv = extractNum(denominator);
       if (dv is num) {
         if (dv == 0) throw Exception('Division by zero');
-        //return Multiply(Literal(1 / dv), numerator).simplify();
+        //return Multiply(Literal.nonComplex(1 / dv), numerator).simplify();
         final reciprocal = (dv is int) ? Rational(1, dv) : 1 / dv;
         return Multiply(Literal(reciprocal), numerator).simplify();
       }
@@ -458,7 +458,7 @@ class Divide extends BinaryOperationsExpression {
         terms = denominator.left;
       }
       if (terms.toString() == numerator.toString()) {
-        return Divide(Literal(1), c).simplify();
+        return Divide(Literal.nonComplex(1), c).simplify();
       }
     }
 

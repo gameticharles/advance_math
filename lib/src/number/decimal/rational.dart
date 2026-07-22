@@ -118,6 +118,11 @@ class Rational implements Comparable<Rational> {
 
   // --- Factory ---
 
+  /// Unsafe version of the [Rational] factory. 
+  /// Assumes that the numerator and the denominator are already simplified.
+  Rational.ints(int num, int denom): numerator = BigInt.from(num), denominator = BigInt.from(denom);
+
+
   /// Creates a [Rational] from a [numerator] and an optional [denominator].
   ///
   /// This is the main entry point for creating rationals. It handles:
@@ -131,6 +136,7 @@ class Rational implements Comparable<Rational> {
   /// Rational(2, 4); // 1/2 (Simplified)
   /// Rational(1, 0); // Infinity
   /// ```
+  
   factory Rational(dynamic numerator, [dynamic denominator]) {
     // 1. FAST RETURN: If inputs are already simple, return immediately.
     if (numerator is Rational && denominator == null) return numerator;

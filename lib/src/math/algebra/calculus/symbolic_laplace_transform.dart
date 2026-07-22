@@ -115,26 +115,26 @@ class LaplaceTransform {
     // L{sinh(at)} = a/(s²-a²)
     var sinhA = _extractHypCoeff(expr, t, isSinh: true);
     if (sinhA != null) {
-      return Divide(sinhA, Subtract(Pow(s, Literal(2)), Pow(sinhA, Literal(2))))
+      return Divide(sinhA, Subtract(Pow(s, Literal.nonComplex(2)), Pow(sinhA, Literal.nonComplex(2))))
           .simplify();
     }
     // L{cosh(at)} = s/(s²-a²)
     var coshA = _extractHypCoeff(expr, t, isSinh: false);
     if (coshA != null) {
-      return Divide(s, Subtract(Pow(s, Literal(2)), Pow(coshA, Literal(2))))
+      return Divide(s, Subtract(Pow(s, Literal.nonComplex(2)), Pow(coshA, Literal.nonComplex(2))))
           .simplify();
     }
 
     // L{sin(at)} = a/(s²+a²)
     var sinA = _extractTrigCoeff(expr, t, isSin: true);
     if (sinA != null) {
-      return Divide(sinA, Add(Pow(s, Literal(2)), Pow(sinA, Literal(2))))
+      return Divide(sinA, Add(Pow(s, Literal.nonComplex(2)), Pow(sinA, Literal.nonComplex(2))))
           .simplify();
     }
     // L{cos(at)} = s/(s²+a²)
     var cosA = _extractTrigCoeff(expr, t, isSin: false);
     if (cosA != null) {
-      return Divide(s, Add(Pow(s, Literal(2)), Pow(cosA, Literal(2))))
+      return Divide(s, Add(Pow(s, Literal.nonComplex(2)), Pow(cosA, Literal.nonComplex(2))))
           .simplify();
     }
 
@@ -245,7 +245,7 @@ class LaplaceTransform {
   }
 
   static Expression? _extractCoeffOfT(Expression expr, Variable t) {
-    if (expr == t) return Literal(1);
+    if (expr == t) return Literal.nonComplex(1);
     if (expr is Negate && expr.operand == t) return Literal(-1);
     if (expr is Multiply) {
       List<Expression> factors = [];
@@ -274,7 +274,7 @@ class LaplaceTransform {
         }
       }
       if (tFactor != null) {
-        if (others.isEmpty) return tFactor is Negate ? Literal(-1) : Literal(1);
+        if (others.isEmpty) return tFactor is Negate ? Literal(-1) : Literal.nonComplex(1);
         Expression c = others[0];
         for (int i = 1; i < others.length; i++) {
           c = Multiply(c, others[i]).simplify();
@@ -384,7 +384,7 @@ class InverseLaplaceTransform {
           n.numerator == BigInt.from(-3) &&
           n.denominator == BigInt.two) {
         return Multiply(
-                Literal(2),
+                Literal.nonComplex(2),
                 Divide(Pow(t, Literal(Rational(1, 2))),
                     Pow(Variable('pi'), Literal(Rational(1, 2)))))
             .simplify();
@@ -396,7 +396,7 @@ class InverseLaplaceTransform {
         expr.left is Literal &&
         (expr.left as Literal).value == 1 &&
         expr.right == s) {
-      return Literal(1);
+      return Literal.nonComplex(1);
     }
 
     // Negative-power Pow: (base)^(-n) → 1/base^n
@@ -406,7 +406,7 @@ class InverseLaplaceTransform {
         double? nd = _asDouble(n.value);
         if (nd != null && nd < 0) {
           return _invertDirect(
-              Divide(Literal(1), Pow(expr.base, Literal(-nd))), s, t);
+              Divide(Literal.nonComplex(1), Pow(expr.base, Literal(-nd))), s, t);
         }
       }
     }
@@ -447,7 +447,7 @@ class InverseLaplaceTransform {
   static Expression _invertDivideSimple(
       Expression numer, Expression den, Variable s, Variable t) {
     // 1/s → 1 handled above, but just in case:
-    if (numer is Literal && numer.value == 1 && den == s) return Literal(1);
+    if (numer is Literal && numer.value == 1 && den == s) return Literal.nonComplex(1);
 
     var denCoeffs = _collectCoeffs(den, s);
     if (denCoeffs == null) throw UnimplementedError('den: $den');
@@ -458,14 +458,14 @@ class InverseLaplaceTransform {
 
     // Degree 1: Q/(Bs+C) = (Q/B)·e^(-C/B · t)
     if (deg == 1) {
-      var B = denCoeffs[1] ?? Literal(0);
-      var C = denCoeffs[0] ?? Literal(0);
+      var B = denCoeffs[1] ?? Literal.nonComplex(0);
+      var C = denCoeffs[0] ?? Literal.nonComplex(0);
       var numCoeffs = _collectCoeffs(numer, s);
       if (numCoeffs == null) {
         throw UnimplementedError('numer is not a polynomial: $numer');
       }
-      var P = numCoeffs[1] ?? Literal(0);
-      var Q = numCoeffs[0] ?? Literal(0);
+      var P = numCoeffs[1] ?? Literal.nonComplex(0);
+      var Q = numCoeffs[0] ?? Literal.nonComplex(0);
       if (_isZeroExpr(P)) {
         var factor = Divide(Q, B).simplify();
         var a = Negate(Divide(C, B)).simplify();
@@ -474,15 +474,15 @@ class InverseLaplaceTransform {
     }
 
     if (deg == 2) {
-      var A = denCoeffs[2] ?? Literal(0);
-      var B = denCoeffs[1] ?? Literal(0);
-      var C = denCoeffs[0] ?? Literal(0);
+      var A = denCoeffs[2] ?? Literal.nonComplex(0);
+      var B = denCoeffs[1] ?? Literal.nonComplex(0);
+      var C = denCoeffs[0] ?? Literal.nonComplex(0);
       var numCoeffs = _collectCoeffs(numer, s);
       if (numCoeffs == null) {
         throw UnimplementedError('numer is not a polynomial: $numer');
       }
-      var P = numCoeffs[1] ?? Literal(0);
-      var Q = numCoeffs[0] ?? Literal(0);
+      var P = numCoeffs[1] ?? Literal.nonComplex(0);
+      var Q = numCoeffs[0] ?? Literal.nonComplex(0);
 
       var aVal = _evalToDouble(A);
       var bVal = _evalToDouble(B);
@@ -497,54 +497,54 @@ class InverseLaplaceTransform {
               dmath.sqrt(4 * aVal * cVal - bVal * bVal) / (2 * aVal);
 
           Expression alpha =
-              Divide(Negate(B), Multiply(Literal(2), A)).simplify();
+              Divide(Negate(B), Multiply(Literal.nonComplex(2), A)).simplify();
           Expression wExpr = _omegaToSymbolic(omegaVal);
 
           Expression eAlpha = _isZeroExpr(alpha)
-              ? Literal(1)
+              ? Literal.nonComplex(1)
               : Pow(Variable('e'), Multiply(alpha, t)).simplify();
 
           Expression coeffCos = Divide(P, A).simplify();
           Expression shift =
-              Divide(Negate(B), Multiply(Literal(2), A)).simplify();
+              Divide(Negate(B), Multiply(Literal.nonComplex(2), A)).simplify();
           Expression coeffSin =
               Divide(Add(Multiply(P, shift), Q), Multiply(A, wExpr)).simplify();
 
           Expression cosTerm = _isZeroExpr(coeffCos)
-              ? Literal(0)
+              ? Literal.nonComplex(0)
               : Multiply(coeffCos, Cos(Multiply(wExpr, t))).simplify();
           Expression sinTerm = _isZeroExpr(coeffSin)
-              ? Literal(0)
+              ? Literal.nonComplex(0)
               : Multiply(coeffSin, Sin(Multiply(wExpr, t))).simplify();
 
           return Multiply(eAlpha, Add(cosTerm, sinTerm).simplify()).simplify();
         } else if (discVal == 0) {
           // Repeated real root
           Expression alpha =
-              Divide(Negate(B), Multiply(Literal(2), A)).simplify();
+              Divide(Negate(B), Multiply(Literal.nonComplex(2), A)).simplify();
           Expression eAlpha = _isZeroExpr(alpha)
-              ? Literal(1)
+              ? Literal.nonComplex(1)
               : Pow(Variable('e'), Multiply(alpha, t)).simplify();
 
           Expression coeff1 = Divide(P, A).simplify();
           Expression shift =
-              Divide(Negate(B), Multiply(Literal(2), A)).simplify();
+              Divide(Negate(B), Multiply(Literal.nonComplex(2), A)).simplify();
           Expression coeff2 = Divide(Add(Multiply(P, shift), Q), A).simplify();
 
-          Expression term1 = _isZeroExpr(coeff1) ? Literal(0) : coeff1;
+          Expression term1 = _isZeroExpr(coeff1) ? Literal.nonComplex(0) : coeff1;
           Expression term2 =
-              _isZeroExpr(coeff2) ? Literal(0) : Multiply(coeff2, t).simplify();
+              _isZeroExpr(coeff2) ? Literal.nonComplex(0) : Multiply(coeff2, t).simplify();
           return Multiply(eAlpha, Add(term1, term2).simplify()).simplify();
         }
       }
     }
 
     if (deg == 4) {
-      var a4 = denCoeffs[4] ?? Literal(0);
-      var a3 = denCoeffs[3] ?? Literal(0);
-      var a2 = denCoeffs[2] ?? Literal(0);
-      var a1 = denCoeffs[1] ?? Literal(0);
-      var a0 = denCoeffs[0] ?? Literal(0);
+      var a4 = denCoeffs[4] ?? Literal.nonComplex(0);
+      var a3 = denCoeffs[3] ?? Literal.nonComplex(0);
+      var a2 = denCoeffs[2] ?? Literal.nonComplex(0);
+      var a1 = denCoeffs[1] ?? Literal.nonComplex(0);
+      var a0 = denCoeffs[0] ?? Literal.nonComplex(0);
 
       if (_isZeroExpr(a3) && _isZeroExpr(a1)) {
         var a4Val = _evalToDouble(a4);
@@ -568,15 +568,15 @@ class InverseLaplaceTransform {
             if (numCoeffs == null) {
               throw UnimplementedError('numer is not a polynomial: $numer');
             }
-            var P = numCoeffs[2] ?? Literal(0);
-            var Q = numCoeffs[1] ?? Literal(0);
-            var R = numCoeffs[0] ?? Literal(0);
+            var P = numCoeffs[2] ?? Literal.nonComplex(0);
+            var Q = numCoeffs[1] ?? Literal.nonComplex(0);
+            var R = numCoeffs[0] ?? Literal.nonComplex(0);
 
             double omegaVal = dmath.sqrt(cVal / aVal);
             Expression wExpr = _omegaToSymbolic(omegaVal);
 
             Expression term1 = _isZeroExpr(P)
-                ? Literal(0)
+                ? Literal.nonComplex(0)
                 : Divide(
                     Multiply(
                         P,
@@ -584,13 +584,13 @@ class InverseLaplaceTransform {
                             Sin(Multiply(wExpr, t)),
                             Multiply(
                                 Multiply(wExpr, t), Cos(Multiply(wExpr, t))))),
-                    Multiply(Literal(2), wExpr));
+                    Multiply(Literal.nonComplex(2), wExpr));
             Expression term2 = _isZeroExpr(Q)
-                ? Literal(0)
+                ? Literal.nonComplex(0)
                 : Divide(Multiply(Q, Multiply(t, Sin(Multiply(wExpr, t)))),
-                    Multiply(Literal(2), wExpr));
+                    Multiply(Literal.nonComplex(2), wExpr));
             Expression term3 = _isZeroExpr(R)
-                ? Literal(0)
+                ? Literal.nonComplex(0)
                 : Divide(
                     Multiply(
                         R,
@@ -598,7 +598,7 @@ class InverseLaplaceTransform {
                             Sin(Multiply(wExpr, t)),
                             Multiply(
                                 Multiply(wExpr, t), Cos(Multiply(wExpr, t))))),
-                    Multiply(Literal(2), Pow(wExpr, Literal(3))));
+                    Multiply(Literal.nonComplex(2), Pow(wExpr, Literal.nonComplex(3))));
 
             return Divide(Add(term1, Add(term2, term3).simplify()).simplify(),
                     Multiply(A, A))
@@ -637,12 +637,12 @@ class InverseLaplaceTransform {
 
     // Polynomial arrays in ℂ from high-degree to low-degree
     List<Complex> N = List.generate(numDeg + 1, (i) {
-      var c = numCoeffs[numDeg - i] ?? Literal(0);
+      var c = numCoeffs[numDeg - i] ?? Literal.nonComplex(0);
       double? v = _evalToDouble(c);
       return v != null ? Complex(v, 0) : Complex(0, 0);
     });
     List<Complex> D = List.generate(denDeg + 1, (i) {
-      var c = denCoeffs[denDeg - i] ?? Literal(0);
+      var c = denCoeffs[denDeg - i] ?? Literal.nonComplex(0);
       double? v = _evalToDouble(c);
       if (v == null) throw UnimplementedError('non-numeric den coeff: $c');
       return Complex(v, 0);
@@ -726,7 +726,7 @@ class InverseLaplaceTransform {
     }
 
     // 5. For each pole compute residues in ℂ using polynomial operations
-    Expression result = Literal(0);
+    Expression result = Literal.nonComplex(0);
     Set<int> handledConj = {};
 
     for (int pi = 0; pi < poles.length; pi++) {
@@ -782,9 +782,9 @@ class InverseLaplaceTransform {
           // L⁻¹{A_j/(s-p)^j} = A_j * t^(j-1)/(j-1)! * e^(pt)
           double coeff = aR / _factorial(m - j) / _factorial(power);
           Expression coeffExpr = _toRationalExpr(coeff);
-          Expression tPow = power == 0 ? Literal(1) : Pow(t, Literal(power));
+          Expression tPow = power == 0 ? Literal.nonComplex(1) : Pow(t, Literal(power));
           Expression eFact = pReal.abs() < 1e-9
-              ? Literal(1)
+              ? Literal.nonComplex(1)
               : Pow(Variable('e'), Multiply(_toRationalExpr(pReal), t));
 
           result = Add(
@@ -802,7 +802,7 @@ class InverseLaplaceTransform {
         double omega = pPos.imaginary;
         Expression wExpr = _omegaToSymbolic(omega);
         Expression eAlpha = alpha.abs() < 1e-9
-            ? Literal(1)
+            ? Literal.nonComplex(1)
             : Pow(Variable('e'), Multiply(_toRationalExpr(alpha), t));
 
         for (int j = 1; j <= m; j++) {
@@ -815,7 +815,7 @@ class InverseLaplaceTransform {
           double coeffCos = 2 * A.real / factMJ / _factorial(power);
           double coeffSin = -2 * A.imaginary / factMJ / _factorial(power);
 
-          Expression tPow = power == 0 ? Literal(1) : Pow(t, Literal(power));
+          Expression tPow = power == 0 ? Literal.nonComplex(1) : Pow(t, Literal(power));
           Expression scale = Multiply(eAlpha, tPow).simplify();
 
           if (coeffCos.abs() > 1e-10) {
@@ -866,7 +866,7 @@ class InverseLaplaceTransform {
         // When nd == -1 the denominator IS the base (not Pow(base, 1.0))
         Expression denom =
             nd == -1.0 ? expr.base : Pow(expr.base, Literal((-nd).toInt()));
-        return (Literal(1), denom);
+        return (Literal.nonComplex(1), denom);
       }
     }
 
@@ -905,14 +905,14 @@ class InverseLaplaceTransform {
 
     if (denFactors.isNotEmpty) {
       Expression numer = numFactors.isEmpty
-          ? Literal(1)
+          ? Literal.nonComplex(1)
           : numFactors.reduce((a, b) => Multiply(a, b));
       Expression denom = denFactors.reduce((a, b) => Multiply(a, b));
       return (numer.simplify(), denom.simplify());
     }
 
     // No denominator found — check if has s at all
-    if (!hasS(expr)) return (expr, Literal(1));
+    if (!hasS(expr)) return (expr, Literal.nonComplex(1));
 
     throw UnimplementedError('cannot extract fraction from: $expr');
   }
@@ -950,7 +950,7 @@ class InverseLaplaceTransform {
           term.getVariableTerms().any((v) => v.identifier.name == varName);
       if (!hasV) return _LaplaceTermCoeff(term, 0);
       if (term is Variable && term.identifier.name == varName) {
-        return _LaplaceTermCoeff(Literal(1), 1);
+        return _LaplaceTermCoeff(Literal.nonComplex(1), 1);
       }
       if (term is Pow &&
           term.base is Variable &&
@@ -969,7 +969,7 @@ class InverseLaplaceTransform {
               : (v.real as num).toDouble();
         }
         if (d != null && d >= 0 && d == d.toInt()) {
-          return _LaplaceTermCoeff(Literal(1), d.toInt());
+          return _LaplaceTermCoeff(Literal.nonComplex(1), d.toInt());
         }
       }
       if (term is Multiply) {
@@ -1025,7 +1025,7 @@ class InverseLaplaceTransform {
   /// Convert a double to a Rational expression if it's close to a simple fraction.
   /// Always returns a symbolic expression, never a float literal.
   static Expression _toRationalExpr(double v) {
-    if (v == 0) return Literal(0);
+    if (v == 0) return Literal.nonComplex(0);
     bool neg = v < 0;
     double av = v.abs();
     // Try denominators 1 .. 120
@@ -1045,7 +1045,7 @@ class InverseLaplaceTransform {
   /// The canonical form is: sqrt(p·q)/q  where ω² ≈ p/q (lowest terms).
   /// E.g. ω = √5/2 → (1/2)·sqrt(5),  ω = √3/3 → (1/3)·sqrt(3),  ω = 2 → 2.
   static Expression _omegaToSymbolic(double omega) {
-    if (omega <= 0) return Literal(0);
+    if (omega <= 0) return Literal.nonComplex(0);
     double w2 = omega * omega;
 
     // Find rational p/q for ω²

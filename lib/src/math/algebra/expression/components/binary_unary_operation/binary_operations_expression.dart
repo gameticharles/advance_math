@@ -12,7 +12,7 @@ abstract class BinaryOperationsExpression extends Expression {
   final Expression left;
   final Expression right;
 
-  BinaryOperationsExpression(this.left, this.right);
+  const BinaryOperationsExpression(this.left, this.right);
 
   @override
   Set<Variable> getVariableTerms() {
