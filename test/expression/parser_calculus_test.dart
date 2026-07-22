@@ -150,7 +150,7 @@ void main() {
       test(
           'integrate(x^-2, x)',
           () => expect(parser.parse('integrate(x^-2, x)').toString(),
-              contains('-1*x^(-1)')));
+              anyOf(contains('-x^(-1)'), contains('-1*x^(-1)'))));
 
       // 36-40: Constants
       test(
@@ -171,8 +171,8 @@ void main() {
               parser.parse('integrate(pi, x)').toString(), contains('pi*x')));
       test(
           'integrate(y, x)',
-          () => expect(
-              parser.parse('integrate(y, x)').toString(), contains('y*x')));
+          () => expect(parser.parse('integrate(y, x)').toString(),
+              anyOf(contains('y*x'), contains('x*y'))));
 
       // 41-45: Trigonometric
       test(
@@ -242,8 +242,10 @@ void main() {
               anyOf(contains('(2 * x)'), contains('2*x'))));
       test(
           'integrate(1/(2*x), x)',
-          () => expect(parser.parse('integrate(1/(2*x), x)').toString(),
-              anyOf(contains('ln((2 * x))'), contains('ln((2*x))'))));
+          () => expect(
+              parser.parse('integrate(1/(2*x), x)').toString(),
+              anyOf(contains('ln((2 * x))'), contains('ln((2*x))'),
+                  contains('(1/2)*ln(x)'))));
 
       // 56-60: Substitution (Non-linear)
       test(
@@ -317,16 +319,18 @@ void main() {
                   .parse('integrate(1/(x+1), x)')
                   .toString()
                   .replaceAll(' ', ''),
-              contains('ln((x+1))')));
+              anyOf(contains('ln(1+x)'), contains('ln(x+1)'))));
       test(
           'integrate(x/(x^2+1), x)',
-          () => expect(parser.parse('integrate(x/(x^2+1), x)').toString(),
-              anyOf(contains('ln(((x^2) + 1))'), contains('ln((x^2+1))'))));
+          () => expect(
+              parser.parse('integrate(x/(x^2+1), x)').toString(),
+              anyOf(contains('ln(((x^2) + 1))'), contains('ln((x^2+1))'),
+                  contains('(1/2)*ln(1+x^2)'))));
       test(
           'integrate(tan(x), x)',
           () => expect(
               parser.parse('integrate(tan(x), x)').toString(),
-              anyOf(contains('ln(cos(x))'),
+              anyOf(contains('ln(cos(x))'), contains('ln(|sec(x)|)'),
                   contains('ln(sec(x))')))); // -ln|cos(x)| or ln|sec(x)|
     });
 
