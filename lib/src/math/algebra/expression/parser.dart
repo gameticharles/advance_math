@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:petitparser/petitparser.dart';
 import '../../../number/decimal/rational.dart';
 import 'expression.dart';
@@ -1252,27 +1253,244 @@ class ExpressionParser {
                     return args[0].simplify();
                   }
 
-                  if (name == 'factor' && args.length == 1) {
-                    if (args[0] is Polynomial) {
-                      final factors = (args[0] as Polynomial).factorize();
-                      if (factors.isEmpty) return Literal(1);
-                      Expression result = factors[0];
-                      for (int i = 1; i < factors.length; i++) {
-                        result = Multiply(result, factors[i]);
-                      }
-                      return result;
-                    }
-                    // Try to parse as polynomial
+                  if (name == 'expand' && args.length == 1) {
+                    return args[0].expand().simplify();
+                  }
+
+                  if (name == 'div' && args.length == 2) {
+                    // Polynomial division: div(numerator, denominator) -> [quotient, remainder]
                     try {
-                      final poly = Polynomial.fromString(args[0].toString());
-                      final factors = poly.factorize();
-                      if (factors.isEmpty) return Literal(1);
-                      Expression result = factors[0];
-                      for (int i = 1; i < factors.length; i++) {
-                        result = Multiply(result, factors[i]);
+                      String divVar = 'y';
+                      final denVars = args[1].getVariableTerms().where((v) => ![
+                            'i',
+                            'e',
+                            'pi',
+                            'sin',
+                            'cos',
+                            'tan',
+                            'ln',
+                            'log',
+                            'exp',
+                            'abs',
+                            'sqrt'
+                          ].contains(v.identifier.name));
+                      if (denVars.isNotEmpty) {
+                        divVar = denVars.first.identifier.name;
+                      } else {
+                        final numVars = args[0].getVariableTerms().where((v) =>
+                            ![
+                              'i',
+                              'e',
+                              'pi',
+                              'sin',
+                              'cos',
+                              'tan',
+                              'ln',
+                              'log',
+                              'exp',
+                              'abs',
+                              'sqrt'
+                            ].contains(v.identifier.name));
+                        if (numVars.isNotEmpty) {
+                          divVar = numVars.first.identifier.name;
+                        }
                       }
-                      return result;
-                    } catch (e) {
+
+                      var numExpr = args[0].expand().simplify();
+                      var denExpr = args[1].expand().simplify();
+
+                      List<Expression> collectSum(Expression e) {
+                        if (e is Add) {
+                          return [
+                            ...collectSum(e.left),
+                            ...collectSum(e.right)
+                          ];
+                        }
+                        if (e is Subtract) {
+                          return [
+                            ...collectSum(e.left),
+                            ...collectSum(
+                                Multiply(Literal(-1), e.right).simplify())
+                          ];
+                        }
+                        return [e];
+                      }
+
+                      int termDeg(Expression t, String v) {
+                        if (t is Variable && t.identifier.name == v) return 1;
+                        if (t is Pow &&
+                            t.left is Variable &&
+                            (t.left as Variable).identifier.name == v) {
+                          if (t.right is Literal) {
+                            var ev = (t.right as Literal).value;
+                            if (ev is int) return ev;
+                            if (ev is double && ev == ev.toInt()) {
+                              return ev.toInt();
+                            }
+                          }
+                        }
+                        if (t is Multiply) {
+                          return termDeg(t.left, v) + termDeg(t.right, v);
+                        }
+                        return 0;
+                      }
+
+                      Expression termCoeff(Expression t, String v) {
+                        int deg = termDeg(t, v);
+                        if (deg == 0) return t;
+                        if (t is Multiply) {
+                          bool leftHas = t.left
+                              .getVariableTerms()
+                              .any((vt) => vt.identifier.name == v);
+                          bool rightHas = t.right
+                              .getVariableTerms()
+                              .any((vt) => vt.identifier.name == v);
+                          if (leftHas && !rightHas) return termCoeff(t.left, v);
+                          if (!leftHas && rightHas) {
+                            return Multiply(t.left, termCoeff(t.right, v))
+                                .simplify();
+                          }
+                          if (!leftHas && !rightHas) return t;
+                        }
+                        return Literal(1);
+                      }
+
+                      bool isZero(Expression e) {
+                        var str = e.simplify().toString();
+                        return str == '0' || str == '0.0';
+                      }
+
+                      Map<int, Expression> numCoeffs = {};
+                      for (var t in collectSum(numExpr)) {
+                        int d = termDeg(t, divVar);
+                        var c = termCoeff(t, divVar);
+                        numCoeffs[d] =
+                            Add(numCoeffs[d] ?? Literal(0), c).simplify();
+                      }
+
+                      Map<int, Expression> denCoeffs = {};
+                      for (var t in collectSum(denExpr)) {
+                        int d = termDeg(t, divVar);
+                        var c = termCoeff(t, divVar);
+                        denCoeffs[d] =
+                            Add(denCoeffs[d] ?? Literal(0), c).simplify();
+                      }
+
+                      int degD = denCoeffs.keys.isEmpty
+                          ? 0
+                          : denCoeffs.keys.reduce((a, b) => a > b ? a : b);
+                      var leadD = denCoeffs[degD] ?? Literal(1);
+
+                      Map<int, Expression> qCoeffs = {};
+
+                      int getDegN() {
+                        var nonZero = numCoeffs.entries
+                            .where((e) => !isZero(e.value))
+                            .map((e) => e.key);
+                        if (nonZero.isEmpty) return -1;
+                        return nonZero.reduce((a, b) => a > b ? a : b);
+                      }
+
+                      int degN = getDegN();
+
+                      while (degN >= degD && degN >= 0) {
+                        var leadN = numCoeffs[degN] ?? Literal(0);
+                        var qTermCoeff = Divide(leadN, leadD).simplify();
+                        int qDeg = degN - degD;
+                        qCoeffs[qDeg] =
+                            Add(qCoeffs[qDeg] ?? Literal(0), qTermCoeff)
+                                .simplify();
+
+                        for (var entry in denCoeffs.entries) {
+                          int dDeg = entry.key;
+                          var dCoeff = entry.value;
+                          int targetDeg = qDeg + dDeg;
+                          var sub = Multiply(qTermCoeff, dCoeff).simplify();
+                          numCoeffs[targetDeg] =
+                              Subtract(numCoeffs[targetDeg] ?? Literal(0), sub)
+                                  .simplify();
+                        }
+
+                        degN = getDegN();
+                      }
+
+                      Expression qExpr = Literal(0);
+                      var sortedQ = qCoeffs.entries.toList()
+                        ..sort((a, b) => a.key.compareTo(b.key));
+                      for (var entry in sortedQ) {
+                        if (isZero(entry.value)) continue;
+                        int d = entry.key;
+                        var c = entry.value;
+                        Expression term;
+                        if (d == 0) {
+                          term = c;
+                        } else if (d == 1) {
+                          term = c.toString() == '1'
+                              ? Variable(divVar)
+                              : Multiply(c, Variable(divVar));
+                        } else {
+                          term = c.toString() == '1'
+                              ? Pow(Variable(divVar), Literal(d))
+                              : Multiply(c, Pow(Variable(divVar), Literal(d)));
+                        }
+                        qExpr = qExpr is Literal && qExpr.value == 0
+                            ? term
+                            : Add(qExpr, term);
+                      }
+
+                      Expression rExpr = Literal(0);
+                      var sortedR = numCoeffs.entries.toList()
+                        ..sort((a, b) => a.key.compareTo(b.key));
+                      for (var entry in sortedR) {
+                        if (isZero(entry.value)) continue;
+                        int d = entry.key;
+                        var c = entry.value;
+                        Expression term;
+                        if (d == 0) {
+                          term = c;
+                        } else if (d == 1) {
+                          term = c.toString() == '1'
+                              ? Variable(divVar)
+                              : Multiply(c, Variable(divVar));
+                        } else {
+                          term = c.toString() == '1'
+                              ? Pow(Variable(divVar), Literal(d))
+                              : Multiply(c, Pow(Variable(divVar), Literal(d)));
+                        }
+                        rExpr = rExpr is Literal && rExpr.value == 0
+                            ? term
+                            : Add(rExpr, term);
+                      }
+
+                      final qStr = qExpr.simplify().toString();
+                      final rStr = rExpr.simplify().toString();
+                      return Literal([qStr, rStr], '[$qStr,$rStr]');
+                    } catch (_) {
+                      return CallExpression(Variable(Identifier('div')), args);
+                    }
+                  }
+
+                  if (name == 'factor' && args.length == 1) {
+                    try {
+                      final arg = args[0];
+                      final Polynomial poly;
+                      if (arg is Polynomial) {
+                        poly = arg;
+                      } else {
+                        String polyStr;
+                        try {
+                          polyStr = arg.expand().simplify().toString();
+                        } catch (_) {
+                          polyStr = arg.toString();
+                        }
+                        poly = Polynomial.fromString(polyStr);
+                      }
+
+                      final factors = poly.factorize();
+                      return factors.isEmpty
+                          ? Literal(1)
+                          : factors.cast<Expression>().reduce(Multiply.new);
+                    } catch (_) {
                       return args[0];
                     }
                   }
@@ -2269,9 +2487,69 @@ class ExpressionParser {
 
                   if (name == 'roots' && args.length == 1) {
                     try {
+                      if (args[0] is Polynomial) {
+                        final r = (args[0] as Polynomial).roots();
+                        return Literal(r, r.toString());
+                      }
+
+                      // Check if args[0] is Pow(base, 1/n) e.g. (-1)^(1/5)
+                      var expr0 = args[0];
+                      if (expr0 is Pow) {
+                        var base = expr0.left;
+                        var exp = expr0.right;
+                        int? n;
+                        if (exp is Divide &&
+                            exp.left is Literal &&
+                            (exp.left as Literal).value == 1) {
+                          dynamic rVal = exp.right is Literal
+                              ? (exp.right as Literal).value
+                              : null;
+                          if (rVal is num) n = rVal.toInt();
+                          if (rVal is Rational && rVal.isInteger) {
+                            n = rVal.numerator.toInt();
+                          }
+                        } else if (exp is Literal) {
+                          dynamic v = exp.value;
+                          if (v is Rational) {
+                            if (v.numerator == BigInt.one) {
+                              n = v.denominator.toInt();
+                            }
+                          } else if (v is double) {
+                            double inv = 1.0 / v;
+                            if ((inv - inv.round()).abs() < 1e-6) {
+                              n = inv.round();
+                            }
+                          }
+                        }
+
+                        if (n != null && n > 0) {
+                          // Construct x^n - base
+                          dynamic baseVal;
+                          try {
+                            baseVal = base.evaluate();
+                          } catch (_) {
+                            baseVal = base;
+                          }
+
+                          List<dynamic> coeffs = List.filled(n + 1, Literal(0));
+                          coeffs[0] = Literal(1);
+                          coeffs[n] = Multiply(
+                                  Literal(-1),
+                                  baseVal is Expression
+                                      ? baseVal
+                                      : Literal(baseVal))
+                              .simplify();
+                          Polynomial poly = Polynomial.fromList(coeffs,
+                              variable: Variable('x'));
+                          final r = poly.roots();
+                          return Literal(r, r.toString());
+                        }
+                      }
+
                       Polynomial poly =
                           Polynomial.fromString(args[0].toString());
-                      return Literal(poly.roots(), poly.roots().toString());
+                      final r = poly.roots();
+                      return Literal(r, r.toString());
                     } catch (e) {
                       return Literal([]);
                     }
@@ -2282,18 +2560,162 @@ class ExpressionParser {
                     // Complete the square: ax^2 + bx + c
                     // a(x + b/2a)^2 + (c - b^2/4a)
                     try {
-                      String varName = 'x';
-                      final String source = args[0].toString();
-                      // Clean standard math functions to avoid mistaking them for variable name
-                      final cleanSource = source.replaceAll(
-                          RegExp(
-                              r'\b(sqcomp|completeSquare|sin|cos|tan|asin|acos|atan|sinh|cosh|tanh|log|ln|exp|abs|sqrt)\b'),
-                          '');
-                      final match = RegExp(r'[a-zA-Z]').firstMatch(cleanSource);
-                      if (match != null) {
-                        varName = match.group(0)!;
+                      String varName;
+                      // If a second argument is provided and it's a Variable, use it
+                      if (args.length >= 2 && args[1] is Variable) {
+                        varName = (args[1] as Variable).identifier.name;
+                      } else {
+                        // Detect variable from expression: first single letter not a function name
+                        final String source = args[0].toString();
+                        final cleanSource = source.replaceAll(
+                            RegExp(
+                                r'\b(sqcomp|completeSquare|sin|cos|tan|asin|acos|atan|sinh|cosh|tanh|log|ln|exp|abs|sqrt)\b'),
+                            '');
+                        final match =
+                            RegExp(r'[a-zA-Z]').firstMatch(cleanSource);
+                        varName = match != null ? match.group(0)! : 'x';
                       }
 
+                      final String source = args[0].toString();
+
+                      // Extract the coefficients of ax^2 + bx + c wrt varName
+                      // using the expression tree directly (handles symbolic coefficients)
+                      final expr = args[0].expand().simplify();
+
+                      // Collect terms by degree of varName
+                      List<Expression> collectSum(Expression e) {
+                        if (e is Add) {
+                          return [
+                            ...collectSum(e.left),
+                            ...collectSum(e.right)
+                          ];
+                        }
+                        if (e is Subtract) {
+                          return [
+                            ...collectSum(e.left),
+                            ...collectSum(
+                                Multiply(Literal(-1), e.right).simplify())
+                          ];
+                        }
+                        return [e];
+                      }
+
+                      int degreeOfTerm(Expression t, String v) {
+                        if (t is Variable && t.identifier.name == v) return 1;
+                        if (t is Pow &&
+                            t.base is Variable &&
+                            (t.base as Variable).identifier.name == v) {
+                          if (t.exponent is Literal) {
+                            var ev = (t.exponent as Literal).value;
+                            if (ev is int) return ev;
+                            if (ev is double && ev == ev.toInt()) {
+                              return ev.toInt();
+                            }
+                          }
+                        }
+                        if (t is Multiply) {
+                          return degreeOfTerm(t.left, v) +
+                              degreeOfTerm(t.right, v);
+                        }
+                        if (t
+                            .getVariableTerms()
+                            .any((vt) => vt.identifier.name == v)) {
+                          return 1;
+                        }
+                        return 0;
+                      }
+
+                      Expression coeffOfTerm(Expression t, String v) {
+                        int deg = degreeOfTerm(t, v);
+                        if (deg == 0) return t;
+                        if (t is Multiply) {
+                          bool leftHas = t.left
+                              .getVariableTerms()
+                              .any((vt) => vt.identifier.name == v);
+                          bool rightHas = t.right
+                              .getVariableTerms()
+                              .any((vt) => vt.identifier.name == v);
+                          if (!leftHas) return t.left;
+                          if (!rightHas) return t.right;
+                        }
+                        return Literal(1);
+                      }
+
+                      Expression aCoeff = Literal(0);
+                      Expression bCoeff = Literal(0);
+                      Expression cCoeff = Literal(0);
+
+                      for (var term in collectSum(expr)) {
+                        int deg = degreeOfTerm(term, varName);
+                        var coeff = coeffOfTerm(term, varName);
+                        if (deg == 2) {
+                          aCoeff = Add(aCoeff, coeff).simplify();
+                        } else if (deg == 1) {
+                          bCoeff = Add(bCoeff, coeff).simplify();
+                        } else {
+                          cCoeff = Add(cCoeff, term).simplify();
+                        }
+                      }
+
+                      // Check aCoeff != 0 (is quadratic in varName)
+                      bool isZeroExpr(Expression e) {
+                        if (e is Literal) {
+                          var v = e.value;
+                          if (v == 0 || v == 0.0) return true;
+                          if (v is Complex) return v == Complex.zero();
+                          if (v is Rational) return v == Rational.zero;
+                        }
+                        return false;
+                      }
+
+                      if (!isZeroExpr(aCoeff)) {
+                        final xVar = Variable(varName);
+
+                        // Check numeric coefficients
+                        dynamic av = aCoeff is Literal ? aCoeff.value : null;
+                        dynamic bv = bCoeff is Literal ? bCoeff.value : null;
+                        dynamic cv = cCoeff is Literal ? cCoeff.value : null;
+                        if (av is num && bv is num && cv is num && av > 0) {
+                          double sqrtA = math.sqrt(av.toDouble());
+                          if (sqrtA == sqrtA.toInt()) {
+                            int sqrtAInt = sqrtA.toInt();
+                            double hB = bv.toDouble() / (2 * sqrtAInt);
+                            Expression hBExpr = hB == hB.toInt()
+                                ? Literal(hB.toInt())
+                                : Literal(Rational(bv.toInt(), 2 * sqrtAInt));
+                            Expression termA = hBExpr;
+                            Expression termB = sqrtAInt == 1
+                                ? xVar
+                                : Multiply(Literal(sqrtAInt), xVar);
+                            Expression sqInner = Add(termA, termB);
+                            double remVal = cv.toDouble() -
+                                (bv.toDouble() * bv.toDouble()) /
+                                    (4 * av.toDouble());
+                            Expression remExpr = remVal == remVal.toInt()
+                                ? Literal(remVal.toInt())
+                                : Literal(Rational(
+                                    (cv.toInt() * 4 * av.toInt() -
+                                        bv.toInt() * bv.toInt()),
+                                    (4 * av.toInt())));
+                            return Add(Pow(sqInner, Literal(2)), remExpr);
+                          }
+                        }
+
+                        // a*(x + b/(2a))^2 + (c - b^2/(4a))
+                        final halfB =
+                            Divide(bCoeff, Multiply(Literal(2), aCoeff))
+                                .simplify();
+                        final bSq4a = Divide(Multiply(bCoeff, bCoeff),
+                                Multiply(Literal(4), aCoeff))
+                            .simplify();
+                        Expression inner = Add(xVar, halfB).simplify();
+                        Expression term1 =
+                            Multiply(aCoeff, Pow(inner, Literal(2))).simplify();
+                        Expression term2 = Subtract(cCoeff, bSq4a).simplify();
+                        return Add(term1, term2).simplify();
+                      }
+
+                      // Fallback: try Polynomial.fromString with detected var
                       Polynomial poly = Polynomial.fromString(source,
                           variable: Variable(varName));
                       if (poly.degree == 2) {

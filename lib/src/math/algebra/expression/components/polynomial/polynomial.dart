@@ -173,7 +173,7 @@ class Polynomial extends Expression {
       final RegExp termPattern = RegExp(
           r"([+-]?(?:(?:[a-zA-Z0-9_.]+(?:\*[a-zA-Z0-9_.]+)*)?\*?)?" +
               RegExp.escape(varName) +
-              r"(?:\^\d+)?(?:/[0-9.]+)?)|([+-]?(?:[a-zA-Z0-9_.]+(?:\*[a-zA-Z0-9_.]+)*))");
+              r"(?:\^\d+)?(?:/[0-9.]+)?)|([+-]?(?:[a-zA-Z0-9_.]+(?:/[0-9.]+)?(?:\*[a-zA-Z0-9_.]+)*))");
 
       var matches = termPattern.allMatches(source).toList();
 
@@ -1288,18 +1288,24 @@ class Polynomial extends Expression {
   ///   `[(x - 2), (x + 3), (x - 1 - 4i)]`.
   ///
   /// Returns:
-  ///   A list of strings where each string is a polynomial factor.
+  ///   A list of Polynomial factors.
   List<Polynomial> factorize() {
     List<Polynomial> factors = [];
 
     for (dynamic root in roots()) {
-      factors.add(Polynomial([1, -root], variable: variable));
+      Expression negatedRoot = Multiply(Literal(-1), root).simplify();
+      factors.add(Polynomial([Literal(1), negatedRoot], variable: variable));
     }
 
     // Add the leading coefficient if it's not 1
-    if (coefficients.first != Complex.one()) {
+    if (coefficients.isNotEmpty &&
+        (coefficients.first is! Literal ||
+            (coefficients.first as Literal).value != Complex.one())) {
       factors[0] = Polynomial(
-          factors[0].coefficients.map((e) => e * coefficients.first).toList(),
+          factors[0]
+              .coefficients
+              .map((e) => Multiply(e, coefficients.first).simplify())
+              .toList(),
           variable: variable);
     }
 

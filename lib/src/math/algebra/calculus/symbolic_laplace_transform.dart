@@ -600,9 +600,10 @@ class InverseLaplaceTransform {
                                 Multiply(wExpr, t), Cos(Multiply(wExpr, t))))),
                     Multiply(Literal(2), Pow(wExpr, Literal(3))));
 
-            return Divide(Add(term1, Add(term2, term3).simplify()).simplify(),
-                    Multiply(A, A))
-                .simplify();
+            return LaplaceTransform._safeSimplify(Divide(
+                LaplaceTransform._safeSimplify(Add(
+                    term1, LaplaceTransform._safeSimplify(Add(term2, term3)))),
+                Multiply(A, A)));
           }
         }
       }

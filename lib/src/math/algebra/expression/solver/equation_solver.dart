@@ -592,6 +592,17 @@ class ExpressionSolver {
       if (val is num && val.isFinite && (val - val.round()).abs() < 1e-9) {
         return val.round();
       }
+      // Rationalize finite doubles to simple fractions (e.g. 0.75 → 3/4)
+      if (val is double && val.isFinite) {
+        for (int den = 2; den <= 1000; den++) {
+          double numDouble = val * den;
+          if ((numDouble - numDouble.round()).abs() < 1e-9) {
+            int numInt = numDouble.round();
+            int g = numInt.abs().gcd(den);
+            return Rational(BigInt.from(numInt ~/ g), BigInt.from(den ~/ g));
+          }
+        }
+      }
       return val;
     }).toList();
 
