@@ -210,9 +210,6 @@ final class DurandKerner extends Polynomial {
     if (cached != null) return cached;
 
     List<dynamic> compute() {
-      final rationalRoots = solveRationalAndDeflate();
-      if (rationalRoots != null) return rationalRoots;
-
       // Check if binomial form: a * x^n + b = 0
       bool isBinomial = true;
       for (int i = 1; i < coefficients.length - 1; i++) {
@@ -228,6 +225,9 @@ final class DurandKerner extends Polynomial {
       if (isBinomial) {
         return super.roots();
       }
+
+      final rationalRoots = solveRationalAndDeflate();
+      if (rationalRoots != null) return rationalRoots;
 
       // In case the polynomial was a constant, just return an empty array because
       // there are no solutions.

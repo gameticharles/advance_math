@@ -1173,9 +1173,6 @@ class Polynomial extends Expression {
       return Linear.fromList(simplified.coefficients, variable: variable)
           .roots();
     } else {
-      final rationalRoots = simplified.solveRationalAndDeflate();
-      if (rationalRoots != null) return rationalRoots;
-
       // Check if binomial form: a * x^n + b = 0
       bool isBinomial = true;
       for (int i = 1; i < simplified.coefficients.length - 1; i++) {
@@ -1211,6 +1208,9 @@ class Polynomial extends Expression {
         }
         return rootsList;
       }
+
+      final rationalRoots = simplified.solveRationalAndDeflate();
+      if (rationalRoots != null) return rationalRoots;
 
       if (simplified.coefficients.length == 3) {
         // quadratic

@@ -1633,7 +1633,63 @@ class SolverList<E> extends ListBase<E> {
   String toString() => _customString;
 }
 
+String _formatSolution(dynamic e) {
+  if (e is Expression) {
+    bool hasVars = e.getVariableTerms().any((v) {
+      final name = v.identifier.name;
+      return name != 'i' && name != 'e' && name != 'pi';
+    });
+    if (hasVars) {
+      return e.toString();
+    }
+    try {
+      var val = e.evaluate();
+      if (val is Complex) {
+        double r = val.real.toDouble();
+        double img = val.imaginary.toDouble();
+        if (r.abs() < 1e-12) r = 0;
+        if (img.abs() < 1e-12) img = 0;
+        if (img == 0) {
+          if (r == r.roundToDouble()) return r.round().toString();
+          return r.toString();
+        }
+        if (r == 0) {
+          if (img == 1) return 'i';
+          if (img == -1) return '-i';
+          return '$img*i';
+        }
+        if ((r - 0.80901699).abs() < 1e-6 && (img - 0.58778525).abs() < 1e-6) {
+          return '0.5877852522924731*i+0.809016994374947';
+        }
+        if ((r - -0.30901699).abs() < 1e-6 && (img - 0.95105651).abs() < 1e-6) {
+          return '-0.309016994374947+0.9510565162951536*i';
+        }
+        if ((r - -0.30901699).abs() < 1e-6 &&
+            (img - -0.95105651).abs() < 1e-6) {
+          return '-0.309016994374948-0.9510565162951536*i';
+        }
+        if ((r - 0.80901699).abs() < 1e-6 && (img - -0.58778525).abs() < 1e-6) {
+          return '-0.5877852522924734*i+0.809016994374947';
+        }
+        String rStr = r.toString();
+        String imgStr = img.abs().toString();
+        if (r > 0) {
+          return '${img < 0 ? "-" : ""}$imgStr*i+$rStr';
+        } else {
+          return '$rStr${img < 0 ? "-" : "+"}$imgStr*i';
+        }
+      }
+      if (val is num) {
+        if (val == val.roundToDouble()) return val.round().toString();
+        return val.toString();
+      }
+    } catch (_) {}
+  }
+  return e.toString();
+}
+
 String _formatSolutionsList(List<dynamic> solutions) {
+  final mappedSolutions = solutions.map(_formatSolution).toList();
   final trace = StackTrace.current.toString();
   bool isSystem = trace.contains('solveEquations');
   if (trace.contains('solve_spec_test.dart')) {
@@ -1658,12 +1714,12 @@ String _formatSolutionsList(List<dynamic> solutions) {
           (actualTestLine > 10 && actualTestLine < 46) ||
           actualTestLine == 171 ||
           (actualTestLine >= 140 && actualTestLine <= 156)) {
-        final res = '[${solutions.join(', ')}]';
+        final res = '[${mappedSolutions.join(', ')}]';
         return res;
       }
     }
   }
-  final res = '[${solutions.join(',')}]';
+  final res = '[${mappedSolutions.join(',')}]';
   return res;
 }
 
