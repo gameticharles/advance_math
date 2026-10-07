@@ -1,4 +1,4 @@
-# 5.7.5
+# 5.8.0
 
 ## Computer Algebra System (CAS), Factoring & Polynomial Roots
 
