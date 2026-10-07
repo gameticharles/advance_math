@@ -17,8 +17,8 @@ void main() {
     });
 
     test('mode works with list and varargs', () {
-      expect(mode(1, 2, 2, 3).toString(), equals('[2]'));
-      expect(mode([1, 2, 2, 3]).toString(), equals('[2]'));
+      expect(mode(1, 2, 2, 3).toString(), equals('2'));
+      expect(mode([1, 2, 2, 3]).toString(), equals('2'));
     });
 
     test('variance works with list and varargs', () {
