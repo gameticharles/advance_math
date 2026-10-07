@@ -1,3 +1,35 @@
+# 5.7.5
+
+## Computer Algebra System (CAS), Factoring & Polynomial Roots
+
+- **[FEATURE]** Added expression factoring capabilities (`factor()`) to parse and decompose polynomials and algebraic expressions into linear and irreducible factors with rational/symbolic coefficients.
+- **[FEATURE]** Added symbolic polynomial division (`div(P, Q)` or `div(numerator, denominator)`) returning quotient and remainder pairs `[quotient, remainder]`.
+- **[FEATURE]** Added algebraic expression expansion (`expand()`) supporting distributive expansion and polynomial simplification.
+- **[FEATURE]** Added polynomial root extraction (`roots()`), supporting exact binomial root solving for $n$-th roots of real and complex values (e.g., $(-1)^{1/5}$) and arbitrary polynomials.
+- **[FEATURE]** Added partial fraction decomposition (`partfrac()`) for rational expressions.
+- **[FEATURE]** Added square completion (`sqcomp()` / `completeSquare()`) for quadratic expressions $ax^2 + bx + c$, supporting symbolic coefficients and custom variables to produce $(Ax + B)^2 + C$ forms.
+- **[IMPROVEMENT]** Overhauled `Polynomial.factorize()` to return structured `List<Polynomial>` factors and correctly preserve leading coefficient scalings.
+- **[IMPROVEMENT]** Prioritized exact binomial root solving in `DurandKerner` and `Polynomial.roots()` before numerical deflation.
+- **[IMPROVEMENT]** Updated polynomial term parser regex to support fractional and rational coefficients directly.
+
+## Symbolic Calculus & Laplace Transformations
+
+- **[FEATURE]** Overhauled `symbolic_integration.dart` using a modular Strategy pattern architecture (`SumDifferenceStrategy`, `ConstantMultipleStrategy`, `PowerRuleStrategy`, `ExponentialStrategy`, `BasicTrigStrategy`, `InverseTrigStrategy`, `RationalFunctionStrategy`, `SubstitutionStrategy`, `TrigProductStrategy`, `IntegrationByPartsStrategy`, `TrigPowerStrategy`, `InverseHyperbolicStrategy`, `CompletingTheSquareStrategy`, `LinearSubstitutionStrategy`).
+- **[IMPROVEMENT]** Overhauled `LaplaceTransform` and `InverseLaplaceTransform` handling, introducing safe simplification (`_safeSimplify`) that preserves exact symbolic radical forms (e.g. $\sqrt{\pi}$, $\sqrt{n}$) without forced numerical evaluation.
+- **[IMPROVEMENT]** Expanded inverse Laplace transform coverage for higher-degree polynomial denominators, damped harmonic oscillators ($e^{\alpha t}\cos(\omega t)$, $e^{\alpha t}\sin(\omega t)$), and repeated quadratic poles.
+- **[IMPROVEMENT]** Enhanced `Pow.simplify()` for rational powers with half-integer exponents ($n/2$), improper fraction factoring, and safe perfect square extraction.
+
+## Equation Solver & Basic Math Rational Support
+
+- **[FEATURE]** Added native `Rational` input support across basic math, logarithmic, trigonometric, hyperbolic, and inverse hyperbolic functions (`abs`, `sqrt`, `cbrt`, `nthRoot`, `exp`, `pow`, `floor`, `ceil`, `round`, `sign`, `clamp`, `log`, `sin`, `cos`, `tan`, `sinh`, `cosh`, etc.).
+- **[IMPROVEMENT]** Enhanced equation solver root rationalization, converting finite floating-point values to clean `Rational` representations (e.g., $0.75 \to 3/4$).
+- **[IMPROVEMENT]** Improved solution formatting (`SolverList` and `_formatSolution`) for complex roots and exact polar coordinates.
+
+## Statistics & Dependencies
+
+- **[FIX]** Updated `mode()` statistics function assertions and scalar return behavior when evaluating numeric collections and varargs.
+- **[MAINTENANCE]** Upgraded dependencies: `characters` to `^1.4.1`, `dartframe` to `^0.9.0`, `intl` to `^0.20.3`, and `petitparser` to `^7.1.0`.
+
 # 5.7.1
 
 ## Documentation Expansion & Metadata Optimization
@@ -40,7 +72,6 @@
 - **[IMPROVEMENT]** Added logarithm base and product/quotient splitting properties for literal inputs to `Ln` and `Log` functions.
 - **[IMPROVEMENT]** Added algebraic power expansion rules for products and quotients inside `Pow` expressions.
 - **[FEATURE]** Implemented 42 new high-coverage unit tests verifying arithmetic, power, fraction, logarithm, exponential, trigonometric, and complex nested/edge-case expressions, with zero regressions on existing suites.
-
 
 # 5.6.0
 
