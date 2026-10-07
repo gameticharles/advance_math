@@ -87,7 +87,7 @@ void main() {
         // Depending on initial guesses, it might find i or -i
         // Here we just check if it satisfies the equation
         var val = f(root);
-        expect(val.abs(), closeTo(0, tol));
+        expect((val.abs().real as num), closeTo(0, tol));
       });
     });
   });

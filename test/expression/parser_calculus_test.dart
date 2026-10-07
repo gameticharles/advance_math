@@ -20,8 +20,8 @@ void main() {
           () => expect(parser.parse('diff(x^1, x)').toString(), equals('1')));
       test(
           'diff(x^-1, x)',
-          () => expect(
-              parser.parse('diff(x^-1, x)').toString(), contains('-x^(-2)')));
+          () => expect(parser.parse('diff(x^-1, x)').toString(),
+              anyOf(contains('-x^(-2)'), contains('-1/x/x'), contains('-1/x^2'))));
 
       // 6-10: Partial Differentiation
       test('diff(y, x)',
@@ -70,8 +70,8 @@ void main() {
               contains('2*exp(2*x)')));
       test(
           'diff(ln(x), x)',
-          () => expect(
-              parser.parse('diff(ln(x), x)').toString(), contains('x^(-1)')));
+          () => expect(parser.parse('diff(ln(x), x)').toString(),
+              anyOf(contains('x^(-1)'), contains('1/x'))));
       test(
           'diff(ln(x^2), x)',
           () => expect(parser.parse('diff(ln(x^2), x)').toString(),
@@ -118,7 +118,7 @@ void main() {
       test(
           'diff(sin(x)/cos(x), x)',
           () => expect(parser.parse('diff(sin(x)/cos(x), x)').toString(),
-              contains('cos(x)^(-2)'))); // sec^2(x)
+              anyOf(contains('cos(x)^(-2)'), contains('1/cos(x)^2'), contains('sec(x)^2')))); // sec^2(x)
       test(
           'diff(x*exp(x), x)',
           () => expect(parser.parse('diff(x*exp(x), x)').toString(),

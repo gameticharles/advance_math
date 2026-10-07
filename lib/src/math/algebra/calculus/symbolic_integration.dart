@@ -70,8 +70,8 @@ class SymbolicIntegration {
     InverseHyperbolicStrategy(),
     CompletingTheSquareStrategy(),
     // LinearSubstitutionStrategy(),
-    RationalFunctionStrategy(),
     SubstitutionStrategy(),
+    RationalFunctionStrategy(),
     TrigProductStrategy(),
     IntegrationByPartsStrategy(),
   ];

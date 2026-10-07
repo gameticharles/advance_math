@@ -87,7 +87,11 @@ dynamic abs(dynamic x) {
 dynamic sqrt(dynamic x) {
   if (x is Expression) return Pow(x, Literal(Rational(1, 2)));
   if (x is Rational) x = x.toDouble();
-  if (x is num || x is Complex) return Complex(x).sqrt();
+  if (x is num) {
+    if (x >= 0) return math.sqrt(x);
+    return Complex(x).sqrt();
+  }
+  if (x is Complex) return x.sqrt();
   if (x is Matrix) return MatrixFunctions(x).sqrt();
   throw ArgumentError('Input should be num, Complex, Matrix, or Expression');
 }
@@ -133,7 +137,7 @@ dynamic nthRoot(dynamic x, dynamic nth) {
 dynamic exp(dynamic x) {
   if (x is Expression) return Exp(x);
   if (x is Rational) x = x.toDouble();
-  if (x is num) return Complex(math.exp(x));
+  if (x is num) return math.exp(x);
   if (x is Complex) return x.exp();
   if (x is Matrix) return MatrixFunctions(x).exp();
   throw ArgumentError('Input should be num, Complex, Matrix, or Expression');
@@ -159,7 +163,14 @@ dynamic pow(dynamic x, dynamic exponent) {
   }
   if (x is Rational) x = x.toDouble();
   if (exponent is Rational) exponent = exponent.toDouble();
-  if (x is num || x is Complex) return Complex(x).pow(exponent);
+  if (x is num && exponent is num) {
+    if (x >= 0 || exponent is int || exponent == exponent.roundToDouble()) {
+      return math.pow(x, exponent);
+    }
+    return Complex(x).pow(exponent);
+  }
+  if (x is Complex) return x.pow(exponent);
+  if (x is num) return Complex(x).pow(exponent);
   if (x is Matrix) return MatrixFunctions(x).pow(exponent);
   throw ArgumentError('Input should be num, Complex, Matrix, or Expression');
 }
@@ -464,7 +475,7 @@ Complex round(dynamic x, [int decimalPlaces = 0]) {
 /// ```
 dynamic max = VarArgsFunction((args, kwargs) {
   var list = _flattenArgs(args);
-  if (list.isEmpty) return Complex(0);
+  if (list.isEmpty) return 0;
 
   // If any argument is an un-evaluated Expression, return a symbolic CallExpression
   if (list.any((e) => e is Expression)) {
@@ -475,7 +486,7 @@ dynamic max = VarArgsFunction((args, kwargs) {
 
   var nums = list.map((e) => e).toList();
   return nums.reduce((curr, next) {
-    if (curr is num && next is num) return Complex(math.max(curr, next));
+    if (curr is num && next is num) return math.max(curr, next);
     // Fallback equality logic if needed or comparable
     // For now assume num or comparable
     return (curr as dynamic) > (next as dynamic) ? curr : next;
@@ -492,7 +503,7 @@ dynamic max = VarArgsFunction((args, kwargs) {
 /// ```
 dynamic min = VarArgsFunction((args, kwargs) {
   var list = _flattenArgs(args);
-  if (list.isEmpty) return Complex(0);
+  if (list.isEmpty) return 0;
 
   if (list.any((e) => e is Expression)) {
     List<Expression> exprList =
@@ -502,7 +513,7 @@ dynamic min = VarArgsFunction((args, kwargs) {
 
   var nums = list.map((e) => e).toList();
   return nums.reduce((curr, next) {
-    if (curr is num && next is num) return Complex(math.min(curr, next));
+    if (curr is num && next is num) return math.min(curr, next);
     return (curr as dynamic) < (next as dynamic) ? curr : next;
   });
 });
@@ -823,7 +834,7 @@ bool isPrime(dynamic number, [int certainty = 12]) {
     // If the number is small, use trial division
     if (n.bitLength <= 31) {
       int num = n.toInt();
-      int limit = (sqrt(num) as Complex).real.toInt();
+      int limit = math.sqrt(num).toInt();
       for (int i = 5; i <= limit; i += 6) {
         if (num % i == 0 || num % (i + 2) == 0) return false;
       }

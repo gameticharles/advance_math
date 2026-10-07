@@ -325,7 +325,11 @@ dynamic atan(dynamic x) {
 /// print(atan2(Matrix.identity(2), Matrix.identity(2))); // Output: [[1.0, 0.0], [0.0, 1.0]]
 /// ```
 dynamic atan2(dynamic a, dynamic b) {
-  if (a is Matrix && b is Matrix) {
+  if (a is Rational) a = a.toDouble();
+  if (b is Rational) b = b.toDouble();
+  if (a is num && b is num) {
+    return math.atan2(a, b);
+  } else if (a is Matrix && b is Matrix) {
     return MatrixFunctions(a).atan2(b);
   } else {
     return Complex(a).atan2(Complex(b));

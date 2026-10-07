@@ -91,6 +91,11 @@ class Point extends Vector {
   /// Returns `true` if this point is 3D (i.e., `z` is not `null`), and `false` otherwise.
   bool is3DPoint() => z != null;
 
+  /// Returns the Euclidean magnitude (length) of this point from the origin.
+  num get magnitude => is3DPoint()
+      ? dmath.sqrt(x * x + y * y + z! * z!)
+      : dmath.sqrt(x * x + y * y);
+
   /// Constructs a new `Point` from a list of numbers.
   ///
   /// The list should contain 2 or 3 numbers. If it contains 2 numbers, they will be used as the `x` and `y` coordinates and `z` will be `null`.

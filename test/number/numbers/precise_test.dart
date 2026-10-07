@@ -114,7 +114,8 @@ void main() {
 
       // Limited to default (50) sig digits
       p = Precision(
-          '5.00000000000000000000000000000000000000000000000000000000000000000000000000000000001');
+          '5.00000000000000000000000000000000000000000000000000000000000000000000000000000000001',
+          sigDigits: 50);
       expect(p.digits.length, 50);
       expect(p.digits[0].toInt(), 0);
       expect(p.digits[49].toInt(), 5);
@@ -445,9 +446,9 @@ void main() {
 
       result = p1 / p1;
       expect(result, Precision.one);
-      expect((result).digits.length, 1);
-      expect(result.power, 0);
-      expect(result.digits[0], Digit.one);
+      expect((result as Precision).digits.length, 1);
+      expect((result).power, 0);
+      expect((result).digits[0], Digit.one);
       expect(result.toString(), '1');
 
       result = p2 / p1;

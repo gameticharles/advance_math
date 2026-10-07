@@ -142,15 +142,15 @@ class Precision extends Real {
   /// One thousand as a Precision.
   static final Precision thousand = Precision(1000);
 
-  /// Infinity as a Precision.
-  static final Precision infinity = Precision(double.infinity);
+  /// Infinity as a Double.
+  static const Double infinity = Double.infinity;
 
-  /// Negative infinity as a Precision.
-  static final Precision negInfinity = Precision(double.negativeInfinity);
+  /// Negative infinity as a Double.
+  static const Double negInfinity = Double.negInfinity;
 
   /// Not a number as a Double.
   // ignore: constant_identifier_names
-  static final Precision nan = Precision(double.nan);
+  static const Double nan = Double.NaN;
 
   /// The digits of the arbitrary precision number are represented as a list of Digit objects,
   /// lowest significant digit to most significant digit.
@@ -380,14 +380,14 @@ class Precision extends Real {
 
   /// Division operator.
   @override
-  Precision operator /(dynamic divisor) {
+  Number operator /(dynamic divisor) {
     var decimalDivisor = toDecimal(divisor);
 
     final negResult = _neg != decimalDivisor._neg;
 
     if (decimalDivisor == Precision.zero) {
-      if (this == Precision.zero) return Precision.nan;
-      return negResult ? Precision.negInfinity : Precision.infinity;
+      if (this == Precision.zero) return Double.NaN;
+      return negResult ? Double.negInfinity : Double.infinity;
     }
     if (decimalDivisor == Precision(1)) return this;
 
@@ -725,12 +725,13 @@ class Precision extends Real {
     }
 
     Precision sum = Precision.zero;
-    Precision term = (this - Precision.one) / (this + Precision.one);
+    Precision term =
+        ((this - Precision.one) / (this + Precision.one)) as Precision;
     Precision termSquared = term * term;
     Precision currentTerm = term;
 
     for (int n = 1; n <= precision; n += 2) {
-      sum += currentTerm / Precision(n);
+      sum += (currentTerm / Precision(n)) as Precision;
       currentTerm *= termSquared;
     }
 
@@ -793,7 +794,7 @@ class Precision extends Real {
   }
 
   Precision tan() {
-    return (sin() / cos());
+    return (sin() / cos()) as Precision;
   }
 
   @override

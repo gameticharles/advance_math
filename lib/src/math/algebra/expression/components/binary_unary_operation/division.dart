@@ -512,10 +512,6 @@ class Divide extends BinaryOperationsExpression {
       }
     }
 
-    if (denominator is! Literal) {
-      return Multiply(Pow(denominator, Literal(-1)), numerator).simplifyBasic();
-    }
-
     return Divide(numerator, denominator);
   }
 
