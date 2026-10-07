@@ -2,7 +2,7 @@ part of '../../../expression.dart';
 
 /// Represents the hyperbolic secant function.
 /// Derivative: -sech(x) * tanh(x)
-/// Integral: (1/a) * atan(sinh(ax + b))  [Gudermannian function]
+/// Integral: (1/a) * atan(sinh(ax + b))  (Gudermannian function)
 class Sech extends TrigonometricExpression {
   Sech(super.operand);
 

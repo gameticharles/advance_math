@@ -192,7 +192,7 @@ class NumericalDifferentiation {
   /// - [x]: Point at which to compute the gradient
   /// - [h]: Step size for finite differences (default: 1e-5)
   ///
-  /// Returns: List of partial derivatives [∂f/∂x₁, ∂f/∂x₂, ...]
+  /// Returns: List of partial derivatives `[∂f/∂x₁, ∂f/∂x₂, ...]`
   ///
   /// Example:
   /// ```dart
@@ -542,11 +542,11 @@ class NumericalDifferentiation {
   /// Formula: curl F = (∂F₃/∂y - ∂F₂/∂z, ∂F₁/∂z - ∂F₃/∂x, ∂F₂/∂x - ∂F₁/∂y)
   ///
   /// Parameters:
-  /// - [vectorField]: List of 3 component functions [Fx, Fy, Fz]
-  /// - [x]: Point [x, y, z] at which to compute the curl
+  /// - [vectorField]: List of 3 component functions `[Fx, Fy, Fz]`
+  /// - [x]: Point `[x, y, z]` at which to compute the curl
   /// - [h]: Step size for finite differences (default: 1e-5)
   ///
-  /// Returns: List [curl_x, curl_y, curl_z]
+  /// Returns: List `[curl_x, curl_y, curl_z]`
   ///
   /// Throws [ArgumentError] if vector field is not 3D
   ///

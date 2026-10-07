@@ -408,7 +408,7 @@ class ZScore {
   /// freedom ν using the following robust procedure:
   ///
   /// 1. **Symmetry handling**: If p < 0.5, compute -inverse(1-p, ν) by symmetry
-  /// 2. **Bracket initialization**: Start with [lower=0, upper=20]
+  /// 2. **Bracket initialization**: Start with `[lower=0, upper=20]`
   /// 3. **Dynamic expansion**: Double upper bound until F(upper; ν) ≥ p
   /// 4. **Bisection iteration**: 60 iterations guarantee convergence below machine epsilon
   ///
@@ -630,7 +630,7 @@ class ZScore {
   ///
   /// ## Formula
   ///
-  /// For two-tailed: confidence = 100 × [2·Φ(|z|) - 1]
+  /// For two-tailed: confidence = 100 × (2·Φ(|z|) - 1)
   /// For one-tailed: confidence = 100 × Φ(|z|)
   ///
   /// where Φ is the standard normal CDF.
@@ -1018,8 +1018,8 @@ class ZScore {
   ///
   /// ## Formula
   ///
-  /// For two-tailed: z = Φ⁻¹[1 - (1 - confidenceLevel/100)/2]
-  /// For one-tailed: z = Φ⁻¹[1 - (1 - confidenceLevel/100)]
+  /// For two-tailed: z = Φ⁻¹(1 - (1 - confidenceLevel/100)/2)
+  /// For one-tailed: z = Φ⁻¹(1 - (1 - confidenceLevel/100))
   ///
   /// ## Parameters
   ///

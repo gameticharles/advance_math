@@ -2735,10 +2735,10 @@ Others metrics include:
 
 - `List<num> toList()`: Converts the vector to a list of numerical values.
 - `int get length`: Returns the length (number of elements) of the vector.
-- `void setAll(num value)`: Sets all elements of this vector to [value].
-- `double distance(Vector other)`: Returns the Euclidean distance between this vector and [other].
-- `Vector projection(Vector other)`: Returns the projection of this vector onto [other].
-- `double angle(Vector other)`: Returns the angle (in radians) between this vector and [other].
+- `void setAll(num value)`: Sets all elements of this vector to `value`.
+- `double distance(Vector other)`: Returns the Euclidean distance between this vector and `other`.
+- `Vector projection(Vector other)`: Returns the projection of this vector onto `other`.
+- `double angle(Vector other)`: Returns the angle (in radians) between this vector and `other`.
 - `List<double> toSpherical()`: Converts the Vector from Cartesian to Spherical coordinates.
 - `void fromSpherical(List<num> sphericalCoordinates)`: Converts the Vector from Spherical to Cartesian coordinates.
 

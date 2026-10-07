@@ -1,3 +1,10 @@
+
+
+# 5.8.2
+
+- **[IMPROVEMENT]** Fixed README
+- **[IMPROVEMENT]** Improved docstrings and updated dependencies
+
 # 5.8.1
 
 - **[BUG_FIX]** Fixed `mode()` in `Statistics` class to handle both ` Iterable<num>` and varargs `num` correctly, resolving the `ArgumentError: At least one element must be provided` when called with no arguments.
@@ -566,7 +573,6 @@
 
   // Custom pattern example: extract words starting with 'C'
   print(testString.extractCustomPattern(r'\bC\w+', unicode: false));
-
   ```
 - **[IMPROVEMENT]** Following the Dart format for libraries
 - **[IMPROVEMENT]** Cleaned code base and examples files

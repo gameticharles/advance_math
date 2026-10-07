@@ -97,7 +97,7 @@ class NumericalIntegration {
   /// into `n` subintervals and approximating the area under the curve as a
   /// series of trapezoids.
   ///
-  /// Formula: ∫[a,b] f(x)dx ≈ h/2 * [f(a) + 2*Σf(xi) + f(b)]
+  /// Formula: `∫[a,b] f(x)dx ≈ h/2 * [f(a) + 2*Σf(xi) + f(b)]`
   /// where h = (b-a)/n
   ///
   /// Parameters:
@@ -137,7 +137,7 @@ class NumericalIntegration {
   /// and provides better accuracy than the trapezoidal rule. Requires an
   /// even number of subintervals.
   ///
-  /// Formula: ∫[a,b] f(x)dx ≈ h/3 * [f(a) + 4*Σf(x_odd) + 2*Σf(x_even) + f(b)]
+  /// Formula: `∫[a,b] f(x)dx ≈ h/3 * [f(a) + 4*Σf(x_odd) + 2*Σf(x_even) + f(b)]`
   ///
   /// Parameters:
   /// - [f]: The function to integrate
@@ -529,7 +529,7 @@ class NumericalIntegration {
 
   /// Computes a double integral over a rectangular region.
   ///
-  /// Integrates f(x,y) over the region [ax, bx] × [ay, by] using nested
+  /// Integrates f(x,y) over the region `[ax, bx] × [ay, by]` using nested
   /// trapezoidal integration.
   ///
   /// Parameters:

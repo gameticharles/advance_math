@@ -54,7 +54,7 @@ class SymbolicCalculus {
   /// The Taylor series represents a function as an infinite sum of terms
   /// calculated from the function's derivatives at a single point.
   ///
-  /// Formula: f(x) ≈ Σ(n=0 to order) [f^(n)(a) * (x-a)^n / n!]
+  /// Formula: `f(x) ≈ Σ(n=0 to order) [f^(n)(a) * (x-a)^n / n!]`
   ///
   /// Parameters:
   /// - [expr]: The expression to expand
@@ -287,7 +287,7 @@ class SymbolicCalculus {
 
   /// Computes a definite integral by evaluating the antiderivative at bounds.
   ///
-  /// This uses the fundamental theorem of calculus: ∫[a,b] f(x)dx = F(b) - F(a)
+  /// This uses the fundamental theorem of calculus: `∫[a,b] f(x)dx = F(b) - F(a)`
   ///
   /// Parameters:
   /// - [expr]: The expression to integrate
