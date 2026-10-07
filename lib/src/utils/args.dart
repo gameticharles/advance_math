@@ -366,7 +366,7 @@ class VarArgsFunction<T> {
         attempts++;
         final result = callback(args, kwargs);
         if (result is Future<T>) {
-          return result;
+          return await result;
         }
         return result;
       } catch (e) {
@@ -384,7 +384,7 @@ class VarArgsFunction<T> {
           // print('Retry attempt $attempts of $maxRetries');
           final result = callback(args, kwargs);
           if (result is Future<T>) {
-            return result;
+            return await result;
           }
           return result;
         } catch (e) {
