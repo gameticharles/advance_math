@@ -40,8 +40,8 @@ class Quartic extends Polynomial {
     dynamic c = 0,
     dynamic d = 0,
     dynamic e = 0,
-    Variable? variable,
-  }) : super([a, b, c, d, e], variable: variable);
+    super.variable,
+  }) : super([a, b, c, d, e]);
 
   /// This is an example of a quartic equations, where the coefficient with the
   /// highest degree goes first:
@@ -65,17 +65,17 @@ class Quartic extends Polynomial {
     num c = 0,
     num d = 0,
     num e = 0,
-    Variable? variable,
+    super.variable,
   }) : super([
           Literal(Complex(a)),
           Literal(Complex(b)),
           Literal(Complex(c)),
           Literal(Complex(d)),
           Literal(Complex(e))
-        ], variable: variable);
+        ]);
 
-  Quartic.fromList(List<dynamic> coefficients, {Variable? variable})
-      : super(coefficients, variable: variable) {
+  Quartic.fromList(List<dynamic> coefficients, {super.variable})
+      : super(coefficients) {
     if (coefficients.length != 5) {
       throw ArgumentError('The input list must contain exactly 5 elements.');
     }

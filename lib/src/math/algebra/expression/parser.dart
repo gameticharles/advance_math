@@ -2505,13 +2505,16 @@ class ExpressionParser {
                         double img = c.imaginary.toDouble();
                         if (r.abs() < 1e-12) r = 0;
                         if (img.abs() < 1e-12) img = 0;
-                        if ((r - 1.1224620483093732).abs() < 1e-12)
+                        if ((r - 1.1224620483093732).abs() < 1e-12) {
                           r = 1.122462048309381;
-                        if ((r - -1.1224620483093732).abs() < 1e-12)
+                        }
+                        if ((r - -1.1224620483093732).abs() < 1e-12) {
                           r = -1.122462048309381;
+                        }
                         if (img == 0) {
-                          if (r == r.roundToDouble())
+                          if (r == r.roundToDouble()) {
                             return r.round().toString();
+                          }
                           return r.toString();
                         }
                         if ((r - 0.80901699).abs() < 1e-6 &&
@@ -2534,12 +2537,12 @@ class ExpressionParser {
                         String rStr = r.toString();
                         String imgStr = img.abs().toString();
                         if (r == 0) {
-                          return '${img < 0 ? "-" : ""}${imgStr}*i';
+                          return '${img < 0 ? "-" : ""}$imgStr*i';
                         }
                         if (r > 0) {
-                          return '${img < 0 ? "-" : ""}${imgStr}*i+${rStr}';
+                          return '${img < 0 ? "-" : ""}$imgStr*i+$rStr';
                         } else {
-                          return '${rStr}${img < 0 ? "-" : "+"}${imgStr}*i';
+                          return '$rStr${img < 0 ? "-" : "+"}$imgStr*i';
                         }
                       }
 
@@ -2549,8 +2552,9 @@ class ExpressionParser {
                             try {
                               var val = e.evaluate();
                               if (val is Complex) return formatComplex(val);
-                              if (val is num)
+                              if (val is num) {
                                 return formatComplex(Complex(val));
+                              }
                               return val;
                             } catch (_) {
                               return e;
@@ -2612,9 +2616,12 @@ class ExpressionParser {
                           if (baseVal is num && baseVal < 0) isNegative = true;
                           if (baseVal is Complex &&
                               baseVal.imaginary == 0 &&
-                              baseVal.real < 0) isNegative = true;
-                          if (baseVal is Rational && baseVal.toDouble() < 0)
+                              baseVal.real < 0) {
                             isNegative = true;
+                          }
+                          if (baseVal is Rational && baseVal.toDouble() < 0) {
+                            isNegative = true;
+                          }
 
                           if (isNegative) {
                             List<dynamic> coeffs =
