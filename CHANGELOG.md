@@ -1,3 +1,7 @@
+# 5.8.1
+
+- **[BUG_FIX]** Fixed `mode()` in `Statistics` class to handle both ` Iterable<num>` and varargs `num` correctly, resolving the `ArgumentError: At least one element must be provided` when called with no arguments.
+
 # 5.8.0
 
 ## Computer Algebra System (CAS), Factoring & Polynomial Roots
